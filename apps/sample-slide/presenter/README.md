@@ -1,5 +1,43 @@
-# Vue 3 + TypeScript + Vite
+# Sample Slide Presenter
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+[← Back to Root](../../README.md)
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+This is a sample slide presenter application built with Vue 3 and Vite. It demonstrates how to use the `@aha/ui` and `@aha/presenter-utils` packages for state synchronization and slide data management.
+
+## Local Development (Standalone Mode)
+
+To run this application standalone (without being embedded in an iframe), you need to enable the development polyfill provided by `@aha/dev`.
+
+### Configuration
+
+1.  **Copy the environment template**:
+    ```bash
+    cp .env.sample .env
+    ```
+
+2.  **Enable the Mock Frame**:
+    Ensure `VITE_AHA_MOCK_FRAME=true` is set in your `.env` file. This tells the application to initialize `initDev()` from `@aha/dev`, which intercepts `postMessage` requests and polyfills the communication with real API calls.
+
+3.  **Set your API Token**:
+    Update `VITE_AHA_TOKEN` with a valid JWT token to authenticate against the development API.
+
+4.  **Set Default Slide ID**:
+    Update `VITE_AHA_DEFAULT_SLIDE` to the ID of the slide you want to load by default.
+
+### Running the App
+
+From the project root:
+```bash
+npm run dev -w @aha/sample-slide-presenter
+```
+
+Or from this directory:
+```bash
+npm run dev
+```
+
+## Features
+
+- **Cross-Tab Sync**: Uses `useSync` and `useSyncReadOnly` from `@aha/ui` for instant state synchronization between the Canvas and Settings pages across different browser tabs.
+- **Backend Integration**: Uses `useSlideUtils` from `@aha/presenter-utils` for fetching and updating slide attributes with a 500ms debounce.
+- **Responsive Layout**: Powered by Ant Design Vue.
