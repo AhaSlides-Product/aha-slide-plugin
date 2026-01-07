@@ -1,0 +1,22 @@
+{
+  "name": "@aha/presenter-utils",
+  "version": "1.0.0",
+  "description": "Utility package for slide presenters",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aha/ui": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
+  }
+}

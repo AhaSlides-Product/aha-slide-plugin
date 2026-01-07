@@ -10,12 +10,23 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { onMounted, watch } from 'vue';
 import { useSync } from '@aha/ui';
+import { useSlideUtils } from '@aha/presenter-utils';
 
-const route = useRoute();
-const slideId = route.params.slideId;
+const { getSlideData, updateSlide, slideId } = useSlideUtils();
 const slideTitle = useSync(`custom-title-${slideId}`, '');
+
+onMounted(async () => {
+  const data = await getSlideData();
+  if (data && data.title) {
+    slideTitle.value = data.title;
+  }
+});
+
+watch(slideTitle, (newTitle) => {
+  updateSlide({ title: newTitle });
+});
 </script>
 
 <style scoped>
