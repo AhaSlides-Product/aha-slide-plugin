@@ -10,12 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useSync } from '@aha/ui';
 
 const route = useRoute();
-const slideId = computed(() => route.params.slideId);
-const slideTitle = ref('');
+const slideId = route.params.slideId;
+const slideTitle = useSync(`custom-title-${slideId}`, '');
 </script>
 
 <style scoped>

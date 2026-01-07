@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { theme } from '@aha/ui';
+
+const route = useRoute();
+const slideId = computed(() => {
+  const id = route.params.slideId;
+  return Array.isArray(id) ? id[0] : id;
+});
 </script>
 
 <template>
   <a-config-provider :theme="theme">
     <main>
-      <router-view></router-view>
+      <router-view :key="slideId"></router-view>
     </main>
   </a-config-provider>
-</template>
+</template> 
 
 <style scoped>
   

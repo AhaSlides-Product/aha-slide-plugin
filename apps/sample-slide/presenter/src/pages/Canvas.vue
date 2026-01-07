@@ -1,15 +1,17 @@
 <template>
   <div class="canvas-page">
     <p>Welcome to the Canvas for Slide: {{ slideId }}</p>
+    <h1>{{ slideTitle }}</h1>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { useSyncReadOnly } from '@aha/ui';
 
 const route = useRoute();
-const slideId = computed(() => route.params.slideId);
+const slideId = route.params.slideId;
+const slideTitle = useSyncReadOnly(`custom-title-${slideId}`, '');
 </script>
 
 <style scoped>
