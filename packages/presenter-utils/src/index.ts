@@ -11,9 +11,9 @@ export function useSlideUtils() {
   /**
    * 2. updateSlide function
    * Handles the logic for sending updates to the backend/store
-   * @param {Record<string, any>} updatedData - The new slide content
+   * @param {attributeKey: string, attributeValue: any} updatedData - The new slide content
    */
-  const updateSlide = async (updatedData: Record<string, any>) => {
+  const updateSlide = async (updatedData: { attributeKey: string, attributeValue: any }) => {
     return execRequest('update-slide', {
       slideId,
       ...updatedData
@@ -24,9 +24,10 @@ export function useSlideUtils() {
    * 3. getSlideData function
    * Fetches slide data from the backend/store
    */
-  const getSlideData = async () => {
+  const getSlideData = async (fields: string[]) => {
     return execRequest('get-slide-data', {
-      slideId
+      slideId,
+      fields
     });
   };
 

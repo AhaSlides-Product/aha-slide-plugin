@@ -1,0 +1,16 @@
+{
+  "name": "@aha/dev",
+  "version": "1.0.0",
+  "description": "Dev polyfill for iframe communication",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aha/ui": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

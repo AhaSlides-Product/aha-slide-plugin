@@ -3,29 +3,34 @@
     <p>Configure preferences for Slide: {{ slideId }}</p>
     
     <div class="settings-form">
-      <h3>Slide Title</h3>
-      <a-input v-model:value="slideTitle" placeholder="Enter slide title" style="width: 300px" />
+      <h3>Slide Greeting</h3>
+      <a-input v-model:value="slideGreeting" placeholder="Enter slide greeting" style="width: 300px" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, watch } from 'vue';
+import { debounce } from 'lodash-es';
 import { useSync } from '@aha/ui';
 import { useSlideUtils } from '@aha/presenter-utils';
 
 const { getSlideData, updateSlide, slideId } = useSlideUtils();
-const slideTitle = useSync(`custom-title-${slideId}`, '');
+const slideGreeting = useSync(`greeting-${slideId}`, '');
 
 onMounted(async () => {
-  const data = await getSlideData();
-  if (data && data.title) {
-    slideTitle.value = data.title;
+  const data = await getSlideData(['greeting']);
+  if (data && data.greeting) {
+    slideGreeting.value = data.greeting;
   }
 });
 
-watch(slideTitle, (newTitle) => {
-  updateSlide({ title: newTitle });
+const debouncedUpdate = debounce((newGreeting: string) => {
+  updateSlide({ attributeKey: 'greeting', attributeValue: newGreeting });
+}, 500);
+
+watch(slideGreeting, (newGreeting) => {
+  debouncedUpdate(newGreeting);
 });
 </script>
 

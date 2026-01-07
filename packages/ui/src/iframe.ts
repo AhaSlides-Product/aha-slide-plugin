@@ -8,6 +8,7 @@ export interface ResponseMessage<T = any> {
   id: string;
   payload?: T;
   error?: string;
+  isResponse: true;
 }
 
 /**
@@ -37,7 +38,7 @@ export function execRequest<TResponse = any, TRequest = any>(
       const data = event.data as ResponseMessage<TResponse>;
 
       // Check if the message is a response to our request.
-      if (data && typeof data === 'object' && data.id === id) {
+      if (data && typeof data === 'object' && data.isResponse === true && data.id === id) {
         window.removeEventListener('message', handler);
         clearTimeout(timer);
 

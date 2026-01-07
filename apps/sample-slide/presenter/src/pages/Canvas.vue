@@ -1,7 +1,7 @@
 <template>
   <div class="canvas-page">
     <p>Welcome to the Canvas for Slide: {{ slideId }}</p>
-    <h1>{{ slideTitle }}</h1>
+    <h1>{{ slideGreeting }}</h1>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import { useSyncReadOnly } from '@aha/ui';
 
 const route = useRoute();
 const slideId = route.params.slideId;
-const slideTitle = useSyncReadOnly(`custom-title-${slideId}`, '');
+const slideGreeting = useSyncReadOnly(`greeting-${slideId}`, '');
 </script>
 
 <style scoped>

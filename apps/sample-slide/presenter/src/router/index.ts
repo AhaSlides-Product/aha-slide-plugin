@@ -6,7 +6,7 @@ import Settings from '../pages/Settings.vue'
 const routes = [
     {
         path: '/',
-        redirect: '/canvas/default-slide'
+        redirect: `/canvas/${import.meta.env.VITE_AHA_DEFAULT_SLIDE}`
     },
     {
         path: '/canvas/:slideId',
