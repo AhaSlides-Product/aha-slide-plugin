@@ -2,7 +2,13 @@ import { ref, watch, nextTick, readonly, type Ref, type DeepReadonly } from 'vue
 import { useBroadcastChannel, watchPausable } from '@vueuse/core';
 
 /**
- * Synchronize a ref state across multiple browser tabs bidirectionally.
+ * Synchronize a reactive state ref across multiple browser tabs bidirectionally.
+ * Uses the BroadcastChannel API under the hood via VueUse.
+ * 
+ * @template T - The type of the state being synchronized.
+ * @param name - The unique name of the synchronization channel.
+ * @param initialState - The initial value of the state.
+ * @returns A reactive ref that stays in sync across tabs.
  */
 export function useSync<T>(name: string, initialState: T): Ref<T> {
   const state = ref(initialState) as Ref<T>;
@@ -26,7 +32,12 @@ export function useSync<T>(name: string, initialState: T): Ref<T> {
 
 /**
  * Synchronize a state from other tabs, but do not broadcast local changes.
- * Returns a read-only ref.
+ * This is useful for listeners that should only react to remote updates.
+ * 
+ * @template T - The type of the state being synchronized.
+ * @param name - The unique name of the synchronization channel.
+ * @param initialState - The initial value of the state.
+ * @returns A read-only reactive ref.
  */
 export function useSyncReadOnly<T>(name: string, initialState: T): DeepReadonly<Ref<T>> {
   const state = ref(initialState) as Ref<T>;

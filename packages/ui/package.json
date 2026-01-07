@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "tsc",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

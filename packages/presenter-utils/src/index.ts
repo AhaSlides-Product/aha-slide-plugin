@@ -1,6 +1,12 @@
 import { useRoute } from 'vue-router';
 import { execRequest } from '@aha/ui';
 
+/**
+ * A composable that provides utilities for interacting with slide data.
+ * Automatically extracts the `slideId` from the current route parameters.
+ * 
+ * @returns An object containing `updateSlide`, `getSlideData`, and the `slideId`.
+ */
 export function useSlideUtils() {
   const route = useRoute();
 

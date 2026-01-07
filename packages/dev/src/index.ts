@@ -64,8 +64,9 @@ const COMMAND_HANDLERS: Record<string, (payload: any) => Promise<any>> = {
 };
 
 /**
- * Initializes development mode polyfill.
- * Listens for postMessage requests and provides mock/API responses.
+ * Initializes the development mode polyfill.
+ * Intercepts `window.postMessage` requests and provides responses by calling the real Dev API.
+ * This should only be used during local development and is typically gated by an environment variable.
  */
 export function initDev() {
   if (window.parent !== window) {

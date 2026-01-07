@@ -1,9 +1,15 @@
+/**
+ * Represents a request message sent between windows.
+ */
 export interface RequestMessage<T = any> {
   id: string;
   type: string;
   payload: T;
 }
 
+/**
+ * Represents a response message received from another window.
+ */
 export interface ResponseMessage<T = any> {
   id: string;
   payload?: T;
@@ -12,14 +18,17 @@ export interface ResponseMessage<T = any> {
 }
 
 /**
- * Executes a request to another window (e.g., an iframe or parent) and waits for a response.
+ * Executes a request to another window (e.g., an iframe or parent) and waits for a corresponding response.
+ * Uses an internal ID to match responses to requests and supports timeouts.
  * 
- * @param targetWindow The window to send the message to.
- * @param type The type of the request.
- * @param payload The data to send.
- * @param origin The target origin. Defaults to '*'.
- * @param timeout Timeout in milliseconds. Defaults to 5000.
- * @returns A promise that resolves with the response payload or rejects on error/timeout.
+ * @template TResponse - The expected type of the response payload.
+ * @template TRequest - The type of the request payload.
+ * @param type - The unique type string identifier for this request.
+ * @param payload - The data to send with the request.
+ * @param targetWindow - The window to send the message to. Defaults to `window.parent`.
+ * @param origin - The target origin for security. Defaults to `'*'`.
+ * @param timeout - Maximum time to wait for a response in milliseconds. Defaults to `5000`.
+ * @returns A promise that resolves with the response payload.
  */
 export function execRequest<TResponse = any, TRequest = any>(
   type: string,

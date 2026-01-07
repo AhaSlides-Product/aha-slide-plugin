@@ -1,5 +1,8 @@
 import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context';
 
+/**
+ * Base theme configuration for Aha Slide applications using Ant Design.
+ */
 export const theme: ThemeConfig = {
   token: {
     colorPrimary: '#6A1EBB',
