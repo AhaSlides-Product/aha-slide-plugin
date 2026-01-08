@@ -8,7 +8,7 @@
 
 > **useSync**\<`T`\>(`name`, `initialState`): `Ref`\<`T`\>
 
-Defined in: [sync.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/72c4cc359af2d69a73177d6ceb2205686948025a/packages/ui/src/sync.ts#L13)
+Defined in: [sync.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/b516bbb35467388e4b68bced29d5297db9320de0/packages/ui/src/sync.ts#L13)
 
 Synchronize a reactive state ref across multiple browser tabs bidirectionally.
 Uses the BroadcastChannel API under the hood via VueUse.

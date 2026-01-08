@@ -8,7 +8,7 @@
 
 > **useSyncReadOnly**\<`T`\>(`name`, `initialState`): `DeepReadonly`\<`Ref`\<`T`\>\>
 
-Defined in: [sync.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/72c4cc359af2d69a73177d6ceb2205686948025a/packages/ui/src/sync.ts#L42)
+Defined in: [sync.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/b516bbb35467388e4b68bced29d5297db9320de0/packages/ui/src/sync.ts#L42)
 
 Synchronize a state from other tabs, but do not broadcast local changes.
 This is useful for listeners that should only react to remote updates.

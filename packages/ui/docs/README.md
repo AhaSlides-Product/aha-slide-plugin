@@ -12,6 +12,7 @@
 ## Variables
 
 - [theme](variables/theme.md)
+- [vEmitAction](variables/vEmitAction.md)
 
 ## Functions
 

@@ -8,6 +8,6 @@
 
 > `const` **theme**: `ThemeConfig`
 
-Defined in: [theme.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/72c4cc359af2d69a73177d6ceb2205686948025a/packages/ui/src/theme.ts#L6)
+Defined in: [theme.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/b516bbb35467388e4b68bced29d5297db9320de0/packages/ui/src/theme.ts#L6)
 
 Base theme configuration for Aha Slide applications using Ant Design.
