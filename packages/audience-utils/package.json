@@ -1,0 +1,23 @@
+{
+  "name": "@aha/audience-utils",
+  "version": "1.0.0",
+  "description": "Utility hooks for slide audience",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+  },
+  "dependencies": {
+    "@aha/ui": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.0"
+  }
+}
