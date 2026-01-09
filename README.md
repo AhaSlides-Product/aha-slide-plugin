@@ -46,7 +46,7 @@ npm run build --workspaces
 After cloning the repository, you should create your own app folder within the `apps/` directory. For example, `apps/my-new-slide`.
 
 The internal structure of your app should be similar to the [sample-slide](./apps/sample-slide) application, typically consisting of:
-- `frontend/`: A frontend application for the slide presenter.
+- `frontend/`: A frontend application for the slide presenter and audience views.
 - `backend/`: A backend service for handling audience interactions.
 
 To ensure your new app is recognized by the monorepo, follow the existing naming conventions and directory patterns.
