@@ -1,6 +1,6 @@
-# Aha Slide Plugin monorepo
+# AhaSlides Slide Plugin monorepo
 
-Welcome to the Aha Slide Plugin monorepo. This project contains shared UI components, utilities, and development tools for building slide presenters.
+Welcome to the AhaSlides Slide Plugin monorepo. This project contains shared UI components, utilities, and development tools for building slide presenters.
 
 ## Packages Documentation
 
