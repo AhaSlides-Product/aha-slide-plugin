@@ -21,6 +21,7 @@ This monorepo includes sample applications to demonstrate the usage of the share
 ```text
 .
 ├── apps/               # Application-specific code
+│   ├── main-backend/   # Unified backend aggregator
 │   └── sample-slide/   # Sample slide implementation
 │       ├── frontend/   # Frontend implementation
 │       └── backend/    # Backend implementation
@@ -78,3 +79,15 @@ npm run dev -w @aha/sample-slide-frontend
 ```
 
 This will launch the Vite development server.
+
+### Running the Unified Backend
+
+To start the aggregated backend server:
+
+```bash
+npm run start:dev -w @aha/main-backend
+```
+
+The `main-backend` application automatically imports the `AppModule` from every slide package in `apps/*/backend`. It uses the NestJS `RouterModule` to mount each slide's controllers under a unique prefix (e.g., `/sample-slide/*`).
+
+When you build or start `main-backend`, it triggers an auto-generation script (`scripts/generate-app-module.js`) that scans the `apps/` directory and updates its own `AppModule` to include all discovered slide backends.
