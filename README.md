@@ -33,11 +33,24 @@ This monorepo includes sample applications to demonstrate the usage of the share
 
 ## Getting Started
 
-To install dependencies and build all packages:
+To install dependencies:
 
 ```bash
 npm install
-npm run build --workspaces
+```
+
+This project uses [Turborepo](https://turbo.build/) to manage build pipelines and caching.
+
+To build all packages and apps:
+
+```bash
+npm run build
+```
+
+To run development mode for all workspaces:
+
+```bash
+npm run dev
 ```
 
 ### For App Developers
