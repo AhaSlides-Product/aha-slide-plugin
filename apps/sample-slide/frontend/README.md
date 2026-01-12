@@ -4,27 +4,7 @@
 
 This is a sample slide presenter application built with Vue 3 and Vite. It demonstrates how to use the `@aha/ui` and `@aha/presenter-utils` packages for state synchronization and slide data management.
 
-## Local Development (Standalone Mode)
-
-To run this application standalone (without being embedded in an iframe), you need to enable the development polyfill provided by `@aha/dev`.
-
-### Configuration
-
-1.  **Copy the environment template**:
-    ```bash
-    cp .env.sample .env
-    ```
-
-2.  **Enable the Mock Frame**:
-    Ensure `VITE_AHA_MOCK_FRAME=true` is set in your `.env` file. This tells the application to initialize `initDev()` from `@aha/dev`, which intercepts `postMessage` requests and polyfills the communication with real API calls.
-
-3.  **Set your API Token**:
-    Update `VITE_AHA_TOKEN` with a valid JWT token to authenticate against the development API.
-
-4.  **Set Default Slide ID**:
-    Update `VITE_AHA_DEFAULT_SLIDE` to the ID of the slide you want to load by default.
-
-### Running the App
+## Running the App
 
 From the project root:
 ```bash

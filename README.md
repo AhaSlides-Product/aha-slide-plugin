@@ -9,13 +9,12 @@ Each package in this monorepo has its own detailed API documentation generated b
 - **[@aha/ui](./packages/ui/docs/README.md)**: Shared UI components, theme configuration, and synchronization hooks (`useSync`, `useSyncReadOnly`).
 - **[@aha/presenter-utils](./packages/presenter-utils/docs/README.md)**: Utility hooks for presenters, including `useSlideUtils` for interacting with slide data.
 - **[@aha/audience-utils](./packages/audience-utils/docs/README.md)**: Utility hooks for audience devices, including `useAudience` for submitting answers and fetching slide data.
-- **[@aha/dev](./packages/dev/docs/README.md)**: Standalone development polyfill for mocking iframe communication and interacting with dev APIs.
 
 ## Sample Applications
 
 This monorepo includes sample applications to demonstrate the usage of the shared packages:
 
-- **[Sample Slide Frontend](./apps/sample-slide/frontend/README.md)**: A Vue 3 application that implements a slide presenter interface using `@aha/ui`, `@aha/presenter-utils`, and integrates with the `@aha/dev` polyfill for local development.
+- **[Sample Slide Frontend](./apps/sample-slide/frontend/README.md)**: A Vue 3 application that implements a slide presenter interface using `@aha/ui`, `@aha/presenter-utils`
 
 ## Project Structure
 
@@ -65,4 +64,4 @@ To start the sample slide frontend in development mode:
 npm run dev -w @aha/sample-slide-frontend
 ```
 
-This will launch the Vite development server. By default, the app uses `@aha/dev` to polyfill iframe communication, allowing you to run it standalone.
+This will launch the Vite development server.
