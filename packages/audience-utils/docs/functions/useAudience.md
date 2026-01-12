@@ -8,7 +8,7 @@
 
 > **useAudience**(): `object`
 
-Defined in: index.ts:10
+Defined in: [index.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/audience-utils/src/index.ts#L10)
 
 A composable that provides utilities for audience interactions with slides.
 Automatically extracts the `slideId` from the current route parameters.

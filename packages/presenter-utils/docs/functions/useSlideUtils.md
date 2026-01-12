@@ -8,7 +8,7 @@
 
 > **useSlideUtils**(): `object`
 
-Defined in: [index.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/72c4cc359af2d69a73177d6ceb2205686948025a/packages/presenter-utils/src/index.ts#L10)
+Defined in: [index.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/presenter-utils/src/index.ts#L10)
 
 A composable that provides utilities for interacting with slide data.
 Automatically extracts the `slideId` from the current route parameters.

@@ -8,7 +8,7 @@
 
 > **execRequest**\<`TResponse`, `TRequest`\>(`type`, `payload`, `targetWindow`, `origin`, `timeout`): `Promise`\<`TResponse`\>
 
-Defined in: [iframe.ts:33](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/b516bbb35467388e4b68bced29d5297db9320de0/packages/ui/src/iframe.ts#L33)
+Defined in: [packages/ui/src/iframe.ts:33](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/ui/src/iframe.ts#L33)
 
 Executes a request to another window (e.g., an iframe or parent) and waits for a corresponding response.
 Uses an internal ID to match responses to requests and supports timeouts.

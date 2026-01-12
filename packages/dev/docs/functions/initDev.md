@@ -8,7 +8,7 @@
 
 > **initDev**(): `void`
 
-Defined in: [index.ts:71](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/72c4cc359af2d69a73177d6ceb2205686948025a/packages/dev/src/index.ts#L71)
+Defined in: [index.ts:71](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/dev/src/index.ts#L71)
 
 Initializes the development mode polyfill.
 Intercepts `window.postMessage` requests and provides responses by calling the real Dev API.
