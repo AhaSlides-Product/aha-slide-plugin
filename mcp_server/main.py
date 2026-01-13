@@ -3,6 +3,7 @@ import os
 import inspect
 import re
 import logging
+import keyword
 from typing import Any, Dict, Optional
 from fastmcp import FastMCP
 
@@ -22,12 +23,17 @@ def universal_slide_handler(slide_data: Dict[str, Any]):
     return {"status": "success", "data_received": slide_data}
 
 def is_valid_python_identifier(name: str) -> bool:
-    """Validate that a string is a valid Python identifier"""
+    """Validate that a string is a valid Python identifier and not a keyword"""
     if not name or not isinstance(name, str):
         return False
     # Must match Python identifier rules: start with letter/underscore,
     # followed by letters, digits, or underscores
-    return re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name) is not None
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name):
+        return False
+    # Must not be a Python keyword
+    if keyword.iskeyword(name):
+        return False
+    return True
 
 def validate_config(config: Dict[str, Any]) -> Optional[str]:
     """
@@ -75,6 +81,7 @@ def validate_config(config: Dict[str, Any]) -> Optional[str]:
 def create_dynamic_function(config: Dict[str, Any]) -> Optional[callable]:
     """
     Create a function with proper signature based on JSON schema parameters.
+    Uses inspect module to safely construct function without exec().
     Returns the function if successful, None if validation fails.
     """
     # Validate configuration first
@@ -88,35 +95,46 @@ def create_dynamic_function(config: Dict[str, Any]) -> Optional[callable]:
     name = config["name"]
     description = config["description"]
 
-    # Build parameter list dynamically (all names are now validated)
-    param_list = []
+    # Build parameter list for inspect.Parameter objects
+    parameters = []
     for param_name in params.keys():
         if param_name in required:
-            param_list.append(param_name)
+            # Required parameter (no default)
+            parameters.append(
+                inspect.Parameter(
+                    param_name,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD
+                )
+            )
         else:
-            param_list.append(f"{param_name}=None")
+            # Optional parameter (default=None)
+            parameters.append(
+                inspect.Parameter(
+                    param_name,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    default=None
+                )
+            )
 
-    # Create function code as string
-    func_params = ", ".join(param_list)
+    # Create the signature
+    sig = inspect.Signature(parameters)
 
-    # Build the slide_data dict safely using validated parameter names
-    param_dict_items = ", ".join([f'"{p}": {p}' for p in params.keys()])
+    # Create the function that will be called
+    def dynamic_function(*args, **kwargs):
+        # Bind the arguments to the signature
+        bound_args = sig.bind(*args, **kwargs)
+        bound_args.apply_defaults()
 
-    func_code = f"""
-def {name}({func_params}):
-    slide_data = {{{param_dict_items}}}
-    return universal_slide_handler(slide_data)
-"""
+        # Convert to slide_data dict
+        slide_data = dict(bound_args.arguments)
+        return universal_slide_handler(slide_data)
 
-    # Execute the code to create the function
-    local_namespace = {"universal_slide_handler": universal_slide_handler}
-    exec(func_code, local_namespace)
+    # Set the signature on the function
+    dynamic_function.__signature__ = sig
+    dynamic_function.__name__ = name
+    dynamic_function.__doc__ = description
 
-    # Set function metadata safely using attributes instead of embedding in code
-    func = local_namespace[name]
-    func.__doc__ = description
-
-    return func
+    return dynamic_function
 
 def load_vendor_plugins(apps_dir="../apps"):
     """Scan apps folder for slides_agent_specs.json files"""
