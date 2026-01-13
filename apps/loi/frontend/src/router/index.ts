@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Canvas from '../pages/Canvas.vue'
-import Presenting from '../pages/Presenting.vue'
 import Settings from '../pages/Settings.vue'
+import Audience from '../pages/Audience.vue'
 
 const routes = [
     {
@@ -14,14 +14,14 @@ const routes = [
         component: Canvas
     },
     {
-        path: '/:type/presenting/:slideId',
-        name: 'Presenting',
-        component: Presenting
-    },
-    {
         path: '/:type/settings/:slideId',
         name: 'Settings',
         component: Settings
+    },
+    {
+        path: '/:type/audience/:slideId',
+        name: 'Audience',
+        component: Audience
     }
 ]
 

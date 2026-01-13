@@ -25,17 +25,13 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue';
 import { debounce } from 'lodash-es';
-import { useSync, useSlidePlugin } from '@aha/ui';
+import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideUtils } from '@aha/presenter-utils';
-import { useXProps } from '../composables/useXProps';
 
-const { getSlideData, updateSlide, slideId } = useSlideUtils();
-const { presentationProps } = useSlidePlugin({ autoHeight: true });
+const { slideId } = useSlideUtils();
+const { presentationProps, upsertSlideAttributeAction, getSlideAttributesAction } = usePresenterPlugin({ autoHeight: true });
 const slideGreeting = useSync(`greeting-${slideId}`, '');
-/**
- * Access to properties and actions passed from the parent application via zoid.
- */
-const xprops = useXProps();
+// xprops removed as it is now handled by usePresenterPlugin
 
 /**
  * Stores the response from the getSlideAttributesAction call.
@@ -49,28 +45,28 @@ const attributeResponse = ref<any>(null);
  * @returns {Promise<void>}
  */
 const handleGetAttributes = async () => {
-  console.log('xprops?.getSlideAttributesAction', xprops?.getSlideAttributesAction)
-  if (xprops?.getSlideAttributesAction) {
+  if (getSlideAttributesAction) {
     try {
-      attributeResponse.value = await xprops.getSlideAttributesAction();
+      attributeResponse.value = await getSlideAttributesAction();
       console.log('Attributes response:', attributeResponse.value);
+      return attributeResponse.value;
     } catch (error) {
       console.error('Error calling getSlideAttributesAction:', error);
     }
   } else {
-    console.warn('getSlideAttributesAction is not available in xprops');
+    console.warn('getSlideAttributesAction is not available');
   }
 };
 
 onMounted(async () => {
-  const data = await getSlideData(['greeting']);
-  if (data && data.greeting) {
-    slideGreeting.value = data.greeting;
+  const attributes = await handleGetAttributes();
+  if (attributes && attributes.greeting) {
+    slideGreeting.value = attributes.greeting;
   }
 });
 
 const debouncedUpdate = debounce((newGreeting: string) => {
-  updateSlide({ attributeKey: 'greeting', attributeValue: newGreeting });
+  upsertSlideAttributeAction({ attributeKey: 'greeting', attributeValue: newGreeting })
 }, 500);
 
 watch(slideGreeting, (newGreeting) => {

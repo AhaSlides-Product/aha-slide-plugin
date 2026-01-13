@@ -6,6 +6,7 @@
 
 ## Interfaces
 
+- [AudienceSlidePluginProps](interfaces/AudienceSlidePluginProps.md)
 - [ImageUploadResult](interfaces/ImageUploadResult.md)
 - [RequestMessage](interfaces/RequestMessage.md)
 - [ResponseMessage](interfaces/ResponseMessage.md)
@@ -15,6 +16,7 @@
 
 ## Variables
 
+- [AudienceSlidePluginIframe](variables/AudienceSlidePluginIframe.md)
 - [PresenterSlidePluginIframe](variables/PresenterSlidePluginIframe.md)
 - [theme](variables/theme.md)
 - [vEmitAction](variables/vEmitAction.md)
@@ -24,7 +26,8 @@
 - [autoReportHeight](functions/autoReportHeight.md)
 - [execRequest](functions/execRequest.md)
 - [uploadImage](functions/uploadImage.md)
+- [useAudiencePlugin](functions/useAudiencePlugin.md)
 - [useColors](functions/useColors.md)
-- [useSlidePlugin](functions/useSlidePlugin.md)
+- [usePresenterPlugin](functions/usePresenterPlugin.md)
 - [useSync](functions/useSync.md)
 - [useSyncReadOnly](functions/useSyncReadOnly.md)

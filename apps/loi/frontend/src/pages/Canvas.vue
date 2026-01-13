@@ -7,11 +7,12 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { useSyncReadOnly, useSlidePlugin } from '@aha/ui';
+import { useSyncReadOnly, usePresenterPlugin } from '@aha/ui';
 
 const route = useRoute();
 const slideId = route.params.slideId;
-const { presentationProps, slideProps } = useSlidePlugin();
+const { presentationProps, slideProps } = usePresenterPlugin();
+presentationProps; slideProps; // Silence unused warning if needed or just remove call if not required
 const slideGreeting = useSyncReadOnly(`greeting-${slideId}`, '');
 </script>
 
