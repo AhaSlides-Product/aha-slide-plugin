@@ -1,0 +1,15 @@
+{
+  "name": "@aha/api",
+  "version": "1.0.0",
+  "description": "API client wrapper for AhaSlides counting endpoints",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
