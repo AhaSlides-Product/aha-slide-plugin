@@ -8,7 +8,7 @@ This is a sample slide presenter application built with Vue 3 and Vite. It demon
 
 From the project root:
 ```bash
-npm run dev -w @aha/sample-slide-frontend
+npm run dev -w @aha/loi-frontend
 ```
 
 Or from this directory:
@@ -28,5 +28,4 @@ When building the frontend for a new slide plugin, your application is expected 
 ## Features
 
 - **Cross-Tab Sync**: Uses `useSync` and `useSyncReadOnly` from `@aha/ui` for instant state synchronization between the Canvas and Settings pages across different browser tabs.
-- **Backend Integration**: Uses `useSlideUtils` from `@aha/presenter-utils` for fetching and updating slide attributes with a 500ms debounce.
 - **Responsive Layout**: Powered by Ant Design Vue.

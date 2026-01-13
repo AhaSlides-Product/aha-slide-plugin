@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Canvas from '../pages/Canvas.vue'
-import Presenting from '../pages/Presenting.vue'
 import Settings from '../pages/Settings.vue'
+import Audience from '../pages/Audience.vue'
 
 const routes = [
     {
@@ -9,19 +9,19 @@ const routes = [
         redirect: `/canvas/${import.meta.env.VITE_AHA_DEFAULT_SLIDE}`
     },
     {
-        path: '/canvas/:slideId',
+        path: '/:type/canvas/:slideId',
         name: 'Canvas',
         component: Canvas
     },
     {
-        path: '/presenting/:slideId',
-        name: 'Presenting',
-        component: Presenting
-    },
-    {
-        path: '/settings/:slideId',
+        path: '/:type/settings/:slideId',
         name: 'Settings',
         component: Settings
+    },
+    {
+        path: '/:type/audience/:slideId',
+        name: 'Audience',
+        component: Audience
     }
 ]
 

@@ -11,28 +11,61 @@
       <p>Language: {{ presentationProps.language }}</p>
       <p>Theme Font: {{ presentationProps.fontFamily }}</p>
     </div>
+
+    <div style="margin-top: 20px;">
+      <a-button type="primary" @click="handleGetAttributes">Get Slide Attributes</a-button>
+      <div v-if="attributeResponse" style="margin-top: 10px;">
+        <h4>Response:</h4>
+        <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px; font-size: 12px;">{{ attributeResponse }}</pre>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue';
+import { onMounted, watch, ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
-import { useSync, useSlidePlugin } from '@aha/ui';
-import { useSlideUtils } from '@aha/presenter-utils';
+import { useSync, usePresenterPlugin } from '@aha/ui';
 
-const { getSlideData, updateSlide, slideId } = useSlideUtils();
-const { presentationProps, slideProps } = useSlidePlugin();
-const slideGreeting = useSync(`greeting-${slideId}`, '');
+const { presentationProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction } = usePresenterPlugin({ autoHeight: true });
+const slideId = computed(() => slideProps.value?.id);
+const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
+// xprops removed as it is now handled by usePresenterPlugin
+
+/**
+ * Stores the response from the getSlideAttributesAction call.
+ */
+const attributeResponse = ref<any>(null);
+
+/**
+ * Handles the click event to fetch slide attributes from the parent application.
+ * Calls the `getSlideAttributesAction` provided by the parent via xprops.
+ * 
+ * @returns {Promise<void>}
+ */
+const handleGetAttributes = async () => {
+  if (getSlideAttributesAction) {
+    try {
+      attributeResponse.value = await getSlideAttributesAction();
+      console.log('Attributes response:', attributeResponse.value);
+      return attributeResponse.value;
+    } catch (error) {
+      console.error('Error calling getSlideAttributesAction:', error);
+    }
+  } else {
+    console.warn('getSlideAttributesAction is not available');
+  }
+};
 
 onMounted(async () => {
-  const data = await getSlideData(['greeting']);
-  if (data && data.greeting) {
-    slideGreeting.value = data.greeting;
+  const attributes = await handleGetAttributes();
+  if (attributes && attributes.greeting) {
+    slideGreeting.value = attributes.greeting;
   }
 });
 
 const debouncedUpdate = debounce((newGreeting: string) => {
-  updateSlide({ attributeKey: 'greeting', attributeValue: newGreeting });
+  upsertSlideAttributeAction({ attributeKey: 'greeting', attributeValue: newGreeting })
 }, 500);
 
 watch(slideGreeting, (newGreeting) => {
