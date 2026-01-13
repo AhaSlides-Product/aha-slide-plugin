@@ -11,7 +11,7 @@ import { useSyncReadOnly, useSlidePlugin } from '@aha/ui';
 
 const route = useRoute();
 const slideId = route.params.slideId;
-const { presentationProps, slideActiveProps } = useSlidePlugin();
+const { presentationProps, slideProps } = useSlidePlugin();
 const slideGreeting = useSyncReadOnly(`greeting-${slideId}`, '');
 </script>
 

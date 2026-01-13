@@ -14,7 +14,7 @@ import { useSlidePlugin } from '@aha/ui';
 
 const route = useRoute();
 const slideId = computed(() => route.params.slideId);
-const { presentationProps, slideActiveProps } = useSlidePlugin();
+const { presentationProps, slideProps } = useSlidePlugin();
 </script>
 
 <style scoped>

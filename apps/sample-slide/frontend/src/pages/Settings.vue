@@ -21,7 +21,7 @@ import { useSync, useSlidePlugin } from '@aha/ui';
 import { useSlideUtils } from '@aha/presenter-utils';
 
 const { getSlideData, updateSlide, slideId } = useSlideUtils();
-const { presentationProps, slideActiveProps } = useSlidePlugin();
+const { presentationProps, slideProps } = useSlidePlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 
 onMounted(async () => {

@@ -8,7 +8,7 @@
 
 Defined in: [packages/ui/src/zoid.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/ui/src/zoid.ts#L7)
 
-Interface for the properties expected by the SlidePluginIframe component.
+Interface for the properties expected by the PresenterSlidePluginIframe component.
 
 ## Properties
 

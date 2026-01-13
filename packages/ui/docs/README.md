@@ -15,7 +15,7 @@
 
 ## Variables
 
-- [SlidePluginIframe](variables/SlidePluginIframe.md)
+- [PresenterSlidePluginIframe](variables/PresenterSlidePluginIframe.md)
 - [theme](variables/theme.md)
 - [vEmitAction](variables/vEmitAction.md)
 

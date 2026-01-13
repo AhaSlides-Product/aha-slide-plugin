@@ -2,44 +2,71 @@ import * as zoid from 'zoid/dist/zoid.frameworks';
 import { ref, onMounted } from 'vue';
 
 /**
- * Interface for the properties expected by the SlidePluginIframe component.
+ * Interface for the properties expected by the PresenterSlidePluginIframe component.
  */
 export interface SlidePluginProps {
   /** The URL of the plugin to be loaded in the iframe */
   url: string;
-  /** Presentation-wide settings and data */
+  /** 
+   * Presentation-wide settings and data that affect the plugin's appearance and behavior.
+   */
   presentation?: {
+    /** The language code (e.g., 'en', 'vi') */
     language?: string;
+    /** The font family name used in the presentation */
     fontFamily?: string;
+    /** Whether to show hyperlinks in the content */
     showHyperLink?: boolean;
+    /** Whether profanity filtering is enabled */
     filteringProfanity?: boolean;
     [key: string]: any;
   };
-  /** Data specific to the currently active slide */
-  slideActive?: {
+  /** 
+   * Data specific to the currently active slide.
+   */
+  slide?: {
+    /** The unique identifier of the slide */
     id?: string | number;
+    /** The base text color for content */
     textColour?: string;
+    /** Whether submissions are currently locked */
     stopSubmission?: boolean;
+    /** Whether results are hidden from the audience */
     hideResult?: boolean;
     [key: string]: any;
   };
   /** 
    * Callback to report height changes from the child to the parent. 
    * Sending null signals the parent to use 100% height (useful for fixed-height or full-screen plugins).
+   * 
+   * @param height - The new height in pixels, or null for 100% height.
    */
   onHeightChange?: (height: number | null) => void;
+  /** 
+   * Action to fetch all custom attributes for the current slide from the parent application.
+   * 
+   * @returns A promise resolving to an object containing slide attributes.
+   */
+  getSlideAttributesAction?: () => Promise<any>;
+  /** 
+   * Action to create or update a specific attribute for the current slide in the parent application.
+   * 
+   * @param payload - The attribute data to sync.
+   * @returns A promise resolving when the update is complete.
+   */
+  upsertSlideAttributeAction?: (payload: { attributeKey: string; attributeValue: any }) => Promise<any>;
 }
 
 /**
- * SlidePluginIframe is a cross-domain component (zoid) that allows
+ * PresenterSlidePluginIframe is a cross-domain component (zoid) that allows
  * Ahaslides parent applications to communicate with plugin iframes.
  * 
  * @example
  * ```typescript
- * import { SlidePluginIframe } from '@aha/ui';
+ * import { PresenterSlidePluginIframe } from '@aha/ui';
  * 
  * // Initializing the component
- * const instance = SlidePluginIframe({
+ * const instance = PresenterSlidePluginIframe({
  *   url: 'https://plugin.example.com',
  *   onHeightChange: (height) => {
  *     console.log('New height:', height);
@@ -50,8 +77,8 @@ export interface SlidePluginProps {
  * instance.render('#zoid-container');
  * ```
  */
-export const SlidePluginIframe = zoid.create({
-  tag: 'slide-plugin-iframe',
+export const PresenterSlidePluginIframe = zoid.create({
+  tag: 'presenter-slide-plugin-iframe',
   url: ({ props }: { props: SlidePluginProps }) => props.url,
   props: {
     url: {
@@ -63,11 +90,19 @@ export const SlidePluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
-    slideActive: {
+    slide: {
       type: 'object',
       required: false,
     },
     onHeightChange: {
+      type: 'function',
+      required: false,
+    },
+    getSlideAttributesAction: {
+      type: 'function',
+      required: false,
+    },
+    upsertSlideAttributeAction: {
       type: 'function',
       required: false,
     },
@@ -125,7 +160,7 @@ export interface UseSlidePluginOptions {
  * Vue composition hook for slide plugin components.
  * 
  * Features:
- * 1. **Prop Management**: Provides reactive access to `presentationProps` and `slideActiveProps`.
+ * 1. **Prop Management**: Provides reactive access to `presentationProps` and `slideProps`.
  * 2. **Prop Diffing**: Automatically logs changes to specific keys when the parent updates props.
  * 3. **Height Reporting**: Handles automatic height reporting via {@link autoReportHeight}.
  * 
@@ -135,7 +170,7 @@ export interface UseSlidePluginOptions {
  * const { presentationProps } = useSlidePlugin();
  * 
  * // Fixed 100% height usage
- * const { slideActiveProps } = useSlidePlugin({ autoHeight: false });
+ * const { slideProps } = useSlidePlugin({ autoHeight: false });
  * ```
  * 
  * @param options - Configure hook behavior (e.g., disable auto-height).
@@ -144,7 +179,7 @@ export interface UseSlidePluginOptions {
 export function useSlidePlugin(options: UseSlidePluginOptions = { autoHeight: true }) {
   console.log('[SlidePlugin] useSlidePlugin called', options);
   const presentationProps = ref<SlidePluginProps['presentation']>((window as any).xprops?.presentation);
-  const slideActiveProps = ref<SlidePluginProps['slideActive']>((window as any).xprops?.slideActive);
+  const slideProps = ref<SlidePluginProps['slide']>((window as any).xprops?.slide);
 
   /**
    * Compares incoming props with current values and logs differences.
@@ -164,17 +199,17 @@ export function useSlidePlugin(options: UseSlidePluginOptions = { autoHeight: tr
       presentationProps.value = { ...newProps.presentation };
     }
 
-    if (newProps.slideActive) {
-      const oldSlideActive = slideActiveProps.value || {};
-      Object.keys(newProps.slideActive).forEach((key) => {
-        if (newProps.slideActive![key] !== oldSlideActive[key]) {
-          console.log(`[SlidePlugin] Key changed: slideActive.${key}`, {
-            from: oldSlideActive[key],
-            to: newProps.slideActive![key],
+    if (newProps.slide) {
+      const oldSlide = slideProps.value || {};
+      Object.keys(newProps.slide).forEach((key) => {
+        if (newProps.slide![key] !== oldSlide[key]) {
+          console.log(`[SlidePlugin] Key changed: slide.${key}`, {
+            from: oldSlide[key],
+            to: newProps.slide![key],
           });
         }
       });
-      slideActiveProps.value = { ...newProps.slideActive };
+      slideProps.value = { ...newProps.slide };
     }
   };
 
@@ -208,6 +243,6 @@ export function useSlidePlugin(options: UseSlidePluginOptions = { autoHeight: tr
 
   return {
     presentationProps,
-    slideActiveProps,
+    slideProps,
   };
 }
