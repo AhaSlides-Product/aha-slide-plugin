@@ -5,3 +5,4 @@ export * from './iframe';
 export * from './tracking';
 export * from './image';
 export * from './zoid';
+export * from './tailwind-colors';

@@ -1,4 +1,26 @@
 /** @type {import('tailwindcss').Config} */
+
+/**
+ * ============================================================
+ * TAILWIND CONFIG - ANT DESIGN VUE THEME INTEGRATION
+ * ============================================================
+ * 
+ * This Tailwind configuration serves as the single source of truth
+ * for design tokens across the application. Values are imported into
+ * packages/ui/src/theme.ts for Ant Design Vue theming.
+ * 
+ * When updating this file, consider updating the Ant Design Vue theme
+ * mappings in theme.ts to maintain design consistency.
+ * ============================================================
+ */
+
+// ============================================================
+// SPACING SCALE
+// Used by: padding, margin, gap, width, height
+// Ant Design Vue tokens: padding*, margin*, controlHeight*
+// Status: PARTIALLY MAPPED (only used via theme.spacing reference)
+// TODO: Map to Ant Design Vue padding/margin/height tokens
+// ============================================================
 const spacing = {
   px: '1px',
   0: '0px',
@@ -72,19 +94,29 @@ module.exports = {
       '3xl': '1920px',
       '4xl': '2560px',
     },
+    // ============================================================
+    // COLORS
+    // Used throughout the design system for all color needs
+    // Ant Design Vue tokens: color*, colorBg*, colorBorder*, colorText*, colorFill*
+    // Status: PARTIALLY MAPPED (see theme.ts for current mappings)
+    // TODO: Map additional semantic color variants (Bg, Border variations)
+    // ============================================================
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
 
+      // TODO: Consider mapping to Ant Design Vue colorLink or custom brand tokens
       brand: {
         a100: '#4F9BF3',
         b100: '#FFB12E',
       },
+      // MAPPED: primary[80] → colorInfo
+      // TODO: Consider mapping other primary shades to Ant Design Vue tokens
       primary: {
         110: '#621BAF', // purple-70 | active
         100: '#621BAF', // purple-70
         90: '#6A1EBB', // purple-60 | default
-        80: '#D3B4FF', // purple-30 | focus
+        80: '#D3B4FF', // purple-30 | focus | MAPPED to colorInfo
         75: '#D3E6FD',
         70: '#D8E9FD',
         60: '#ECF4FE',
@@ -92,6 +124,7 @@ module.exports = {
         40: '#F2F7FF',
         20: '#F0E4FF', // purple-15
       },
+      // TODO: Map to Ant Design Vue secondary/neutral tokens
       secondary: {
         100: '#282E3E',
         60: '#3F4557',
@@ -101,42 +134,59 @@ module.exports = {
         15: '#EFF1F7',
         10: '#F7FAFC',
       },
+      // MAPPED: Extensively used for text, backgrounds, and borders
+      // base[100] → colorText
+      // base[80] → colorTextSecondary
+      // base[70] → colorTextTertiary
+      // base[60] → colorTextQuaternary
+      // base[40] → colorBorder
+      // base[30] → colorBorderSecondary
+      // base[10] → colorBgLayout
+      // base[0] → colorBgContainer, colorBgElevated
+      // TODO: Map base[50] → colorTextDisabled, base[60] → colorTextPlaceholder
       base: {
-        100: '#0A0A0A',
+        100: '#0A0A0A',  // MAPPED to colorText
         90: '#4B4B4B',
-        80: '#707070',
-        70: '#999999',
+        80: '#707070',   // MAPPED to colorTextSecondary
+        70: '#999999',   // MAPPED to colorTextTertiary
         65: '#9D9D9D',
-        60: '#AFAFAF',
+        60: '#AFAFAF',   // MAPPED to colorTextQuaternary
         55: '#B5B5B5',
         50: '#BFBFBF',
-        40: '#CECECE',
-        30: '#EBEBEB',
+        40: '#CECECE',   // MAPPED to colorBorder
+        30: '#EBEBEB',   // MAPPED to colorBorderSecondary
         20: '#F3F3F3',
-        10: '#F5F5F5',
-        0: '#FFFFFF',
+        10: '#F5F5F5',   // MAPPED to colorBgLayout
+        0: '#FFFFFF',    // MAPPED to colorBgContainer, colorBgElevated
         '0-65': '#F5F5F5',
       },
+      // TODO: Map to Ant Design Vue colorLink or colorInfo variants
       blue: {
         50: '#1890FF',
         10: '#E6F7FF',
       },
+      
+      // MAPPED: red[100] → colorError
+      // TODO: Map red[10] → colorErrorBg, other shades → colorErrorBorder
       red: {
         130: '#CF1322',
         120: '#F5222D',
         110: '#FF2850',
-        100: '#DA323C',
+        100: '#DA323C',  // MAPPED to colorError
         60: '#FF4D4F',
         50: '#FF4954',
         40: '#FF5A7A',
-        10: '#FFF2F3',
+        10: '#FFF2F3',   // TODO: Map to colorErrorBg
       },
+      
+      // TODO: Map to Ant Design Vue colorWarning variants
       yellow: {
         100: '#FF922E',
         50: '#FFB12E',
         30: '#FFD52E',
         10: '#FFF7EA',
       },
+      // TODO: Map to custom Alert or Tag component colors
       pink: {
         5: '#FDF6FA',
         10: '#FFF0F6',
@@ -150,71 +200,90 @@ module.exports = {
         95: '#B31B57',
         100: '#FF4081',
       },
+      
+      // TODO: Map green[10] → colorSuccessBg, other shades to success variants
       green: {
         100: '#0C924A',
         80: '#15A962',
         50: '#33C173',
-        10: '#EBF9F1',
+        10: '#EBF9F1',   // TODO: Map to colorSuccessBg
       },
+      
+      // MAPPED: Primary brand color palette
+      // purple[60] → colorPrimary, Button.colorPrimary
+      // purple[50] → colorPrimaryHover, Button.colorPrimaryHover
+      // purple[70] → colorPrimaryActive, Button.colorPrimaryActive
+      // TODO: Map lighter shades (10-30) to hover/focus backgrounds
       purple: {
         100: '#2B0051',
         90: '#430379',
         80: '#5715A0',
-        70: '#621BAF',
-        60: '#6A1EBB',
+        70: '#621BAF',   // MAPPED to colorPrimaryActive
+        60: '#6A1EBB',   // MAPPED to colorPrimary (PRIMARY BRAND COLOR)
         55: '#7831C8',
-        50: '#8644D4',
+        50: '#8644D4',   // MAPPED to colorPrimaryHover
         45: '#985AE2',
         40: '#A96FF0',
         35: '#BE92F8',
-        30: '#D3B4FF',
+        30: '#D3B4FF',   // TODO: Map to focus/hover backgrounds
         25: '#DCC4FF',
         20: '#E6D4FF',
         15: '#F0E4FF',
-        10: '#F9F5FF',
+        10: '#F9F5FF',   // TODO: Map to primary background variants
         5: '#EAF0FF',
       },
+      
+      // MAPPED: emerald[60] → colorSuccess
+      // TODO: Map emerald[10] → colorSuccessBg, emerald[60] → colorSuccessBorder
       emerald: {
         100: '#062A27',
         90: '#0A4C47',
         80: '#0F6E65',
         70: '#13A181',
-        60: '#16C49A',
+        60: '#16C49A',   // MAPPED to colorSuccess
         50: '#20E8B5',
         40: '#4EF1C5',
         30: '#93F5DA',
         20: '#D8FAEF',
-        10: '#F5FFFC',
+        10: '#F5FFFC',   // TODO: Map to colorSuccessBg
       },
+      
+      // MAPPED: coral[60] → colorWarning
+      // TODO: Map coral[10] → colorWarningBg, coral[60] → colorWarningBorder
       coral: {
         100: '#661D05',
         90: '#993310',
         80: '#CC471A',
         70: '#E65829',
         65: '#E65B29',
-        60: '#FF7747',
+        60: '#FF7747',   // MAPPED to colorWarning
         50: '#FF9068',
         40: '#FFAD8C',
         30: '#FFCBB0',
         25: '#FFE5D6',
         20: '#FFF5D6',
-        10: '#FFF5F0',
+        10: '#FFF5F0',   // TODO: Map to colorWarningBg
       },
+      // TODO: Map to Ant Design Vue colorWhite token
       white: {
-        100: '#FFFFFF',
+        100: '#FFFFFF',  // TODO: Map to colorWhite
       },
+      
+      // TODO: Map to Ant Design Vue colorBlack token
       black: {
-        100: '#000000',
+        100: '#000000',  // TODO: Map to colorBlack
       },
+      // TODO: Map all button colors to Ant Design Vue Button component tokens
+      // These custom button colors should be mapped to Button component in theme.ts
       button: {
-        focusOutline: '#89BEFA',
-        text: '#FFFFFF',
-        // Colors for primary button
+        focusOutline: '#89BEFA',    // TODO: Map to Button.primaryShadow
+        text: '#FFFFFF',            // TODO: Map to Button.colorTextLightSolid
+        // Colors for primary button - TODO: Map to Button component tokens
         primaryBg: '#348EF6',
         primaryBgHover: '#2E7FDB',
         primaryBgActive: '#2970C2',
         primaryTextDisable: '#ffffff',
-        // Colors for secondary button
+        // Colors for secondary button - TODO: Map to Button.default* tokens
         secondaryBorderFocus: '#348EF6',
         secondaryBgHover: '#F2F7FF',
         secondaryBgActive: '#D8E9FD',
@@ -223,36 +292,39 @@ module.exports = {
         secondaryBorder: '#D3D7E1',
         secondaryText: '#282E3E',
         secondaryBgFocus: '#D8E9FD',
-        // Colors for success button
+        // Colors for success button - TODO: Consider custom Button variant
         successBg: '#33c173',
         successBgHover: '#168c4d',
         successText: '#ffffff',
         successBgActive: '#2cb268',
         successBgFocus: '#12733f',
-        // Color for danger button
+        // Color for danger button - TODO: Map to Button.danger* tokens
         dangerBgFocus: '#9E242C',
         dangerBg: '#D43F48',
         dangerBgHover: '#B82A33',
         dangerText: '#ffffff',
       },
+      // TODO: Alternative neutral palette - map to Ant Design Vue neutral/fill tokens
       gray: {
-        0: '#FFFFFF',
+        0: '#FFFFFF',   // TODO: Alternative for colorBgContainer
         10: '#FDFDFD',
         15: '#FAFAFA',
         20: '#F7F7F7',
         25: '#F3F3F3',
-        30: '#F1F1F1',
-        35: '#EBEBEB',
-        40: '#E3E3E3',
-        50: '#D4D4D4',
+        30: '#F1F1F1',  // TODO: Map to colorFillQuaternary
+        35: '#EBEBEB',  // TODO: Map to colorFillTertiary
+        40: '#E3E3E3',  // TODO: Map to colorFillSecondary
+        50: '#D4D4D4',  // TODO: Map to colorFill
         55: '#CCCCCC',
-        60: '#B5B5B5',
-        70: '#8A8A8A',
-        80: '#616161',
+        60: '#B5B5B5',  // TODO: Alternative for colorTextPlaceholder
+        70: '#8A8A8A',  // TODO: Alternative for colorTextTertiary
+        80: '#616161',  // TODO: Alternative for colorTextSecondary
         90: '#4A4A4A',
         95: '#303030',
-        100: '#1A1A1A',
+        100: '#1A1A1A', // TODO: Alternative for colorText
       },
+      
+      // TODO: Map to dark theme or custom brand variants
       indigo: {
         0: '#ffffff',
         10: '#f9f9ff',
@@ -270,7 +342,18 @@ module.exports = {
         100: '#1a1a2e',
       },
     },
+    // ============================================================
+    // SPACING SCALE (imported from above)
+    // Status: Available but not mapped to Ant Design Vue
+    // TODO: Map to padding*, margin*, controlHeight* tokens in theme.ts
+    // ============================================================
     spacing,
+    
+    // ============================================================
+    // ANIMATIONS
+    // Status: NOT MAPPED
+    // TODO: Consider mapping to Ant Design Vue motion* tokens
+    // ============================================================
     animation: {
       none: 'none',
       spin: 'spin 1s linear infinite',
@@ -312,14 +395,20 @@ module.exports = {
       DEFAULT: theme('colors.gray.200', 'currentColor'),
     }),
     borderOpacity: (theme) => theme('opacity'),
+    // ============================================================
+    // BORDER RADIUS
+    // Status: PARTIALLY MAPPED (DEFAULT hardcoded to 4px in theme.ts)
+    // TODO: Map to Ant Design Vue borderRadius, borderRadiusLG, borderRadiusSM, borderRadiusXS
+    // borderRadiusOuter tokens for nested components
+    // ============================================================
     borderRadius: {
       none: '0px',
-      sm: '0.125rem',
-      DEFAULT: '0.25rem',
-      md: '0.375rem',
-      lg: '0.5rem',
-      xl: '0.75rem',
-      '2xl': '1rem',
+      sm: '0.125rem',    // 2px - TODO: Map to borderRadiusSM
+      DEFAULT: '0.25rem', // 4px - MAPPED to borderRadius
+      md: '0.375rem',    // 6px
+      lg: '0.5rem',      // 8px - TODO: Map to borderRadiusLG
+      xl: '0.75rem',     // 12px - TODO: Map to borderRadiusXS or custom value
+      '2xl': '1rem',     // 16px
       '2.5xl': '1.25rem',
       '3xl': '1.5rem',
       full: '9999px',
@@ -332,15 +421,26 @@ module.exports = {
       4: '4px',
       8: '8px',
     },
+    // ============================================================
+    // BOX SHADOWS
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue boxShadow, boxShadowSecondary, boxShadowTertiary tokens
+    // Component-specific shadows should be mapped to component tokens:
+    // - card → Card.boxShadow
+    // - dialog/panel/profile → Modal.boxShadow
+    // - dropdown → Select/Dropdown.boxShadow
+    // - input → Input shadow on focus
+    // ============================================================
     boxShadow: {
-      sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-      DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-      md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',      // TODO: Map to boxShadowTertiary
+      DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)', // TODO: Map to boxShadowSecondary
+      md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', // TODO: Map to boxShadow
       lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       none: 'none',
+      // Custom colored shadows - TODO: Consider for Button.primaryShadow etc.
       'blue-md': '0 4px 0px #621BAF',
       blue: '0px 3px 0px #621BAF',
       'yellow-md': '0px 4px 0px #FF922E',
@@ -355,15 +455,16 @@ module.exports = {
       green: '0px 3px 0px #15A962',
       'primary-75-md': '0 4px 0 #D3E6FD',
       'primary-75': '0 3px 0 #D3E6FD',
+      // Component-specific shadows - TODO: Map to component tokens in theme.ts
       panel: '76.15px 55.15px 97.53px rgba(0, 0, 0, 0.06)',
-      input: '0px 0px 0px 2px rgba(79, 154, 242, 0.2)',
+      input: '0px 0px 0px 2px rgba(79, 154, 242, 0.2)',      // TODO: Map to Input focus shadow
       nav: 'inset 4px 4px 3px rgba(0, 0, 0, 0.25)',
-      dropdown: '3px 3px 5px rgba(37, 42, 56, 0.1)',
-      dialog: '5px 5px 20px rgba(37, 42, 56, 0.1)',
-      card: '0px 1px 3px 0px rgba(211, 215, 225, 0.81)',
+      dropdown: '3px 3px 5px rgba(37, 42, 56, 0.1)',         // TODO: Map to Dropdown.boxShadow
+      dialog: '5px 5px 20px rgba(37, 42, 56, 0.1)',          // TODO: Map to Modal.boxShadow
+      card: '0px 1px 3px 0px rgba(211, 215, 225, 0.81)',     // TODO: Map to Card.boxShadow
       profile: '12px 20px 24px 0px rgba(37, 42, 56, 0.15)',
       top: '0px 4px 11px 0px rgba(0,0,0,0.08)',
-      badge: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+      badge: '0px 2px 4px rgba(0, 0, 0, 0.1)',               // TODO: Map to Badge.boxShadow
     },
     container: {},
     cursor: {
@@ -393,9 +494,14 @@ module.exports = {
       0: '0',
       DEFAULT: '1',
     },
+    // ============================================================
+    // FONT FAMILIES
+    // Status: PARTIALLY MAPPED (sans is used for fontFamily token)
+    // TODO: Consider mapping mono to fontFamilyCode token in Ant Design Vue
+    // ============================================================
     fontFamily: {
       jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
-      sans: [
+      sans: [                          // MAPPED to fontFamily token
         'Nunito',
         'system-ui',
         '-apple-system',
@@ -412,7 +518,7 @@ module.exports = {
         '"Noto Color Emoji"',
       ],
       serif: ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
-      mono: [
+      mono: [                          // TODO: Map to fontFamilyCode
         'ui-monospace',
         'SFMono-Regular',
         'Menlo',
@@ -423,32 +529,43 @@ module.exports = {
         'monospace',
       ],
     },
+    // ============================================================
+    // FONT SIZES
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue fontSize, fontSizeSM, fontSizeLG, fontSizeXL tokens
+    // TODO: Map heading sizes to fontSizeHeading1, fontSizeHeading2, etc.
+    // ============================================================
     fontSize: {
       '3xs': ['0.375rem', { lineHeight: '0.375rem' }],
       '2xs': ['0.5rem', { lineHeight: '0.75rem' }],
       '1.5xs': ['0.625rem', { lineHeight: '0.875rem' }],
-      xs: ['0.75rem', { lineHeight: '1rem' }],
-      sm: ['0.875rem', { lineHeight: '1.25rem' }],
-      base: ['1rem', { lineHeight: '1.5rem' }],
-      lg: ['1.125rem', { lineHeight: '1.75rem' }],
-      xl: ['1.25rem', { lineHeight: '1.75rem' }],
-      '2xl': ['1.5rem', { lineHeight: '2rem' }],
-      '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
-      '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
-      '5xl': ['3rem', { lineHeight: '1' }],
-      '6xl': ['3.75rem', { lineHeight: '1' }],
+      xs: ['0.75rem', { lineHeight: '1rem' }],     // 12px - TODO: Map to fontSizeXS
+      sm: ['0.875rem', { lineHeight: '1.25rem' }], // 14px - TODO: Map to fontSizeSM
+      base: ['1rem', { lineHeight: '1.5rem' }],    // 16px - TODO: Map to fontSize
+      lg: ['1.125rem', { lineHeight: '1.75rem' }], // 18px - TODO: Map to fontSizeLG
+      xl: ['1.25rem', { lineHeight: '1.75rem' }],  // 20px - TODO: Map to fontSizeXL
+      '2xl': ['1.5rem', { lineHeight: '2rem' }],   // 24px - TODO: Map to fontSizeHeading5
+      '3xl': ['1.875rem', { lineHeight: '2.25rem' }], // 30px - TODO: Map to fontSizeHeading4
+      '4xl': ['2.25rem', { lineHeight: '2.5rem' }],   // 36px - TODO: Map to fontSizeHeading3
+      '5xl': ['3rem', { lineHeight: '1' }],           // 48px - TODO: Map to fontSizeHeading2
+      '6xl': ['3.75rem', { lineHeight: '1' }],        // 60px - TODO: Map to fontSizeHeading1
       '7xl': ['4.5rem', { lineHeight: '1' }],
       '8xl': ['6rem', { lineHeight: '1' }],
       '9xl': ['8rem', { lineHeight: '1' }],
       'md14-h18': ['0.875rem', { lineHeight: '1.125rem' }],
     },
+    // ============================================================
+    // FONT WEIGHTS
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue fontWeightStrong token (typically 600)
+    // ============================================================
     fontWeight: {
       thin: '100',
       extralight: '200',
       light: '300',
-      normal: '400',
+      normal: '400',     // TODO: Map to default font weight
       medium: '500',
-      semibold: '600',
+      semibold: '600',   // TODO: Map to fontWeightStrong
       bold: '700',
       extrabold: '800',
       black: '900',
@@ -702,19 +819,25 @@ module.exports = {
       wider: '0.05em',
       widest: '0.1em',
     },
+    // ============================================================
+    // LINE HEIGHTS
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue lineHeight, lineHeightSM, lineHeightLG tokens
+    // TODO: Map to lineHeightHeading1-5 for heading line heights
+    // ============================================================
     lineHeight: {
       none: '1',
       tight: '1.25',
       snug: '1.375',
-      normal: '1.5',
+      normal: '1.5',    // TODO: Map to lineHeight
       relaxed: '1.625',
       loose: '2',
       3: '.75rem',
-      4: '1rem',
+      4: '1rem',        // TODO: Map to lineHeightSM
       5: '1.25rem',
-      6: '1.5rem',
+      6: '1.5rem',      // TODO: Map to lineHeight
       7: '1.75rem',
-      8: '2rem',
+      8: '2rem',        // TODO: Map to lineHeightLG
       9: '2.25rem',
       10: '2.5rem',
     },
@@ -894,13 +1017,21 @@ module.exports = {
     },
     textColor: (theme) => theme('colors'),
     textOpacity: (theme) => theme('opacity'),
+    // ============================================================
+    // TRANSITION DURATIONS
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue motion tokens:
+    // - 100ms → motionDurationFast
+    // - 200ms → motionDurationMid
+    // - 300-500ms → motionDurationSlow
+    // ============================================================
     transitionDuration: {
       DEFAULT: '150ms',
       75: '75ms',
-      100: '100ms',
+      100: '100ms',   // TODO: Map to motionDurationFast
       150: '150ms',
-      200: '200ms',
-      300: '300ms',
+      200: '200ms',   // TODO: Map to motionDurationMid
+      300: '300ms',   // TODO: Map to motionDurationSlow
       500: '500ms',
       700: '700ms',
       1000: '1000ms',
@@ -924,12 +1055,20 @@ module.exports = {
       shadow: 'box-shadow',
       transform: 'transform',
     },
+    // ============================================================
+    // TRANSITION TIMING FUNCTIONS
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue easing tokens:
+    // - in-out → motionEaseInOut
+    // - in → motionEaseIn, motionEaseInBack, motionEaseInCirc
+    // - out → motionEaseOut, motionEaseOutBack, motionEaseOutCirc
+    // ============================================================
     transitionTimingFunction: {
-      DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)', // TODO: Map to motionEaseInOut
       linear: 'linear',
-      in: 'cubic-bezier(0.4, 0, 1, 1)',
-      out: 'cubic-bezier(0, 0, 0.2, 1)',
-      'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+      in: 'cubic-bezier(0.4, 0, 1, 1)',        // TODO: Map to motionEaseIn
+      out: 'cubic-bezier(0, 0, 0.2, 1)',       // TODO: Map to motionEaseOut
+      'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',// TODO: Map to motionEaseInOut
     },
     translate: (theme, { negative }) => ({
       ...theme('spacing'),
@@ -984,16 +1123,22 @@ module.exports = {
       max: 'max-content',
       fit: 'fit-content',
     }),
+    // ============================================================
+    // Z-INDEX SCALE
+    // Status: NOT MAPPED
+    // TODO: Map to Ant Design Vue zIndexBase, zIndexPopupBase tokens
+    // Ant Design uses specific z-index values for layering (typically 1000+)
+    // ============================================================
     zIndex: {
       auto: 'auto',
       0: '0',
       1: '1',
       5: '5',
-      10: '10',
+      10: '10',       // TODO: Consider for zIndexBase
       20: '20',
       30: '30',
       40: '40',
-      50: '50',
+      50: '50',       // TODO: Consider for zIndexPopupBase
     },
   },
   variantOrder: [
