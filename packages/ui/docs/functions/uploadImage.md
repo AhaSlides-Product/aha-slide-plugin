@@ -8,7 +8,7 @@
 
 > **uploadImage**(`file`): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/image.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/image.ts#L19)
+Defined in: [packages/ui/src/image.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/image.ts#L19)
 
 Uploads an image file to the hosting service.
 

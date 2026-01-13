@@ -8,7 +8,7 @@
 
 > **useAudiencePlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:265](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L265)
+Defined in: [packages/ui/src/zoid.ts:273](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L273)
 
 Hook for Audience Plugins.
 Provides access to presentation, slide, and slideAttributes data.
@@ -34,6 +34,10 @@ Reactive refs for presentation, slide, and slideAttributes props.
 ### presentationProps
 
 > **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+
+### slideAttributesProps
+
+> **slideAttributesProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
 
 ### slideProps
 

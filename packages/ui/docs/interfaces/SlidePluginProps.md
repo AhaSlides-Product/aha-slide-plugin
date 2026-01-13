@@ -6,7 +6,7 @@
 
 # Interface: SlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L7)
+Defined in: [packages/ui/src/zoid.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L7)
 
 Interface for the properties expected by the PresenterSlidePluginIframe component.
 
@@ -16,7 +16,7 @@ Interface for the properties expected by the PresenterSlidePluginIframe componen
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:59](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L59)
+Defined in: [packages/ui/src/zoid.ts:59](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L59)
 
 The base URL of the parent application
 
@@ -26,7 +26,7 @@ The base URL of the parent application
 
 > `optional` **getSlideAttributesAction**: () => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L50)
+Defined in: [packages/ui/src/zoid.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L50)
 
 Action to fetch all custom attributes for the current slide from the parent application.
 
@@ -42,7 +42,7 @@ A promise resolving to an object containing slide attributes.
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L44)
+Defined in: [packages/ui/src/zoid.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L44)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -65,7 +65,7 @@ The new height in pixels, or null for 100% height.
 
 > `optional` **presentation**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L13)
+Defined in: [packages/ui/src/zoid.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L13)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
@@ -103,7 +103,7 @@ Whether to show hyperlinks in the content
 
 > `optional` **slide**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L27)
+Defined in: [packages/ui/src/zoid.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L27)
 
 Data specific to the currently active slide.
 
@@ -141,7 +141,7 @@ The base text color for content
 
 > `optional` **upsertSlideAttributeAction**: (`payload`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:57](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L57)
+Defined in: [packages/ui/src/zoid.ts:57](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L57)
 
 Action to create or update a specific attribute for the current slide in the parent application.
 
@@ -171,6 +171,6 @@ A promise resolving when the update is complete.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L9)
+Defined in: [packages/ui/src/zoid.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L9)
 
 The URL of the plugin to be loaded in the iframe

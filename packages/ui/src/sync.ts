@@ -26,6 +26,7 @@ export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
 
     bc = new BroadcastChannel(channelName);
     bc.onmessage = (event) => {
+      console.log(`[useSync:${channelName}] received:`, event.data);
       if (event.data !== undefined && JSON.stringify(event.data) !== JSON.stringify(state.value)) {
         isInternalUpdate = true;
         state.value = event.data;
@@ -40,6 +41,7 @@ export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
   watch(state, (newValue) => {
     if (isInternalUpdate) return;
     if (bc) {
+      console.log(`[useSync:${unref(name)}] broadcasting:`, newValue);
       bc.postMessage(JSON.parse(JSON.stringify(newValue)));
     }
   }, { deep: true });
