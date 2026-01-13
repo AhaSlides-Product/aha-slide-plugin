@@ -23,14 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref } from 'vue';
+import { onMounted, watch, ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
-import { useSlideUtils } from '@aha/presenter-utils';
 
-const { slideId } = useSlideUtils();
-const { presentationProps, upsertSlideAttributeAction, getSlideAttributesAction } = usePresenterPlugin({ autoHeight: true });
-const slideGreeting = useSync(`greeting-${slideId}`, '');
+const { presentationProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction } = usePresenterPlugin({ autoHeight: true });
+const slideId = computed(() => slideProps.value?.id);
+const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
 // xprops removed as it is now handled by usePresenterPlugin
 
 /**

@@ -8,7 +8,7 @@
 
 > **useAudiencePlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:250](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L250)
+Defined in: [packages/ui/src/zoid.ts:265](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L265)
 
 Hook for Audience Plugins.
 Provides access to presentation, slide, and slideAttributes data.
@@ -26,6 +26,10 @@ Configure hook behavior (e.g., disable auto-height).
 `object`
 
 Reactive refs for presentation, slide, and slideAttributes props.
+
+### baseUrl
+
+> **baseUrl**: `Ref`\<`string` \| `undefined`, `string` \| `undefined`\>
 
 ### presentationProps
 

@@ -1,53 +1,99 @@
-import { ref, watch, nextTick, readonly, type Ref, type DeepReadonly } from 'vue';
-import { useBroadcastChannel, watchPausable } from '@vueuse/core';
+import { ref, watch, nextTick, readonly, unref, type Ref, type DeepReadonly } from 'vue';
 
 /**
  * Synchronize a reactive state ref across multiple browser tabs bidirectionally.
- * Uses the BroadcastChannel API under the hood via VueUse.
  * 
  * @template T - The type of the state being synchronized.
- * @param name - The unique name of the synchronization channel.
+ * @param name - The unique name of the synchronization channel (can be a Ref or string).
  * @param initialState - The initial value of the state.
  * @returns A reactive ref that stays in sync across tabs.
  */
-export function useSync<T>(name: string, initialState: T): Ref<T> {
+export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
   const state = ref(initialState) as Ref<T>;
-  const { data, post } = useBroadcastChannel<T, T>({ name });
+  let bc: BroadcastChannel | null = null;
+  let isInternalUpdate = false;
 
-  const { pause, resume } = watchPausable(state, (newValue) => {
-    post(newValue);
+  const closeChannel = () => {
+    if (bc) {
+      bc.close();
+      bc = null;
+    }
+  };
+
+  const openChannel = (channelName: string) => {
+    closeChannel();
+    if (!channelName) return;
+
+    bc = new BroadcastChannel(channelName);
+    bc.onmessage = (event) => {
+      if (event.data !== undefined && JSON.stringify(event.data) !== JSON.stringify(state.value)) {
+        isInternalUpdate = true;
+        state.value = event.data;
+        nextTick(() => {
+          isInternalUpdate = false;
+        });
+      }
+    };
+  };
+
+  // Sync state changes to other tabs
+  watch(state, (newValue) => {
+    if (isInternalUpdate) return;
+    if (bc) {
+      bc.postMessage(JSON.parse(JSON.stringify(newValue)));
+    }
   }, { deep: true });
 
-  watch(data, async (newValue) => {
-    if (newValue !== undefined && newValue !== state.value) {
-      pause();
-      state.value = newValue;
-      await nextTick();
-      resume();
+  // Handle name changes reactively
+  watch(() => unref(name), (newName) => {
+    if (newName) {
+      openChannel(newName);
+    } else {
+      closeChannel();
     }
-  });
+  }, { immediate: true });
 
   return state;
 }
 
 /**
  * Synchronize a state from other tabs, but do not broadcast local changes.
- * This is useful for listeners that should only react to remote updates.
  * 
  * @template T - The type of the state being synchronized.
  * @param name - The unique name of the synchronization channel.
  * @param initialState - The initial value of the state.
  * @returns A read-only reactive ref.
  */
-export function useSyncReadOnly<T>(name: string, initialState: T): DeepReadonly<Ref<T>> {
+export function useSyncReadOnly<T>(name: string | Ref<any>, initialState: T): DeepReadonly<Ref<T>> {
   const state = ref(initialState) as Ref<T>;
-  const { data } = useBroadcastChannel<T, T>({ name });
+  let bc: BroadcastChannel | null = null;
 
-  watch(data, (newValue) => {
-    if (newValue !== undefined) {
-      state.value = newValue;
+  const closeChannel = () => {
+    if (bc) {
+      bc.close();
+      bc = null;
     }
-  });
+  };
+
+  const openChannel = (channelName: string) => {
+    closeChannel();
+    if (!channelName) return;
+
+    bc = new BroadcastChannel(channelName);
+    bc.onmessage = (event) => {
+      if (event.data !== undefined) {
+        state.value = event.data;
+      }
+    };
+  };
+
+  watch(() => unref(name), (newName) => {
+    if (newName) {
+      openChannel(newName);
+    } else {
+      closeChannel();
+    }
+  }, { immediate: true });
 
   return readonly(state) as DeepReadonly<Ref<T>>;
 }

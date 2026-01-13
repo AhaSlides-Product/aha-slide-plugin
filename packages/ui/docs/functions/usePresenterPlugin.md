@@ -8,7 +8,7 @@
 
 > **usePresenterPlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:191](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L191)
+Defined in: [packages/ui/src/zoid.ts:203](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L203)
 
 Hook for Presenter Plugins (Canvas, Settings).
 Provides access to presentation and slide data, as well as actions to manage slide attributes.
@@ -26,6 +26,10 @@ Configure hook behavior (e.g., disable auto-height).
 `object`
 
 Reactive refs for presentation and slide props, and actions for slide attributes.
+
+### baseUrl
+
+> **baseUrl**: `Ref`\<`string` \| `undefined`, `string` \| `undefined`\>
 
 ### getSlideAttributesAction()
 

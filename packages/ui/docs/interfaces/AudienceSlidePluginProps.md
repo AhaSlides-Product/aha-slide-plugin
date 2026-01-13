@@ -6,17 +6,27 @@
 
 # Interface: AudienceSlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:99](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L99)
+Defined in: [packages/ui/src/zoid.ts:105](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L105)
 
 Interface for the properties expected by the AudienceSlidePluginIframe component.
 
 ## Properties
 
+### baseUrl?
+
+> `optional` **baseUrl**: `string`
+
+Defined in: [packages/ui/src/zoid.ts:124](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L124)
+
+The base URL of the parent application
+
+***
+
 ### onHeightChange()?
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:116](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L116)
+Defined in: [packages/ui/src/zoid.ts:122](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L122)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -39,7 +49,7 @@ The new height in pixels, or null for 100% height.
 
 > `optional` **presentation**: `Record`\<`string`, `any`\>
 
-Defined in: [packages/ui/src/zoid.ts:105](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L105)
+Defined in: [packages/ui/src/zoid.ts:111](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L111)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
@@ -49,7 +59,7 @@ Presentation-wide settings and data that affect the plugin's appearance and beha
 
 > `optional` **slide**: `Record`\<`string`, `any`\>
 
-Defined in: [packages/ui/src/zoid.ts:109](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L109)
+Defined in: [packages/ui/src/zoid.ts:115](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L115)
 
 Data specific to the currently active slide.
 
@@ -59,6 +69,6 @@ Data specific to the currently active slide.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:101](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L101)
+Defined in: [packages/ui/src/zoid.ts:107](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L107)
 
 The URL of the plugin to be loaded in the iframe

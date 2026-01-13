@@ -8,7 +8,7 @@
 
 > **useColors**(): `DeepReadonly`\<`Ref`\<`string`[]\>\>
 
-Defined in: [packages/ui/src/colors.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/colors.ts#L11)
+Defined in: [packages/ui/src/colors.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/colors.ts#L11)
 
 Returns a synchronized, read-only list of colors for the current slide.
 The synchronization channel is dynamically scoped to the current `slideId` from the route.

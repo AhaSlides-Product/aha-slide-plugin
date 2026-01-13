@@ -8,7 +8,7 @@
 
 > `const` **PresenterSlidePluginIframe**: `any`
 
-Defined in: [packages/ui/src/zoid.ts:64](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/cd9b05f8dbb05e4870c0cb2cf0990c50f3d011fa/packages/ui/src/zoid.ts#L64)
+Defined in: [packages/ui/src/zoid.ts:66](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/zoid.ts#L66)
 
 PresenterSlidePluginIframe is a cross-domain component (zoid) that allows
 Ahaslides parent applications to communicate with plugin iframes in the presenter view.
