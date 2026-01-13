@@ -1,0 +1,12 @@
+{
+    "name": "create_sample_slides",
+    "description": "Creates a slide with a title and a list of bullet points.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "bullets": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "bullets"]
+    }
+  }
