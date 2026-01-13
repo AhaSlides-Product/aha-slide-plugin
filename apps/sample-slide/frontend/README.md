@@ -8,7 +8,7 @@ This is a sample slide presenter application built with Vue 3 and Vite. It demon
 
 From the project root:
 ```bash
-npm run dev -w @aha/loi-frontend
+npm run dev -w @aha/sample-slide-frontend
 ```
 
 Or from this directory:

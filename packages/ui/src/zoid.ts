@@ -11,6 +11,8 @@ export interface SlidePluginProps {
    * Presentation-wide settings and data that affect the plugin's appearance and behavior.
    */
   presentation?: {
+    /** The unique identifier of the presentation */
+    id?: string | number;
     /** The language code (e.g., 'en', 'vi') */
     language?: string;
     /** The font family name used in the presentation */
@@ -19,6 +21,16 @@ export interface SlidePluginProps {
     showHyperLink?: boolean;
     /** Whether profanity filtering is enabled */
     filteringProfanity?: boolean;
+    /** The unique access code of the presentation */
+    uniqueAccessCode?: string;
+    /** The share code of the presentation */
+    shareCode?: string;
+    /** The access code of the presentation */
+    accessCode?: string;
+    /** The teamplay object used in the presentation */
+    teamplay?: Record<string, any>;
+    /** Whether audience pacing is enabled */
+    audiencePacing?: boolean;
     [key: string]: any;
   };
   /** 
@@ -27,12 +39,28 @@ export interface SlidePluginProps {
   slide?: {
     /** The unique identifier of the slide */
     id?: string | number;
-    /** The base text color for content */
-    textColour?: string;
-    /** Whether submissions are currently locked */
-    stopSubmission?: boolean;
-    /** Whether results are hidden from the audience */
-    hideResult?: boolean;
+    /** The version of the slide */
+    version?: number;
+    /** Time allowed to answer the slide in seconds */
+    timeToAnswer?: number;
+    /** The timestamp when the quiz starts */
+    quizTimestamp?: number;
+    /** Whether multiple choices can be selected */
+    multipleChoice?: boolean;
+    /** Whether answering correctly awards points */
+    isCorrectGetPoint?: boolean;
+    /** Whether faster answers award more points */
+    fastAnswerGetMorePoint?: boolean;
+    /** Minimum points awarded */
+    minPoint?: number;
+    /** Maximum points awarded */
+    maxPoint?: number;
+    /** The type of the slide (e.g., 'multiple-choice', 'open-ended') */
+    slideType?: string;
+    /** Whether streak detection is enabled */
+    isEnableStreakDetection?: boolean;
+    /** Whether streak bonus is enabled */
+    isEnableStreakBonus?: boolean;
     [key: string]: any;
   };
   /** 
@@ -45,9 +73,10 @@ export interface SlidePluginProps {
   /** 
    * Action to fetch all custom attributes for the current slide from the parent application.
    * 
+   * @param slideId - Optional override for the slide identifier.
    * @returns A promise resolving to an object containing slide attributes.
    */
-  getSlideAttributesAction?: () => Promise<any>;
+  getSlideAttributesAction?: (slideId?: string | number) => Promise<any>;
   /** 
    * Action to create or update a specific attribute for the current slide in the parent application.
    * 
@@ -108,11 +137,69 @@ export interface AudienceSlidePluginProps {
   /** 
    * Presentation-wide settings and data that affect the plugin's appearance and behavior.
    */
-  presentation?: Record<string, any>;
+  presentation?: {
+    /** The unique identifier of the presentation */
+    id?: string | number;
+    /** The language code (e.g., 'en', 'vi') */
+    language?: string;
+    /** The font family name used in the presentation */
+    fontFamily?: string;
+    /** Whether to show hyperlinks in the content */
+    showHyperLink?: boolean;
+    /** Whether profanity filtering is enabled */
+    filteringProfanity?: boolean;
+    /** The unique access code of the presentation */
+    uniqueAccessCode?: string;
+    /** The share code of the presentation */
+    shareCode?: string;
+    /** The access code of the presentation */
+    accessCode?: string;
+    /** The teamplay object used in the presentation */
+    teamPlay?: Record<string, any>;
+    /** Whether audience pacing is enabled */
+    audiencePacing?: boolean;
+    [key: string]: any;
+  };
   /** 
    * Data specific to the currently active slide.
    */
-  slide?: Record<string, any>;
+  slide?: {
+    /** The unique identifier of the slide */
+    id?: string | number;
+    /** The version of the slide */
+    version?: number;
+    /** Time allowed to answer the slide in seconds */
+    timeToAnswer?: number;
+    /** The timestamp when the quiz starts */
+    quizTimestamp?: number;
+    /** Whether multiple choices can be selected */
+    multipleChoice?: boolean;
+    /** Whether answering correctly awards points */
+    isCorrectGetPoint?: boolean;
+    /** Whether faster answers award more points */
+    fastAnswerGetMorePoint?: boolean;
+    /** Minimum points awarded */
+    minPoint?: number;
+    /** Maximum points awarded */
+    maxPoint?: number;
+    /** The type of the slide (e.g., 'multiple-choice', 'open-ended') */
+    slideType?: string;
+    /** Whether streak detection is enabled */
+    isEnableStreakDetection?: boolean;
+    /** Whether streak bonus is enabled */
+    isEnableStreakBonus?: boolean;
+    [key: string]: any;
+  };
+  /** The name of the audience participant */
+  audienceName?: string;
+  /** The emoji chosen by the audience participant */
+  audienceEmoji?: string;
+  /** The unique identifier of the audience participant */
+  audienceId?: string | number;
+  /** The email of the audience participant */
+  audienceEmail?: string;
+  /** The team name of the audience participant */
+  audienceTeam?: string;
   /** 
    * Callback to report height changes from the child to the parent. 
    * Sending null signals the parent to use 100% height.
@@ -120,6 +207,10 @@ export interface AudienceSlidePluginProps {
    * @param height - The new height in pixels, or null for 100% height.
    */
   onHeightChange?: (height: number | null) => void;
+  /** 
+   * Custom attributes associated with the current slide.
+   */
+  slideAttributes?: Record<string, any>;
   /** The base URL of the parent application */
   baseUrl?: string;
 }
@@ -145,8 +236,32 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
+    audienceName: {
+      type: 'string',
+      required: false,
+    },
+    audienceEmoji: {
+      type: 'string',
+      required: false,
+    },
+    audienceId: {
+      type: 'string',
+      required: false,
+    },
+    audienceEmail: {
+      type: 'string',
+      required: false,
+    },
+    audienceTeam: {
+      type: 'string',
+      required: false,
+    },
     onHeightChange: {
       type: 'function',
+      required: false,
+    },
+    slideAttributes: {
+      type: 'object',
       required: false,
     },
     baseUrl: {
@@ -172,15 +287,43 @@ export function autoReportHeight() {
   }
 
   const sendHeight = () => {
-    const height = document.body.scrollHeight;
+    const app = document.getElementById('app');
+    const height = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      app ? app.scrollHeight : 0
+    );
+    console.log('[SlidePlugin] Reporting height:', height);
     xprops.onHeightChange(height);
   };
 
   const observer = new ResizeObserver(() => sendHeight());
   observer.observe(document.body);
-  setTimeout(sendHeight, 100);
+  const app = document.getElementById('app');
+  if (app) {
+    observer.observe(app);
+  }
 
-  return () => observer.disconnect();
+  // Fallback for changes that might not trigger ResizeObserver on the containers
+  const mutObserver = new MutationObserver(() => sendHeight());
+  mutObserver.observe(document.body, {
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+
+  // Initial report
+  sendHeight();
+  
+  // Also report after a short delay for any late rendering
+  setTimeout(sendHeight, 300);
+
+  return () => {
+    observer.disconnect();
+    mutObserver.disconnect();
+  };
 }
 
 /**
@@ -230,9 +373,9 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
   const originalGetAttributes = xprops?.getSlideAttributesAction;
   
-  const getSlideAttributesAction = async () => {
+  const getSlideAttributesAction = async (slideId?: string | number): Promise<any> => {
     if (typeof originalGetAttributes !== 'function') return undefined;
-    const response = await originalGetAttributes();
+    const response = await originalGetAttributes(slideId);
     if (Array.isArray(response)) {
       return response.reduce((acc, item) => {
         if (item && item.type) {
@@ -265,6 +408,14 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
 export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight: true }) {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
+  const slideAttributesProps = ref<Record<string, any> | undefined>((window as any).xprops?.slideAttributes);
+  
+  const xprops = (window as any).xprops;
+  const audienceName = ref<string | undefined>(xprops?.audienceName);
+  const audienceEmoji = ref<string | undefined>(xprops?.audienceEmoji);
+  const audienceId = ref<string | number | undefined>(xprops?.audienceId);
+  const audienceEmail = ref<string | undefined>(xprops?.audienceEmail);
+  const audienceTeam = ref<string | undefined>(xprops?.audienceTeam);
 
   onMounted(() => {
     let cleanup = () => {};
@@ -282,14 +433,30 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       xprops.onProps((newProps: any) => {
         if (newProps.presentation) presentationProps.value = { ...newProps.presentation };
         if (newProps.slide) slideProps.value = { ...newProps.slide };
+        if (newProps.slideAttributes) slideAttributesProps.value = { ...newProps.slideAttributes };
         if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
+        
+        if (newProps.audienceName) audienceName.value = newProps.audienceName;
+        if (newProps.audienceEmoji) audienceEmoji.value = newProps.audienceEmoji;
+        if (newProps.audienceId) audienceId.value = newProps.audienceId;
+        if (newProps.audienceEmail) audienceEmail.value = newProps.audienceEmail;
+        if (newProps.audienceTeam) audienceTeam.value = newProps.audienceTeam;
       });
     }
     return cleanup;
   });
 
-  const xprops = (window as any).xprops;
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
 
-  return { presentationProps, slideProps, baseUrl };
+  return { 
+    presentationProps, 
+    slideProps, 
+    slideAttributesProps, 
+    baseUrl,
+    audienceName,
+    audienceEmoji,
+    audienceId,
+    audienceEmail,
+    audienceTeam
+  };
 }

@@ -6,7 +6,7 @@
 
 # Interface: RequestMessage\<T\>
 
-Defined in: [packages/ui/src/iframe.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/iframe.ts#L4)
+Defined in: [packages/ui/src/iframe.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/iframe.ts#L4)
 
 Represents a request message sent between windows.
 
@@ -22,7 +22,7 @@ Represents a request message sent between windows.
 
 > **id**: `string`
 
-Defined in: [packages/ui/src/iframe.ts:5](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/iframe.ts#L5)
+Defined in: [packages/ui/src/iframe.ts:5](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/iframe.ts#L5)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/iframe.ts:5](https://github.com/AhaSlides-Product/a
 
 > **payload**: `T`
 
-Defined in: [packages/ui/src/iframe.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/iframe.ts#L7)
+Defined in: [packages/ui/src/iframe.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/iframe.ts#L7)
 
 ***
 
@@ -38,4 +38,4 @@ Defined in: [packages/ui/src/iframe.ts:7](https://github.com/AhaSlides-Product/a
 
 > **type**: `string`
 
-Defined in: [packages/ui/src/iframe.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/iframe.ts#L6)
+Defined in: [packages/ui/src/iframe.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/iframe.ts#L6)

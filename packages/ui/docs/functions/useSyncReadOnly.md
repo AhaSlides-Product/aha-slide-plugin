@@ -8,7 +8,7 @@
 
 > **useSyncReadOnly**\<`T`\>(`name`, `initialState`): `DeepReadonly`\<`Ref`\<`T`\>\>
 
-Defined in: [packages/ui/src/sync.ts:67](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d0b17028ef558ec827f47f763e73d18be6e2a14e/packages/ui/src/sync.ts#L67)
+Defined in: [packages/ui/src/sync.ts:67](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/sync.ts#L67)
 
 Synchronize a state from other tabs, but do not broadcast local changes.
 
