@@ -2,15 +2,23 @@ import json
 import os
 import inspect
 import re
+import logging
 from typing import Any, Dict, Optional
 from fastmcp import FastMCP
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 mcp = FastMCP("SlidesVendorRegistry")
 
 # This is the single function that will handle ALL slide types
 def universal_slide_handler(slide_data: Dict[str, Any]):
     # This logic would be where you call the actual vendor code/API
-    print(f"Executing slide creation with data: {slide_data}")
+    logger.info(f"Executing slide creation with data: {slide_data}")
     return {"status": "success", "data_received": slide_data}
 
 def is_valid_python_identifier(name: str) -> bool:
@@ -72,7 +80,7 @@ def create_dynamic_function(config: Dict[str, Any]) -> Optional[callable]:
     # Validate configuration first
     validation_error = validate_config(config)
     if validation_error:
-        print(f"Configuration validation failed: {validation_error}")
+        logger.error(f"Configuration validation failed: {validation_error}")
         return None
 
     params = config.get("parameters", {}).get("properties", {})
@@ -115,8 +123,10 @@ def load_vendor_plugins(apps_dir="../apps"):
     apps_path = os.path.abspath(os.path.join(os.path.dirname(__file__), apps_dir))
 
     if not os.path.exists(apps_path):
-        print(f"Warning: Apps directory not found at {apps_path}")
+        logger.warning(f"Apps directory not found at {apps_path}")
         return
+
+    logger.info(f"Scanning for plugins in: {apps_path}")
 
     # Walk through all subdirectories in apps folder
     for root, dirs, files in os.walk(apps_path):
@@ -132,16 +142,16 @@ def load_vendor_plugins(apps_dir="../apps"):
                 # Only register if validation passed
                 if tool_handler is None:
                     app_name = os.path.basename(root)
-                    print(f"Skipped invalid plugin from app: {app_name}")
+                    logger.warning(f"Skipped invalid plugin from app: {app_name}")
                     continue
 
                 # Register the tool with the server using @mcp.tool decorator approach
                 mcp.tool(tool_handler)
                 app_name = os.path.basename(root)
-                print(f"Registered slide type '{config['name']}' from app: {app_name}")
+                logger.info(f"Registered slide type '{config['name']}' from app: {app_name}")
             except Exception as e:
                 app_name = os.path.basename(root)
-                print(f"Error loading {spec_file} from app '{app_name}': {e}")
+                logger.error(f"Error loading {spec_file} from app '{app_name}': {e}")
 
 load_vendor_plugins()
 if __name__ == "__main__":
