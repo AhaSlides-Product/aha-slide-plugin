@@ -1,0 +1,31 @@
+{
+  "name": "@aha/main-backend",
+  "version": "0.0.1",
+  "description": "Aggregated backend for all slides",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "prebuild": "node scripts/generate-app-module.js",
+    "prestart": "node scripts/generate-app-module.js",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@aha/sample-slide-backend": "*",
+    "@aha/backend-utils": "*",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  }
+}

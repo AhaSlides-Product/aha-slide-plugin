@@ -1,21 +1,25 @@
 {
   "name": "aha-slide-plugin",
   "version": "1.0.0",
+  "packageManager": "npm@10.9.2",
   "private": true,
   "workspaces": [
     "apps/*/*",
+    "apps/main-backend",
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "docs": "turbo run docs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "turbo": "2.7.4",
     "typedoc": "0.28.15",
     "typedoc-plugin-markdown": "4.9.0"
   }
