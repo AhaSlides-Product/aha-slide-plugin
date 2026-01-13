@@ -29,6 +29,8 @@ export interface SlidePluginProps {
     accessCode?: string;
     /** The teamplay object used in the presentation */
     teamplay?: Record<string, any>;
+    /** Whether audience pacing is enabled */
+    audiencePacing?: boolean;
     [key: string]: any;
   };
   /** 
@@ -37,12 +39,28 @@ export interface SlidePluginProps {
   slide?: {
     /** The unique identifier of the slide */
     id?: string | number;
-    /** The base text color for content */
-    textColour?: string;
-    /** Whether submissions are currently locked */
-    stopSubmission?: boolean;
-    /** Whether results are hidden from the audience */
-    hideResult?: boolean;
+    /** The version of the slide */
+    version?: number;
+    /** Time allowed to answer the slide in seconds */
+    timeToAnswer?: number;
+    /** The timestamp when the quiz starts */
+    quizTimestamp?: number;
+    /** Whether multiple choices can be selected */
+    multipleChoice?: boolean;
+    /** Whether answering correctly awards points */
+    isCorrectGetPoint?: boolean;
+    /** Whether faster answers award more points */
+    fastAnswerGetMorePoint?: boolean;
+    /** Minimum points awarded */
+    minPoint?: number;
+    /** Maximum points awarded */
+    maxPoint?: number;
+    /** The type of the slide (e.g., 'multiple-choice', 'open-ended') */
+    slideType?: string;
+    /** Whether streak detection is enabled */
+    isEnableStreakDetection?: boolean;
+    /** Whether streak bonus is enabled */
+    isEnableStreakBonus?: boolean;
     [key: string]: any;
   };
   /** 
@@ -137,7 +155,9 @@ export interface AudienceSlidePluginProps {
     /** The access code of the presentation */
     accessCode?: string;
     /** The teamplay object used in the presentation */
-    teamplay?: Record<string, any>;
+    teamPlay?: Record<string, any>;
+    /** Whether audience pacing is enabled */
+    audiencePacing?: boolean;
     [key: string]: any;
   };
   /** 
@@ -267,15 +287,43 @@ export function autoReportHeight() {
   }
 
   const sendHeight = () => {
-    const height = document.body.scrollHeight;
+    const app = document.getElementById('app');
+    const height = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      app ? app.scrollHeight : 0
+    );
+    console.log('[SlidePlugin] Reporting height:', height);
     xprops.onHeightChange(height);
   };
 
   const observer = new ResizeObserver(() => sendHeight());
   observer.observe(document.body);
-  setTimeout(sendHeight, 100);
+  const app = document.getElementById('app');
+  if (app) {
+    observer.observe(app);
+  }
 
-  return () => observer.disconnect();
+  // Fallback for changes that might not trigger ResizeObserver on the containers
+  const mutObserver = new MutationObserver(() => sendHeight());
+  mutObserver.observe(document.body, {
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+
+  // Initial report
+  sendHeight();
+  
+  // Also report after a short delay for any late rendering
+  setTimeout(sendHeight, 300);
+
+  return () => {
+    observer.disconnect();
+    mutObserver.disconnect();
+  };
 }
 
 /**

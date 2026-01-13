@@ -27,12 +27,9 @@
       <pre>{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
 
-    <div style="margin-top: 20px;">
-      <a-button type="primary" @click="handleGetAttributes(slideId)">Get Slide Attributes</a-button>
-      <div v-if="attributeResponse" style="margin-top: 10px;">
-        <h4>Slide Attributes Response:</h4>
-        <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
-      </div>
+    <div v-if="attributeResponse" class="debug-section">
+      <h3>Slide Attributes</h3>
+      <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
     </div>
   </div>
 </template>
