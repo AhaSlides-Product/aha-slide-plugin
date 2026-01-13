@@ -62,7 +62,7 @@ export class AppModule {}
 `;
 
   fs.writeFileSync(targetFile, content);
-  console.log('Successfully generated apps/main-backend/src/app.module.ts');
+  console.log('Successfully generated packages/backend-main/src/app.module.ts');
 
   // Update package.json dependencies
   const mainPkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'));
@@ -80,7 +80,7 @@ export class AppModule {}
 
   if (changed) {
     fs.writeFileSync(pkgFile, JSON.stringify(mainPkg, null, 2) + '\n');
-    console.log('Successfully updated apps/main-backend/package.json dependencies');
+    console.log('Successfully updated packages/backend-main/package.json dependencies');
   }
 }
 

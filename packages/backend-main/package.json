@@ -1,5 +1,5 @@
 {
-  "name": "@aha/main-backend",
+  "name": "@aha/backend-main",
   "version": "0.0.1",
   "description": "Aggregated backend for all slides",
   "private": true,
