@@ -14,11 +14,12 @@ import { theme } from 'ant-design-vue';
  * NOTE: This theme uses a subset of available Ant Design Vue tokens.
  * See comments below for tokens that could be mapped from Tailwind config.
  */
-export const ahaSlidesTheme: ThemeConfig = {
+export const ahaSlidesDefaultTheme: ThemeConfig = {
   algorithm: theme.defaultAlgorithm,
   token: {
     ...SeedTokens,
     ...MapTokens,
     ...AliasTokens,
   },
+  
 };

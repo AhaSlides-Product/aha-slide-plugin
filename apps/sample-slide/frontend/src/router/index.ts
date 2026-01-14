@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Canvas from '../pages/Canvas.vue'
 import Settings from '../pages/Settings.vue'
 import Audience from '../pages/Audience.vue'
+import TailwindTest from '../pages/TailwindTest.vue'
 
 const routes = [
     {
@@ -22,6 +23,11 @@ const routes = [
         path: '/:type/audience/:slideId',
         name: 'Audience',
         component: Audience
+    },
+    {
+        path: '/tailwind-test',
+        name: 'TailwindTest',
+        component: TailwindTest
     }
 ]
 

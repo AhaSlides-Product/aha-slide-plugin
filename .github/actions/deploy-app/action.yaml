@@ -1,0 +1,35 @@
+name: 'Deploy App'
+description: 'Deploys the application artifacts'
+inputs:
+  s3_bucket:
+    description: 'Target S3 Bucket'
+    required: true
+  aws_access_key_id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws_region:
+    description: 'AWS Region'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-builds
+        path: deployment_artifacts
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Deploy to S3
+      shell: bash
+      run: aws s3 sync deployment_artifacts s3://${{ inputs.s3_bucket }} --delete

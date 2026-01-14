@@ -5,14 +5,30 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./tailwind.config": {
+      "import": "./tailwind.config.js",
+      "default": "./tailwind.config.js"
+    },
+    "./styles.css": "./src/styles.css",
+    "./antd-vars.css": "./dist/assets/antd-vars.css"
+  },
   "files": [
     "dist",
-    "src/styles.css"
+    "src/styles.css",
+    "tailwind.config.js",
+    "tailwind.config.d.ts"
   ],
   "scripts": {
-    "build": "npm run build:ts && npm run build:css",
+    "build": "npm run build:ts && npm run build:css && npm run build:antd-vars",
     "build:ts": "tsc",
     "build:css": "postcss src/styles.css -o dist/styles.css",
+    "build:antd-vars": "node scripts/generate-css-vars.js",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
