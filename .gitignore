@@ -5,5 +5,4 @@ dist
 .vscode
 .idea
 .npm
-package-lock.json
 .turbo
