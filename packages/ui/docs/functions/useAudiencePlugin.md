@@ -8,7 +8,7 @@
 
 > **useAudiencePlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:273](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L273)
+Defined in: [packages/ui/src/zoid.ts:508](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L508)
 
 Hook for Audience Plugins.
 Provides access to presentation, slide, and slideAttributes data.
@@ -27,18 +27,54 @@ Configure hook behavior (e.g., disable auto-height).
 
 Reactive refs for presentation, slide, and slideAttributes props.
 
+### audienceEmail
+
+> **audienceEmail**: `Ref`\<`string` \| `undefined`\>
+
+### audienceEmoji
+
+> **audienceEmoji**: `Ref`\<`string` \| `undefined`\>
+
+### audienceId
+
+> **audienceId**: `Ref`\<`string` \| `number` \| `undefined`\>
+
+### audienceName
+
+> **audienceName**: `Ref`\<`string` \| `undefined`\>
+
+### audienceSendCountingAction
+
+> **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
+
+### audienceTeam
+
+> **audienceTeam**: `Ref`\<`string` \| `undefined`\>
+
 ### baseUrl
 
-> **baseUrl**: `Ref`\<`string` \| `undefined`, `string` \| `undefined`\>
+> **baseUrl**: `Ref`\<`string` \| `undefined`\>
+
+### onMqttMessage
+
+> **onMqttMessage**: (`handler`) => `void` \| `undefined`
 
 ### presentationProps
 
-> **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+> **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
 ### slideAttributesProps
 
-> **slideAttributesProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+> **slideAttributesProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
 ### slideProps
 
-> **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+> **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
+
+### subscribeTopic
+
+> **subscribeTopic**: (`topic`) => `void` \| `undefined`
+
+### unsubscribeTopic
+
+> **unsubscribeTopic**: (`topic`) => `void` \| `undefined`
