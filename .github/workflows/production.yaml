@@ -27,7 +27,7 @@ jobs:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_CANARY }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
+          aws_region: us-east-1
 
   deploy_production:
     name: Deploy Production
@@ -43,4 +43,4 @@ jobs:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
+          aws_region: us-east-1
