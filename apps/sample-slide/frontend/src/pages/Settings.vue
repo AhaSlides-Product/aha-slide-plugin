@@ -17,7 +17,7 @@
         Share: {{ presentationProps.shareCode }}, 
         Access: {{ presentationProps.accessCode }}
       </p>
-      <p><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></p>
+      <div class="teamplay-info"><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></div>
     </div>
 
     <div v-if="slideProps" class="debug-section">
@@ -80,7 +80,9 @@ onMounted(async () => {
 });
 
 const debouncedUpdate = debounce((newGreeting: string) => {
-  upsertSlideAttributeAction({ attributeKey: 'greeting', attributeValue: newGreeting })
+  if (upsertSlideAttributeAction) {
+    upsertSlideAttributeAction({ attributeKey: 'greeting', attributeValue: newGreeting })
+  }
 }, 500);
 
 watch(slideGreeting, (newGreeting) => {
