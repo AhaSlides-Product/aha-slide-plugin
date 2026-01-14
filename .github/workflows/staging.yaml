@@ -1,0 +1,13 @@
+name: Staging Deploy
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/reusable-deploy.yaml
+    with:
+      s3_bucket: plugins.dev.ahaslide.com
+    secrets: inherit

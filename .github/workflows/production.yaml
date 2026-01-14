@@ -1,0 +1,19 @@
+name: Production Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_canary:
+    name: Deploy Canary
+    uses: ./.github/workflows/reusable-deploy.yaml
+    with:
+      s3_bucket: plugins2.ahaslides.com
+    secrets: inherit
+
+  deploy_production:
+    name: Deploy Production
+    uses: ./.github/workflows/reusable-deploy.yaml
+    with:
+      s3_bucket: plugins.ahaslides.com
+    secrets: inherit
