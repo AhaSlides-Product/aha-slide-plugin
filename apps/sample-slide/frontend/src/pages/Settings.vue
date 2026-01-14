@@ -6,6 +6,11 @@
       <h3>Slide Greeting</h3>
       <a-input v-model:value="slideGreeting" placeholder="Enter slide greeting" style="width: 300px" />
     </div>
+    <div>
+      <a-typography-title>Heading 1</a-typography-title>
+      <a-typography-title :level="2">Heading 2</a-typography-title>
+    </div>
+    <a-button type="primary" size="small">Sample button</a-button>
 
     <div v-if="presentationProps" class="debug-section">
       <h3>Presentation Details</h3>

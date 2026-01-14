@@ -1,6 +1,7 @@
 import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context';
 import SeedTokens from './ant-design-tokens/seed-tokens.js';
 import MapTokens from './ant-design-tokens/map-tokens.js';
+import AliasTokens from './ant-design-tokens/alias-tokens.js';
 import { theme } from 'ant-design-vue';
 
 // Extract colors from Tailwind config
@@ -18,5 +19,6 @@ export const ahaSlidesTheme: ThemeConfig = {
   token: {
     ...SeedTokens,
     ...MapTokens,
+    ...AliasTokens,
   },
 };
