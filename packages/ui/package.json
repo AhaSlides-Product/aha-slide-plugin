@@ -15,7 +15,8 @@
       "import": "./tailwind.config.js",
       "default": "./tailwind.config.js"
     },
-    "./styles.css": "./src/styles.css"
+    "./styles.css": "./src/styles.css",
+    "./antd-vars.css": "./dist/assets/antd-vars.css"
   },
   "files": [
     "dist",
@@ -24,9 +25,10 @@
     "tailwind.config.d.ts"
   ],
   "scripts": {
-    "build": "npm run build:ts && npm run build:css",
+    "build": "npm run build:ts && npm run build:css && npm run build:antd-vars",
     "build:ts": "tsc",
     "build:css": "postcss src/styles.css -o dist/styles.css",
+    "build:antd-vars": "node scripts/generate-css-vars.js",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

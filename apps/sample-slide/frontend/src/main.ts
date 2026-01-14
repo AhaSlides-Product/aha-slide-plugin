@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
 import './style.css'
+import '@aha/ui/antd-vars.css'
 import App from './App.vue'
 import router from './router';
 import { PresenterSlidePluginIframe, AudienceSlidePluginIframe } from '@aha/ui';

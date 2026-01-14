@@ -1,5 +1,6 @@
 <template>
-  <div class="p-8 min-h-screen bg-base-10">
+  <div class="p-8 bg-red-50">
+    <p class="text-helpFullLink">Helpful link</p>
     <!-- ====================================== -->
     <!-- TAILWIND CSS VALIDATION TEST SECTION -->
     <!-- ====================================== -->
@@ -7,15 +8,10 @@
       <h2 class="text-3xl font-bold text-purple-60 mb-6">🎨 Tailwind CSS Test Section</h2>
       
       <!-- Colors Test -->
-      <div class="mb-6">
-        <h3 class="text-xl font-semibold text-base-100 mb-3">Color Tokens</h3>
-        <div class="flex flex-wrap gap-3">
-          <div class="px-4 py-2 bg-purple-60 text-white rounded-lg shadow">Purple 60 (Primary)</div>
-          <div class="px-4 py-2 bg-emerald-60 text-white rounded-lg shadow">Emerald 60 (Success)</div>
-          <div class="px-4 py-2 bg-coral-60 text-white rounded-lg shadow">Coral 60 (Warning)</div>
-          <div class="px-4 py-2 bg-red-100 text-white rounded-lg shadow">Red 100 (Error)</div>
-          <div class="px-4 py-2 bg-base-10 text-base-100 rounded-lg shadow border border-base-40">Base Colors</div>
-        </div>
+      <div class="flex flex-row space-between gap-4">
+        <p>item 1</p>
+        <p>item 2</p>
+        <p>item 3</p>
       </div>
 
       <!-- Layout Test -->
@@ -153,10 +149,11 @@
 </template>
 
 <script setup lang="ts">
-// No logic needed - this is purely a visual test component
 </script>
 
 <style scoped>
-/* No custom styles needed - testing Tailwind only */
+.text-helpFullLink {
+  color: var(--ant-colorThankful);
+}
 </style>
 
