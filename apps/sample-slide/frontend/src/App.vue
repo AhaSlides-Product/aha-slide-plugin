@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { theme } from '@aha/ui';
+import { ahaSlidesTheme } from '@aha/ui';
 
 const route = useRoute();
 const slideId = computed(() => {
@@ -11,7 +11,7 @@ const slideId = computed(() => {
 </script>
 
 <template>
-  <a-config-provider :theme="theme">
+  <a-config-provider :theme="ahaSlidesTheme">
     <main>
       <router-view :key="slideId"></router-view>
     </main>
