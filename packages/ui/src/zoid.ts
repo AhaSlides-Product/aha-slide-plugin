@@ -1,5 +1,5 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, type Ref } from 'vue';
 
 /**
  * Interface for the properties expected by the PresenterSlidePluginIframe component.
@@ -86,6 +86,31 @@ export interface SlidePluginProps {
   upsertSlideAttributeAction?: (payload: { attributeKey: string; attributeValue: any }) => Promise<any>;
   /** The base URL of the parent application */
   baseUrl?: string;
+  /** 
+   * Subscribe to a specific MQTT topic.
+   * 
+   * @param topic - The topic to subscribe to.
+   */
+  subscribeTopic?: (topic: string) => void;
+  /** 
+   * Unsubscribe from a specific MQTT topic.
+   * 
+   * @param topic - The topic to unsubscribe from.
+   */
+  unsubscribeTopic?: (topic: string) => void;
+  /** 
+   * Register a handler for MQTT messages.
+   * 
+   * @param handler - A function that handles incoming MQTT messages.
+   */
+  onMqttMessage?: (handler: (topic: string, message: string) => void) => void;
+  /** 
+   * Action to send counting data from the audience to the parent application.
+   * 
+   * @param payload - Optional payload for counting.
+   * @returns A promise resolving when the counting is handled.
+   */
+  audienceSendCountingAction?: (payload?: any) => Promise<any>;
 }
 
 /**
@@ -123,6 +148,22 @@ export const PresenterSlidePluginIframe = zoid.create({
     },
     baseUrl: {
       type: 'string',
+      required: false,
+    },
+    subscribeTopic: {
+      type: 'function',
+      required: false,
+    },
+    unsubscribeTopic: {
+      type: 'function',
+      required: false,
+    },
+    onMqttMessage: {
+      type: 'function',
+      required: false,
+    },
+    audienceSendCountingAction: {
+      type: 'function',
       required: false,
     },
   },
@@ -213,6 +254,31 @@ export interface AudienceSlidePluginProps {
   slideAttributes?: Record<string, any>;
   /** The base URL of the parent application */
   baseUrl?: string;
+  /** 
+   * Subscribe to a specific MQTT topic.
+   * 
+   * @param topic - The topic to subscribe to.
+   */
+  subscribeTopic?: (topic: string) => void;
+  /** 
+   * Unsubscribe from a specific MQTT topic.
+   * 
+   * @param topic - The topic to unsubscribe from.
+   */
+  unsubscribeTopic?: (topic: string) => void;
+  /** 
+   * Register a handler for MQTT messages.
+   * 
+   * @param handler - A function that handles incoming MQTT messages.
+   */
+  onMqttMessage?: (handler: (topic: string, message: string) => void) => void;
+  /** 
+   * Action to send counting data from the audience to the parent application.
+   * 
+   * @param payload - Optional payload for counting.
+   * @returns A promise resolving when the counting is handled.
+   */
+  audienceSendCountingAction?: (payload?: any) => Promise<any>;
 }
 
 /**
@@ -266,6 +332,22 @@ export const AudienceSlidePluginIframe = zoid.create({
     },
     baseUrl: {
       type: 'string',
+      required: false,
+    },
+    subscribeTopic: {
+      type: 'function',
+      required: false,
+    },
+    unsubscribeTopic: {
+      type: 'function',
+      required: false,
+    },
+    onMqttMessage: {
+      type: 'function',
+      required: false,
+    },
+    audienceSendCountingAction: {
+      type: 'function',
       required: false,
     },
   },
@@ -343,7 +425,17 @@ export interface UseSlidePluginOptions {
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
  */
-export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }) {
+export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): {
+  presentationProps: Ref<Record<string, any> | undefined>;
+  slideProps: Ref<Record<string, any> | undefined>;
+  getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
+  upsertSlideAttributeAction: ((payload: { attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
+  baseUrl: Ref<string | undefined>;
+  subscribeTopic: ((topic: string) => void) | undefined;
+  unsubscribeTopic: ((topic: string) => void) | undefined;
+  onMqttMessage: ((handler: (topic: string, message: string) => void) => void) | undefined;
+  audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
+} {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
 
@@ -388,13 +480,21 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   };
 
   const upsertSlideAttributeAction = xprops?.upsertSlideAttributeAction;
+  const subscribeTopic = xprops?.subscribeTopic;
+  const unsubscribeTopic = xprops?.unsubscribeTopic;
+  const onMqttMessage = xprops?.onMqttMessage;
+  const audienceSendCountingAction = xprops?.audienceSendCountingAction;
 
   return { 
     presentationProps, 
     slideProps, 
     getSlideAttributesAction, 
     upsertSlideAttributeAction,
-    baseUrl
+    baseUrl,
+    subscribeTopic,
+    unsubscribeTopic,
+    onMqttMessage,
+    audienceSendCountingAction
   };
 }
 
@@ -405,7 +505,21 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for presentation, slide, and slideAttributes props.
  */
-export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight: true }) {
+export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight: true }): {
+  presentationProps: Ref<Record<string, any> | undefined>;
+  slideProps: Ref<Record<string, any> | undefined>;
+  slideAttributesProps: Ref<Record<string, any> | undefined>;
+  baseUrl: Ref<string | undefined>;
+  audienceName: Ref<string | undefined>;
+  audienceEmoji: Ref<string | undefined>;
+  audienceId: Ref<string | number | undefined>;
+  audienceEmail: Ref<string | undefined>;
+  audienceTeam: Ref<string | undefined>;
+  subscribeTopic: ((topic: string) => void) | undefined;
+  unsubscribeTopic: ((topic: string) => void) | undefined;
+  onMqttMessage: ((handler: (topic: string, message: string) => void) => void) | undefined;
+  audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
+} {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
   const slideAttributesProps = ref<Record<string, any> | undefined>((window as any).xprops?.slideAttributes);
@@ -447,6 +561,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   });
 
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
+  const subscribeTopic = xprops?.subscribeTopic;
+  const unsubscribeTopic = xprops?.unsubscribeTopic;
+  const onMqttMessage = xprops?.onMqttMessage;
+  const audienceSendCountingAction = xprops?.audienceSendCountingAction;
 
   return { 
     presentationProps, 
@@ -457,6 +575,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmoji,
     audienceId,
     audienceEmail,
-    audienceTeam
+    audienceTeam,
+    subscribeTopic,
+    unsubscribeTopic,
+    onMqttMessage,
+    audienceSendCountingAction
   };
 }

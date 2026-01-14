@@ -19,7 +19,7 @@
     <div v-if="presentationProps" class="debug-section">
       <h3>Presentation Info</h3>
       <p><b>Access Code:</b> {{ presentationProps.accessCode }}</p>
-      <p><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></p>
+      <div class="teamplay-info"><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></div>
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
@@ -33,20 +33,24 @@
       <pre class="code-block">{{ JSON.stringify(slideAttributesProps, null, 2) }}</pre>
     </div>
 
-    <div style="margin-top: 20px;">
-      <router-link :to="`/${route.params.type}/canvas/${slideId}`">Back to Canvas</router-link> |
-      <router-link :to="`/${route.params.type}/settings/${slideId}`">Go to Settings</router-link>
+    <div class="vote-section">
+      <h3>Realtime Vote</h3>
+      <div class="vote-controls">
+        <a-button type="primary" size="large" @click="handleVote" :loading="voting">
+          🔥 Vote Now!
+        </a-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 
 const route = useRoute();
-const slideId = computed(() => route.params.slideId);
+const slideId = computed(() => route.params.slideId as string);
 const { 
   presentationProps, 
   slideProps, 
@@ -55,8 +59,61 @@ const {
   audienceEmoji,
   audienceId,
   audienceEmail,
-  audienceTeam
+  audienceTeam,
+  subscribeTopic,
+  unsubscribeTopic,
+  onMqttMessage,
+  audienceSendCountingAction
 } = useAudiencePlugin();
+
+const voting = ref(false);
+const mqttMessages = ref<string[]>([]);
+const countTopic = computed(() => `plugin-counting/slide-${slideId}`);
+
+const handleVote = async () => {
+  if (!audienceSendCountingAction) {
+    console.error('audienceSendCountingAction is not available');
+    return;
+  }
+  
+  voting.value = true;
+  try {
+    await audienceSendCountingAction({
+      "bucket": "plugin-counting",
+      "key": `slide-${slideId.value}`,
+      "item": (Math.random() * 10).toString()
+    });
+    console.log('Vote submitted successfully');
+  } catch (error) {
+    console.error('Failed to submit vote:', error);
+  } finally {
+    voting.value = false;
+  }
+};
+
+onMounted(() => {
+  if (subscribeTopic && onMqttMessage) {
+    watch(countTopic, (newTopic, oldTopic) => {
+      if (oldTopic && unsubscribeTopic) unsubscribeTopic(oldTopic);
+      if (newTopic) subscribeTopic(newTopic);
+    }, { immediate: true });
+
+    onMqttMessage((topic: string, message: string) => {
+      if (topic === countTopic.value) {
+        mqttMessages.value.push(`${new Date().toLocaleTimeString()}: ${message}`);
+        if (mqttMessages.value.length > 5) mqttMessages.value.shift();
+      }
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (unsubscribeTopic && countTopic.value) {
+    unsubscribeTopic(countTopic.value);
+  }
+});
+
+import { watch } from 'vue';
 </script>
 
 <style scoped>
@@ -100,5 +157,37 @@ const {
   border-radius: 6px;
   overflow: auto;
   font-size: 12px;
+}
+.vote-section {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fff0f6;
+  border: 2px dashed #eb2f96;
+  border-radius: 12px;
+  text-align: center;
+}
+.vote-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+.mqtt-display {
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.mini-message-list {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0;
+}
+.mini-message-list li {
+  padding: 4px;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: monospace;
 }
 </style>

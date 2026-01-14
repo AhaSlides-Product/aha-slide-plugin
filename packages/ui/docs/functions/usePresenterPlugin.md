@@ -8,7 +8,7 @@
 
 > **usePresenterPlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:211](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ed9f8db8759a780455b9f361423c35035a6f7ed1/packages/ui/src/zoid.ts#L211)
+Defined in: [packages/ui/src/zoid.ts:428](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L428)
 
 Hook for Presenter Plugins (Canvas, Settings).
 Provides access to presentation and slide data, as well as actions to manage slide attributes.
@@ -27,26 +27,48 @@ Configure hook behavior (e.g., disable auto-height).
 
 Reactive refs for presentation and slide props, and actions for slide attributes.
 
+### audienceSendCountingAction
+
+> **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
+
 ### baseUrl
 
-> **baseUrl**: `Ref`\<`string` \| `undefined`, `string` \| `undefined`\>
+> **baseUrl**: `Ref`\<`string` \| `undefined`\>
 
 ### getSlideAttributesAction()
 
-> **getSlideAttributesAction**: () => `Promise`\<`any`\>
+> **getSlideAttributesAction**: (`slideId?`) => `Promise`\<`any`\>
+
+#### Parameters
+
+##### slideId?
+
+`string` | `number`
 
 #### Returns
 
 `Promise`\<`any`\>
 
+### onMqttMessage
+
+> **onMqttMessage**: (`handler`) => `void` \| `undefined`
+
 ### presentationProps
 
-> **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+> **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
 ### slideProps
 
-> **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`, `Record`\<`string`, `any`\> \| `undefined`\>
+> **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
+
+### subscribeTopic
+
+> **subscribeTopic**: (`topic`) => `void` \| `undefined`
+
+### unsubscribeTopic
+
+> **unsubscribeTopic**: (`topic`) => `void` \| `undefined`
 
 ### upsertSlideAttributeAction
 
-> **upsertSlideAttributeAction**: `any`
+> **upsertSlideAttributeAction**: (`payload`) => `Promise`\<`any`\> \| `undefined`

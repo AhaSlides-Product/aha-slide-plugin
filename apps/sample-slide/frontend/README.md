@@ -2,7 +2,7 @@
 
 [← Back to Root](../../README.md)
 
-This is a sample slide presenter application built with Vue 3 and Vite. It demonstrates how to use the `@aha/ui` and `@aha/presenter-utils` packages for state synchronization and slide data management.
+This is a sample slide presenter application built with Vue 3 and Vite. It demonstrates how to use the `@aha/ui` packages for state synchronization and slide data management.
 
 ## Running the App
 

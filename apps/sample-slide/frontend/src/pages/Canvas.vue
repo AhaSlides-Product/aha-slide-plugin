@@ -23,28 +23,79 @@
       <pre class="code-block">{{ JSON.stringify(slideAttributes, null, 2) }}</pre>
     </div>
 
+    <div class="debug-section mqtt-section">
+      <h3>Realtime Messages ({{ countTopic }})</h3>
+      <div v-if="mqttMessages.length === 0" class="no-messages">
+        Waiting for messages...
+      </div>
+      <ul v-else class="message-list">
+        <li v-for="(msg, index) in mqttMessages" :key="index">
+          {{ msg }}
+        </li>
+      </ul>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 
 const route = useRoute();
 const slideId = route.params.slideId as string;
-const { presentationProps, slideProps, getSlideAttributesAction } = usePresenterPlugin();
+const { 
+  presentationProps, 
+  slideProps, 
+  getSlideAttributesAction,
+  subscribeTopic,
+  unsubscribeTopic,
+  onMqttMessage
+} = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const slideAttributes = ref<any>(null);
+const mqttMessages = ref<string[]>([]);
+const countTopic = `plugin-counting/slide-${slideId}`;
 
 onMounted(async () => {
   document.body.classList.add('enable-scroll');
+  
+  // MQTT Integration
+  if (subscribeTopic && onMqttMessage) {
+    subscribeTopic(countTopic);
+    onMqttMessage((topic: string, message: string) => {
+      console.log('topictopictopic', topic, message);
+      try {
+        const payload = JSON.parse(message);
+        if (topic === countTopic) {
+          mqttMessages.value.unshift(`${new Date().toLocaleTimeString()}: Total Count = ${payload.total} (${payload.count_type})`);
+        } else {
+          mqttMessages.value.unshift(`${new Date().toLocaleTimeString()} [${topic}]: ${message}`);
+        }
+      } catch (e) {
+        mqttMessages.value.unshift(`${new Date().toLocaleTimeString()} [${topic}]: ${message}`);
+      }
+      
+      // Limit to last 10 messages
+      if (mqttMessages.value.length > 10) {
+        mqttMessages.value.pop();
+      }
+    });
+  }
+
   if (getSlideAttributesAction && slideId) {
     const attributes = await getSlideAttributesAction(slideId);
     slideAttributes.value = attributes;
     if (attributes && attributes.greeting) {
       slideGreeting.value = attributes.greeting;
     }
+  }
+});
+
+onUnmounted(() => {
+  if (unsubscribeTopic) {
+    unsubscribeTopic(countTopic);
   }
 });
 </script>
@@ -79,5 +130,23 @@ onMounted(async () => {
   border-radius: 6px;
   overflow: auto;
   font-size: 12px;
+}
+.mqtt-section {
+  border-left-color: #52c41a;
+}
+.message-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+.message-list li {
+  padding: 8px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  font-family: monospace;
+}
+.no-messages {
+  color: #999;
+  font-style: italic;
 }
 </style>

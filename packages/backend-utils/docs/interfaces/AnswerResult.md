@@ -6,7 +6,7 @@
 
 # Interface: AnswerResult
 
-Defined in: [AnswerResult.ts:21](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L21)
+Defined in: [AnswerResult.ts:21](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L21)
 
 Represents the result of an audience answer submission processed by the backend.
 
@@ -16,7 +16,7 @@ Represents the result of an audience answer submission processed by the backend.
 
 > **audience**: `string`
 
-Defined in: [AnswerResult.ts:33](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L33)
+Defined in: [AnswerResult.ts:33](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L33)
 
 The audience member identifier.
 
@@ -26,7 +26,7 @@ The audience member identifier.
 
 > `optional` **audienceEmoji**: `string`
 
-Defined in: [AnswerResult.ts:37](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L37)
+Defined in: [AnswerResult.ts:37](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L37)
 
 Optional emoji representing the audience member.
 
@@ -36,7 +36,7 @@ Optional emoji representing the audience member.
 
 > **audienceName**: `string`
 
-Defined in: [AnswerResult.ts:35](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L35)
+Defined in: [AnswerResult.ts:35](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L35)
 
 The display name of the audience member.
 
@@ -46,7 +46,7 @@ The display name of the audience member.
 
 > **correct**: `boolean`
 
-Defined in: [AnswerResult.ts:39](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L39)
+Defined in: [AnswerResult.ts:39](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L39)
 
 Whether the answer was considered correct.
 
@@ -56,7 +56,7 @@ Whether the answer was considered correct.
 
 > **count\_total**: [`CountTotal`](../type-aliases/CountTotal.md)
 
-Defined in: [AnswerResult.ts:29](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L29)
+Defined in: [AnswerResult.ts:29](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L29)
 
 Aggregated statistics data.
 
@@ -66,7 +66,7 @@ Aggregated statistics data.
 
 > **data**: `string`
 
-Defined in: [AnswerResult.ts:41](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L41)
+Defined in: [AnswerResult.ts:41](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L41)
 
 Stringified raw answer data for persistence.
 
@@ -76,7 +76,7 @@ Stringified raw answer data for persistence.
 
 > **point**: `number`
 
-Defined in: [AnswerResult.ts:31](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L31)
+Defined in: [AnswerResult.ts:31](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L31)
 
 Points awarded to the audience member for this answer.
 
@@ -86,7 +86,7 @@ Points awarded to the audience member for this answer.
 
 > **presentation**: `number`
 
-Defined in: [AnswerResult.ts:23](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L23)
+Defined in: [AnswerResult.ts:23](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L23)
 
 The unique identifier of the presentation.
 
@@ -96,7 +96,7 @@ The unique identifier of the presentation.
 
 > **slide**: `number`
 
-Defined in: [AnswerResult.ts:25](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L25)
+Defined in: [AnswerResult.ts:25](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L25)
 
 The unique identifier of the slide.
 
@@ -106,6 +106,6 @@ The unique identifier of the slide.
 
 > **version**: `number`
 
-Defined in: [AnswerResult.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/39439237c366309fa5f1d8b1c51b57a305f27d27/packages/backend-utils/src/AnswerResult.ts#L27)
+Defined in: [AnswerResult.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/AnswerResult.ts#L27)
 
 The version number of the slide.
