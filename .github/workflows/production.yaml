@@ -1,4 +1,4 @@
-name: Production Deploy
+name: Production & Canary Deploy
 
 on:
   workflow_dispatch:
@@ -6,14 +6,14 @@ on:
 jobs:
   deploy_canary:
     name: Deploy Canary
-    uses: ./.github/workflows/reusable-deploy.yaml
+    uses: ./.github/reusable/deploy.yaml
     with:
       s3_bucket: plugins2.ahaslides.com
     secrets: inherit
 
   deploy_production:
     name: Deploy Production
-    uses: ./.github/workflows/reusable-deploy.yaml
+    uses: ./.github/reusable/deploy.yaml
     with:
       s3_bucket: plugins.ahaslides.com
     secrets: inherit
