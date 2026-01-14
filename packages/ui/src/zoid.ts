@@ -89,21 +89,15 @@ export interface SlidePluginProps {
   /** 
    * Subscribe to a specific MQTT topic.
    * 
-   * @param topic - The topic to subscribe to.
+   * @param options - Subscription options including type, topic, and callback.
    */
-  subscribeTopic?: (topic: string) => void;
+  subscribeTopic?: (options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void;
   /** 
    * Unsubscribe from a specific MQTT topic.
    * 
    * @param topic - The topic to unsubscribe from.
    */
   unsubscribeTopic?: (topic: string) => void;
-  /** 
-   * Register a handler for MQTT messages.
-   * 
-   * @param handler - A function that handles incoming MQTT messages.
-   */
-  onMqttMessage?: (handler: (topic: string, message: string) => void) => void;
   /** 
    * Action to send counting data from the audience to the parent application.
    * 
@@ -155,10 +149,6 @@ export const PresenterSlidePluginIframe = zoid.create({
       required: false,
     },
     unsubscribeTopic: {
-      type: 'function',
-      required: false,
-    },
-    onMqttMessage: {
       type: 'function',
       required: false,
     },
@@ -257,21 +247,15 @@ export interface AudienceSlidePluginProps {
   /** 
    * Subscribe to a specific MQTT topic.
    * 
-   * @param topic - The topic to subscribe to.
+   * @param options - Subscription options including type, topic, and callback.
    */
-  subscribeTopic?: (topic: string) => void;
+  subscribeTopic?: (options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void;
   /** 
    * Unsubscribe from a specific MQTT topic.
    * 
    * @param topic - The topic to unsubscribe from.
    */
   unsubscribeTopic?: (topic: string) => void;
-  /** 
-   * Register a handler for MQTT messages.
-   * 
-   * @param handler - A function that handles incoming MQTT messages.
-   */
-  onMqttMessage?: (handler: (topic: string, message: string) => void) => void;
   /** 
    * Action to send counting data from the audience to the parent application.
    * 
@@ -339,10 +323,6 @@ export const AudienceSlidePluginIframe = zoid.create({
       required: false,
     },
     unsubscribeTopic: {
-      type: 'function',
-      required: false,
-    },
-    onMqttMessage: {
       type: 'function',
       required: false,
     },
@@ -431,9 +411,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
   baseUrl: Ref<string | undefined>;
-  subscribeTopic: ((topic: string) => void) | undefined;
+  subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
-  onMqttMessage: ((handler: (topic: string, message: string) => void) => void) | undefined;
   audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
@@ -482,7 +461,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const upsertSlideAttributeAction = xprops?.upsertSlideAttributeAction;
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
-  const onMqttMessage = xprops?.onMqttMessage;
   const audienceSendCountingAction = xprops?.audienceSendCountingAction;
 
   return { 
@@ -493,7 +471,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     baseUrl,
     subscribeTopic,
     unsubscribeTopic,
-    onMqttMessage,
     audienceSendCountingAction
   };
 }
@@ -515,9 +492,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceId: Ref<string | number | undefined>;
   audienceEmail: Ref<string | undefined>;
   audienceTeam: Ref<string | undefined>;
-  subscribeTopic: ((topic: string) => void) | undefined;
+  subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
-  onMqttMessage: ((handler: (topic: string, message: string) => void) => void) | undefined;
   audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
@@ -563,7 +539,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
-  const onMqttMessage = xprops?.onMqttMessage;
   const audienceSendCountingAction = xprops?.audienceSendCountingAction;
 
   return { 
@@ -578,7 +553,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceTeam,
     subscribeTopic,
     unsubscribeTopic,
-    onMqttMessage,
     audienceSendCountingAction
   };
 }

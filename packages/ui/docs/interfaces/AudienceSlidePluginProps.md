@@ -119,27 +119,7 @@ The new height in pixels, or null for 100% height.
 
 ***
 
-### onMqttMessage()?
 
-> `optional` **onMqttMessage**: (`handler`) => `void`
-
-Defined in: [packages/ui/src/zoid.ts:274](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L274)
-
-Register a handler for MQTT messages.
-
-#### Parameters
-
-##### handler
-
-(`topic`, `message`) => `void`
-
-A function that handles incoming MQTT messages.
-
-#### Returns
-
-`void`
-
-***
 
 ### presentation?
 
@@ -313,19 +293,13 @@ Custom attributes associated with the current slide.
 
 ### subscribeTopic()?
 
-> `optional` **subscribeTopic**: (`topic`) => `void`
-
-Defined in: [packages/ui/src/zoid.ts:262](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L262)
-
-Subscribe to a specific MQTT topic.
+> `optional` **subscribeTopic**: (`options`) => `void`
 
 #### Parameters
 
-##### topic
+##### options
 
-`string`
-
-The topic to subscribe to.
+{ `callback`: (`topic`, `message`) => `void`; `topic`: `string`; `type?`: `string`; }
 
 #### Returns
 

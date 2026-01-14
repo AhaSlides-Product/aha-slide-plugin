@@ -49,9 +49,7 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 `Promise`\<`any`\>
 
-### onMqttMessage
 
-> **onMqttMessage**: (`handler`) => `void` \| `undefined`
 
 ### presentationProps
 
@@ -63,7 +61,17 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 ### subscribeTopic
 
-> **subscribeTopic**: (`topic`) => `void` \| `undefined`
+> **subscribeTopic**: (`options`) => `void` \| `undefined`
+
+#### Parameters
+
+##### options
+
+{ `callback`: (`topic`, `message`) => `void`; `topic`: `string`; `type?`: `string`; }
+
+#### Returns
+
+`void` \| `undefined`
 
 ### unsubscribeTopic
 
