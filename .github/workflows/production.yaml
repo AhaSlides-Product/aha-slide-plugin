@@ -1,4 +1,4 @@
-name: Production & Canary Deploy
+name: "Production & Canary Deploy"
 
 on:
   workflow_dispatch:
