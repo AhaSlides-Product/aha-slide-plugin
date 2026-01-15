@@ -16,10 +16,9 @@
 
 ## Variables
 
+- [ahaSlidesDefaultTheme](variables/ahaSlidesDefaultTheme.md)
 - [AudienceSlidePluginIframe](variables/AudienceSlidePluginIframe.md)
 - [PresenterSlidePluginIframe](variables/PresenterSlidePluginIframe.md)
-- [tailwindColors](variables/tailwindColors.md)
-- [theme](variables/theme.md)
 - [vEmitAction](variables/vEmitAction.md)
 
 ## Functions

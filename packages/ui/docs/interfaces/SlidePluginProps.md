@@ -6,7 +6,7 @@
 
 # Interface: SlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L7)
+Defined in: [packages/ui/src/zoid.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L8)
 
 Interface for the properties expected by the PresenterSlidePluginIframe component.
 
@@ -16,7 +16,7 @@ Interface for the properties expected by the PresenterSlidePluginIframe componen
 
 > `optional` **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:113](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L113)
+Defined in: [packages/ui/src/zoid.ts:108](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L108)
 
 Action to send counting data from the audience to the parent application.
 
@@ -40,7 +40,7 @@ A promise resolving when the counting is handled.
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:88](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L88)
+Defined in: [packages/ui/src/zoid.ts:89](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L89)
 
 The base URL of the parent application
 
@@ -50,7 +50,7 @@ The base URL of the parent application
 
 > `optional` **getSlideAttributesAction**: (`slideId?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:79](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L79)
+Defined in: [packages/ui/src/zoid.ts:80](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L80)
 
 Action to fetch all custom attributes for the current slide from the parent application.
 
@@ -74,7 +74,7 @@ A promise resolving to an object containing slide attributes.
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:72](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L72)
+Defined in: [packages/ui/src/zoid.ts:73](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L73)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -93,13 +93,11 @@ The new height in pixels, or null for 100% height.
 
 ***
 
-
-
 ### presentation?
 
 > `optional` **presentation**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L13)
+Defined in: [packages/ui/src/zoid.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L14)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
@@ -173,7 +171,7 @@ The unique access code of the presentation
 
 > `optional` **slide**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:39](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L39)
+Defined in: [packages/ui/src/zoid.ts:40](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L40)
 
 Data specific to the currently active slide.
 
@@ -259,11 +257,49 @@ The version of the slide
 
 > `optional` **subscribeTopic**: (`options`) => `void`
 
+Defined in: [packages/ui/src/zoid.ts:95](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L95)
+
+Subscribe to a specific MQTT topic.
+
 #### Parameters
 
 ##### options
 
-{ `callback`: (`topic`, `message`) => `void`; `topic`: `string`; `type?`: `string`; }
+Subscription options including type, topic, and callback.
+
+###### callback
+
+(`topic`, `message`) => `void`
+
+###### topic
+
+`string`
+
+###### type?
+
+`string`
+
+#### Returns
+
+`void`
+
+***
+
+### trackGA4AndMixpanel()?
+
+> `optional` **trackGA4AndMixpanel**: (`payload`) => `void`
+
+Defined in: [packages/ui/src/zoid.ts:114](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L114)
+
+Action to track events to GA4 and Mixpanel.
+
+#### Parameters
+
+##### payload
+
+`any`
+
+The event payload to track.
 
 #### Returns
 
@@ -275,7 +311,7 @@ The version of the slide
 
 > `optional` **unsubscribeTopic**: (`topic`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:100](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L100)
+Defined in: [packages/ui/src/zoid.ts:101](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L101)
 
 Unsubscribe from a specific MQTT topic.
 
@@ -293,11 +329,23 @@ The topic to unsubscribe from.
 
 ***
 
+### uploadImage()
+
+> **uploadImage**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+Defined in: [packages/ui/src/zoid.ts:115](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L115)
+
+#### Returns
+
+`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+***
+
 ### upsertSlideAttributeAction()?
 
 > `optional` **upsertSlideAttributeAction**: (`payload`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:86](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L86)
+Defined in: [packages/ui/src/zoid.ts:87](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L87)
 
 Action to create or update a specific attribute for the current slide in the parent application.
 
@@ -315,6 +363,10 @@ The attribute data to sync.
 
 `any`
 
+###### slideId?
+
+`string` \| `number`
+
 #### Returns
 
 `Promise`\<`any`\>
@@ -327,6 +379,6 @@ A promise resolving when the update is complete.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L9)
+Defined in: [packages/ui/src/zoid.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L10)
 
 The URL of the plugin to be loaded in the iframe

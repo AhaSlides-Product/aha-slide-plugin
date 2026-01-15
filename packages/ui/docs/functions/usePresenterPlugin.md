@@ -8,7 +8,7 @@
 
 > **usePresenterPlugin**(`options`): `object`
 
-Defined in: [packages/ui/src/zoid.ts:428](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L428)
+Defined in: [packages/ui/src/zoid.ts:434](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/zoid.ts#L434)
 
 Hook for Presenter Plugins (Canvas, Settings).
 Provides access to presentation and slide data, as well as actions to manage slide attributes.
@@ -49,8 +49,6 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 `Promise`\<`any`\>
 
-
-
 ### presentationProps
 
 > **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
@@ -63,19 +61,13 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 > **subscribeTopic**: (`options`) => `void` \| `undefined`
 
-#### Parameters
-
-##### options
-
-{ `callback`: (`topic`, `message`) => `void`; `topic`: `string`; `type?`: `string`; }
-
-#### Returns
-
-`void` \| `undefined`
-
 ### unsubscribeTopic
 
 > **unsubscribeTopic**: (`topic`) => `void` \| `undefined`
+
+### uploadImage
+
+> **uploadImage**: () => `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\> \| `undefined`
 
 ### upsertSlideAttributeAction
 
