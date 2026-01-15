@@ -104,7 +104,7 @@ export interface SlidePluginProps {
    * @param payload - Optional payload for counting.
    * @returns A promise resolving when the counting is handled.
    */
-  audienceSendCountingAction?: (payload?: any) => Promise<any>;
+  audienceSendCountingUniqueAction?: (payload?: any) => Promise<any>;
 }
 
 /**
@@ -152,7 +152,7 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
-    audienceSendCountingAction: {
+    audienceSendCountingUniqueAction: {
       type: 'function',
       required: false,
     },
@@ -262,7 +262,7 @@ export interface AudienceSlidePluginProps {
    * @param payload - Optional payload for counting.
    * @returns A promise resolving when the counting is handled.
    */
-  audienceSendCountingAction?: (payload?: any) => Promise<any>;
+  audienceSendCountingUniqueAction?: (payload?: any) => Promise<any>;
 }
 
 /**
@@ -326,7 +326,7 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
-    audienceSendCountingAction: {
+    audienceSendCountingUniqueAction: {
       type: 'function',
       required: false,
     },
@@ -413,7 +413,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   baseUrl: Ref<string | undefined>;
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
-  audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
+  audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
@@ -461,7 +461,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const upsertSlideAttributeAction = xprops?.upsertSlideAttributeAction;
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
-  const audienceSendCountingAction = xprops?.audienceSendCountingAction;
+  const audienceSendCountingUniqueAction = xprops?.audienceSendCountingUniqueAction;
 
   return { 
     presentationProps, 
@@ -471,7 +471,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     baseUrl,
     subscribeTopic,
     unsubscribeTopic,
-    audienceSendCountingAction
+    audienceSendCountingUniqueAction
   };
 }
 
@@ -494,7 +494,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceTeam: Ref<string | undefined>;
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
-  audienceSendCountingAction: ((payload?: any) => Promise<any>) | undefined;
+  audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
@@ -539,7 +539,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
-  const audienceSendCountingAction = xprops?.audienceSendCountingAction;
+  const audienceSendCountingUniqueAction = xprops?.audienceSendCountingUniqueAction;
 
   return { 
     presentationProps, 
@@ -553,6 +553,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceTeam,
     subscribeTopic,
     unsubscribeTopic,
-    audienceSendCountingAction
+    audienceSendCountingUniqueAction
   };
 }

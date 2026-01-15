@@ -62,21 +62,21 @@ const {
   audienceTeam,
   subscribeTopic,
   unsubscribeTopic,
-  audienceSendCountingAction
+  audienceSendCountingUniqueAction,
 } = useAudiencePlugin();
 
 const voting = ref(false);
 const countTopic = computed(() => `plugin-counting/slide-${slideId}`);
 
 const handleVote = async () => {
-  if (!audienceSendCountingAction) {
-    console.error('audienceSendCountingAction is not available');
+  if (!audienceSendCountingUniqueAction) {
+    console.error('audienceSendCountingUniqueAction is not available');
     return;
   }
   
   voting.value = true;
   try {
-    await audienceSendCountingAction({
+    await audienceSendCountingUniqueAction({
       "bucket": "plugin-counting",
       "key": `slide-${slideId.value}`,
       "item": (Math.random() * 10).toString()

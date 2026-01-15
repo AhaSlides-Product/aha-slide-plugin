@@ -27,9 +27,9 @@ Configure hook behavior (e.g., disable auto-height).
 
 Reactive refs for presentation and slide props, and actions for slide attributes.
 
-### audienceSendCountingAction
+### audienceSendCountingUniqueAction
 
-> **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
+> **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
 
 ### baseUrl
 

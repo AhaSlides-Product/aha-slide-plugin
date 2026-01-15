@@ -12,9 +12,9 @@ Interface for the properties expected by the PresenterSlidePluginIframe componen
 
 ## Properties
 
-### audienceSendCountingAction()?
+### audienceSendCountingUniqueAction()?
 
-> `optional` **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\>
+> `optional` **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\>
 
 Defined in: [packages/ui/src/zoid.ts:113](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/zoid.ts#L113)
 

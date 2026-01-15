@@ -43,9 +43,9 @@ Reactive refs for presentation, slide, and slideAttributes props.
 
 > **audienceName**: `Ref`\<`string` \| `undefined`\>
 
-### audienceSendCountingAction
+### audienceSendCountingUniqueAction
 
-> **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
+> **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
 
 ### audienceTeam
 
