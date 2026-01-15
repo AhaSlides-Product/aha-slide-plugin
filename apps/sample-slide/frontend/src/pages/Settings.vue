@@ -16,7 +16,7 @@
       <a-button type="primary" @click="handleImageUpload">Upload Image</a-button>
       <div v-if="imageUrl" style="margin-top: 10px;">
         <img v-if="imageUrl" :src="imageUrl" alt="Slide Image" style="max-width: 100%; max-height: 400px; border-radius: 8px;" />
-        <a-button type="primary" @click="() => imageUrl = null">Clear Image</a-button>
+        <a-button type="primary" @click="() => imageUrl = ''">Clear Image</a-button>
       </div>
     </div>
 
