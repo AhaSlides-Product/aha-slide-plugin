@@ -16,7 +16,7 @@
       "default": "./tailwind.config.js"
     },
     "./styles.css": "./src/styles.css",
-    "./antd-vars.css": "./dist/assets/antd-vars.css"
+    "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css"
   },
   "files": [
     "dist",

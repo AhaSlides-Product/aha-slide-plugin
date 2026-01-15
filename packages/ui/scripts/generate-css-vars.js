@@ -22,7 +22,7 @@ const mapToken = defaultAlgorithm({ ...defaultSeed, ...ahaSlidesDefaultTheme.tok
 const cssVariables = Object.entries(mapToken)
   .filter(([_, value]) => typeof value === 'string' || typeof value === 'number')
   .map(([key, value]) => {
-    const name = `--ant-${key}`;
+    const name = `--aha-${key}`;
     const unit = typeof value === 'number' && !['zIndex', 'opacity', 'weight'].some(k => key.toLowerCase().includes(k)) ? 'px' : '';
     return `  ${name}: ${value}${unit};`;
   })
@@ -31,7 +31,7 @@ const cssVariables = Object.entries(mapToken)
 const cssContent = `:root {\n${cssVariables}\n}`;
 
 // 4. Create directory structure if it doesn't exist
-const outputPath = path.resolve(__dirname, '../dist/assets/antd-vars.css');
+const outputPath = path.resolve(__dirname, '../dist/assets/ahaslides-vars.css');
 const outputDir = path.dirname(outputPath);
 
 // Create directory recursively (won't throw error if it already exists)
@@ -39,5 +39,5 @@ fs.mkdirSync(outputDir, { recursive: true });
 
 // 5. Save to your assets folder
 fs.writeFileSync(outputPath, cssContent);
-console.log('✅ Ant Design tokens extracted to antd-vars.css');
+console.log('✅ AhaSlides Design tokens extracted to ahaslides-vars.css');
 console.log(`📁 Output: ${outputPath}`);
