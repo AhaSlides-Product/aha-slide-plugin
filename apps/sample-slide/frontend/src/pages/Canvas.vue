@@ -4,6 +4,9 @@
     <p>Welcome to the Canvas for Slide: {{ slideId }}</p>
     <div class="greeting-display">
       <h2>Greeting: {{ slideGreeting }}</h2>
+       <div v-if="imageUrl" style="margin-top: 10px;">
+        <img :src="imageUrl" alt="Slide Image" style="max-width: 100%; max-height: 400px; border-radius: 8px;" />
+      </div>
     </div>
 
     <div v-if="presentationProps" class="debug-section">
@@ -44,6 +47,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSync, usePresenterPlugin } from '@aha/ui';
+import { useSlideImage } from '../composables/useSlideImage';
 
 const route = useRoute();
 const slideId = route.params.slideId as string;
@@ -55,6 +59,7 @@ const {
   unsubscribeTopic
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
+const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);
 const mqttMessages = ref<string[]>([]);
 const countTopic = `plugin-counting/slide-${slideId}`;
