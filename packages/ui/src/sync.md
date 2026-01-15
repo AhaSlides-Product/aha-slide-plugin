@@ -54,3 +54,39 @@ console.log(state.value.isActive);
 ### Returns
 
 *   `DeepReadonly<Ref<T>>`: A read-only reactive reference.
+
+## Example: Syncing a Setting
+
+```typescript
+// src/composables/useTheme.ts
+import { useSync } from '@aha/ui';
+
+export function useTheme() {
+  // 'app-theme' is the unique channel name.
+  // 'light' is the initial value.
+  const theme = useSync<string>('app-theme', 'light');
+
+  const toggleTheme = () => {
+    theme.value = theme.value === 'light' ? 'dark' : 'light';
+  };
+
+  return { theme, toggleTheme };
+}
+```
+
+### Usage in Component
+
+```vue
+<!-- Header.vue -->
+<script setup>
+import { useTheme } from '../composables/useTheme';
+
+const { theme, toggleTheme } = useTheme();
+</script>
+
+<template>
+  <button @click="toggleTheme">
+    Current Theme: {{ theme }} (Click to toggle)
+  </button>
+</template>
+```
