@@ -20,7 +20,6 @@ const mapToken = defaultAlgorithm({ ...defaultSeed, ...ahaSlidesDefaultTheme.tok
 
 // 3. Convert them to CSS Variable format
 const cssVariables = Object.entries(mapToken)
-  .filter(([_, value]) => typeof value === 'string' || typeof value === 'number')
   .map(([key, value]) => {
     const name = `--aha-${key}`;
     const unit = typeof value === 'number' && !['zIndex', 'opacity', 'weight'].some(k => key.toLowerCase().includes(k)) ? 'px' : '';
