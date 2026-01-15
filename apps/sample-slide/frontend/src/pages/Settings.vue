@@ -11,6 +11,14 @@
       <a-typography-title :level="2">Heading 2</a-typography-title>
     </div>
     <a-button type="primary" size="small">Sample button</a-button>
+    <div style="margin-top: 10px;">
+      <p>Upload Image:</p>
+      <a-button type="primary" @click="handleImageUpload">Upload Image</a-button>
+      <div v-if="imageUrl" style="margin-top: 10px;">
+        <img v-if="imageUrl" :src="imageUrl" alt="Slide Image" style="max-width: 100%; max-height: 400px; border-radius: 8px;" />
+        <a-button type="primary" @click="() => imageUrl = null">Clear Image</a-button>
+      </div>
+    </div>
 
     <div v-if="presentationProps" class="debug-section">
       <h3>Presentation Details</h3>
@@ -43,10 +51,26 @@
 import { onMounted, watch, ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
+import { useSlideImage } from '../composables/useSlideImage';
 
-const { presentationProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction } = usePresenterPlugin({ autoHeight: true });
+const { presentationProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
+  uploadImage
+ } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
+
+const { imageUrl } = useSlideImage(slideId);
+
+const handleImageUpload = async () => {
+  try {
+    if (uploadImage) {
+      const result = await uploadImage();
+      imageUrl.value = result.url;
+    }
+  } catch (error) {
+    console.error('Upload failed:', error);
+  }
+};
 // xprops removed as it is now handled by usePresenterPlugin
 
 /**

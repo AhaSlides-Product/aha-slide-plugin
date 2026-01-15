@@ -1,5 +1,6 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
 import { ref, onMounted, type Ref } from 'vue';
+import { ImageUploadResult } from './image';
 
 /**
  * Interface for the properties expected by the PresenterSlidePluginIframe component.
@@ -111,6 +112,7 @@ export interface SlidePluginProps {
    * @param payload - The event payload to track.
    */
   trackGA4AndMixpanel?: (payload: any) => void;
+  uploadImage: () => Promise<ImageUploadResult>;
 }
 
 /**
@@ -163,6 +165,10 @@ export const PresenterSlidePluginIframe = zoid.create({
       required: false,
     },
     trackGA4AndMixpanel: {
+      type: 'function',
+      required: false,
+    },
+    uploadImage: {
       type: 'function',
       required: false,
     },
@@ -361,11 +367,11 @@ export const AudienceSlidePluginIframe = zoid.create({
  */
 export function autoReportHeight() {
   console.log('[SlidePlugin] autoReportHeight called');
-  if (typeof window === 'undefined') return () => {};
-  
+  if (typeof window === 'undefined') return () => { };
+
   const xprops = (window as any).xprops;
   if (!xprops || typeof xprops.onHeightChange !== 'function') {
-    return () => {};
+    return () => { };
   }
 
   const sendHeight = () => {
@@ -398,7 +404,7 @@ export function autoReportHeight() {
 
   // Initial report
   sendHeight();
-  
+
   // Also report after a short delay for any late rendering
   setTimeout(sendHeight, 300);
 
@@ -434,12 +440,13 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
   audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;
+  uploadImage: (() => Promise<ImageUploadResult>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
 
   onMounted(() => {
-    let cleanup = () => {};
+    let cleanup = () => { };
     if (options.autoHeight !== false) {
       cleanup = autoReportHeight();
     } else {
@@ -463,7 +470,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const xprops = (window as any).xprops;
   const baseUrl = ref<string | undefined>(xprops?.baseUrl);
   const originalGetAttributes = xprops?.getSlideAttributesAction;
-  
+
   const getSlideAttributesAction = async (slideId?: string | number): Promise<any> => {
     if (typeof originalGetAttributes !== 'function') return undefined;
     const response = await originalGetAttributes(slideId);
@@ -482,16 +489,18 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
   const audienceSendCountingUniqueAction = xprops?.audienceSendCountingUniqueAction;
+  const uploadImage = xprops?.uploadImage;
 
-  return { 
-    presentationProps, 
-    slideProps, 
-    getSlideAttributesAction, 
+  return {
+    presentationProps,
+    slideProps,
+    getSlideAttributesAction,
     upsertSlideAttributeAction,
     baseUrl,
     subscribeTopic,
     unsubscribeTopic,
-    audienceSendCountingUniqueAction
+    audienceSendCountingUniqueAction,
+    uploadImage,
   };
 }
 
@@ -519,7 +528,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
   const slideAttributesProps = ref<Record<string, any> | undefined>((window as any).xprops?.slideAttributes);
-  
+
   const xprops = (window as any).xprops;
   const audienceName = ref<string | undefined>(xprops?.audienceName);
   const audienceEmoji = ref<string | undefined>(xprops?.audienceEmoji);
@@ -528,7 +537,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const audienceTeam = ref<string | undefined>(xprops?.audienceTeam);
 
   onMounted(() => {
-    let cleanup = () => {};
+    let cleanup = () => { };
     if (options.autoHeight !== false) {
       cleanup = autoReportHeight();
     } else {
@@ -545,7 +554,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
         if (newProps.slide) slideProps.value = { ...newProps.slide };
         if (newProps.slideAttributes) slideAttributesProps.value = { ...newProps.slideAttributes };
         if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
-        
+
         if (newProps.audienceName) audienceName.value = newProps.audienceName;
         if (newProps.audienceEmoji) audienceEmoji.value = newProps.audienceEmoji;
         if (newProps.audienceId) audienceId.value = newProps.audienceId;
@@ -561,10 +570,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const unsubscribeTopic = xprops?.unsubscribeTopic;
   const audienceSendCountingUniqueAction = xprops?.audienceSendCountingUniqueAction;
 
-  return { 
-    presentationProps, 
-    slideProps, 
-    slideAttributesProps, 
+  return {
+    presentationProps,
+    slideProps,
+    slideAttributesProps,
     baseUrl,
     audienceName,
     audienceEmoji,
