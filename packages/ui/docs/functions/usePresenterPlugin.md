@@ -27,9 +27,9 @@ Configure hook behavior (e.g., disable auto-height).
 
 Reactive refs for presentation and slide props, and actions for slide attributes.
 
-### audienceSendCountingAction
+### audienceSendCountingUniqueAction
 
-> **audienceSendCountingAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
+> **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
 
 ### baseUrl
 
@@ -49,9 +49,7 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 `Promise`\<`any`\>
 
-### onMqttMessage
 
-> **onMqttMessage**: (`handler`) => `void` \| `undefined`
 
 ### presentationProps
 
@@ -63,7 +61,17 @@ Reactive refs for presentation and slide props, and actions for slide attributes
 
 ### subscribeTopic
 
-> **subscribeTopic**: (`topic`) => `void` \| `undefined`
+> **subscribeTopic**: (`options`) => `void` \| `undefined`
+
+#### Parameters
+
+##### options
+
+{ `callback`: (`topic`, `message`) => `void`; `topic`: `string`; `type?`: `string`; }
+
+#### Returns
+
+`void` \| `undefined`
 
 ### unsubscribeTopic
 

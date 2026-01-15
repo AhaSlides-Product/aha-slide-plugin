@@ -86,7 +86,7 @@ onMounted(async () => {
 
 const debouncedUpdate = debounce((newGreeting: string) => {
   if (upsertSlideAttributeAction) {
-    upsertSlideAttributeAction({ attributeKey: 'greeting', attributeValue: newGreeting })
+    upsertSlideAttributeAction({ slideId: slideId.value, attributeKey: 'greeting', attributeValue: newGreeting })
   }
 }, 500);
 

@@ -62,23 +62,21 @@ const {
   audienceTeam,
   subscribeTopic,
   unsubscribeTopic,
-  onMqttMessage,
-  audienceSendCountingAction
+  audienceSendCountingUniqueAction,
 } = useAudiencePlugin();
 
 const voting = ref(false);
-const mqttMessages = ref<string[]>([]);
 const countTopic = computed(() => `plugin-counting/slide-${slideId}`);
 
 const handleVote = async () => {
-  if (!audienceSendCountingAction) {
-    console.error('audienceSendCountingAction is not available');
+  if (!audienceSendCountingUniqueAction) {
+    console.error('audienceSendCountingUniqueAction is not available');
     return;
   }
   
   voting.value = true;
   try {
-    await audienceSendCountingAction({
+    await audienceSendCountingUniqueAction({
       "bucket": "plugin-counting",
       "key": `slide-${slideId.value}`,
       "item": (Math.random() * 10).toString()
@@ -92,18 +90,19 @@ const handleVote = async () => {
 };
 
 onMounted(() => {
-  if (subscribeTopic && onMqttMessage) {
+  if (subscribeTopic) {
     watch(countTopic, (newTopic, oldTopic) => {
       if (oldTopic && unsubscribeTopic) unsubscribeTopic(oldTopic);
-      if (newTopic) subscribeTopic(newTopic);
-    }, { immediate: true });
-
-    onMqttMessage((topic: string, message: string) => {
-      if (topic === countTopic.value) {
-        mqttMessages.value.push(`${new Date().toLocaleTimeString()}: ${message}`);
-        if (mqttMessages.value.length > 5) mqttMessages.value.shift();
+      if (newTopic) {
+        subscribeTopic({
+          type: 'counting',
+          topic: newTopic,
+          callback: (topic: string, message: any) => {
+            console.log('Received message in Audience:', topic, message);
+          }
+        });
       }
-    });
+    }, { immediate: true });
   }
 });
 

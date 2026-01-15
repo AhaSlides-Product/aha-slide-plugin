@@ -35,6 +35,8 @@
       </ul>
     </div>
 
+
+
   </div>
 </template>
 
@@ -50,8 +52,7 @@ const {
   slideProps, 
   getSlideAttributesAction,
   subscribeTopic,
-  unsubscribeTopic,
-  onMqttMessage
+  unsubscribeTopic
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const slideAttributes = ref<any>(null);
@@ -62,24 +63,16 @@ onMounted(async () => {
   document.body.classList.add('enable-scroll');
   
   // MQTT Integration
-  if (subscribeTopic && onMqttMessage) {
-    subscribeTopic(countTopic);
-    onMqttMessage((topic: string, message: string) => {
-      console.log('topictopictopic', topic, message);
-      try {
-        const payload = JSON.parse(message);
-        if (topic === countTopic) {
-          mqttMessages.value.unshift(`${new Date().toLocaleTimeString()}: Total Count = ${payload.total} (${payload.count_type})`);
-        } else {
-          mqttMessages.value.unshift(`${new Date().toLocaleTimeString()} [${topic}]: ${message}`);
+  if (subscribeTopic) {
+    subscribeTopic({
+      type: 'counting',
+      topic: countTopic,
+      callback: (topic: string, message: any) => {
+        console.log('Received message:', topic, message);
+        mqttMessages.value.unshift(`${new Date().toLocaleTimeString()}: Total Count = ${message.total} (${message.count_type})`);
+        if (mqttMessages.value.length > 10) {
+          mqttMessages.value.pop();
         }
-      } catch (e) {
-        mqttMessages.value.unshift(`${new Date().toLocaleTimeString()} [${topic}]: ${message}`);
-      }
-      
-      // Limit to last 10 messages
-      if (mqttMessages.value.length > 10) {
-        mqttMessages.value.pop();
       }
     });
   }
