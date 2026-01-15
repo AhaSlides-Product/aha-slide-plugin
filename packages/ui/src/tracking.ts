@@ -8,7 +8,7 @@ export interface TrackingElement extends HTMLElement {
 /**
  * A Vue directive to track click actions and emit them to the parent window.
  * It attaches a click event listener to the element and sends the binding value
- * as a 'track-action' message via postMessage.
+ * via zoid prop `trackGA4AndMixpanel`.
  * 
  * @example
  * ```html
@@ -21,10 +21,10 @@ export const vEmitAction: ObjectDirective<TrackingElement, any> = {
   mounted(el, binding) {
     el._trackingPayload = binding.value;
     el._emitActionHandler = () => {
-      window.parent.postMessage({
-        type: 'track-action',
-        payload: el._trackingPayload
-      }, '*');
+      const xprops = (window as any).xprops;
+      if (xprops && typeof xprops.trackGA4AndMixpanel === 'function') {
+        xprops.trackGA4AndMixpanel(el._trackingPayload);
+      }
     };
     el.addEventListener('click', el._emitActionHandler);
   },

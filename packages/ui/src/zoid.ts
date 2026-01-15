@@ -105,6 +105,12 @@ export interface SlidePluginProps {
    * @returns A promise resolving when the counting is handled.
    */
   audienceSendCountingUniqueAction?: (payload?: any) => Promise<any>;
+  /** 
+   * Action to track events to GA4 and Mixpanel.
+   * 
+   * @param payload - The event payload to track.
+   */
+  trackGA4AndMixpanel?: (payload: any) => void;
 }
 
 /**
@@ -153,6 +159,10 @@ export const PresenterSlidePluginIframe = zoid.create({
       required: false,
     },
     audienceSendCountingUniqueAction: {
+      type: 'function',
+      required: false,
+    },
+    trackGA4AndMixpanel: {
       type: 'function',
       required: false,
     },
@@ -263,6 +273,12 @@ export interface AudienceSlidePluginProps {
    * @returns A promise resolving when the counting is handled.
    */
   audienceSendCountingUniqueAction?: (payload?: any) => Promise<any>;
+  /** 
+   * Action to track events to GA4 and Mixpanel.
+   * 
+   * @param payload - The event payload to track.
+   */
+  trackGA4AndMixpanel?: (payload: any) => void;
 }
 
 /**
@@ -327,6 +343,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       required: false,
     },
     audienceSendCountingUniqueAction: {
+      type: 'function',
+      required: false,
+    },
+    trackGA4AndMixpanel: {
       type: 'function',
       required: false,
     },
