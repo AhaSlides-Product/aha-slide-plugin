@@ -83,7 +83,7 @@ export interface SlidePluginProps {
    * @param payload - The attribute data to sync.
    * @returns A promise resolving when the update is complete.
    */
-  upsertSlideAttributeAction?: (payload: { attributeKey: string; attributeValue: any }) => Promise<any>;
+  upsertSlideAttributeAction?: (payload: { slideId?: string | number, attributeKey: string; attributeValue: any }) => Promise<any>;
   /** The base URL of the parent application */
   baseUrl?: string;
   /** 
@@ -429,7 +429,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   presentationProps: Ref<Record<string, any> | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
-  upsertSlideAttributeAction: ((payload: { attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
+  upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
   baseUrl: Ref<string | undefined>;
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
