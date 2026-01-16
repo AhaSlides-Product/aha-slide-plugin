@@ -6,7 +6,7 @@
 
 # Function: uploadImage()
 
-> **uploadImage**(`file`): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
+> **uploadImage**(): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
 
 Defined in: [packages/ui/src/image.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/image.ts#L19)
 

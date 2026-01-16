@@ -16,7 +16,7 @@ export interface ImageUploadResult {
  * @param file The image file to be uploaded.
  * @returns A promise that resolves to the upload result containing URLs and metadata.
  */
-export async function uploadImage(file: File): Promise<ImageUploadResult> {
+export async function uploadImage(): Promise<ImageUploadResult> {
   // Implementation will be provided by the host application environment.
   return {} as ImageUploadResult;
 }
