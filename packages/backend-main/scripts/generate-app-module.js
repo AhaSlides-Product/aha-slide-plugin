@@ -48,10 +48,12 @@ function generate() {
  */
 import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
+import { HealthModule } from './health/health.module';
 ${imports}
 
 @Module({
   imports: [
+    HealthModule,
     ${moduleImports},
     RouterModule.register([
 ${routerConfig}

@@ -2,13 +2,13 @@
 
 ***
 
-[@aha/ui](../README.md) / theme
+[@aha/ui](../README.md) / ahaSlidesDefaultTheme
 
-# Variable: theme
+# Variable: ahaSlidesDefaultTheme
 
-> `const` **theme**: `ThemeConfig`
+> `const` **ahaSlidesDefaultTheme**: `ThemeConfig`
 
-Defined in: [packages/ui/src/theme.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/theme.ts#L18)
+Defined in: [packages/ui/src/theme.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/theme.ts#L17)
 
 Base theme configuration for Aha Slide applications using Ant Design.
 Colors are sourced from the Tailwind config to maintain design consistency.

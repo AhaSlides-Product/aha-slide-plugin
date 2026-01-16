@@ -1,5 +1,17 @@
 name: 'Build App'
 description: 'Builds the application'
+
+inputs:
+  repository_url:
+    description: "Docker repository URL"
+    required: true
+  commit_sha:
+    description: "Commit SHA for tagging the image"
+    required: true
+  platform:
+    description: "Architecture platform"
+    required: false
+    default: linux/amd64
 runs:
   using: "composite"
   steps:
@@ -15,6 +27,22 @@ runs:
     - name: Build
       shell: bash
       run: npm run build
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v5
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v5
+
+    - name: Build and Push Docker Image
+      run: |
+        cd packages/backend-main
+        echo "Building image ${{ inputs.repository_url }}:${{ inputs.commit_sha }}..."
+        docker build \
+          --platform ${{ inputs.platform }} \
+          --push \
+          -t ${{ inputs.repository_url }}:${{ inputs.commit_sha }} .
+      shell: bash
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
