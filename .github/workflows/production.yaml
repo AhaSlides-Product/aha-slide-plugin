@@ -12,6 +12,9 @@ jobs:
 
       - name: Build
         uses: ./.github/actions/build-app
+        with:
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          commit_sha: ${{ github.sha }}
 
   deploy_canary:
     name: Deploy Canary
@@ -22,13 +25,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_CANARY }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: canary-plugins-default
+          ecs_service: plugins-backend-service
+          ecs_task_definition: ecs/tasks/canary-plugins-backend-default.json
 
   deploy_production:
     name: Deploy Production
@@ -39,10 +54,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: prod-plugins-default
+          ecs_service: plugins-backend-service
+          ecs_task_definition: ecs/tasks/prod-plugins-backend-default.json

@@ -14,6 +14,9 @@ jobs:
 
       - name: Build
         uses: ./.github/actions/build-app
+        with:
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          commit_sha: ${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -22,10 +25,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: plugins.dev.ahaslide.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: dev01-plugins-default
+          ecs_service: plugins-backend-service
+          ecs_task_definition: ecs/tasks/dev01-plugins-backend-default.json
