@@ -4,6 +4,10 @@
 
 # @aha/ui
 
+## UI Design
+- CSS variables: available in @aha/ui/ahaslides-vars.css
+- Design tokens: will be controlled by AhaSlides
+
 ## Interfaces
 
 - [AudienceSlidePluginProps](interfaces/AudienceSlidePluginProps.md)

@@ -8,7 +8,7 @@ const SeedTokens = {
   colorSuccess: '#16C49A',
   colorWarning: '#FF7747',
   colorInfo: '#9BB3E9',
-  colorTextBase: '#1A1A2E',
+  colorTextBase: '#1A1A1A',
 }
 
 export default SeedTokens;
