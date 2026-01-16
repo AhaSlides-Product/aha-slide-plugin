@@ -14,12 +14,6 @@ Uploads an image file to the hosting service.
 
 ## Parameters
 
-### file
-
-`File`
-
-The image file to be uploaded.
-
 ## Returns
 
 `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
