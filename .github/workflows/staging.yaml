@@ -25,9 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
@@ -35,6 +32,9 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs
@@ -46,4 +46,4 @@ jobs:
           commit_sha: ${{ github.sha }}
           ecs_cluster: dev01-plugins
           ecs_service: dev01-plugins-default
-          ecs_task_definition: ecs/tasks/dev01-plugins-backend-default.json
+          ecs_task_definition: ecs/tasks/dev01-plugins-default.json
