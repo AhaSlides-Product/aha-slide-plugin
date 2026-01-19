@@ -47,6 +47,7 @@ jobs:
           ecs_cluster: us01-plugins
           ecs_service: us01-plugins-canary
           ecs_task_definition: ecs/tasks/us01-plugins-backend-canary.json
+          container_name: plugins-default
 
   deploy_production:
     name: Deploy Production
@@ -76,3 +77,4 @@ jobs:
           ecs_cluster: us01-plugins
           ecs_service: us01-plugins-default
           ecs_task_definition: ecs/tasks/us01-plugins-backend-default.json
+          container_name: plugins-default
