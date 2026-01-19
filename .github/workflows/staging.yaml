@@ -15,7 +15,7 @@ jobs:
       - name: Build
         uses: ./.github/actions/build-app
         with:
-          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
           commit_sha: ${{ github.sha }}
 
   deploy:
@@ -39,7 +39,7 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
-          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
           commit_sha: ${{ github.sha }}
           ecs_cluster: dev01-plugins
           ecs_service: dev01-plugins-default
