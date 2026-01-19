@@ -90,3 +90,14 @@ npm run start:dev -w @aha/backend-main
 The `backend-main` application automatically imports the `AppModule` from every slide package in `apps/*/backend`. It uses the NestJS `RouterModule` to mount each slide's controllers under a unique prefix (e.g., `/sample-slide/*`).
 
 When you build or start `backend-main`, it triggers an auto-generation script (`scripts/generate-app-module.js`) that scans the `apps/` directory and updates its own `AppModule` to include all discovered slide backends.
+
+### Environments 
+
+#### Local development 
+
+For local development, please use Ahaslides' sandbox environment at `https://presenter.sandbox.ahaslide.com`. The environment is pre-configured with `localhost:5173` for slide types `ranking`, `pin on image` and `ideas board`. 
+
+#### Staging 
+
+Plugins are deployed at `plugins.dev.ahaslide.com` and can be tested with `https://presenter.dev.ahaslides.com` 
+
