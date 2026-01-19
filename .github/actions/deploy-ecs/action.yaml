@@ -28,7 +28,7 @@ inputs:
   container_name:
     description: 'Container Name in Task Definition'
     required: false
-    default: 'plugins-default'
+    default: 'plugins'
 
 runs:
   using: "composite"

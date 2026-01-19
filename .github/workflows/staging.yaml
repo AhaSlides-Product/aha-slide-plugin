@@ -47,4 +47,3 @@ jobs:
           ecs_cluster: dev01-plugins
           ecs_service: dev01-plugins-default
           ecs_task_definition: ecs/tasks/dev01-plugins-default.json
-          container_name: plugins-default
