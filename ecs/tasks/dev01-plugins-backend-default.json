@@ -1,12 +1,13 @@
 {
+  "family": "dev01-plugins-default",
   "containerDefinitions": [
     {
-      "name": "plugins-backend",
+      "name": "plugins-default",
       "image": "",
       "cpu": 1024,
       "portMappings": [
         {
-          "name": "plugins-backend-3000-tcp",
+          "name": "plugins-default-3000-tcp",
           "containerPort": 3000,
           "hostPort": 3000,
           "protocol": "tcp"
