@@ -41,6 +41,6 @@ jobs:
           aws_region: us-east-1
           repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
           commit_sha: ${{ github.sha }}
-          ecs_cluster: dev01-plugins-default
-          ecs_service: plugins-backend-service
+          ecs_cluster: dev01-plugins
+          ecs_service: dev01-plugins-default
           ecs_task_definition: ecs/tasks/dev01-plugins-backend-default.json

@@ -41,9 +41,9 @@ jobs:
           aws_region: us-east-1
           repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
           commit_sha: ${{ github.sha }}
-          ecs_cluster: canary-plugins-default
-          ecs_service: plugins-backend-service
-          ecs_task_definition: ecs/tasks/canary-plugins-backend-default.json
+          ecs_cluster: us01-plugins
+          ecs_service: us01-plugins-canary
+          ecs_task_definition: ecs/tasks/us01-plugins-backend-canary.json
 
   deploy_production:
     name: Deploy Production
@@ -70,6 +70,6 @@ jobs:
           aws_region: us-east-1
           repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/plugins-backend
           commit_sha: ${{ github.sha }}
-          ecs_cluster: prod-plugins-default
-          ecs_service: plugins-backend-service
-          ecs_task_definition: ecs/tasks/prod-plugins-backend-default.json
+          ecs_cluster: us01-plugins
+          ecs_service: us01-plugins-default
+          ecs_task_definition: ecs/tasks/us01-plugins-backend-default.json
