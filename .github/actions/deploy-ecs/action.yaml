@@ -89,4 +89,4 @@ runs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ inputs.ecs_service }}
         cluster: ${{ inputs.ecs_cluster }}
-        wait-for-service-stability: true
+        wait-for-service-stability: false # true = cost more CI credit :P
