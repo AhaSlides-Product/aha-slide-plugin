@@ -18,7 +18,11 @@
     "./styles.css": "./src/styles.css",
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
     "./icons": "./dist/icons",
-    "./vite.config.icon": "./src/vite.config.icon.js",
+    "./vite.config.icon": {
+      "types": "./src/vite.config.icon.d.ts",
+      "import": "./src/vite.config.icon.js",
+      "default": "./src/vite.config.icon.js"
+    },
     "./AhaIcon.vue": "./src/AhaIcon.vue"
   },
   "files": [
