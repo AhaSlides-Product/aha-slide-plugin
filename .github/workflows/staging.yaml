@@ -7,7 +7,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-2404-arm64-8core-32gbram
+    runs-on:
+      group: github-runner-arm64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
