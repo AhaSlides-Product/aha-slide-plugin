@@ -3,6 +3,7 @@ import Canvas from '../pages/Canvas.vue'
 import Settings from '../pages/Settings.vue'
 import Audience from '../pages/Audience.vue'
 import ComponentsShowcase from '../pages/AntDesignComponentsShowcase.vue'
+import IconsShowcase from '../pages/IconsShowcase.vue'
 
 const routes = [
     {
@@ -28,6 +29,11 @@ const routes = [
         path: '/components',
         name: 'ComponentsShowcase',
         component: ComponentsShowcase
+    },
+    {
+        path: '/icons',
+        name: 'IconsShowcase',
+        component: IconsShowcase
     }
 ]
 
