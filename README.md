@@ -91,6 +91,11 @@ The `backend-main` application automatically imports the `AppModule` from every 
 
 When you build or start `backend-main`, it triggers an auto-generation script (`scripts/generate-app-module.js`) that scans the `apps/` directory and updates its own `AppModule` to include all discovered slide backends.
 
+This module also auto-prefixes all routes with `/api/plugins` to align with the API gateway configuration.
+So backend api paths become `/api/plugins/{slide-type}/**`
+
+If plugin providers want to expose a custom api, please prefix the api path with `external/`. For example `/api/plugins/ideas-board/external/auto-group-ideas` 
+
 ### Environments 
 
 #### Local development 
