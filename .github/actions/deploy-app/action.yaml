@@ -43,7 +43,7 @@ runs:
           if [ -d "${app_dir}frontend/dist" ]; then
             echo "Deploying ${app_name}..."
             # Sync all files except index.html first
-            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}/${app_name}" --exclude "*/index.html" --exclude "index.html"
+            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}" --exclude "*/index.html" --exclude "index.html"
             # Then sync index.html files last
             aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
             
