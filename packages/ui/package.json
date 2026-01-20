@@ -18,13 +18,15 @@
     "./styles.css": "./src/styles.css",
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
     "./icons": "./dist/icons",
-    "./vite.config.icon": "./src/vite.config.icon.js"
+    "./vite.config.icon": "./src/vite.config.icon.js",
+    "./AhaIcon.vue": "./src/AhaIcon.vue"
   },
   "files": [
     "dist",
     "src/styles.css",
     "src/vite.config.icon.js",
     "src/icons",
+    "src/AhaIcon.vue",
     "tailwind.config.js",
     "tailwind.config.d.ts"
   ],
