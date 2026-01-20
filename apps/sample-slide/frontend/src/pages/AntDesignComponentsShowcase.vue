@@ -4,7 +4,7 @@
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-base-100 mb-2">Ant Design Vue Components</h1>
       <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
-      </div>
+    </div>
 
     <!-- Navigation -->
       <div class="mb-6">
@@ -54,46 +54,6 @@
             <HeartOutlined style="font-size: 24px" />
             <StarOutlined style="font-size: 24px" />
           </a-space>
-        </ComponentDemo>
-      </ComponentSection>
-
-      <!-- CUSTOM AHA ICONS -->
-      <ComponentSection title="Custom Aha Icons" description="Custom SVG icons loaded via unplugin-icons">
-        <ComponentDemo title="All Custom Icons" :span="24">
-          <div class="space-y-4">
-            <div class="flex flex-wrap gap-6">
-              <div class="flex flex-col items-center gap-2 p-4 border border-base-30 rounded-lg hover:bg-base-20 transition-colors">
-                <IconSystemAlignCenter class="text-4xl text-purple-60" />
-                <span class="text-xs text-base-70">IconSystemAlignCenter</span>
-            </div>
-            <div class="flex flex-col items-center gap-2 p-4 border border-base-30 rounded-lg hover:bg-base-20 transition-colors">
-                <IconSystemBell class="text-4xl text-purple-60" />
-                <span class="text-xs text-base-70">IconSystemBell</span>
-            </div>
-      </div>
-
-            <a-divider>Usage Examples</a-divider>
-
-            <div class="space-y-3">
-              <div class="flex items-center gap-3 p-3 bg-white rounded border border-base-30">
-                <IconSystemBell class="text-2xl text-emerald-60" />
-                <span>Icon with different color</span>
-          </div>
-              <div class="flex items-center gap-3 p-3 bg-white rounded border border-base-30">
-                <IconSystemBell class="text-xl" />
-                <IconSystemBell class="text-2xl" />
-                <IconSystemBell class="text-3xl" />
-                <IconSystemBell class="text-4xl" />
-                <span class="ml-2">Icons scale with text size</span>
-        </div>
-              <div class="flex items-center gap-3 p-3 bg-purple-60 rounded text-white">
-                <IconSystemBell class="text-2xl" />
-                <span>Icons inherit currentColor</span>
-          </div>
-        </div>
-
-            <a-alert message="Import with: import IconAhaAsterisk from '~icons/aha/aha-asterisk'" type="info" />
-          </div>
         </ComponentDemo>
       </ComponentSection>
 
@@ -529,10 +489,6 @@ import {
 } from '@ant-design/icons-vue';
 import ComponentSection from '../components/ComponentSection.vue';
 import ComponentDemo from '../components/ComponentDemo.vue';
-
-// Custom Aha Icons
-import IconSystemAlignCenter from '~icons/aha/system-align-center';
-import IconSystemBell from '~icons/aha/system-bell';
 
 
 // Enable scrolling for this page
