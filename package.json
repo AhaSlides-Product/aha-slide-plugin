@@ -11,7 +11,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
-    "docs": "turbo run docs"
+    "docs": "turbo run docs",
+    "storybook": "turbo run storybook"
   },
   "keywords": [],
   "author": "",
