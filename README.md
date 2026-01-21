@@ -96,6 +96,10 @@ So backend api paths become `/api/plugins/{slide-type}/**`
 
 If plugin providers want to expose a custom api, please prefix the api path with `external/`. For example `/api/plugins/ideas-board/external/auto-group-ideas` 
 
+```
+curl https://plugins.dev.ahaslide.com/api/plugins/sample-slide/external/example
+```
+
 ### Environments 
 
 #### Local development 
