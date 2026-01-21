@@ -69,6 +69,13 @@ To generate or update documentation:
 npm run docs --workspaces
 ```
 
+### Existing components and icons
+
+You can view existing components and icons in the storybook
+```
+npm run storybook 
+```
+
 ### Running the Sample App
 
 To start the sample slide frontend in development mode:
