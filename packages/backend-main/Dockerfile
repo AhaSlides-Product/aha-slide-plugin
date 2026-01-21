@@ -15,5 +15,5 @@ COPY packages/backend-main/package.json ./packages/backend-main/
 COPY packages/backend-main/dist ./packages/backend-main/dist
 
 WORKDIR /app/packages/backend-main
-
+EXPOSE 3000
 CMD ["node", "dist/main.js"]
