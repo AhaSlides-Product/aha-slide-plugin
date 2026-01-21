@@ -1,5 +1,5 @@
-import type { Preview } from "@storybook/vue3";
-import { setup } from "@storybook/vue3";
+import type { Preview } from "@storybook/vue3-vite";
+import { setup } from "@storybook/vue3-vite";
 import Antd from "ant-design-vue";
 import AhaIcon from "@aha/ui/AhaIcon.vue";
 

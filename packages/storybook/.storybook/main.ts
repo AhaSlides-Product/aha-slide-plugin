@@ -1,20 +1,17 @@
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
 import type { StorybookConfig } from "@storybook/vue3-vite";
 import vue from "@vitejs/plugin-vue";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
-  addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
-  ],
+  addons: [getAbsolutePath("@storybook/addon-links"), getAbsolutePath("@storybook/addon-docs")],
+
   framework: {
-    name: "@storybook/vue3-vite",
+    name: getAbsolutePath("@storybook/vue3-vite"),
     options: {},
   },
-  docs: {
-    autodocs: "tag",
-  },
+
   async viteFinal(config: any) {
     config.plugins = config.plugins || [];
 
@@ -29,6 +26,10 @@ const config: StorybookConfig = {
     const { ahaViteIconPlugin } = await import("@aha/ui/vite.config.icon");
     config.plugins.push(ahaViteIconPlugin);
     return config;
-  },
+  }
 };
 export default config;
+
+function getAbsolutePath(value: string): any {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}

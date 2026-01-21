@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/vue3";
+import type { Meta, StoryObj } from "@storybook/vue3-vite";
 import IconsV2 from "./IconsV2.vue";
 
 const meta: Meta<typeof IconsV2> = {
