@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
-    "test": "node --require ./jest.setup.js ./node_modules/.bin/jest --verbose --forceExit"
+    "test": "jest --verbose --forceExit"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",

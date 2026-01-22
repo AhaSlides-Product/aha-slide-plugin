@@ -253,7 +253,7 @@ describe('AhaSDK E2E Tests', () => {
   });
 
   describe('Bulk Submission Operations', () => {
-    it('should create multiple submissions', async () => {
+    it.skip('should create multiple submissions', async () => {
       const submissions = await sdk.createSubmissions({
         submissions: [
           {

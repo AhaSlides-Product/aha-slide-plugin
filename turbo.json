@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "AHA_SDK_BASE_URL",
+    "AHA_SDK_TEST_JWT_TOKEN",
+    "AHA_SDK_TEST_SLIDE_ID",
+    "AHA_SDK_TEST_PRESENTATION_ID"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
