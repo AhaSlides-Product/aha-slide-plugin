@@ -34,6 +34,7 @@ describe('AppController', () => {
         audience: 'aud',
         audienceName: 'Audience Name',
         audienceEmoji: '😊',
+        slideData: {},
       };
       const result = { some: 'result' };
       jest.spyOn(appService, 'processAnswer').mockReturnValue(result as any);

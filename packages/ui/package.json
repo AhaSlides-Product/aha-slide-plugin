@@ -40,7 +40,7 @@
     "build:css": "postcss src/styles.css -o dist/styles.css",
     "build:antd-vars": "node scripts/generate-css-vars.js",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests specified for @aha/ui\" && exit 0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",

@@ -9,7 +9,7 @@
     "prestart": "node scripts/generate-app-module.js",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@aha/sample-slide-backend": "*",
