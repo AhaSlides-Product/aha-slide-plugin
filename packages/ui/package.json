@@ -16,11 +16,21 @@
       "default": "./tailwind.config.js"
     },
     "./styles.css": "./src/styles.css",
-    "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css"
+    "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
+    "./icons": "./dist/icons",
+    "./vite.config.icon": {
+      "types": "./src/vite.config.icon.d.ts",
+      "import": "./src/vite.config.icon.js",
+      "default": "./src/vite.config.icon.js"
+    },
+    "./AhaIcon.vue": "./src/AhaIcon.vue"
   },
   "files": [
     "dist",
     "src/styles.css",
+    "src/vite.config.icon.js",
+    "src/icons",
+    "src/AhaIcon.vue",
     "tailwind.config.js",
     "tailwind.config.d.ts"
   ],
@@ -41,12 +51,15 @@
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.0.0",
+    "unplugin-icons": "^23.0.1",
+    "unplugin-vue-components": "^30.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },
   "peerDependencies": {
     "@vueuse/core": "^10.0.0",
     "ant-design-vue": "^4.0.0",
+    "vite": "^7.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },

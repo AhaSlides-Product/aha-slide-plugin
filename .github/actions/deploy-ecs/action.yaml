@@ -28,7 +28,7 @@ inputs:
   container_name:
     description: 'Container Name in Task Definition'
     required: false
-    default: 'plugins-backend'
+    default: 'plugins'
 
 runs:
   using: "composite"
@@ -89,4 +89,4 @@ runs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ inputs.ecs_service }}
         cluster: ${{ inputs.ecs_cluster }}
-        wait-for-service-stability: true
+        wait-for-service-stability: false # true = cost more CI credit :P

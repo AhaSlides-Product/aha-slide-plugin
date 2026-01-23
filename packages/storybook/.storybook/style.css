@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+html,
+#app,
+body {
+  overflow: hidden;
+  font-family: var(--aha-fontFamily);
+  overflow: auto;
+}

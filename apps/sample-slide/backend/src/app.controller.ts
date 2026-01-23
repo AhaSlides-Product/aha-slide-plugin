@@ -11,6 +11,11 @@ export class AppController {
     return 'OK';
   }
 
+  @Get('/external/example')
+  getExternalExample() {
+    return { message: 'external api get' };
+  }
+
   @Post('ranking')
   @HttpCode(HttpStatus.OK)
   submitAnswer(@Body() payload: SubmitAnswerDto) {

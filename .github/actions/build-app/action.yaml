@@ -12,6 +12,15 @@ inputs:
     description: "Architecture platform"
     required: false
     default: linux/amd64
+  aws_access_key_id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws_region:
+    description: 'AWS Region'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -28,19 +37,24 @@ runs:
       shell: bash
       run: npm run build
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v5
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-region: ${{ inputs.aws_region }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v5
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Build and Push Docker Image
       run: |
-        cd packages/backend-main
         echo "Building image ${{ inputs.repository_url }}:${{ inputs.commit_sha }}..."
         docker build \
           --platform ${{ inputs.platform }} \
           --push \
+          -f packages/backend-main/Dockerfile \
           -t ${{ inputs.repository_url }}:${{ inputs.commit_sha }} .
       shell: bash
 
