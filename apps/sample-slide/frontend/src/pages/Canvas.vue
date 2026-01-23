@@ -9,24 +9,24 @@
       </div>
     </div>
 
-    <div v-if="presentationProps" class="debug-section">
+    <div v-if="presentationProps" class="debug-section" data-testid="canvas-presentation-details-props">
       <h3>Presentation Details</h3>
       <p><b>ID:</b> {{ presentationProps.id }}</p>
       <p><b>Access:</b> {{ presentationProps.accessCode }} ({{ presentationProps.uniqueAccessCode }})</p>
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="slideProps" class="debug-section">
+    <div v-if="slideProps" class="debug-section" data-testid="canvas-slide-details-props">
       <h3>Slide Details</h3>
       <pre class="code-block">{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="slideAttributes" class="debug-section">
+    <div v-if="slideAttributes" class="debug-section" data-testid="canvas-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(slideAttributes, null, 2) }}</pre>
     </div>
 
-    <div class="debug-section mqtt-section">
+    <div class="debug-section mqtt-section" data-testid="canvas-mqtt">
       <h3>Realtime Messages ({{ countTopic }})</h3>
       <div v-if="mqttMessages.length === 0" class="no-messages">
         Waiting for messages...

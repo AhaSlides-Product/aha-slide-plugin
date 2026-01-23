@@ -16,19 +16,19 @@
       </div>
     </div>
 
-    <div v-if="presentationProps" class="debug-section">
+    <div v-if="presentationProps" class="debug-section" data-testid="audience-presentation-props">
       <h3>Presentation Info</h3>
       <p><b>Access Code:</b> {{ presentationProps.accessCode }}</p>
       <div class="teamplay-info"><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></div>
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="slideProps" class="debug-section">
+    <div v-if="slideProps" class="debug-section" data-testid="audience-slide-details-props">
       <h3>Slide Info</h3>
       <pre class="code-block">{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="slideAttributesProps" class="debug-section">
+    <div v-if="slideAttributesProps" class="debug-section" data-testid="audience-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(slideAttributesProps, null, 2) }}</pre>
     </div>
