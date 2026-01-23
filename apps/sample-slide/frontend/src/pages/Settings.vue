@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div v-if="presentationProps" class="debug-section">
+    <div v-if="presentationProps" class="debug-section" data-testid="settings-presentation-props">
       <h3>Presentation Details</h3>
       <p><b>ID:</b> {{ presentationProps.id }}</p>
       <p><b>Language:</b> {{ presentationProps.language }}</p>
@@ -33,14 +33,14 @@
       <div class="teamplay-info"><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></div>
     </div>
 
-    <div v-if="slideProps" class="debug-section">
+    <div v-if="slideProps" class="debug-section" data-testid="settings-slide-details-props">
       <h3>Slide Details</h3>
       <p><b>Slide ID:</b> {{ slideProps.id }}</p>
       <p v-if="slideProps.textColour"><b>Text Colour:</b> <span :style="{ color: slideProps.textColour }">{{ slideProps.textColour }}</span></p>
       <pre>{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="attributeResponse" class="debug-section">
+    <div v-if="attributeResponse" class="debug-section" data-testid="settings-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
     </div>

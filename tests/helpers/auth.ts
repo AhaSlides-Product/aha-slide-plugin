@@ -9,6 +9,9 @@ import { Page } from "@playwright/test";
 export class AuthHelper {
     static async addTokenToCookies(page: Page) {
         //token of user qa.ahaslides+2@gmail.com | 123123123
+        //token is valid for 1 year
+
+        //token for staging environment
         const token ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYzNSwiaWF0IjoxNzY3NjY3MTY2LCJleHAiOjE4MzA3MzkxNjZ9.BmHKiSpn8oGaCN4jwyiT1KIQZezRut03Mc3_XVqc66g';
         await page.context().addCookies([
             {
