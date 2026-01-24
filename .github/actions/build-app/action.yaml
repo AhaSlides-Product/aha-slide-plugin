@@ -50,11 +50,11 @@ runs:
 
     - name: Build and Push Docker Image
       run: |
-        cd packages/backend-main
         echo "Building image ${{ inputs.repository_url }}:${{ inputs.commit_sha }}..."
         docker build \
           --platform ${{ inputs.platform }} \
           --push \
+          -f packages/backend-main/Dockerfile \
           -t ${{ inputs.repository_url }}:${{ inputs.commit_sha }} .
       shell: bash
 

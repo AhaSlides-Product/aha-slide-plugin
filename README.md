@@ -69,6 +69,13 @@ To generate or update documentation:
 npm run docs --workspaces
 ```
 
+### Existing components and icons
+
+You can view existing components and icons in the storybook
+```
+npm run storybook 
+```
+
 ### Running the Sample App
 
 To start the sample slide frontend in development mode:
@@ -95,6 +102,10 @@ This module also auto-prefixes all routes with `/api/plugins` to align with the 
 So backend api paths become `/api/plugins/{slide-type}/**`
 
 If plugin providers want to expose a custom api, please prefix the api path with `external/`. For example `/api/plugins/ideas-board/external/auto-group-ideas` 
+
+```
+curl https://plugins.dev.ahaslide.com/api/plugins/sample-slide/external/example
+```
 
 ### Environments 
 

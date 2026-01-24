@@ -1,0 +1,13 @@
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Environment variables
+.env
+.env.local
+
+# Test artifacts
+*.log
+screenshots/
+videos/
