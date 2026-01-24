@@ -17,7 +17,12 @@
     },
     "./styles.css": "./src/styles.css",
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
-    "./icons": "./dist/icons",
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "import": "./dist/icons/index.js",
+      "default": "./dist/icons/index.js"
+    },
+    "./icons/*": "./dist/icons/*",
     "./vite.config.icon": "./src/vite.config.icon.js",
     "./AhaIcon.vue": "./src/AhaIcon.vue"
   },
@@ -31,7 +36,8 @@
     "tailwind.config.d.ts"
   ],
   "scripts": {
-    "build": "npm run build:ts && npm run build:css && npm run build:antd-vars",
+    "build": "npm run build:icons && npm run build:ts && npm run build:css && npm run build:antd-vars && npm run build:icons",
+    "build:icons": "node scripts/generate-icons.js",
     "build:ts": "tsc",
     "build:css": "postcss src/styles.css -o dist/styles.css",
     "build:antd-vars": "node scripts/generate-css-vars.js",
@@ -39,6 +45,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@ant-design/icons-vue": "^7.0.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@vueuse/core": "^10.0.0",
     "ant-design-vue": "^4.0.0",
@@ -53,6 +60,7 @@
     "vue-router": "^4.0.0"
   },
   "peerDependencies": {
+    "@ant-design/icons-vue": "^7.0.0",
     "@vueuse/core": "^10.0.0",
     "ant-design-vue": "^4.0.0",
     "vue": "^3.0.0",
