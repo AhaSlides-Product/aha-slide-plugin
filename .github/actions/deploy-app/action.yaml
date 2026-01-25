@@ -16,6 +16,10 @@ inputs:
   cloudfront_distribution_id:
     description: 'CloudFront Distribution ID to invalidate'
     required: false
+  deploy_storybook:
+    description: 'Whether to deploy storybook'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -25,6 +29,13 @@ runs:
       with:
         name: frontend-builds
         path: deployment_artifacts
+
+    - name: Download Storybook Artifacts
+      if: ${{ inputs.deploy_storybook == 'true' }}
+      uses: actions/download-artifact@v4
+      with:
+        name: storybook-builds
+        path: storybook_artifacts
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -50,6 +61,13 @@ runs:
             INVALIDATION_PATHS="$INVALIDATION_PATHS /${app_name}/*"
           fi
         done
+
+        # Deploy Storybook if it exists and input is true
+        if [ "${{ inputs.deploy_storybook }}" == "true" ] && [ -d "storybook_artifacts" ]; then
+          echo "Deploying Storybook..."
+          aws s3 sync "storybook_artifacts" "s3://${{ inputs.s3_bucket }}/storybook"
+          INVALIDATION_PATHS="$INVALIDATION_PATHS /storybook/*"
+        fi
 
         if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then
           echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
