@@ -17,7 +17,11 @@
     },
     "./styles.css": "./src/styles.css",
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
-    "./icons": "./dist/icons",
+    "./icons": {
+      "types": "./dist/generated-icons/index.d.ts",
+      "import": "./dist/generated-icons/index.js",
+      "default": "./dist/generated-icons/index.js"
+    },
     "./vite.config.icon": {
       "types": "./src/vite.config.icon.d.ts",
       "import": "./src/vite.config.icon.js",

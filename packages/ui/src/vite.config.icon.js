@@ -10,11 +10,33 @@ export const ahaViteIconPlugin = Icons({
   compiler: 'vue3',
   customCollections: {
     // Custom Aha icons from the @aha/ui package
-    aha: FileSystemIconLoader(
-      resolve(__dirname, './icons'),
-    ),
+    aha: async (name) => {
+      // Transform system-* to aha-* to match file names
+      let fileName = name.replace('system-', 'aha-')
+      
+      // Handle special cases with characters that don't work in file names
+      const specialCases = {
+        'aha-q&a': 'aha-qna',
+        // Add more special cases here if needed
+      }
+      
+      if (specialCases[fileName]) {
+        fileName = specialCases[fileName]
+      }
+      
+      const filePath = resolve(__dirname, './icons', `${fileName}.svg`)
+      
+      try {
+        const fs = await import('fs/promises')
+        const svg = await fs.readFile(filePath, 'utf-8')
+        return svg.replace(/^<svg /, '<svg fill="currentColor" ')
+      } catch (error) {
+        console.warn(`Icon not found: ${filePath}`)
+        return null
+      }
+    },
   },
-  autoInstall: true,
+  autoInstall: false,
 })
 
 export default ahaViteIconPlugin

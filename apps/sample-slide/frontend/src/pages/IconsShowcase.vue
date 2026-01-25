@@ -342,7 +342,7 @@ import IconSystemPresentationConnect from '~icons/aha/system-presentation-connec
 import IconSystemPresentationDisconnect from '~icons/aha/system-presentation-disconnect';
 import IconSystemProjectorScreenChart from '~icons/aha/system-projector-screen-chart';
 import IconSystemPushPin from '~icons/aha/system-push-pin';
-import IconSystemQA from '~icons/aha/system-q&a';
+import IconSystemQA from '~icons/aha/system-qna';
 import IconSystemQrCode from '~icons/aha/system-qr-code';
 import IconSystemQuestion from '~icons/aha/system-question';
 import IconSystemRemote from '~icons/aha/system-remote';
