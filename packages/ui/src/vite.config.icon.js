@@ -13,19 +13,19 @@ export const ahaViteIconPlugin = Icons({
     aha: async (name) => {
       // Transform system-* to aha-* to match file names
       let fileName = name.replace('system-', 'aha-')
-      
+
       // Handle special cases with characters that don't work in file names
       const specialCases = {
         'aha-q&a': 'aha-qna',
         // Add more special cases here if needed
       }
-      
+
       if (specialCases[fileName]) {
         fileName = specialCases[fileName]
       }
-      
+
       const filePath = resolve(__dirname, './icons', `${fileName}.svg`)
-      
+
       try {
         const fs = await import('fs/promises')
         const svg = await fs.readFile(filePath, 'utf-8')

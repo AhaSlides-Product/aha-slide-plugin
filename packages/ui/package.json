@@ -18,9 +18,9 @@
     "./styles.css": "./src/styles.css",
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
     "./icons": {
-      "types": "./dist/generated-icons/index.d.ts",
-      "import": "./dist/generated-icons/index.js",
-      "default": "./dist/generated-icons/index.js"
+      "types": "./dist/icons/index.d.ts",
+      "import": "./dist/icons/index.js",
+      "default": "./dist/icons/index.js"
     },
     "./vite.config.icon": {
       "types": "./src/vite.config.icon.d.ts",
