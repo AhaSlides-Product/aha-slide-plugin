@@ -32,6 +32,11 @@
       </p>
       <div class="teamplay-info"><b>Teamplay:</b> <pre style="display:inline">{{ JSON.stringify(presentationProps.teamplay) }}</pre></div>
     </div>
+    
+    <div v-if="presentationAttributeColorPaletteProps" class="debug-section" data-testid="settings-presentation-color-palette-props">
+      <h3>Presentation Color Palette</h3>
+      <pre class="code-block">{{ JSON.stringify(presentationAttributeColorPaletteProps, null, 2) }}</pre>
+    </div>
 
     <div v-if="slideProps" class="debug-section" data-testid="settings-slide-details-props">
       <h3>Slide Details</h3>
@@ -53,7 +58,7 @@ import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 
-const { presentationProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
+const { presentationProps, presentationAttributeColorPaletteProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
   uploadImage
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);

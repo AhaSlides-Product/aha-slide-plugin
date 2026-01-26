@@ -16,6 +16,11 @@
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
+    <div v-if="presentationAttributeColorPaletteProps" class="debug-section" data-testid="canvas-presentation-color-palette-props">
+      <h3>Presentation Color Palette</h3>
+      <pre class="code-block">{{ JSON.stringify(presentationAttributeColorPaletteProps, null, 2) }}</pre>
+    </div>
+
     <div v-if="slideProps" class="debug-section" data-testid="canvas-slide-details-props">
       <h3>Slide Details</h3>
       <pre class="code-block">{{ JSON.stringify(slideProps, null, 2) }}</pre>
@@ -53,6 +58,7 @@ const route = useRoute();
 const slideId = route.params.slideId as string;
 const { 
   presentationProps, 
+  presentationAttributeColorPaletteProps,
   slideProps, 
   getSlideAttributesAction,
   subscribeTopic,

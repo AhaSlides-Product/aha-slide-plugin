@@ -23,6 +23,11 @@
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
+    <div v-if="presentationAttributeColorPaletteProps" class="debug-section" data-testid="audience-presentation-color-palette-props">
+      <h3>Presentation Color Palette</h3>
+      <pre class="code-block">{{ JSON.stringify(presentationAttributeColorPaletteProps, null, 2) }}</pre>
+    </div>
+
     <div v-if="slideProps" class="debug-section" data-testid="audience-slide-details-props">
       <h3>Slide Info</h3>
       <pre class="code-block">{{ JSON.stringify(slideProps, null, 2) }}</pre>
@@ -39,6 +44,9 @@
         <a-button type="primary" size="large" @click="handleVote" :loading="voting">
           🔥 Vote Now!
         </a-button>
+        <a-button type="default" size="large" @click="handleSubmitSubmission" :loading="submitting" style="margin-top: 10px;">
+          📝 Submit Sample Essay
+        </a-button>
       </div>
     </div>
   </div>
@@ -53,6 +61,7 @@ const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
 const { 
   presentationProps, 
+  presentationAttributeColorPaletteProps,
   slideProps, 
   slideAttributesProps,
   audienceName,
@@ -86,6 +95,43 @@ const handleVote = async () => {
     console.error('Failed to submit vote:', error);
   } finally {
     voting.value = false;
+  }
+};
+
+const submitting = ref(false);
+const handleSubmitSubmission = async () => {
+  submitting.value = true;
+  const payload = {
+    slideId: slideProps.value?.id || 3,
+    slideVersion: slideProps.value?.version || 2,
+    type: "sample-slide",
+    attributes: JSON.stringify({
+      text: "Long essay response",
+      wordCount: 250,
+      language: "en"
+    })
+  };
+
+  try {
+    console.log('Submitting to liveproxy...', payload);
+    
+    const response = await fetch('http://localhost:8888/api/live/submissions?slide_type=ranking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+    console.log('Liveproxy response status:', response.status);
+    
+    if (response.ok) {
+      console.log('Submission successful');
+    } else {
+      console.warn('Submission failed');
+    }
+  } catch (error) {
+    console.error('Submission error:', error);
+  } finally {
+    submitting.value = false;
   }
 };
 
