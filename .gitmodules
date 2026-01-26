@@ -7,6 +7,6 @@
 [submodule "apps/idea-board"]
 	path = apps/ideaBoard
 	url = git@github.com:AhaSlides-Product/slide-plugin-idea-board.git
-[submodule "apps/pin-on-image"]
+[submodule "apps/pinOnImage"]
 	path = apps/pinOnImage
-	url = git@github.com/AhaSlides-Product/slide-plugin-pin-on-image.git
+	url = git@github.com:AhaSlides-Product/slide-plugin-pin-on-image
