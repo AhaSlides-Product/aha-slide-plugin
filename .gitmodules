@@ -5,7 +5,7 @@
 	path = apps/ranking
 	url = git@github.com:AhaSlides-Product/slide-plugin-ranking-question.git
 [submodule "apps/idea-board"]
-	path = apps/idea-board
+	path = apps/ideaBoard
 	url = git@github.com:AhaSlides-Product/slide-plugin-idea-board.git
 [submodule "apps/pin-on-image"]
 	path = apps/pinOnImage
