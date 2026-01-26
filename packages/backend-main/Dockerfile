@@ -8,6 +8,7 @@ COPY --chown=node:node node_modules ./node_modules
 # Copy internal packages that are dependencies
 # Note: These are needed because node_modules contains symlinks to them
 COPY --chown=node:node packages/backend-utils ./packages/backend-utils
+COPY --chown=node:node packages/common ./packages/common
 COPY --chown=node:node apps/sample-slide/backend ./apps/sample-slide/backend
 
 # Copy the actual application package and its build output

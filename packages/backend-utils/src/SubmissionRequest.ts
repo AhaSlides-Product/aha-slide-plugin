@@ -1,7 +1,7 @@
 /**
  * Data Transfer Object for ranking slide answer submission.
  */
-export class SubmitAnswerDto {
+export class SubmissionRequest {
   /** The unique identifier of the presentation. */
   presentationId!: number;
   /** The unique identifier of the slide. */

@@ -71,7 +71,7 @@ npm run docs --workspaces
 
 ### Existing components and icons
 
-You can view existing components and icons in the storybook
+You can view existing components and icons in the storybook https://plugins.dev.ahaslide.com/storybook/
 ```
 npm run storybook 
 ```

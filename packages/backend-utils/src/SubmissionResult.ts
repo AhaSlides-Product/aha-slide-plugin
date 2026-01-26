@@ -33,13 +33,7 @@ export type CountUnique = CountUniqueItem[];
 /**
  * Represents the result of an audience answer submission processed by the backend.
  */
-import { SubmitAnswerDto } from './submit-answer.dto';
-
-/**
- * Represents the result of an audience answer submission processed by the backend.
- */
-export interface AnswerResult {
-  submission: SubmitAnswerDto;
+export interface SubmissionResult {
   count_total?: CountTotal;
   count_unique?: CountUnique;
 }
