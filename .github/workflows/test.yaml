@@ -1,0 +1,33 @@
+name: "Test"
+
+on:
+  push:
+    branches:
+      - staging
+  pull_request:
+    branches:
+      - staging
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          AHA_SDK_BASE_URL: ${{ secrets.AHA_SDK_BASE_URL }}
+          AHA_SDK_TEST_JWT_TOKEN: ${{ secrets.AHA_SDK_TEST_JWT_TOKEN }}
+          AHA_SDK_TEST_SLIDE_ID: ${{ secrets.AHA_SDK_TEST_SLIDE_ID }}
+          AHA_SDK_TEST_PRESENTATION_ID: ${{ secrets.AHA_SDK_TEST_PRESENTATION_ID }}
