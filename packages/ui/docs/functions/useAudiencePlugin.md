@@ -6,9 +6,9 @@
 
 # Function: useAudiencePlugin()
 
-> **useAudiencePlugin**(`options`): `object`
+> **useAudiencePlugin**(`options`): [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid.ts:538](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L538)
+Defined in: [packages/ui/src/zoid.ts:513](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L513)
 
 Hook for Audience Plugins.
 Provides access to presentation, slide, and slideAttributes data.
@@ -23,54 +23,6 @@ Configure hook behavior (e.g., disable auto-height).
 
 ## Returns
 
-`object`
+[`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
 Reactive refs for presentation, slide, and slideAttributes props.
-
-### audienceEmail
-
-> **audienceEmail**: `Ref`\<`string` \| `undefined`\>
-
-### audienceEmoji
-
-> **audienceEmoji**: `Ref`\<`string` \| `undefined`\>
-
-### audienceId
-
-> **audienceId**: `Ref`\<`string` \| `number` \| `undefined`\>
-
-### audienceName
-
-> **audienceName**: `Ref`\<`string` \| `undefined`\>
-
-### audienceSendCountingUniqueAction
-
-> **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
-
-### audienceTeam
-
-> **audienceTeam**: `Ref`\<`string` \| `undefined`\>
-
-### baseUrl
-
-> **baseUrl**: `Ref`\<`string` \| `undefined`\>
-
-### presentationProps
-
-> **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
-
-### slideAttributesProps
-
-> **slideAttributesProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
-
-### slideProps
-
-> **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
-
-### subscribeTopic
-
-> **subscribeTopic**: (`options`) => `void` \| `undefined`
-
-### unsubscribeTopic
-
-> **unsubscribeTopic**: (`topic`) => `void` \| `undefined`

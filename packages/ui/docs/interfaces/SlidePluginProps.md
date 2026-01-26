@@ -6,9 +6,13 @@
 
 # Interface: SlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L8)
+Defined in: [packages/ui/src/zoid.ts:124](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L124)
 
 Interface for the properties expected by the PresenterSlidePluginIframe component.
+
+## Extends
+
+- [`BaseSlidePluginProps`](BaseSlidePluginProps.md)
 
 ## Properties
 
@@ -16,7 +20,7 @@ Interface for the properties expected by the PresenterSlidePluginIframe componen
 
 > `optional` **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:120](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L120)
+Defined in: [packages/ui/src/zoid.ts:112](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L112)
 
 Action to send counting data from the audience to the parent application.
 
@@ -34,15 +38,23 @@ Optional payload for counting.
 
 A promise resolving when the counting is handled.
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`audienceSendCountingUniqueAction`](BaseSlidePluginProps.md#audiencesendcountinguniqueaction)
+
 ***
 
 ### baseUrl?
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:101](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L101)
+Defined in: [packages/ui/src/zoid.ts:93](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L93)
 
 The base URL of the parent application
+
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`baseUrl`](BaseSlidePluginProps.md#baseurl)
 
 ***
 
@@ -50,7 +62,7 @@ The base URL of the parent application
 
 > `optional` **getSlideAttributesAction**: (`slideId?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:92](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L92)
+Defined in: [packages/ui/src/zoid.ts:135](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L135)
 
 Action to fetch all custom attributes for the current slide from the parent application.
 
@@ -74,7 +86,7 @@ A promise resolving to an object containing slide attributes.
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:85](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L85)
+Defined in: [packages/ui/src/zoid.ts:91](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L91)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -91,91 +103,127 @@ The new height in pixels, or null for 100% height.
 
 `void`
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`onHeightChange`](BaseSlidePluginProps.md#onheightchange)
+
 ***
 
 ### presentation?
 
-> `optional` **presentation**: `object`
+> `optional` **presentation**: `object` & `object`
 
-Defined in: [packages/ui/src/zoid.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L14)
+Defined in: [packages/ui/src/zoid.ts:125](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L125)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
-#### Index Signature
+#### Type Declaration
 
-\[`key`: `string`\]: `any`
-
-#### accessCode?
+##### accessCode?
 
 > `optional` **accessCode**: `string`
 
 The access code of the presentation
 
-#### audienceAdmission?
+##### audienceAdmission?
 
 > `optional` **audienceAdmission**: `string`
 
 The audience admission setting (e.g., 'auto', 'manual')
 
-#### audiencePacing?
+##### audiencePacing?
 
 > `optional` **audiencePacing**: `boolean`
 
 Whether audience pacing is enabled
 
-#### filteringProfanity?
+##### filteringProfanity?
 
 > `optional` **filteringProfanity**: `boolean`
 
 Whether profanity filtering is enabled
 
-#### fontFamily?
+##### fontFamily?
 
 > `optional` **fontFamily**: `string`
 
 The font family name used in the presentation
 
-#### id?
+##### id?
 
 > `optional` **id**: `string` \| `number`
 
 The unique identifier of the presentation
 
-#### language?
+##### language?
 
 > `optional` **language**: `string`
 
 The language code (e.g., 'en', 'vi')
 
-#### presenting?
+##### presenting?
 
 > `optional` **presenting**: `boolean`
 
 Whether the presentation is currently presenting
 
-#### shareCode?
+##### shareCode?
 
 > `optional` **shareCode**: `string`
 
 The share code of the presentation
 
-#### showHyperLink?
+##### showHyperLink?
 
 > `optional` **showHyperLink**: `boolean`
 
 Whether to show hyperlinks in the content
 
-#### teamplay?
+##### uniqueAccessCode?
+
+> `optional` **uniqueAccessCode**: `string`
+
+The unique access code of the presentation
+
+#### Type Declaration
+
+##### teamplay?
 
 > `optional` **teamplay**: `Record`\<`string`, `any`\>
 
 The teamplay object used in the presentation
 
-#### uniqueAccessCode?
+#### Overrides
 
-> `optional` **uniqueAccessCode**: `string`
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentation`](BaseSlidePluginProps.md#presentation)
 
-The unique access code of the presentation
+***
+
+### presentationColorPalette?
+
+> `optional` **presentationColorPalette**: `string`[]
+
+Defined in: [packages/ui/src/zoid.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L42)
+
+Presentation-wide color palette attributes.
+
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentationColorPalette`](BaseSlidePluginProps.md#presentationcolorpalette)
+
+***
+
+### presentationLighterColorPalette?
+
+> `optional` **presentationLighterColorPalette**: `string`[]
+
+Defined in: [packages/ui/src/zoid.ts:46](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L46)
+
+Presentation-wide lighter color palette attributes.
+
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentationLighterColorPalette`](BaseSlidePluginProps.md#presentationlightercolorpalette)
 
 ***
 
@@ -183,7 +231,7 @@ The unique access code of the presentation
 
 > `optional` **slide**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L44)
+Defined in: [packages/ui/src/zoid.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L50)
 
 Data specific to the currently active slide.
 
@@ -287,13 +335,17 @@ Time allowed to answer the slide in seconds
 
 The version of the slide
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`slide`](BaseSlidePluginProps.md#slide)
+
 ***
 
 ### subscribeTopic()?
 
 > `optional` **subscribeTopic**: (`options`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:107](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L107)
+Defined in: [packages/ui/src/zoid.ts:99](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L99)
 
 Subscribe to a specific MQTT topic.
 
@@ -319,13 +371,17 @@ Subscription options including type, topic, and callback.
 
 `void`
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`subscribeTopic`](BaseSlidePluginProps.md#subscribetopic)
+
 ***
 
 ### trackGA4AndMixpanel()?
 
 > `optional` **trackGA4AndMixpanel**: (`payload`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:126](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L126)
+Defined in: [packages/ui/src/zoid.ts:118](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L118)
 
 Action to track events to GA4 and Mixpanel.
 
@@ -341,13 +397,17 @@ The event payload to track.
 
 `void`
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`trackGA4AndMixpanel`](BaseSlidePluginProps.md#trackga4andmixpanel)
+
 ***
 
 ### unsubscribeTopic()?
 
 > `optional` **unsubscribeTopic**: (`topic`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:113](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L113)
+Defined in: [packages/ui/src/zoid.ts:105](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L105)
 
 Unsubscribe from a specific MQTT topic.
 
@@ -363,13 +423,17 @@ The topic to unsubscribe from.
 
 `void`
 
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`unsubscribeTopic`](BaseSlidePluginProps.md#unsubscribetopic)
+
 ***
 
 ### uploadImage()
 
 > **uploadImage**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/zoid.ts:127](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L127)
+Defined in: [packages/ui/src/zoid.ts:143](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L143)
 
 #### Returns
 
@@ -381,7 +445,7 @@ Defined in: [packages/ui/src/zoid.ts:127](https://github.com/AhaSlides-Product/a
 
 > `optional` **upsertSlideAttributeAction**: (`payload`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:99](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L99)
+Defined in: [packages/ui/src/zoid.ts:142](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L142)
 
 Action to create or update a specific attribute for the current slide in the parent application.
 
@@ -415,6 +479,10 @@ A promise resolving when the update is complete.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/zoid.ts#L10)
+Defined in: [packages/ui/src/zoid.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L10)
 
 The URL of the plugin to be loaded in the iframe
+
+#### Inherited from
+
+[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`url`](BaseSlidePluginProps.md#url)

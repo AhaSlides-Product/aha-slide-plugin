@@ -7,6 +7,8 @@
 ## Interfaces
 
 - [AudienceSlidePluginProps](interfaces/AudienceSlidePluginProps.md)
+- [BaseSlidePluginProps](interfaces/BaseSlidePluginProps.md)
+- [BaseSlidePluginReturn](interfaces/BaseSlidePluginReturn.md)
 - [ImageUploadResult](interfaces/ImageUploadResult.md)
 - [RequestMessage](interfaces/RequestMessage.md)
 - [ResponseMessage](interfaces/ResponseMessage.md)

@@ -2,59 +2,20 @@
 
 ***
 
-[@aha/ui](../README.md) / AudienceSlidePluginProps
+[@aha/ui](../README.md) / BaseSlidePluginProps
 
-# Interface: AudienceSlidePluginProps
+# Interface: BaseSlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:213](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L213)
+Defined in: [packages/ui/src/zoid.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L8)
 
-Interface for the properties expected by the AudienceSlidePluginIframe component.
+Common properties shared between presenter and audience slide plugins.
 
-## Extends
+## Extended by
 
-- [`BaseSlidePluginProps`](BaseSlidePluginProps.md)
+- [`SlidePluginProps`](SlidePluginProps.md)
+- [`AudienceSlidePluginProps`](AudienceSlidePluginProps.md)
 
 ## Properties
-
-### audienceEmail?
-
-> `optional` **audienceEmail**: `string`
-
-Defined in: [packages/ui/src/zoid.ts:225](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L225)
-
-The email of the audience participant
-
-***
-
-### audienceEmoji?
-
-> `optional` **audienceEmoji**: `string`
-
-Defined in: [packages/ui/src/zoid.ts:221](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L221)
-
-The emoji chosen by the audience participant
-
-***
-
-### audienceId?
-
-> `optional` **audienceId**: `string` \| `number`
-
-Defined in: [packages/ui/src/zoid.ts:223](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L223)
-
-The unique identifier of the audience participant
-
-***
-
-### audienceName?
-
-> `optional` **audienceName**: `string`
-
-Defined in: [packages/ui/src/zoid.ts:219](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L219)
-
-The name of the audience participant
-
-***
 
 ### audienceSendCountingUniqueAction()?
 
@@ -78,20 +39,6 @@ Optional payload for counting.
 
 A promise resolving when the counting is handled.
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`audienceSendCountingUniqueAction`](BaseSlidePluginProps.md#audiencesendcountinguniqueaction)
-
-***
-
-### audienceTeam?
-
-> `optional` **audienceTeam**: `string`
-
-Defined in: [packages/ui/src/zoid.ts:227](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L227)
-
-The team name of the audience participant
-
 ***
 
 ### baseUrl?
@@ -101,10 +48,6 @@ The team name of the audience participant
 Defined in: [packages/ui/src/zoid.ts:93](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L93)
 
 The base URL of the parent application
-
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`baseUrl`](BaseSlidePluginProps.md#baseurl)
 
 ***
 
@@ -129,99 +72,85 @@ The new height in pixels, or null for 100% height.
 
 `void`
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`onHeightChange`](BaseSlidePluginProps.md#onheightchange)
-
 ***
 
 ### presentation?
 
-> `optional` **presentation**: `object` & `object`
+> `optional` **presentation**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:214](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L214)
+Defined in: [packages/ui/src/zoid.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L14)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
-#### Type Declaration
+#### Index Signature
 
-##### accessCode?
+\[`key`: `string`\]: `any`
+
+#### accessCode?
 
 > `optional` **accessCode**: `string`
 
 The access code of the presentation
 
-##### audienceAdmission?
+#### audienceAdmission?
 
 > `optional` **audienceAdmission**: `string`
 
 The audience admission setting (e.g., 'auto', 'manual')
 
-##### audiencePacing?
+#### audiencePacing?
 
 > `optional` **audiencePacing**: `boolean`
 
 Whether audience pacing is enabled
 
-##### filteringProfanity?
+#### filteringProfanity?
 
 > `optional` **filteringProfanity**: `boolean`
 
 Whether profanity filtering is enabled
 
-##### fontFamily?
+#### fontFamily?
 
 > `optional` **fontFamily**: `string`
 
 The font family name used in the presentation
 
-##### id?
+#### id?
 
 > `optional` **id**: `string` \| `number`
 
 The unique identifier of the presentation
 
-##### language?
+#### language?
 
 > `optional` **language**: `string`
 
 The language code (e.g., 'en', 'vi')
 
-##### presenting?
+#### presenting?
 
 > `optional` **presenting**: `boolean`
 
 Whether the presentation is currently presenting
 
-##### shareCode?
+#### shareCode?
 
 > `optional` **shareCode**: `string`
 
 The share code of the presentation
 
-##### showHyperLink?
+#### showHyperLink?
 
 > `optional` **showHyperLink**: `boolean`
 
 Whether to show hyperlinks in the content
 
-##### uniqueAccessCode?
+#### uniqueAccessCode?
 
 > `optional` **uniqueAccessCode**: `string`
 
 The unique access code of the presentation
-
-#### Type Declaration
-
-##### teamPlay?
-
-> `optional` **teamPlay**: `Record`\<`string`, `any`\>
-
-The teamplay object used in the presentation
-
-#### Overrides
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentation`](BaseSlidePluginProps.md#presentation)
 
 ***
 
@@ -233,10 +162,6 @@ Defined in: [packages/ui/src/zoid.ts:42](https://github.com/AhaSlides-Product/ah
 
 Presentation-wide color palette attributes.
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentationColorPalette`](BaseSlidePluginProps.md#presentationcolorpalette)
-
 ***
 
 ### presentationLighterColorPalette?
@@ -246,10 +171,6 @@ Presentation-wide color palette attributes.
 Defined in: [packages/ui/src/zoid.ts:46](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L46)
 
 Presentation-wide lighter color palette attributes.
-
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`presentationLighterColorPalette`](BaseSlidePluginProps.md#presentationlightercolorpalette)
 
 ***
 
@@ -361,20 +282,6 @@ Time allowed to answer the slide in seconds
 
 The version of the slide
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`slide`](BaseSlidePluginProps.md#slide)
-
-***
-
-### slideAttributes?
-
-> `optional` **slideAttributes**: `Record`\<`string`, `any`\>
-
-Defined in: [packages/ui/src/zoid.ts:231](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L231)
-
-Custom attributes associated with the current slide.
-
 ***
 
 ### subscribeTopic()?
@@ -407,10 +314,6 @@ Subscription options including type, topic, and callback.
 
 `void`
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`subscribeTopic`](BaseSlidePluginProps.md#subscribetopic)
-
 ***
 
 ### trackGA4AndMixpanel()?
@@ -432,10 +335,6 @@ The event payload to track.
 #### Returns
 
 `void`
-
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`trackGA4AndMixpanel`](BaseSlidePluginProps.md#trackga4andmixpanel)
 
 ***
 
@@ -459,10 +358,6 @@ The topic to unsubscribe from.
 
 `void`
 
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`unsubscribeTopic`](BaseSlidePluginProps.md#unsubscribetopic)
-
 ***
 
 ### url
@@ -472,7 +367,3 @@ The topic to unsubscribe from.
 Defined in: [packages/ui/src/zoid.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L10)
 
 The URL of the plugin to be loaded in the iframe
-
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`url`](BaseSlidePluginProps.md#url)

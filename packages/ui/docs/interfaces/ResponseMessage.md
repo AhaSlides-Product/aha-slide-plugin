@@ -6,7 +6,7 @@
 
 # Interface: ResponseMessage\<T\>
 
-Defined in: [packages/ui/src/iframe.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/iframe.ts#L13)
+Defined in: [packages/ui/src/iframe.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/iframe.ts#L13)
 
 Represents a response message received from another window.
 
@@ -22,7 +22,7 @@ Represents a response message received from another window.
 
 > `optional` **error**: `string`
 
-Defined in: [packages/ui/src/iframe.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/iframe.ts#L16)
+Defined in: [packages/ui/src/iframe.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/iframe.ts#L16)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: [packages/ui/src/iframe.ts:16](https://github.com/AhaSlides-Product/
 
 > **id**: `string`
 
-Defined in: [packages/ui/src/iframe.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/iframe.ts#L14)
+Defined in: [packages/ui/src/iframe.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/iframe.ts#L14)
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: [packages/ui/src/iframe.ts:14](https://github.com/AhaSlides-Product/
 
 > **isResponse**: `true`
 
-Defined in: [packages/ui/src/iframe.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/iframe.ts#L17)
+Defined in: [packages/ui/src/iframe.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/iframe.ts#L17)
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: [packages/ui/src/iframe.ts:17](https://github.com/AhaSlides-Product/
 
 > `optional` **payload**: `T`
 
-Defined in: [packages/ui/src/iframe.ts:15](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/ui/src/iframe.ts#L15)
+Defined in: [packages/ui/src/iframe.ts:15](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/iframe.ts#L15)
