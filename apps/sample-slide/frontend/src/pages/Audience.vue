@@ -23,9 +23,14 @@
       <pre class="code-block">{{ JSON.stringify(presentationProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="presentationAttributeColorPaletteProps" class="debug-section" data-testid="audience-presentation-color-palette-props">
+    <div v-if="presentationColorPaletteProps" class="debug-section" data-testid="audience-presentation-color-palette-props">
       <h3>Presentation Color Palette</h3>
-      <pre class="code-block">{{ JSON.stringify(presentationAttributeColorPaletteProps, null, 2) }}</pre>
+      <pre class="code-block">{{ JSON.stringify(presentationColorPaletteProps, null, 2) }}</pre>
+    </div>
+
+    <div v-if="presentationLighterColorPaletteProps" class="debug-section" data-testid="audience-presentation-lighter-color-palette-props">
+      <h3>Presentation Lighter Color Palette</h3>
+      <pre class="code-block">{{ JSON.stringify(presentationLighterColorPaletteProps, null, 2) }}</pre>
     </div>
 
     <div v-if="slideProps" class="debug-section" data-testid="audience-slide-details-props">
@@ -61,7 +66,8 @@ const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
 const { 
   presentationProps, 
-  presentationAttributeColorPaletteProps,
+  presentationColorPaletteProps,
+  presentationLighterColorPaletteProps,
   slideProps, 
   slideAttributesProps,
   audienceName,

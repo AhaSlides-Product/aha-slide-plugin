@@ -41,7 +41,11 @@ export interface SlidePluginProps {
   /**
    * Presentation-wide color palette attributes.
    */
-  presentationAttributeColorPalette?: Record<string, any>;
+  presentationColorPalette?: string[];
+  /**
+   * Presentation-wide lighter color palette attributes.
+   */
+  presentationLighterColorPalette?: string[];
   /** 
    * Data specific to the currently active slide.
    */
@@ -234,7 +238,11 @@ export interface AudienceSlidePluginProps {
   /**
    * Presentation-wide color palette attributes.
    */
-  presentationAttributeColorPalette?: Record<string, any>;
+  presentationColorPalette?: string[];
+  /**
+   * Presentation-wide lighter color palette attributes.
+   */
+  presentationLighterColorPalette?: string[];
   /** 
    * Data specific to the currently active slide.
    */
@@ -340,8 +348,12 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
-    presentationAttributeColorPalette: {
-      type: 'object',
+    presentationColorPalette: {
+      type: 'array',
+      required: false,
+    },
+    presentationLighterColorPalette: {
+      type: 'array',
       required: false,
     },
     slide: {
@@ -473,7 +485,8 @@ export interface UseSlidePluginOptions {
  */
 export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): {
   presentationProps: Ref<Record<string, any> | undefined>;
-  presentationAttributeColorPaletteProps: Ref<Record<string, any> | undefined>;
+  presentationColorPaletteProps: Ref<string[] | undefined>;
+  presentationLighterColorPaletteProps: Ref<string[] | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
@@ -484,7 +497,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   uploadImage: (() => Promise<ImageUploadResult>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
-  const presentationAttributeColorPaletteProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentationAttributeColorPalette);
+  const presentationColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationColorPalette);
+  const presentationLighterColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationLighterColorPalette);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
 
   onMounted(() => {
@@ -502,7 +516,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     if (xprops && typeof xprops.onProps === 'function') {
       xprops.onProps((newProps: any) => {
         if (newProps.presentation) presentationProps.value = { ...newProps.presentation };
-        if (newProps.presentationAttributeColorPalette) presentationAttributeColorPaletteProps.value = { ...newProps.presentationAttributeColorPalette };
+        if (newProps.presentationColorPalette) presentationColorPaletteProps.value = [...newProps.presentationColorPalette];
+        if (newProps.presentationLighterColorPalette) presentationLighterColorPaletteProps.value = [...newProps.presentationLighterColorPalette];
         if (newProps.slide) slideProps.value = { ...newProps.slide };
         if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
       });
@@ -536,7 +551,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
 
   return {
     presentationProps,
-    presentationAttributeColorPaletteProps,
+    presentationColorPaletteProps,
+    presentationLighterColorPaletteProps,
     slideProps,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
@@ -557,7 +573,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
  */
 export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight: true }): {
   presentationProps: Ref<Record<string, any> | undefined>;
-  presentationAttributeColorPaletteProps: Ref<Record<string, any> | undefined>;
+  presentationColorPaletteProps: Ref<string[] | undefined>;
+  presentationLighterColorPaletteProps: Ref<string[] | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   slideAttributesProps: Ref<Record<string, any> | undefined>;
   baseUrl: Ref<string | undefined>;
@@ -571,7 +588,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;
 } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
-  const presentationAttributeColorPaletteProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentationAttributeColorPalette);
+  const presentationColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationColorPalette);
+  const presentationLighterColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationLighterColorPalette);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
   const slideAttributesProps = ref<Record<string, any> | undefined>((window as any).xprops?.slideAttributes);
 
@@ -597,7 +615,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     if (xprops && typeof xprops.onProps === 'function') {
       xprops.onProps((newProps: any) => {
         if (newProps.presentation) presentationProps.value = { ...newProps.presentation };
-        if (newProps.presentationAttributeColorPalette) presentationAttributeColorPaletteProps.value = { ...newProps.presentationAttributeColorPalette };
+        if (newProps.presentationColorPalette) presentationColorPaletteProps.value = [...newProps.presentationColorPalette];
+        if (newProps.presentationLighterColorPalette) presentationLighterColorPaletteProps.value = [...newProps.presentationLighterColorPalette];
         if (newProps.slide) slideProps.value = { ...newProps.slide };
         if (newProps.slideAttributes) slideAttributesProps.value = { ...newProps.slideAttributes };
         if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
@@ -619,7 +638,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
 
   return {
     presentationProps,
-    presentationAttributeColorPaletteProps,
+    presentationColorPaletteProps,
+    presentationLighterColorPaletteProps,
     slideProps,
     slideAttributesProps,
     baseUrl,
