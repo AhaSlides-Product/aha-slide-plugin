@@ -1,0 +1,7 @@
+src
+test
+scripts
+tsconfig.json
+nest-cli.json
+.turbo
+*.tsbuildinfo

@@ -7,13 +7,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-runner-arm64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build
         uses: ./.github/actions/build-app
+        with:
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
+          commit_sha: ${{ github.sha }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          platform: linux/arm64
+          build_storybook: 'true'
 
   deploy:
     runs-on: ubuntu-latest
@@ -22,10 +31,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: plugins.dev.ahaslide.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+          cloudfront_distribution_id: E24EITRV4LCVOE
+          deploy_storybook: 'true'
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: dev01-plugins
+          ecs_service: dev01-plugins-default
+          ecs_task_definition: ecs/tasks/dev01-plugins-default.json

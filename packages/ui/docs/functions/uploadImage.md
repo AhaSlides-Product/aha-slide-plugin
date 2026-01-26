@@ -6,19 +6,13 @@
 
 # Function: uploadImage()
 
-> **uploadImage**(`file`): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
+> **uploadImage**(): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/image.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/ui/src/image.ts#L19)
+Defined in: [packages/ui/src/image.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/ui/src/image.ts#L19)
 
 Uploads an image file to the hosting service.
 
 ## Parameters
-
-### file
-
-`File`
-
-The image file to be uploaded.
 
 ## Returns
 

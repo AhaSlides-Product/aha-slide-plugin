@@ -1,5 +1,30 @@
 name: 'Build App'
 description: 'Builds the application'
+
+inputs:
+  repository_url:
+    description: "Docker repository URL"
+    required: true
+  commit_sha:
+    description: "Commit SHA for tagging the image"
+    required: true
+  platform:
+    description: "Architecture platform"
+    required: false
+    default: linux/amd64
+  aws_access_key_id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws_region:
+    description: 'AWS Region'
+    required: true
+  build_storybook:
+    description: 'Whether to build storybook'
+    required: false
+    default: 'false'
 runs:
   using: "composite"
   steps:
@@ -16,8 +41,37 @@ runs:
       shell: bash
       run: npm run build
 
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and Push Docker Image
+      run: |
+        echo "Building image ${{ inputs.repository_url }}:${{ inputs.commit_sha }}..."
+        docker build \
+          --platform ${{ inputs.platform }} \
+          --push \
+          -f packages/backend-main/Dockerfile \
+          -t ${{ inputs.repository_url }}:${{ inputs.commit_sha }} .
+      shell: bash
+
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: frontend-builds
         path: apps/**/frontend/dist
+
+    - name: Upload Storybook Artifacts
+      if: ${{ inputs.build_storybook == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: storybook-builds
+        path: packages/storybook/storybook-static
+

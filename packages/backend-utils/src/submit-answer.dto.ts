@@ -11,11 +11,13 @@ export class SubmitAnswerDto {
   /** The version number of the slide being answered. */
   slideVersion!: number;
   /** The ordered list of answer options selected by the audience. */
-  answer!: string[];
+  answer!: any;
   /** The audience session ID. */
   audience!: string;
   /** The display name of the audience member. */
   audienceName!: string;
   /** The emoji representation of the audience member. */
   audienceEmoji!: string;
+
+  slideData: any;
 }

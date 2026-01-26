@@ -13,6 +13,13 @@ inputs:
   aws_region:
     description: 'AWS Region'
     required: true
+  cloudfront_distribution_id:
+    description: 'CloudFront Distribution ID to invalidate'
+    required: false
+  deploy_storybook:
+    description: 'Whether to deploy storybook'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -22,6 +29,13 @@ runs:
       with:
         name: frontend-builds
         path: deployment_artifacts
+
+    - name: Download Storybook Artifacts
+      if: ${{ inputs.deploy_storybook == 'true' }}
+      uses: actions/download-artifact@v4
+      with:
+        name: storybook-builds
+        path: storybook_artifacts
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -34,13 +48,28 @@ runs:
       shell: bash
       run: |
         # Loop through each app directory and sync frontend/dist to S3
+        INVALIDATION_PATHS=""
         for app_dir in deployment_artifacts/*/; do
           app_name=$(basename "$app_dir")
           if [ -d "${app_dir}frontend/dist" ]; then
             echo "Deploying ${app_name}..."
             # Sync all files except index.html first
-            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}/${app_name}" --exclude "*/index.html" --exclude "index.html"
+            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}" --exclude "*/index.html" --exclude "index.html"
             # Then sync index.html files last
             aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
+            
+            INVALIDATION_PATHS="$INVALIDATION_PATHS /${app_name}/*"
           fi
         done
+
+        # Deploy Storybook if it exists and input is true
+        if [ "${{ inputs.deploy_storybook }}" == "true" ] && [ -d "storybook_artifacts" ]; then
+          echo "Deploying Storybook..."
+          aws s3 sync "storybook_artifacts" "s3://${{ inputs.s3_bucket }}/storybook"
+          INVALIDATION_PATHS="$INVALIDATION_PATHS /storybook/*"
+        fi
+
+        if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then
+          echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
+          aws cloudfront create-invalidation --distribution-id "${{ inputs.cloudfront_distribution_id }}" --paths $INVALIDATION_PATHS
+        fi

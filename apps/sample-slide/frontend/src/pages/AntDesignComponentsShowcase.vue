@@ -1,14 +1,14 @@
 <template>
-  <div class="bg-base-10 p-8">
+  <div class="min-h-screen bg-base-10 p-8">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-base-100 mb-2">Ant Design Vue Components with AhaSlides branding</h1>
-      <p class="text-base-70 text-base mt-10">A comprehensive showcase of all components in ant-design-vue 4.2</p>
-      </div>
+      <h1 class="text-4xl font-bold text-base-100 mb-2">Ant Design Vue Components</h1>
+      <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
+    </div>
 
     <!-- Navigation -->
       <div class="mb-6">
-      <a-button type="link" @click="$router.back()">
+      <a-button type="link" @click="$router.back()" :icon="h(AhaStar)">
         ← Back
       </a-button>
             </div>
@@ -30,6 +30,9 @@
             <a-button type="primary" loading>Loading</a-button>
             <a-button type="primary" size="large">Large</a-button>
             <a-button type="primary" size="small">Small</a-button>
+            <a-button type="primary" :icon="AhaStar">
+              With icon
+            </a-button>
           </a-space>
         </ComponentDemo>
 
@@ -477,7 +480,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, h } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import {
   HomeOutlined,
@@ -487,8 +490,10 @@ import {
   StarOutlined,
   UploadOutlined,
 } from '@ant-design/icons-vue';
+import {AhaStar} from '@aha/ui/icons';
 import ComponentSection from '../components/ComponentSection.vue';
 import ComponentDemo from '../components/ComponentDemo.vue';
+
 
 // Enable scrolling for this page
 onMounted(() => {

@@ -5,13 +5,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: github-runner-arm64
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build
         uses: ./.github/actions/build-app
+        with:
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
+          commit_sha: ${{ github.sha }}
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          platform: linux/arm64
 
   deploy_canary:
     name: Deploy Canary
@@ -22,13 +30,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_CANARY }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: us01-plugins
+          ecs_service: us01-plugins-canary
+          ecs_task_definition: ecs/tasks/us01-plugins-canary.json
 
   deploy_production:
     name: Deploy Production
@@ -39,10 +59,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy
+      - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+
+      - name: Deploy Backend
+        uses: ./.github/actions/deploy-ecs
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
+          commit_sha: ${{ github.sha }}
+          ecs_cluster: us01-plugins
+          ecs_service: us01-plugins-default
+          ecs_task_definition: ecs/tasks/us01-plugins-default.json

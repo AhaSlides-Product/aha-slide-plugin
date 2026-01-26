@@ -6,7 +6,7 @@
 
 # Class: SubmitAnswerDto
 
-Defined in: [submit-answer.dto.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L4)
+Defined in: [submit-answer.dto.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L4)
 
 Data Transfer Object for ranking slide answer submission.
 
@@ -24,9 +24,9 @@ Data Transfer Object for ranking slide answer submission.
 
 ### answer
 
-> **answer**: `string`[]
+> **answer**: `any`
 
-Defined in: [submit-answer.dto.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L14)
+Defined in: [submit-answer.dto.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L14)
 
 The ordered list of answer options selected by the audience.
 
@@ -36,7 +36,7 @@ The ordered list of answer options selected by the audience.
 
 > **audience**: `string`
 
-Defined in: [submit-answer.dto.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L16)
+Defined in: [submit-answer.dto.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L16)
 
 The audience session ID.
 
@@ -46,7 +46,7 @@ The audience session ID.
 
 > **audienceEmoji**: `string`
 
-Defined in: [submit-answer.dto.ts:20](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L20)
+Defined in: [submit-answer.dto.ts:20](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L20)
 
 The emoji representation of the audience member.
 
@@ -56,7 +56,7 @@ The emoji representation of the audience member.
 
 > **audienceId**: `string`
 
-Defined in: [submit-answer.dto.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L10)
+Defined in: [submit-answer.dto.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L10)
 
 The session identifier of the audience member.
 
@@ -66,7 +66,7 @@ The session identifier of the audience member.
 
 > **audienceName**: `string`
 
-Defined in: [submit-answer.dto.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L18)
+Defined in: [submit-answer.dto.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L18)
 
 The display name of the audience member.
 
@@ -76,9 +76,17 @@ The display name of the audience member.
 
 > **presentationId**: `number`
 
-Defined in: [submit-answer.dto.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L6)
+Defined in: [submit-answer.dto.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L6)
 
 The unique identifier of the presentation.
+
+***
+
+### slideData
+
+> **slideData**: `any`
+
+Defined in: [submit-answer.dto.ts:22](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L22)
 
 ***
 
@@ -86,7 +94,7 @@ The unique identifier of the presentation.
 
 > **slideId**: `number`
 
-Defined in: [submit-answer.dto.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L8)
+Defined in: [submit-answer.dto.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L8)
 
 The unique identifier of the slide.
 
@@ -96,6 +104,6 @@ The unique identifier of the slide.
 
 > **slideVersion**: `number`
 
-Defined in: [submit-answer.dto.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/ba80983bd50ca063a1b9a1379ae08370d8394222/packages/backend-utils/src/submit-answer.dto.ts#L12)
+Defined in: [submit-answer.dto.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/submit-answer.dto.ts#L12)
 
 The version number of the slide being answered.

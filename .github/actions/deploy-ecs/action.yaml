@@ -1,0 +1,92 @@
+name: 'Deploy ECS'
+description: 'Deploys the application to AWS ECS'
+inputs:
+  aws_access_key_id:
+    description: 'AWS Access Key ID'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS Secret Access Key'
+    required: true
+  aws_region:
+    description: 'AWS Region'
+    required: true
+  repository_url:
+    description: 'Docker Repository URL'
+    required: true
+  commit_sha:
+    description: 'Commit SHA'
+    required: true
+  ecs_cluster:
+    description: 'ECS Cluster Name'
+    required: true
+  ecs_service:
+    description: 'ECS Service Name'
+    required: true
+  ecs_task_definition:
+    description: 'Path to ECS Task Definition'
+    required: true
+  container_name:
+    description: 'Container Name in Task Definition'
+    required: false
+    default: 'plugins'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws_access_key_id }}
+        aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+        aws-region: ${{ inputs.aws_region }}
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ inputs.ecs_task_definition }}
+        container-name: ${{ inputs.container_name }}
+        image: ${{ inputs.repository_url }}:${{ inputs.commit_sha }}
+
+    - name: Prepare ECS Environment
+      shell: bash
+      run: |
+        # 1. Ensure Log Group Exists
+        # Extract log group from task definition
+        LOG_GROUP_NAME=$(jq -r '.containerDefinitions[0].logConfiguration.options["awslogs-group"]' ${{ inputs.ecs_task_definition }})
+        
+        if [ "$LOG_GROUP_NAME" != "null" ] && [ -n "$LOG_GROUP_NAME" ]; then
+          echo "Checking Log Group: $LOG_GROUP_NAME"
+          LOG_GROUP_EXISTS=$(aws logs describe-log-groups --region ${{ inputs.aws_region }} --log-group-name-prefix "$LOG_GROUP_NAME" --query "logGroups[?logGroupName=='$LOG_GROUP_NAME'] | length(@)" --output text)
+          
+          if [[ "$LOG_GROUP_EXISTS" == "0" ]]; then
+            echo "Log group $LOG_GROUP_NAME does not exist. Creating log group."
+            aws logs create-log-group --region ${{ inputs.aws_region }} --log-group-name "$LOG_GROUP_NAME"
+            echo "Setting log group retention to 30 days."
+            aws logs put-retention-policy --region ${{ inputs.aws_region }} --log-group-name "$LOG_GROUP_NAME" --retention-in-days 30
+          else
+            echo "Log group $LOG_GROUP_NAME already exists."
+          fi
+        else
+          echo "No log group configuration found in task definition. Skipping creation."
+        fi
+
+        # 2. Check Service Existence
+        echo "Checking Service: ${{ inputs.ecs_service }} in Cluster: ${{ inputs.ecs_cluster }}"
+        SERVICE_STATUS=$(aws ecs describe-services --region ${{ inputs.aws_region }} --cluster ${{ inputs.ecs_cluster }} --services ${{ inputs.ecs_service }} --query "services[0].status" --output text 2>/dev/null)
+        
+        if [[ "$SERVICE_STATUS" == "ACTIVE" ]]; then
+          echo "Service ${{ inputs.ecs_service }} is ACTIVE."
+        else
+          echo "Error: Service ${{ inputs.ecs_service }} does not exist or is not ACTIVE. Status: $SERVICE_STATUS"
+          echo "Pipeline stopped as requested."
+          exit 1
+        fi
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ inputs.ecs_service }}
+        cluster: ${{ inputs.ecs_cluster }}
+        wait-for-service-stability: false # true = cost more CI credit :P
