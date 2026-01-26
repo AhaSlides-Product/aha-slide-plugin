@@ -1,1 +1,1 @@
-export * from "./eqmx"
+export * from "./emqx"
