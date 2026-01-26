@@ -6,13 +6,13 @@
 
 ## Classes
 
-- [SubmitAnswerDto](classes/SubmitAnswerDto.md)
+- [SubmissionRequest](classes/SubmissionRequest.md)
 
 ## Interfaces
 
-- [AnswerResult](interfaces/AnswerResult.md)
 - [CountTotalItem](interfaces/CountTotalItem.md)
 - [CountUniqueItem](interfaces/CountUniqueItem.md)
+- [SubmissionResult](interfaces/SubmissionResult.md)
 
 ## Type Aliases
 

@@ -8,6 +8,6 @@
 
 > **CountTotal** = [`CountTotalItem`](../interfaces/CountTotalItem.md)[]
 
-Defined in: [AnswerResult.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/bf5daf7f9bcfd4441ec675a1339242de93661955/packages/backend-utils/src/AnswerResult.ts#L16)
+Defined in: [SubmissionResult.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/3f307ee201e0da6c14fae0bf8233f474547111f3/packages/backend-utils/src/SubmissionResult.ts#L16)
 
 A collection of items to be aggregated in the statistics.

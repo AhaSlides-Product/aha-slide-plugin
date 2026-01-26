@@ -4,11 +4,6 @@
 
 # @aha/ui
 
-## UI Components
-- Each plugin should use ant-design-vue for reusable components. We already configured the design tokens to match our branding identity. 
-- We exported the ThemeConfig for the ant-design-vue in @aha/ui. See apps/sample-slide/frontend/src/App.vue for example.
-- The design tokens are avaiable as CSS variables in @aha/ui/ahaslides-vars.css
-
 ## Interfaces
 
 - [AudienceSlidePluginProps](interfaces/AudienceSlidePluginProps.md)
