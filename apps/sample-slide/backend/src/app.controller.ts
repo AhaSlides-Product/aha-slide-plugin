@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AppService } from './app.service';
-import { SubmitAnswerDto } from '@aha/backend-utils';
+import { SubmissionRequest } from '@aha/backend-utils';
 
 @Controller()
 export class AppController {
@@ -16,10 +16,10 @@ export class AppController {
     return { message: 'external api get' };
   }
 
-  @Post('ranking')
+  @Post()
   @HttpCode(HttpStatus.OK)
-  submitAnswer(@Body() payload: SubmitAnswerDto) {
+  submitAnswer(@Body() payload: SubmissionRequest) {
     console.log('Answer received', payload);
-    return this.appService.processAnswer(payload);
+    return this.appService.processSubmission(payload);
   }
 }

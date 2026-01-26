@@ -1,2 +1,2 @@
-export * from './submit-answer.dto';
-export * from './AnswerResult';
+export * from './SubmissionRequest';
+export * from './SubmissionResult';
