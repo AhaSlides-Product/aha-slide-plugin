@@ -1,0 +1,14 @@
+{
+  "name": "@aha/common",
+  "version": "1.0.0",
+  "description": "Shared utilities for both backend and frontend",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

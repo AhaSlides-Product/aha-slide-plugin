@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SubmitAnswerDto, AnswerResult, CountTotal } from '@aha/backend-utils';
-
+import { getBucket } from '@aha/common';
 @Injectable()
 export class AppService {
   getHello(): string {
@@ -22,10 +22,8 @@ export class AppService {
     } = payload;
 
     const n = answer.length;
-    const statsType = 'count';
-    const aggregationLevel = 'option';
     const count_total: CountTotal = answer.map((option: any, index: number) => ({
-      bucket: `presentation-${presentationId}/ranking/${statsType}/${aggregationLevel}/${slideId}/${slideVersion}`,
+      bucket: getBucket({ presentationId, slideId, slideVersion, name: 'ranking'}),
       key: `${option}`,
       increase_by: n - index, // highest rank gets highest points
     }));
