@@ -32,6 +32,10 @@ export interface SlidePluginProps {
     teamplay?: Record<string, any>;
     /** Whether audience pacing is enabled */
     audiencePacing?: boolean;
+    /** Whether the presentation is currently presenting */
+    presenting?: boolean;
+    /** The audience admission setting (e.g., 'auto', 'manual') */
+    audienceAdmission?: string;
     [key: string]: any;
   };
   /** 
@@ -62,6 +66,14 @@ export interface SlidePluginProps {
     isEnableStreakDetection?: boolean;
     /** Whether streak bonus is enabled */
     isEnableStreakBonus?: boolean;
+    /** Whether the slide has a time limit */
+    hasTimeLimit?: boolean;
+    /** Whether to show voting results on audience devices */
+    showVotingResultsOnAudience?: boolean;
+    /** Whether image submission is allowed */
+    imageSubmission?: boolean;
+    /** The limit on the number of choices */
+    limitChoice?: number;
     [key: string]: any;
   };
   /** 
@@ -205,6 +217,10 @@ export interface AudienceSlidePluginProps {
     teamPlay?: Record<string, any>;
     /** Whether audience pacing is enabled */
     audiencePacing?: boolean;
+    /** Whether the presentation is currently presenting */
+    presenting?: boolean;
+    /** The audience admission setting (e.g., 'auto', 'manual') */
+    audienceAdmission?: string;
     [key: string]: any;
   };
   /** 
@@ -235,6 +251,14 @@ export interface AudienceSlidePluginProps {
     isEnableStreakDetection?: boolean;
     /** Whether streak bonus is enabled */
     isEnableStreakBonus?: boolean;
+    /** Whether the slide has a time limit */
+    hasTimeLimit?: boolean;
+    /** Whether to show voting results on audience devices */
+    showVotingResultsOnAudience?: boolean;
+    /** Whether image submission is allowed */
+    imageSubmission?: boolean;
+    /** The limit on the number of choices */
+    limitChoice?: number;
     [key: string]: any;
   };
   /** The name of the audience participant */
