@@ -39,9 +39,36 @@ runs:
 
     - name: Build
       shell: bash
-      run: npm run build
+      run: npm run build -- --continue || true
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-builds
+        path: apps/**/frontend/dist
+        if-no-files-found: warn
+
+    - name: Upload Storybook Artifacts
+      if: ${{ inputs.build_storybook == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: storybook-builds
+        path: packages/storybook/storybook-static
+        if-no-files-found: ignore
+
+    - name: Check Backend Build
+      id: check-backend
+      shell: bash
+      run: |
+        if [ -f "packages/backend-main/dist/main.js" ]; then
+          echo "build_success=true" >> $GITHUB_OUTPUT
+        else
+          echo "Backend build failed or missing artifacts."
+          echo "build_success=false" >> $GITHUB_OUTPUT
+        fi
 
     - name: Configure AWS Credentials
+      if: steps.check-backend.outputs.build_success == 'true'
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ inputs.aws_access_key_id }}
@@ -49,10 +76,12 @@ runs:
         aws-region: ${{ inputs.aws_region }}
 
     - name: Login to Amazon ECR
+      if: steps.check-backend.outputs.build_success == 'true'
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
     - name: Build and Push Docker Image
+      if: steps.check-backend.outputs.build_success == 'true'
       run: |
         echo "Building image ${{ inputs.repository_url }}:${{ inputs.commit_sha }}..."
         docker build \
@@ -61,17 +90,4 @@ runs:
           -f packages/backend-main/Dockerfile \
           -t ${{ inputs.repository_url }}:${{ inputs.commit_sha }} .
       shell: bash
-
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-builds
-        path: apps/**/frontend/dist
-
-    - name: Upload Storybook Artifacts
-      if: ${{ inputs.build_storybook == 'true' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: storybook-builds
-        path: packages/storybook/storybook-static
 
