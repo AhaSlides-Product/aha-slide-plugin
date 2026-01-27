@@ -111,17 +111,20 @@ const handleSubmitSubmission = async () => {
     slideId: slideProps.value?.id || 3,
     slideVersion: slideProps.value?.version || 2,
     type: "sample-slide",
-    attributes: JSON.stringify({
+    presentationId: presentationProps.value?.id,
+    attributes: {
       text: "Long essay response",
       wordCount: 250,
-      language: "en"
-    })
+      language: "en",
+      key: "submit-test",
+      increase: 10
+    }
   };
 
   try {
     console.log('Submitting to liveproxy...', payload);
     
-    const response = await fetch('http://localhost:8888/api/live/submissions?slide_type=ranking', {
+    const response = await fetch('https://audience.dev.ahaslide.com/api/live/submissions?slide_type=sample-slide', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
