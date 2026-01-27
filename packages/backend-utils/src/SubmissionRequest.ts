@@ -1,23 +1,21 @@
 /**
  * Data Transfer Object for ranking slide answer submission.
  */
-export class SubmissionRequest {
+export interface SubmissionRequest {
   /** The unique identifier of the presentation. */
-  presentationId!: number;
+  presentationId: number;
   /** The unique identifier of the slide. */
-  slideId!: number;
+  slideId: number;
   /** The session identifier of the audience member. */
-  audienceId!: string;
+  audienceId: string;
   /** The version number of the slide being answered. */
-  slideVersion!: number;
+  slideVersion: number;
   /** The ordered list of answer options selected by the audience. */
-  answer!: any;
+  attributes: any;
   /** The audience session ID. */
-  audience!: string;
+  audience: string;
   /** The display name of the audience member. */
-  audienceName!: string;
+  audienceName: string;
   /** The emoji representation of the audience member. */
-  audienceEmoji!: string;
-
-  slideData: any;
+  audienceEmoji: string;
 }

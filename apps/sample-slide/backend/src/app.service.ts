@@ -12,21 +12,18 @@ export class AppService {
    */
   processSubmission(payload: SubmissionRequest) {
     const {
-      answer,
+      attributes,
       slideId,
       presentationId,
       slideVersion,
-      audience,
-      audienceName,
-      audienceEmoji,
     } = payload;
-
-    const n = answer.length;
-    const count_total: CountTotal = answer.map((option: any, index: number) => ({
-      bucket: getBucket({ presentationId, slideId, slideVersion, name: 'ranking' }),
-      key: `${option}`,
-      increase_by: n - index, // highest rank gets highest points
-    }));
+    const bucket = getBucket({ presentationId, slideId, slideVersion, name: 'sample-slide' })
+    const { increase, key } = attributes
+    const count_total: CountTotal = [{
+      bucket,
+      key,
+      increase_by: increase, // highest rank gets highest points
+    }];
 
     const response: SubmissionResult = {
       count_total,
