@@ -1,0 +1,21 @@
+{
+  "name": "@aha/api",
+  "version": "1.0.0",
+  "description": "Shared utilities for both backend and frontend",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

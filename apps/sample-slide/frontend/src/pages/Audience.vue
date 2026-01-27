@@ -61,6 +61,7 @@
 import { useRoute } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
+import { ApiClient, type SubmissionPayload } from '@aha/api';
 
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -78,6 +79,7 @@ const {
   subscribeTopic,
   unsubscribeTopic,
   audienceSendCountingUniqueAction,
+  baseUrl,
 } = useAudiencePlugin();
 
 const voting = ref(false);
@@ -106,12 +108,16 @@ const handleVote = async () => {
 
 const submitting = ref(false);
 const handleSubmitSubmission = async () => {
+  if (!baseUrl.value) {
+    console.error('baseUrl is not available');
+    return;
+  }
   submitting.value = true;
-  const payload = {
+  const payload: SubmissionPayload = {
     slideId: slideProps.value?.id || 3,
     slideVersion: slideProps.value?.version || 2,
     type: "sample-slide",
-    presentationId: presentationProps.value?.id,
+    presentationId: presentationProps.value?.id || 0,
     attributes: {
       text: "Long essay response",
       wordCount: 250,
@@ -122,23 +128,19 @@ const handleSubmitSubmission = async () => {
   };
 
   try {
-    console.log('Submitting to liveproxy...', payload);
-    
-    const response = await fetch('https://audience.dev.ahaslide.com/api/live/submissions?slide_type=sample-slide', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+    console.log('Audience: Submitting to liveproxy...', payload);
+    const client = new ApiClient(baseUrl.value);
+    const response = await client.sendSubmission(payload);
 
-    console.log('Liveproxy response status:', response.status);
+    console.log('Audience: Liveproxy response status:', response.status);
     
     if (response.ok) {
-      console.log('Submission successful');
+      console.log('Audience: Submission successful');
     } else {
-      console.warn('Submission failed');
+      console.warn('Audience: Submission failed');
     }
   } catch (error) {
-    console.error('Submission error:', error);
+    console.error('Audience: Submission error:', error);
   } finally {
     submitting.value = false;
   }
