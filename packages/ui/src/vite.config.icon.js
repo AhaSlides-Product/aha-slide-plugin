@@ -1,5 +1,5 @@
 import Icons from 'unplugin-icons/vite'
-import { FileSystemIconLoader } from 'unplugin-icons/loaders'
+
 import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
 

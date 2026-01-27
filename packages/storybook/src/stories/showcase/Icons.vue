@@ -14,6 +14,23 @@
       </h2>
 
       <div class="space-y-8">
+        <!-- Prerequisites -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">Prerequisites</h3>
+          <p class="text-base-70 mb-3">To enable icon imports using the <code>~icons/aha/*</code> syntax, you need to add the Aha Icon Vite plugin to your project configuration.</p>
+          <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80 overflow-x-auto">
+            <div><span class="text-base-50">// vite.config.ts</span></div>
+            <div><span class="text-primary-80">import</span> { ahaViteIconPlugin } <span class="text-primary-80">from</span> <span class="text-emerald-70">'@aha/ui/vite.config.icon'</span>;</div>
+            <br />
+            <div><span class="text-primary-80">export default</span> defineConfig({</div>
+            <div>  plugins: [</div>
+            <div>    <span class="text-base-50">// ... other plugins</span></div>
+            <div>    ahaViteIconPlugin,</div>
+            <div>  ],</div>
+            <div>});</div>
+          </div>
+        </div>
+
         <!-- Step 1 -->
         <div>
           <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">1. Import the icon</h3>
