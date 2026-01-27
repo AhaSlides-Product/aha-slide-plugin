@@ -30,7 +30,6 @@
 - [openUploadImageModal](functions/openUploadImageModal.md)
 - [uploadImage](functions/uploadImage.md)
 - [useAudiencePlugin](functions/useAudiencePlugin.md)
-- [useColors](functions/useColors.md)
 - [usePresenterPlugin](functions/usePresenterPlugin.md)
 - [useSync](functions/useSync.md)
 - [useSyncReadOnly](functions/useSyncReadOnly.md)
