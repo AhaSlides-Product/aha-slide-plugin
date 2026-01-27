@@ -139,8 +139,44 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param payload - The attribute data to sync.
    * @returns A promise resolving when the update is complete.
    */
-  upsertSlideAttributeAction?: (payload: { slideId?: string | number, attributeKey: string; attributeValue: any }) => Promise<any>;
   uploadImage: () => Promise<ImageUploadResult>;
+  /** 
+   * Callback function to subscribe to keyboard events from the parent application.
+   * 
+   * @param callback - The function to call when a keyboard event occurs.
+   */
+  onKeyboard?: (callback: (event: PluginKeyboardEvent) => void) => void;
+  /** 
+   * Action to emit a keyboard event from the plugin to the parent application.
+   * 
+   * @param event - The keyboard event data to emit.
+   */
+  emitKeyboardEvent?: (event: PluginKeyboardEvent) => void;
+}
+
+/**
+ * Represents a serializable subset of a KeyboardEvent.
+ * Used for cross-domain communication via Zoid.
+ */
+export interface PluginKeyboardEvent {
+  /** The key value of the event */
+  key: string;
+  /** The physical key code of the event */
+  code: string;
+  /** Whether the Ctrl key was pressed */
+  ctrlKey: boolean;
+  /** Whether the Shift key was pressed */
+  shiftKey: boolean;
+  /** Whether the Alt key was pressed */
+  altKey: boolean;
+  /** Whether the Meta key was pressed */
+  metaKey: boolean;
+  /** Whether the event is repeating */
+  repeat: boolean;
+  /** The location of the key on the keyboard */
+  location: number;
+  /** The legacy keyCode of the event */
+  keyCode: number;
 }
 
 /**
@@ -201,6 +237,14 @@ export const PresenterSlidePluginIframe = zoid.create({
       required: false,
     },
     uploadImage: {
+      type: 'function',
+      required: false,
+    },
+    onKeyboard: {
+      type: 'function',
+      required: false,
+    },
+    emitKeyboardEvent: {
       type: 'function',
       required: false,
     },
@@ -466,6 +510,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
   uploadImage: (() => Promise<ImageUploadResult>) | undefined;
+  onKeyboard: ((callback: (event: PluginKeyboardEvent) => void) => void) | undefined;
+  emitKeyboardEvent: ((event: PluginKeyboardEvent) => void) | undefined;
 } {
   const baseHook = useBaseSlidePlugin(options);
   const { xprops } = baseHook;
@@ -487,6 +533,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
 
   const upsertSlideAttributeAction = xprops?.upsertSlideAttributeAction;
   const uploadImage = xprops?.uploadImage;
+  const onKeyboard = xprops?.onKeyboard;
+  const emitKeyboardEvent = xprops?.emitKeyboardEvent;
 
   return {
     presentationProps: baseHook.presentationProps,
@@ -500,6 +548,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     getSlideAttributesAction,
     upsertSlideAttributeAction,
     uploadImage,
+    onKeyboard,
+    emitKeyboardEvent,
   };
 }
 

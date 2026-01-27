@@ -48,6 +48,16 @@
       </ul>
     </div>
 
+    <div class="debug-section keyboard-section" data-testid="canvas-keyboard">
+      <h3>Last Keyboard Event</h3>
+      <div v-if="!lastKeyboardEvent" class="no-messages">
+        Waiting for keyboard events from host...
+      </div>
+      <div v-else class="last-event">
+        {{ lastKeyboardEvent }}
+      </div>
+    </div>
+
 
 
   </div>
@@ -56,7 +66,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useSync, usePresenterPlugin } from '@aha/ui';
+import { useSync, usePresenterPlugin, type PluginKeyboardEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 
 const route = useRoute();
@@ -68,12 +78,15 @@ const {
   slideProps, 
   getSlideAttributesAction,
   subscribeTopic,
-  unsubscribeTopic
+  unsubscribeTopic,
+  onKeyboard,
+  emitKeyboardEvent
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);
 const mqttMessages = ref<string[]>([]);
+const lastKeyboardEvent = ref<string>('');
 const countTopic = `plugin-counting/slide-${slideId}`;
 
 onMounted(async () => {
@@ -94,6 +107,35 @@ onMounted(async () => {
     });
   }
 
+  // Keyboard Event Integration
+  // Listens for keyboard events passed down from the host application via Zoid
+  if (onKeyboard) {
+    onKeyboard((event: PluginKeyboardEvent) => {
+      console.log('Received keyboard event:', event);
+      lastKeyboardEvent.value = `${new Date().toLocaleTimeString()}: Key = ${event.key} (Code: ${event.code})`;
+    });
+  }
+
+  // Guest-to-Host Communication
+  // Listen for keyboard events in the iframe and emit them to the parent application
+  document.onkeydown = (e: KeyboardEvent) => {
+    if (emitKeyboardEvent) {
+      const serializableEvent: PluginKeyboardEvent = {
+        key: e.key,
+        code: e.code,
+        keyCode: e.keyCode,
+        ctrlKey: e.ctrlKey,
+        shiftKey: e.shiftKey,
+        altKey: e.altKey,
+        metaKey: e.metaKey,
+        repeat: e.repeat,
+        location: e.location,
+      };
+      console.log('[Canvas] Emitting keyboard event to Host:', serializableEvent);
+      emitKeyboardEvent(serializableEvent);
+    }
+  };
+
   if (getSlideAttributesAction && slideId) {
     const attributes = await getSlideAttributesAction(slideId);
     slideAttributes.value = attributes;
@@ -104,6 +146,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  document.onkeydown = null;
   if (unsubscribeTopic) {
     unsubscribeTopic(countTopic);
   }
@@ -143,6 +186,15 @@ onUnmounted(() => {
 }
 .mqtt-section {
   border-left-color: #52c41a;
+}
+.keyboard-section {
+  border-left-color: #eb2f96;
+}
+.last-event {
+  padding: 10px;
+  background: #fff;
+  font-family: monospace;
+  font-weight: bold;
 }
 .message-list {
   list-style: none;
