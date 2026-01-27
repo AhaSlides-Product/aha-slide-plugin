@@ -4,14 +4,11 @@
 
 # @aha/backend-utils
 
-## Classes
-
-- [SubmissionRequest](classes/SubmissionRequest.md)
-
 ## Interfaces
 
 - [CountTotalItem](interfaces/CountTotalItem.md)
 - [CountUniqueItem](interfaces/CountUniqueItem.md)
+- [SubmissionRequest](interfaces/SubmissionRequest.md)
 - [SubmissionResult](interfaces/SubmissionResult.md)
 
 ## Type Aliases

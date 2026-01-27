@@ -6,7 +6,7 @@
 
 # Interface: SlidePluginProps
 
-Defined in: [packages/ui/src/zoid.ts:124](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L124)
+Defined in: [packages/ui/src/zoid/presenter.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L14)
 
 Interface for the properties expected by the PresenterSlidePluginIframe component.
 
@@ -20,7 +20,7 @@ Interface for the properties expected by the PresenterSlidePluginIframe componen
 
 > `optional` **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:112](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L112)
+Defined in: [packages/ui/src/zoid/base.ts:110](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L110)
 
 Action to send counting data from the audience to the parent application.
 
@@ -48,7 +48,7 @@ A promise resolving when the counting is handled.
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:93](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L93)
+Defined in: [packages/ui/src/zoid/base.ts:91](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L91)
 
 The base URL of the parent application
 
@@ -58,11 +58,33 @@ The base URL of the parent application
 
 ***
 
+### emitKeyboardEvent()?
+
+> `optional` **emitKeyboardEvent**: (`event`) => `void`
+
+Defined in: [packages/ui/src/zoid/presenter.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L44)
+
+Action to emit a keyboard event from the plugin to the parent application.
+
+#### Parameters
+
+##### event
+
+[`PluginKeyboardEvent`](PluginKeyboardEvent.md)
+
+The keyboard event data to emit.
+
+#### Returns
+
+`void`
+
+***
+
 ### getSlideAttributesAction()?
 
 > `optional` **getSlideAttributesAction**: (`slideId?`) => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid.ts:135](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L135)
+Defined in: [packages/ui/src/zoid/presenter.ts:25](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L25)
 
 Action to fetch all custom attributes for the current slide from the parent application.
 
@@ -86,7 +108,7 @@ A promise resolving to an object containing slide attributes.
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:91](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L91)
+Defined in: [packages/ui/src/zoid/base.ts:89](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L89)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -109,11 +131,33 @@ The new height in pixels, or null for 100% height.
 
 ***
 
+### onKeyboard()?
+
+> `optional` **onKeyboard**: (`callback`) => `void`
+
+Defined in: [packages/ui/src/zoid/presenter.ts:38](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L38)
+
+Callback function to subscribe to keyboard events from the parent application.
+
+#### Parameters
+
+##### callback
+
+(`event`) => `void`
+
+The function to call when a keyboard event occurs.
+
+#### Returns
+
+`void`
+
+***
+
 ### presentation?
 
 > `optional` **presentation**: `object` & `object`
 
-Defined in: [packages/ui/src/zoid.ts:125](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L125)
+Defined in: [packages/ui/src/zoid/presenter.ts:15](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L15)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
@@ -203,7 +247,7 @@ The teamplay object used in the presentation
 
 > `optional` **presentationColorPalette**: `string`[]
 
-Defined in: [packages/ui/src/zoid.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L42)
+Defined in: [packages/ui/src/zoid/base.ts:40](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L40)
 
 Presentation-wide color palette attributes.
 
@@ -217,7 +261,7 @@ Presentation-wide color palette attributes.
 
 > `optional` **presentationLighterColorPalette**: `string`[]
 
-Defined in: [packages/ui/src/zoid.ts:46](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L46)
+Defined in: [packages/ui/src/zoid/base.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L44)
 
 Presentation-wide lighter color palette attributes.
 
@@ -231,7 +275,7 @@ Presentation-wide lighter color palette attributes.
 
 > `optional` **slide**: `object`
 
-Defined in: [packages/ui/src/zoid.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L50)
+Defined in: [packages/ui/src/zoid/base.ts:48](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L48)
 
 Data specific to the currently active slide.
 
@@ -345,7 +389,7 @@ The version of the slide
 
 > `optional` **subscribeTopic**: (`options`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:99](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L99)
+Defined in: [packages/ui/src/zoid/base.ts:97](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L97)
 
 Subscribe to a specific MQTT topic.
 
@@ -381,7 +425,7 @@ Subscription options including type, topic, and callback.
 
 > `optional` **trackGA4AndMixpanel**: (`payload`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:118](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L118)
+Defined in: [packages/ui/src/zoid/base.ts:116](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L116)
 
 Action to track events to GA4 and Mixpanel.
 
@@ -407,7 +451,7 @@ The event payload to track.
 
 > `optional` **unsubscribeTopic**: (`topic`) => `void`
 
-Defined in: [packages/ui/src/zoid.ts:105](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L105)
+Defined in: [packages/ui/src/zoid/base.ts:103](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L103)
 
 Unsubscribe from a specific MQTT topic.
 
@@ -429,141 +473,17 @@ The topic to unsubscribe from.
 
 ***
 
-### openEditImageModal()?
+### uploadImage()
 
-> `optional` **openEditImageModal**: (`currentImageUrl`) => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+> **uploadImage**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/zoid.ts:470](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L470)
-
-Opens a modal in the parent application that allows the user to edit an existing image.
-The modal provides image editing capabilities and returns the edited image result.
-
-#### Parameters
-
-##### currentImageUrl
-
-`string`
-
-The URL of the current image to be edited.
-
-#### Returns
-
-`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
-
-A promise that resolves to the edited image upload result containing the new URL and metadata.
-
-#### Example
-
-```typescript
-const handleEditImage = async () => {
-  if (openEditImageModal && imageUrl.value) {
-    const result = await openEditImageModal(imageUrl.value);
-    imageUrl.value = result.url;
-    console.log('Image edited successfully:', result);
-  }
-};
-```
-
-***
-
-### openUploadImageModal()?
-
-> `optional` **openUploadImageModal**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
-
-Defined in: [packages/ui/src/zoid.ts:469](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L469)
-
-Opens a modal in the parent application that allows the user to select and upload an image.
-This provides a UI-based approach to image uploading, as opposed to programmatic upload via `uploadImage`.
-
-#### Returns
-
-`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
-
-A promise that resolves to the image upload result containing the URL and metadata.
-
-#### Example
-
-```typescript
-const handleImageUpload = async () => {
-  if (openUploadImageModal) {
-    const result = await openUploadImageModal();
-    imageUrl.value = result.url;
-    console.log('Image uploaded:', result);
-  }
-};
-```
-
-***
-
-### uploadImage()?
-
-> `optional` **uploadImage**: (`file`) => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
-
-Defined in: [packages/ui/src/zoid.ts:468](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L468)
-
-Programmatically uploads an image file to the parent application's hosting service.
-This function accepts a File object (typically from an input or drag-and-drop event) and handles the upload process.
-
-#### Parameters
-
-##### file
-
-`File`
-
-The image file to upload. Must be a valid File object (Blob).
-
-#### Returns
-
-`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
-
-A promise that resolves to the image upload result containing the URL, path, and any additional metadata.
-
-#### Example
-
-```typescript
-// Using with Ant Design Upload component
-const handleCustomUpload = async (options: any) => {
-  const { file } = options;
-  
-  if (uploadImage) {
-    const result = await uploadImage(file.originFileObj);
-    imageUrl.value = result.url;
-    console.log('Image uploaded successfully:', result);
-  }
-};
-```
-
-***
-
-### upsertSlideAttributeAction()?
-
-> `optional` **upsertSlideAttributeAction**: (`payload`) => `Promise`\<`any`\>
-
-Defined in: [packages/ui/src/zoid.ts:142](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L142)
+Defined in: [packages/ui/src/zoid/presenter.ts:32](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L32)
 
 Action to create or update a specific attribute for the current slide in the parent application.
 
-#### Parameters
-
-##### payload
-
-The attribute data to sync.
-
-###### attributeKey
-
-`string`
-
-###### attributeValue
-
-`any`
-
-###### slideId?
-
-`string` \| `number`
-
 #### Returns
 
-`Promise`\<`any`\>
+`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
 
 A promise resolving when the update is complete.
 
@@ -573,7 +493,7 @@ A promise resolving when the update is complete.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L10)
+Defined in: [packages/ui/src/zoid/base.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L8)
 
 The URL of the plugin to be loaded in the iframe
 

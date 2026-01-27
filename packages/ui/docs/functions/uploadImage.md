@@ -6,38 +6,14 @@
 
 # Function: uploadImage()
 
-> **uploadImage**(`file`): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
+> **uploadImage**(): `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/zoid.ts:468](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L468)
+Defined in: [packages/ui/src/image.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/image.ts#L18)
 
-Programmatically uploads an image file to the parent application's hosting service.
-This function accepts a File object (typically from an input or drag-and-drop event) and handles the upload process.
-
-## Parameters
-
-### file
-
-`File`
-
-The image file to upload. Must be a valid File object (Blob).
+Uploads an image file to the hosting service.
 
 ## Returns
 
 `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\>
 
-A promise that resolves to the image upload result containing the URL, path, and any additional metadata.
-
-## Example
-
-```typescript
-// Using with Ant Design Upload component
-const handleCustomUpload = async (options: any) => {
-  const { file } = options;
-  
-  if (uploadImage) {
-    const result = await uploadImage(file.originFileObj);
-    imageUrl.value = result.url;
-    console.log('Image uploaded successfully:', result);
-  }
-};
-```
+A promise that resolves to the upload result containing URLs and metadata.

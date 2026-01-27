@@ -6,7 +6,7 @@
 
 # Interface: SubmissionResult
 
-Defined in: [SubmissionResult.ts:36](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/backend-utils/src/SubmissionResult.ts#L36)
+Defined in: [SubmissionResult.ts:36](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L36)
 
 Represents the result of an audience answer submission processed by the backend.
 
@@ -16,7 +16,7 @@ Represents the result of an audience answer submission processed by the backend.
 
 > `optional` **count\_total**: [`CountTotal`](../type-aliases/CountTotal.md)
 
-Defined in: [SubmissionResult.ts:37](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/backend-utils/src/SubmissionResult.ts#L37)
+Defined in: [SubmissionResult.ts:37](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L37)
 
 ***
 
@@ -24,4 +24,4 @@ Defined in: [SubmissionResult.ts:37](https://github.com/AhaSlides-Product/aha-sl
 
 > `optional` **count\_unique**: [`CountUnique`](../type-aliases/CountUnique.md)
 
-Defined in: [SubmissionResult.ts:38](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/backend-utils/src/SubmissionResult.ts#L38)
+Defined in: [SubmissionResult.ts:38](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L38)

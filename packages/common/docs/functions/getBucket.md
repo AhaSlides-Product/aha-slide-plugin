@@ -6,17 +6,17 @@
 
 # Function: getBucket()
 
-> **getBucket**(`__namedParameters`): `string`
+> **getBucket**(`bucketName`, `__namedParameters`): `string`
 
-Defined in: [emqx.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/common/src/emqx.ts#L1)
+Defined in: [emqx.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/common/src/emqx.ts#L1)
 
 ## Parameters
 
-### \_\_namedParameters
-
-#### name
+### bucketName
 
 `string`
+
+### \_\_namedParameters
 
 #### presentationId
 
