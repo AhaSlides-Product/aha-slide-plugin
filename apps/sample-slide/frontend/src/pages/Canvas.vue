@@ -47,6 +47,18 @@
         </li>
       </ul>
     </div>
+    
+    <div class="debug-section submit-test-section" data-testid="canvas-submit-test">
+      <h3>Submit Test Messages</h3>
+      <div v-if="submitTestMessages.length === 0" class="no-messages">
+        Waiting for submit test messages...
+      </div>
+      <ul v-else class="message-list">
+        <li v-for="(msg, index) in submitTestMessages" :key="index">
+          {{ msg }}
+        </li>
+      </ul>
+    </div>
 
     <div class="debug-section keyboard-section" data-testid="canvas-keyboard">
       <h3>Last Keyboard Event</h3>
@@ -68,6 +80,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSync, usePresenterPlugin, type PluginKeyboardEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
+import { getBucket } from '@aha/common';
 
 const route = useRoute();
 const slideId = route.params.slideId as string;
@@ -85,9 +98,15 @@ const {
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);
-const mqttMessages = ref<string[]>([]);
 const lastKeyboardEvent = ref<string>('');
+const mqttMessages = ref<string[]>([]);
+const submitTestMessages = ref<string[]>([]);
 const countTopic = `plugin-counting/slide-${slideId}`;
+const submitTestTopic = `${getBucket('sample-slide', {
+  presentationId: presentationProps.value?.id,
+  slideId: slideProps.value?.id,
+  slideVersion: slideProps.value?.version,
+})}/submit-test`;
 
 onMounted(async () => {
   document.body.classList.add('enable-scroll');
@@ -102,6 +121,18 @@ onMounted(async () => {
         mqttMessages.value.unshift(`${new Date().toLocaleTimeString()}: Total Count = ${message.total} (${message.count_type})`);
         if (mqttMessages.value.length > 10) {
           mqttMessages.value.pop();
+        }
+      }
+    });
+
+    subscribeTopic({
+      type: 'counting',
+      topic: submitTestTopic,
+      callback: (topic: string, message: any) => {
+        console.log('Received submit test message:', topic, message);
+        submitTestMessages.value.unshift(`${new Date().toLocaleTimeString()}: ${JSON.stringify(message)}`);
+        if (submitTestMessages.value.length > 10) {
+          submitTestMessages.value.pop();
         }
       }
     });
@@ -149,6 +180,7 @@ onUnmounted(() => {
   document.onkeydown = null;
   if (unsubscribeTopic) {
     unsubscribeTopic(countTopic);
+    unsubscribeTopic(submitTestTopic);
   }
 });
 </script>
@@ -189,6 +221,9 @@ onUnmounted(() => {
 }
 .keyboard-section {
   border-left-color: #eb2f96;
+}
+.submit-test-section {
+  border-left-color: #722ed1;
 }
 .last-event {
   padding: 10px;
