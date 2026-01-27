@@ -3,9 +3,38 @@
   <div class="p-8 bg-base-10">
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-4xl font-bold text-base-100 mb-2">Custom Aha Icons</h1>
+      <h1 class="text-4xl font-bold text-base-100 mb-2">AhaSlides Icons Set</h1>
       <p class="text-base-70">All custom SVG icons loaded via unplugin-icons from @aha/ui package</p>
     </div>
+
+    <h3 class="font-bold">Usage</h3>
+    <p>Import the icon</p>
+    <pre>
+      import IconAhaStar from '~icons/aha/aha-star';
+    </pre>
+    <p>Use the icon</p>
+    <pre>
+      {{ '<IconAhaStar />' }}
+    </pre>
+    <p>Icon size: Use <code>width</code> and <code>height</code> props like so</p>
+    <pre>
+      {{ '<IconAhaStar width="24" height="24" />' }}
+    </pre>
+    <p>Icon color: change the <code>color</code> property of the icon. Should be done via CSS classes</p>
+    <pre>
+      {{ '<IconAhaStar :style="{ color: \'red\' }" />' }}
+    </pre>
+    <p>Use within <code>{{ '<a-button>' }}</code></p>
+    <pre>
+  {{ `
+      <a-button>
+        <template #icon>
+          <IconAhaStar class='inline mr-2' />
+        </template>
+        Button Text
+      </a-button>
+  ` }}
+    </pre>
 
     <!-- Search and Filter -->
     <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
@@ -22,31 +51,7 @@
         </template>
       </a-input-search>
     </div>
-
-    <!-- Stats -->
-    <div class="mb-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
-      <a-card size="small" class="stat-card">
-        <a-statistic title="Total Icons" :value="icons.length">
-          <template #prefix>
-            <AppstoreOutlined class="text-purple-60" />
-          </template>
-        </a-statistic>
-      </a-card>
-      <a-card size="small" class="stat-card">
-        <a-statistic title="Showing" :value="filteredIcons.length">
-          <template #prefix>
-            <FilterOutlined class="text-emerald-60" />
-          </template>
-        </a-statistic>
-      </a-card>
-      <a-card size="small" class="stat-card">
-        <a-statistic title="Click to Copy" value="Import">
-          <template #prefix>
-            <CopyOutlined class="text-coral-60" />
-          </template>
-        </a-statistic>
-      </a-card>
-    </div>
+    
 
     <!-- Icon Grid -->
     <div class="bg-white rounded-xl p-8 shadow-lg border border-base-20">
@@ -62,7 +67,7 @@
             @click="copyIconImport(icon.name)"
           >
             <div class="icon-wrapper">
-              <component :is="icon.component" class="icon" />
+              <component :is="icon.component" class="icon text-primary-90" />
             </div>
             <span class="icon-name">{{ icon.displayName }}</span>
           </div>
@@ -495,7 +500,7 @@ const copyIconImport = (iconName: string) => {
 }
 
 .icon-card:hover {
-  border-color: #9333ea;
+  border-color: var(--aha-colorPrimaryText);
   background: #faf5ff;
   transform: translateY(-4px) scale(1.05);
 }
