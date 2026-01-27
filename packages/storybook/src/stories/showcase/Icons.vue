@@ -7,29 +7,69 @@
       <p class="text-base-70">All custom SVG icons loaded via unplugin-icons from @aha/ui package</p>
     </div>
 
-    <h3 class="font-bold text-(length:--aha-fontSizeHeading3)">Usage</h3>
-    <p class="mb-2">Import the icon</p>
-    <pre class="bg-(--aha-colorBgLayout) mb-4">
-      import IconAhaStar from '~icons/aha/aha-star';
-    </pre>
-    <p class="mb-2">Use the icon in the template tag</p>
-    <pre class="bg-(--aha-colorBgLayout) mb-4">
-      {{ '<IconAhaStar />' }}</pre>
-    <p>Icon size: Use <code>width</code> and <code>height</code> props like so</p>
-    <pre class="bg-(--aha-colorBgLayout) mb-4">
-      {{ '<IconAhaStar width="24" height="24" />' }}</pre>
-    <p class="mb-2">Icon color: change the <code>color</code> property of the icon. Should be done via CSS classes</p>
-    <pre class="bg-(--aha-colorBgLayout) mb-4">
-      {{ '<IconAhaStar :style="{ color: \'red\' }" />' }}</pre>
-    <p class="mb-2">Use within <code>{{ '<a-button>' }}</code></p>
-    <pre class="bg-(--aha-colorBgLayout) mb-4">
-    {{ `<a-button>
-        <template #icon>
-          <IconAhaStar class='inline mr-2' />
-        </template>
-        Button Text
-      </a-button>
-  ` }}</pre>
+    <!-- Usage Documentation -->
+    <div class="mb-10 p-6 bg-white rounded-xl shadow-xs border border-base-20">
+      <h2 class="text-2xl font-bold mb-6 text-base-100 flex items-center gap-2">
+        <span>📚</span> Developer Guide
+      </h2>
+
+      <div class="space-y-8">
+        <!-- Step 1 -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">1. Import the icon</h3>
+          <p class="text-base-70 mb-3">Import icons directly from the <code class="bg-base-10 px-1 rounded text-primary-90">~icons/aha</code> collection.</p>
+          <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80">
+            <span class="text-primary-80">import</span> IconAhaStar <span class="text-primary-80">from</span> <span class="text-emerald-70">'~icons/aha/aha-star'</span>;
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">2. Basic Usage</h3>
+          <p class="text-base-70 mb-3">Use the component directly in your template.</p>
+          <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80">
+            {{ '<IconAhaStar />' }}
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">3. Customization</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Sizing -->
+            <div>
+              <p class="text-sm font-bold text-base-80 mb-2 uppercase tracking-wide">Sizing</p>
+              <p class="text-sm text-base-60 mb-2">Control size via props or utility classes.</p>
+              <div class="bg-base-5 p-3 rounded-lg border border-base-10 font-mono text-xs text-base-80">
+                 {{ '<IconAhaStar width="24" height="24" />' }}
+              </div>
+            </div>
+            <!-- Coloring -->
+            <div>
+              <p class="text-sm font-bold text-base-80 mb-2 uppercase tracking-wide">Coloring</p>
+              <p class="text-sm text-base-60 mb-2">Icons inherit color (currentColor) by default.</p>
+              <div class="bg-base-5 p-3 rounded-lg border border-base-10 font-mono text-xs text-base-80">
+                {{ '<IconAhaStar class="text-red-500" />' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div>
+           <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">4. Ant Design Integration</h3>
+           <p class="text-base-70 mb-3">Example usage within an <code>a-button</code>.</p>
+           <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80 whitespace-pre overflow-x-auto">
+{{ `<a-button>
+  <template #icon>
+    <IconAhaStar />
+  </template>
+  Star Button
+</a-button>` }}
+           </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Search and Filter -->
     <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
