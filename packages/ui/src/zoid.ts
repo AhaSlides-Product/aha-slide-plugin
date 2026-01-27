@@ -471,7 +471,7 @@ function useBaseSlidePlugin(
         if (newProps.presentationLighterColorPalette) presentationLighterColorPaletteProps.value = [...newProps.presentationLighterColorPalette];
         if (newProps.slide) slideProps.value = { ...newProps.slide };
         if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
-        
+
         // Call extension callback if provided
         if (onPropsExtension) {
           onPropsExtension(newProps);
@@ -509,9 +509,11 @@ function useBaseSlidePlugin(
 export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): BaseSlidePluginReturn & {
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
-  uploadImage: (() => Promise<ImageUploadResult>) | undefined;
   onKeyboard: ((callback: (event: PluginKeyboardEvent) => void) => void) | undefined;
   emitKeyboardEvent: ((event: PluginKeyboardEvent) => void) | undefined;
+  uploadImage: ((file: File) => Promise<ImageUploadResult>) | undefined;
+  openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
+  openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
 } {
   const baseHook = useBaseSlidePlugin(options);
   const { xprops } = baseHook;
@@ -535,6 +537,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   const uploadImage = xprops?.uploadImage;
   const onKeyboard = xprops?.onKeyboard;
   const emitKeyboardEvent = xprops?.emitKeyboardEvent;
+  const openUploadImageModal = xprops?.openUploadImageModal;
+  const openEditImageModal = xprops?.openEditImageModal;
 
   return {
     presentationProps: baseHook.presentationProps,
@@ -550,6 +554,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     uploadImage,
     onKeyboard,
     emitKeyboardEvent,
+    openUploadImageModal,
+    openEditImageModal,
   };
 }
 

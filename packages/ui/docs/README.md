@@ -27,6 +27,8 @@
 
 - [autoReportHeight](functions/autoReportHeight.md)
 - [execRequest](functions/execRequest.md)
+- [openEditImageModal](functions/openEditImageModal.md)
+- [openUploadImageModal](functions/openUploadImageModal.md)
 - [uploadImage](functions/uploadImage.md)
 - [useAudiencePlugin](functions/useAudiencePlugin.md)
 - [useColors](functions/useColors.md)

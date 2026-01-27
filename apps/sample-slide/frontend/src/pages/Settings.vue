@@ -20,6 +20,14 @@
       </div>
     </div>
 
+    <!-- Sample 2: Edit Image Modal Button -->
+    <div v-if="imageUrl" style="margin-top: 20px; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+      <h3>Sample 2: Edit Uploaded Image</h3>
+      <a-button type="primary" @click="handleEditImage">
+        <edit-outlined /> Edit Image
+      </a-button>
+    </div>
+
     <div v-if="presentationProps" class="debug-section" data-testid="settings-presentation-props">
       <h3>Presentation Details</h3>
       <p><b>ID:</b> {{ presentationProps.id }}</p>
@@ -62,9 +70,10 @@ import { onMounted, watch, ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
+import { UploadOutlined, EditOutlined } from '@ant-design/icons-vue';
 
 const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  uploadImage
+  uploadImage, openUploadImageModal, openEditImageModal
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -73,12 +82,41 @@ const { imageUrl } = useSlideImage(slideId);
 
 const handleImageUpload = async () => {
   try {
-    if (uploadImage) {
-      const result = await uploadImage();
+    if (openUploadImageModal) {
+      const result = await openUploadImageModal();
       imageUrl.value = result.url;
     }
   } catch (error) {
     console.error('Upload failed:', error);
+  }
+};
+
+// Sample 1: Upload image using uploadImage function
+const handleCustomUpload = async (options: any) => {
+  const { file } = options;
+  console.log('is instance of Blob', file.originFileObj instanceof Blob);
+  console.log('originFileObj',file.originFileObj)
+  try {
+    if (uploadImage) {
+      const result = await uploadImage(file.originFileObj);
+      imageUrl.value = result.url;
+      console.log('Image uploaded successfully:', result);
+    }
+  } catch (error) {
+    console.error('Upload failed:', error);
+  }
+};
+
+// Sample 2: Edit image using openEditImageModal function
+const handleEditImage = async () => {
+  try {
+    if (openEditImageModal && imageUrl.value) {
+      const result = await openEditImageModal(imageUrl.value);
+      imageUrl.value = result.url;
+      console.log('Image edited successfully:', result);
+    }
+  } catch (error) {
+    console.error('Edit failed:', error);
   }
 };
 // xprops removed as it is now handled by usePresenterPlugin

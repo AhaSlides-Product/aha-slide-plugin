@@ -429,15 +429,109 @@ The topic to unsubscribe from.
 
 ***
 
-### uploadImage()
+### openEditImageModal()?
 
-> **uploadImage**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+> `optional` **openEditImageModal**: (`currentImageUrl`) => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
 
-Defined in: [packages/ui/src/zoid.ts:143](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L143)
+Defined in: [packages/ui/src/zoid.ts:470](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L470)
+
+Opens a modal in the parent application that allows the user to edit an existing image.
+The modal provides image editing capabilities and returns the edited image result.
+
+#### Parameters
+
+##### currentImageUrl
+
+`string`
+
+The URL of the current image to be edited.
 
 #### Returns
 
 `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+A promise that resolves to the edited image upload result containing the new URL and metadata.
+
+#### Example
+
+```typescript
+const handleEditImage = async () => {
+  if (openEditImageModal && imageUrl.value) {
+    const result = await openEditImageModal(imageUrl.value);
+    imageUrl.value = result.url;
+    console.log('Image edited successfully:', result);
+  }
+};
+```
+
+***
+
+### openUploadImageModal()?
+
+> `optional` **openUploadImageModal**: () => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+Defined in: [packages/ui/src/zoid.ts:469](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L469)
+
+Opens a modal in the parent application that allows the user to select and upload an image.
+This provides a UI-based approach to image uploading, as opposed to programmatic upload via `uploadImage`.
+
+#### Returns
+
+`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+A promise that resolves to the image upload result containing the URL and metadata.
+
+#### Example
+
+```typescript
+const handleImageUpload = async () => {
+  if (openUploadImageModal) {
+    const result = await openUploadImageModal();
+    imageUrl.value = result.url;
+    console.log('Image uploaded:', result);
+  }
+};
+```
+
+***
+
+### uploadImage()?
+
+> `optional` **uploadImage**: (`file`) => `Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+Defined in: [packages/ui/src/zoid.ts:468](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L468)
+
+Programmatically uploads an image file to the parent application's hosting service.
+This function accepts a File object (typically from an input or drag-and-drop event) and handles the upload process.
+
+#### Parameters
+
+##### file
+
+`File`
+
+The image file to upload. Must be a valid File object (Blob).
+
+#### Returns
+
+`Promise`\<[`ImageUploadResult`](ImageUploadResult.md)\>
+
+A promise that resolves to the image upload result containing the URL, path, and any additional metadata.
+
+#### Example
+
+```typescript
+// Using with Ant Design Upload component
+const handleCustomUpload = async (options: any) => {
+  const { file } = options;
+  
+  if (uploadImage) {
+    const result = await uploadImage(file.originFileObj);
+    imageUrl.value = result.url;
+    console.log('Image uploaded successfully:', result);
+  }
+};
+```
 
 ***
 
