@@ -70,10 +70,10 @@ import { onMounted, watch, ref, computed } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
-import { UploadOutlined, EditOutlined } from '@ant-design/icons-vue';
+import { EditOutlined } from '@ant-design/icons-vue';
 
 const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  uploadImage, openUploadImageModal, openEditImageModal
+  openUploadImageModal, openEditImageModal
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -92,20 +92,20 @@ const handleImageUpload = async () => {
 };
 
 // Sample 1: Upload image using uploadImage function
-const handleCustomUpload = async (options: any) => {
-  const { file } = options;
-  console.log('is instance of Blob', file.originFileObj instanceof Blob);
-  console.log('originFileObj',file.originFileObj)
-  try {
-    if (uploadImage) {
-      const result = await uploadImage(file.originFileObj);
-      imageUrl.value = result.url;
-      console.log('Image uploaded successfully:', result);
-    }
-  } catch (error) {
-    console.error('Upload failed:', error);
-  }
-};
+// const handleCustomUpload = async (options: any) => {
+//   const { file } = options;
+//   console.log('is instance of Blob', file.originFileObj instanceof Blob);
+//   console.log('originFileObj',file.originFileObj)
+//   try {
+//     if (uploadImage) {
+//       const result = await uploadImage(file.originFileObj);
+//       imageUrl.value = result.url;
+//       console.log('Image uploaded successfully:', result);
+//     }
+//   } catch (error) {
+//     console.error('Upload failed:', error);
+//   }
+// };
 
 // Sample 2: Edit image using openEditImageModal function
 const handleEditImage = async () => {
