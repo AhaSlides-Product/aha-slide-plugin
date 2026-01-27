@@ -29,7 +29,7 @@ export const ahaViteIconPlugin = Icons({
       try {
         const fs = await import('fs/promises')
         const svg = await fs.readFile(filePath, 'utf-8')
-        return svg.replace(/^<svg /, '<svg fill="currentColor" ')
+        return svg
       } catch (error) {
         console.warn(`Icon not found: ${filePath}`)
         return null

@@ -97,11 +97,11 @@
           </h3>
           <div class="example-content">
             <div class="flex items-end justify-center gap-4 p-6 bg-linear-to-br from-purple-50 to-blue-50 rounded-lg">
-              <IconSystemStar class="text-xl text-purple-60" />
-              <IconSystemStar class="text-2xl text-purple-60" />
-              <IconSystemStar class="text-3xl text-purple-60" />
-              <IconSystemStar class="text-4xl text-purple-60" />
-              <IconSystemStar class="text-5xl text-purple-60" />
+              <IconAhaStar class="text-xl text-purple-60" />
+              <IconAhaStar class="text-2xl text-purple-60" />
+              <IconAhaStar class="text-3xl text-purple-60" />
+              <IconAhaStar class="text-4xl text-purple-60" />
+              <IconAhaStar class="text-5xl text-purple-60" />
             </div>
           </div>
         </div>
@@ -114,11 +114,11 @@
           </h3>
           <div class="example-content">
             <div class="flex items-center justify-center gap-4 p-6 bg-linear-to-br from-emerald-50 to-teal-50 rounded-lg flex-wrap">
-              <IconSystemHeart class="text-4xl text-red-500" />
-              <IconSystemHeart class="text-4xl text-purple-60" />
-              <IconSystemHeart class="text-4xl text-emerald-60" />
-              <IconSystemHeart class="text-4xl text-coral-60" />
-              <IconSystemHeart class="text-4xl text-blue-60" />
+              <IconAhaHeart class="text-4xl text-red-500" />
+              <IconAhaHeart class="text-4xl text-purple-60" />
+              <IconAhaHeart class="text-4xl text-emerald-60" />
+              <IconAhaHeart class="text-4xl text-coral-60" />
+              <IconAhaHeart class="text-4xl text-blue-60" />
             </div>
           </div>
         </div>
@@ -132,16 +132,16 @@
           <div class="example-content">
             <div class="flex items-center justify-center gap-4 p-6 bg-base-10 rounded-lg flex-wrap">
               <div class="icon-bg bg-purple-60">
-                <IconSystemGift class="text-3xl text-white" />
+                <IconAhaGift class="text-3xl text-white" />
               </div>
               <div class="icon-bg bg-emerald-60 rounded-full">
-                <IconSystemBell class="text-3xl text-white" />
+                <IconAhaBell class="text-3xl text-white" />
               </div>
               <div class="icon-bg bg-coral-60">
-                <IconSystemFire class="text-3xl text-white" />
+                <IconAhaFire class="text-3xl text-white" />
               </div>
               <div class="icon-bg bg-blue-60 rounded-full">
-                <IconSystemSparkle class="text-3xl text-white" />
+                <IconAhaSparkle class="text-3xl text-white" />
               </div>
             </div>
           </div>
@@ -156,9 +156,9 @@
           <div class="example-content">
             <div class="bg-base-100 text-white p-4 rounded-lg font-mono text-sm">
               <div class="text-emerald-400">import</div>
-              <div class="ml-2">IconSystemStar</div>
+              <div class="ml-2">IconAhaStar</div>
               <div class="text-emerald-400">from</div>
-              <div class="ml-2 text-amber-300">'~icons/aha/system-star'</div>
+              <div class="ml-2 text-amber-300">'~icons/aha/aha-star'</div>
             </div>
             <a-button type="primary" block class="mt-3" @click="copyExampleImport">
               <CopyOutlined /> Copy Import
@@ -203,187 +203,187 @@ import {
 } from '@ant-design/icons-vue';
 
 // Import all icons dynamically
-import IconSystemAlignCenter from '~icons/aha/system-align-center';
-import IconSystemAlignLeft from '~icons/aha/system-align-left';
-import IconSystemAlignRight from '~icons/aha/system-align-right';
-import IconSystemAnimation from '~icons/aha/system-animation';
-import IconSystemArrowClockwise from '~icons/aha/system-arrow-clockwise';
-import IconSystemArrowCounterClockwise from '~icons/aha/system-arrow-counter-clockwise';
-import IconSystemArrowDown from '~icons/aha/system-arrow-down';
-import IconSystemArrowLeft from '~icons/aha/system-arrow-left';
-import IconSystemArrowRight from '~icons/aha/system-arrow-right';
-import IconSystemArrowSquareOut from '~icons/aha/system-arrow-square-out';
-import IconSystemArrowUUpLeft from '~icons/aha/system-arrow-u-up-left';
-import IconSystemArrowUUpRight from '~icons/aha/system-arrow-u-up-right';
-import IconSystemArrowUp from '~icons/aha/system-arrow-up';
-import IconSystemArrowsClockwise from '~icons/aha/system-arrows-clockwise';
-import IconSystemArrowsDownUp from '~icons/aha/system-arrows-down-up';
-import IconSystemArrowsInSimple from '~icons/aha/system-arrows-in-simple';
-import IconSystemArrowsLeftRight from '~icons/aha/system-arrows-left-right';
-import IconSystemArrowsOutCardinal from '~icons/aha/system-arrows-out-cardinal';
-import IconSystemArrowsOutSimple from '~icons/aha/system-arrows-out-simple';
-import IconSystemAsterisk from '~icons/aha/system-asterisk';
-import IconSystemBackstage from '~icons/aha/system-backstage';
-import IconSystemBell from '~icons/aha/system-bell';
-import IconSystemBook from '~icons/aha/system-book';
-import IconSystemBookmarkSimple from '~icons/aha/system-bookmark-simple';
-import IconSystemBriefcase from '~icons/aha/system-briefcase';
-import IconSystemCalendarDot from '~icons/aha/system-calendar-dot';
-import IconSystemCalendarDots from '~icons/aha/system-calendar-dots';
-import IconSystemCardsThree from '~icons/aha/system-cards-three';
-import IconSystemCaretDown from '~icons/aha/system-caret-down';
-import IconSystemCaretLeft from '~icons/aha/system-caret-left';
-import IconSystemCaretRight from '~icons/aha/system-caret-right';
-import IconSystemCaretUp from '~icons/aha/system-caret-up';
-import IconSystemChartBar from '~icons/aha/system-chart-bar';
-import IconSystemChartDonut from '~icons/aha/system-chart-donut';
-import IconSystemChartLineUp from '~icons/aha/system-chart-line-up';
-import IconSystemChartPie from '~icons/aha/system-chart-pie';
-import IconSystemChatAdd from '~icons/aha/system-chat-add';
-import IconSystemChatCenteredText from '~icons/aha/system-chat-centered-text';
-import IconSystemChatCircle from '~icons/aha/system-chat-circle';
-import IconSystemChatText from '~icons/aha/system-chat-text';
-import IconSystemChatsCircle from '~icons/aha/system-chats-circle';
-import IconSystemCheckCircle from '~icons/aha/system-check-circle';
-import IconSystemCheck from '~icons/aha/system-check';
-import IconSystemCircleNotch from '~icons/aha/system-circle-notch';
-import IconSystemConfetti from '~icons/aha/system-confetti';
-import IconSystemCopy from '~icons/aha/system-copy';
-import IconSystemCreditCard from '~icons/aha/system-credit-card';
-import IconSystemCurrencyCircleDollar from '~icons/aha/system-currency-circle-dollar';
-import IconSystemCursorClick from '~icons/aha/system-cursor-click';
-import IconSystemDeviceMobile from '~icons/aha/system-device-mobile';
-import IconSystemDocumentCheck from '~icons/aha/system-document-check';
-import IconSystemDotsThreeVertical from '~icons/aha/system-dots-three-vertical';
-import IconSystemDotsThree from '~icons/aha/system-dots-three';
-import IconSystemDownloadSimple from '~icons/aha/system-download-simple';
-import IconSystemDrag from '~icons/aha/system-drag';
-import IconSystemDrum from '~icons/aha/system-drum';
-import IconSystemDuplicate from '~icons/aha/system-duplicate';
-import IconSystemEmojiBubble from '~icons/aha/system-emoji-bubble';
-import IconSystemEnvelop from '~icons/aha/system-envelop';
-import IconSystemEnvelope from '~icons/aha/system-envelope';
-import IconSystemEquation from '~icons/aha/system-equation';
-import IconSystemExclamationMark from '~icons/aha/system-exclamation-mark';
-import IconSystemExport from '~icons/aha/system-export';
-import IconSystemEyeSlash from '~icons/aha/system-eye-slash';
-import IconSystemEye from '~icons/aha/system-eye';
-import IconSystemFileArrowDown from '~icons/aha/system-file-arrow-down';
-import IconSystemFileArrowIn from '~icons/aha/system-file-arrow-in';
-import IconSystemFileArrowUp from '~icons/aha/system-file-arrow-up';
-import IconSystemFileAudio from '~icons/aha/system-file-audio';
-import IconSystemFileCheck from '~icons/aha/system-file-check';
-import IconSystemFileXls from '~icons/aha/system-file-xls';
-import IconSystemFile from '~icons/aha/system-file';
-import IconSystemFolder2 from '~icons/aha/system-folder-2';
-import IconSystemFolderSimpleArrow from '~icons/aha/system-folder-simple-arrow';
-import IconSystemFolderSimplePlus from '~icons/aha/system-folder-simple-plus';
-import IconSystemFolderUser from '~icons/aha/system-folder-user';
-import IconSystemFolder from '~icons/aha/system-folder';
-import IconSystemForm from '~icons/aha/system-form';
-import IconSystemFrameCorners from '~icons/aha/system-frame-corners';
-import IconSystemGear from '~icons/aha/system-gear';
-import IconSystemGif from '~icons/aha/system-gif';
-import IconSystemGlobeSimple from '~icons/aha/system-globe-simple';
-import IconSystemHandPointing from '~icons/aha/system-hand-pointing';
-import IconSystemHand from '~icons/aha/system-hand';
-import IconSystemHandsClapping from '~icons/aha/system-hands-clapping';
-import IconSystemHeartStraight from '~icons/aha/system-heart-straight';
-import IconSystemHourglassHigh from '~icons/aha/system-hourglass-high';
+import IconAhaAlignCenter from '~icons/aha/aha-align-center';
+import IconAhaAlignLeft from '~icons/aha/aha-align-left';
+import IconAhaAlignRight from '~icons/aha/aha-align-right';
+import IconAhaAnimation from '~icons/aha/aha-animation';
+import IconAhaArrowClockwise from '~icons/aha/aha-arrow-clockwise';
+import IconAhaArrowCounterClockwise from '~icons/aha/aha-arrow-counter-clockwise';
+import IconAhaArrowDown from '~icons/aha/aha-arrow-down';
+import IconAhaArrowLeft from '~icons/aha/aha-arrow-left';
+import IconAhaArrowRight from '~icons/aha/aha-arrow-right';
+import IconAhaArrowSquareOut from '~icons/aha/aha-arrow-square-out';
+import IconAhaArrowUUpLeft from '~icons/aha/aha-arrow-u-up-left';
+import IconAhaArrowUUpRight from '~icons/aha/aha-arrow-u-up-right';
+import IconAhaArrowUp from '~icons/aha/aha-arrow-up';
+import IconAhaArrowsClockwise from '~icons/aha/aha-arrows-clockwise';
+import IconAhaArrowsDownUp from '~icons/aha/aha-arrows-down-up';
+import IconAhaArrowsInSimple from '~icons/aha/aha-arrows-in-simple';
+import IconAhaArrowsLeftRight from '~icons/aha/aha-arrows-left-right';
+import IconAhaArrowsOutCardinal from '~icons/aha/aha-arrows-out-cardinal';
+import IconAhaArrowsOutSimple from '~icons/aha/aha-arrows-out-simple';
+import IconAhaAsterisk from '~icons/aha/aha-asterisk';
+import IconAhaBackstage from '~icons/aha/aha-backstage';
+import IconAhaBell from '~icons/aha/aha-bell';
+import IconAhaBook from '~icons/aha/aha-book';
+import IconAhaBookmarkSimple from '~icons/aha/aha-bookmark-simple';
+import IconAhaBriefcase from '~icons/aha/aha-briefcase';
+import IconAhaCalendarDot from '~icons/aha/aha-calendar-dot';
+import IconAhaCalendarDots from '~icons/aha/aha-calendar-dots';
+import IconAhaCardsThree from '~icons/aha/aha-cards-three';
+import IconAhaCaretDown from '~icons/aha/aha-caret-down';
+import IconAhaCaretLeft from '~icons/aha/aha-caret-left';
+import IconAhaCaretRight from '~icons/aha/aha-caret-right';
+import IconAhaCaretUp from '~icons/aha/aha-caret-up';
+import IconAhaChartBar from '~icons/aha/aha-chart-bar';
+import IconAhaChartDonut from '~icons/aha/aha-chart-donut';
+import IconAhaChartLineUp from '~icons/aha/aha-chart-line-up';
+import IconAhaChartPie from '~icons/aha/aha-chart-pie';
+import IconAhaChatAdd from '~icons/aha/aha-chat-add';
+import IconAhaChatCenteredText from '~icons/aha/aha-chat-centered-text';
+import IconAhaChatCircle from '~icons/aha/aha-chat-circle';
+import IconAhaChatText from '~icons/aha/aha-chat-text';
+import IconAhaChatsCircle from '~icons/aha/aha-chats-circle';
+import IconAhaCheckCircle from '~icons/aha/aha-check-circle';
+import IconAhaCheck from '~icons/aha/aha-check';
+import IconAhaCircleNotch from '~icons/aha/aha-circle-notch';
+import IconAhaConfetti from '~icons/aha/aha-confetti';
+import IconAhaCopy from '~icons/aha/aha-copy';
+import IconAhaCreditCard from '~icons/aha/aha-credit-card';
+import IconAhaCurrencyCircleDollar from '~icons/aha/aha-currency-circle-dollar';
+import IconAhaCursorClick from '~icons/aha/aha-cursor-click';
+import IconAhaDeviceMobile from '~icons/aha/aha-device-mobile';
+import IconAhaDocumentCheck from '~icons/aha/aha-document-check';
+import IconAhaDotsThreeVertical from '~icons/aha/aha-dots-three-vertical';
+import IconAhaDotsThree from '~icons/aha/aha-dots-three';
+import IconAhaDownloadSimple from '~icons/aha/aha-download-simple';
+import IconAhaDrag from '~icons/aha/aha-drag';
+import IconAhaDrum from '~icons/aha/aha-drum';
+import IconAhaDuplicate from '~icons/aha/aha-duplicate';
+import IconAhaEmojiBubble from '~icons/aha/aha-emoji-bubble';
+import IconAhaEnvelop from '~icons/aha/aha-envelop';
+import IconAhaEnvelope from '~icons/aha/aha-envelope';
+import IconAhaEquation from '~icons/aha/aha-equation';
+import IconAhaExclamationMark from '~icons/aha/aha-exclamation-mark';
+import IconAhaExport from '~icons/aha/aha-export';
+import IconAhaEyeSlash from '~icons/aha/aha-eye-slash';
+import IconAhaEye from '~icons/aha/aha-eye';
+import IconAhaFileArrowDown from '~icons/aha/aha-file-arrow-down';
+import IconAhaFileArrowIn from '~icons/aha/aha-file-arrow-in';
+import IconAhaFileArrowUp from '~icons/aha/aha-file-arrow-up';
+import IconAhaFileAudio from '~icons/aha/aha-file-audio';
+import IconAhaFileCheck from '~icons/aha/aha-file-check';
+import IconAhaFileXls from '~icons/aha/aha-file-xls';
+import IconAhaFile from '~icons/aha/aha-file';
+import IconAhaFolder2 from '~icons/aha/aha-folder-2';
+import IconAhaFolderSimpleArrow from '~icons/aha/aha-folder-simple-arrow';
+import IconAhaFolderSimplePlus from '~icons/aha/aha-folder-simple-plus';
+import IconAhaFolderUser from '~icons/aha/aha-folder-user';
+import IconAhaFolder from '~icons/aha/aha-folder';
+import IconAhaForm from '~icons/aha/aha-form';
+import IconAhaFrameCorners from '~icons/aha/aha-frame-corners';
+import IconAhaGear from '~icons/aha/aha-gear';
+import IconAhaGif from '~icons/aha/aha-gif';
+import IconAhaGlobeSimple from '~icons/aha/aha-globe-simple';
+import IconAhaHandPointing from '~icons/aha/aha-hand-pointing';
+import IconAhaHand from '~icons/aha/aha-hand';
+import IconAhaHandsClapping from '~icons/aha/aha-hands-clapping';
+import IconAhaHeartStraight from '~icons/aha/aha-heart-straight';
+import IconAhaHourglassHigh from '~icons/aha/aha-hourglass-high';
 // Additional icons used in examples
-import IconSystemStar from '~icons/aha/system-star';
-import IconSystemFire from '~icons/aha/system-fire';
-import IconSystemGift from '~icons/aha/system-gift';
-import IconSystemSparkle from '~icons/aha/system-sparkle';
-import IconSystemHouse from '~icons/aha/system-house';
-import IconSystemIdentificationCard from '~icons/aha/system-identification-card';
-import IconSystemImageSquare from '~icons/aha/system-image-square';
-import IconSystemImages from '~icons/aha/system-images';
-import IconSystemInfo from '~icons/aha/system-info';
-import IconSystemInvoice from '~icons/aha/system-invoice';
-import IconSystemKSquare from '~icons/aha/system-k-square';
-import IconSystemKeyReturn from '~icons/aha/system-key-return';
-import IconSystemLayout from '~icons/aha/system-layout';
-import IconSystemLightbulbFilament from '~icons/aha/system-lightbulb-filament';
-import IconSystemLineWeight from '~icons/aha/system-line-weight';
-import IconSystemLink from '~icons/aha/system-link';
-import IconSystemList1 from '~icons/aha/system-list-1';
-import IconSystemListNumbers from '~icons/aha/system-list-numbers';
-import IconSystemList from '~icons/aha/system-list';
-import IconSystemLockOpen from '~icons/aha/system-lock-open';
-import IconSystemLock from '~icons/aha/system-lock';
-import IconSystemMagicWand from '~icons/aha/system-magic-wand';
-import IconSystemMagnifyingGlass from '~icons/aha/system-magnifying-glass';
-import IconSystemMicrophone from '~icons/aha/system-microphone';
-import IconSystemMicrosoftExcelLogo from '~icons/aha/system-microsoft-excel-logo';
-import IconSystemMinusSquare from '~icons/aha/system-minus-square';
-import IconSystemMinus from '~icons/aha/system-minus';
-import IconSystemMoneyBack from '~icons/aha/system-money-back';
-import IconSystemMusicNotesSimple from '~icons/aha/system-music-notes-simple';
-import IconSystemMusicNotes from '~icons/aha/system-music-notes';
-import IconSystemNoteFilled from '~icons/aha/system-note-filled';
-import IconSystemNote from '~icons/aha/system-note';
-import IconSystemNumberOne from '~icons/aha/system-number-one';
-import IconSystemPalette from '~icons/aha/system-palette';
-import IconSystemPaperClip from '~icons/aha/system-paper-clip';
-import IconSystemPaste from '~icons/aha/system-paste';
-import IconSystemPause from '~icons/aha/system-pause';
-import IconSystemPencilSimpleLine from '~icons/aha/system-pencil-simple-line';
-import IconSystemPencilSimple from '~icons/aha/system-pencil-simple';
-import IconSystemPercent from '~icons/aha/system-percent';
-import IconSystemPinnedFilled from '~icons/aha/system-pinned-filled';
-import IconSystemPlan from '~icons/aha/system-plan';
-import IconSystemPlay from '~icons/aha/system-play';
-import IconSystemPlusSquare from '~icons/aha/system-plus-square';
-import IconSystemPlus from '~icons/aha/system-plus';
-import IconSystemPresentationChartOne from '~icons/aha/system-presentation-chart-one';
-import IconSystemPresentationChart from '~icons/aha/system-presentation-chart';
-import IconSystemPresentationConnect from '~icons/aha/system-presentation-connect';
-import IconSystemPresentationDisconnect from '~icons/aha/system-presentation-disconnect';
-import IconSystemProjectorScreenChart from '~icons/aha/system-projector-screen-chart';
-import IconSystemPushPin from '~icons/aha/system-push-pin';
-import IconSystemQA from '~icons/aha/system-qna';
-import IconSystemQrCode from '~icons/aha/system-qr-code';
-import IconSystemQuestion from '~icons/aha/system-question';
-import IconSystemRemote from '~icons/aha/system-remote';
-import IconSystemRows from '~icons/aha/system-rows';
-import IconSystemScissors from '~icons/aha/system-scissors';
-import IconSystemShapes from '~icons/aha/system-shapes';
-import IconSystemShareNetwork from '~icons/aha/system-share-network';
-import IconSystemShieldCheck from '~icons/aha/system-shield-check';
-import IconSystemShieldWarning from '~icons/aha/system-shield-warning';
-import IconSystemShuffle from '~icons/aha/system-shuffle';
-import IconSystemSignOut from '~icons/aha/system-sign-out';
-import IconSystemSlidersHorizontal from '~icons/aha/system-sliders-horizontal';
-import IconSystemSmiley from '~icons/aha/system-smiley';
-import IconSystemSpeakerSimpleHigh from '~icons/aha/system-speaker-simple-high';
-import IconSystemSpeakerSimpleX from '~icons/aha/system-speaker-simple-x';
-import IconSystemSquaresFour from '~icons/aha/system-squares-four';
-import IconSystemStackSimple from '~icons/aha/system-stack-simple';
-import IconSystemStack from '~icons/aha/system-stack';
-import IconSystemStop from '~icons/aha/system-stop';
-import IconSystemTable from '~icons/aha/system-table';
-import IconSystemTextT from '~icons/aha/system-text-t';
-import IconSystemThumbsDown from '~icons/aha/system-thumbs-down';
-import IconSystemThumbsUp from '~icons/aha/system-thumbs-up';
-import IconSystemTimer from '~icons/aha/system-timer';
-import IconSystemTrash from '~icons/aha/system-trash';
-import IconSystemTrendDown from '~icons/aha/system-trend-down';
-import IconSystemTrendUp from '~icons/aha/system-trend-up';
-import IconSystemTrophySlash from '~icons/aha/system-trophy-slash';
-import IconSystemTrophy from '~icons/aha/system-trophy';
-import IconSystemUploadSimple from '~icons/aha/system-upload-simple';
-import IconSystemUserCircle from '~icons/aha/system-user-circle';
-import IconSystemUserPlus from '~icons/aha/system-user-plus';
-import IconSystemUser from '~icons/aha/system-user';
-import IconSystemUsersThree from '~icons/aha/system-users-three';
-import IconSystemUsers from '~icons/aha/system-users';
-import IconSystemVideo from '~icons/aha/system-video';
-import IconSystemWallet from '~icons/aha/system-wallet';
-import IconSystemWarningCircle from '~icons/aha/system-warning-circle';
-import IconSystemWhatsappLogo from '~icons/aha/system-whatsapp-logo';
-import IconSystemXCircle from '~icons/aha/system-x-circle';
-import IconSystemX from '~icons/aha/system-x';
+import IconAhaStar from '~icons/aha/aha-star';
+import IconAhaFire from '~icons/aha/aha-fire';
+import IconAhaGift from '~icons/aha/aha-gift';
+import IconAhaSparkle from '~icons/aha/aha-sparkle';
+import IconAhaHouse from '~icons/aha/aha-house';
+import IconAhaIdentificationCard from '~icons/aha/aha-identification-card';
+import IconAhaImageSquare from '~icons/aha/aha-image-square';
+import IconAhaImages from '~icons/aha/aha-images';
+import IconAhaInfo from '~icons/aha/aha-info';
+import IconAhaInvoice from '~icons/aha/aha-invoice';
+import IconAhaKSquare from '~icons/aha/aha-k-square';
+import IconAhaKeyReturn from '~icons/aha/aha-key-return';
+import IconAhaLayout from '~icons/aha/aha-layout';
+import IconAhaLightbulbFilament from '~icons/aha/aha-lightbulb-filament';
+import IconAhaLineWeight from '~icons/aha/aha-line-weight';
+import IconAhaLink from '~icons/aha/aha-link';
+import IconAhaList1 from '~icons/aha/aha-list-1';
+import IconAhaListNumbers from '~icons/aha/aha-list-numbers';
+import IconAhaList from '~icons/aha/aha-list';
+import IconAhaLockOpen from '~icons/aha/aha-lock-open';
+import IconAhaLock from '~icons/aha/aha-lock';
+import IconAhaMagicWand from '~icons/aha/aha-magic-wand';
+import IconAhaMagnifyingGlass from '~icons/aha/aha-magnifying-glass';
+import IconAhaMicrophone from '~icons/aha/aha-microphone';
+import IconAhaMicrosoftExcelLogo from '~icons/aha/aha-microsoft-excel-logo';
+import IconAhaMinusSquare from '~icons/aha/aha-minus-square';
+import IconAhaMinus from '~icons/aha/aha-minus';
+import IconAhaMoneyBack from '~icons/aha/aha-money-back';
+import IconAhaMusicNotesSimple from '~icons/aha/aha-music-notes-simple';
+import IconAhaMusicNotes from '~icons/aha/aha-music-notes';
+import IconAhaNoteFilled from '~icons/aha/aha-note-filled';
+import IconAhaNote from '~icons/aha/aha-note';
+import IconAhaNumberOne from '~icons/aha/aha-number-one';
+import IconAhaPalette from '~icons/aha/aha-palette';
+import IconAhaPaperClip from '~icons/aha/aha-paper-clip';
+import IconAhaPaste from '~icons/aha/aha-paste';
+import IconAhaPause from '~icons/aha/aha-pause';
+import IconAhaPencilSimpleLine from '~icons/aha/aha-pencil-simple-line';
+import IconAhaPencilSimple from '~icons/aha/aha-pencil-simple';
+import IconAhaPercent from '~icons/aha/aha-percent';
+import IconAhaPinnedFilled from '~icons/aha/aha-pinned-filled';
+import IconAhaPlan from '~icons/aha/aha-plan';
+import IconAhaPlay from '~icons/aha/aha-play';
+import IconAhaPlusSquare from '~icons/aha/aha-plus-square';
+import IconAhaPlus from '~icons/aha/aha-plus';
+import IconAhaPresentationChartOne from '~icons/aha/aha-presentation-chart-one';
+import IconAhaPresentationChart from '~icons/aha/aha-presentation-chart';
+import IconAhaPresentationConnect from '~icons/aha/aha-presentation-connect';
+import IconAhaPresentationDisconnect from '~icons/aha/aha-presentation-disconnect';
+import IconAhaProjectorScreenChart from '~icons/aha/aha-projector-screen-chart';
+import IconAhaPushPin from '~icons/aha/aha-push-pin';
+import IconAhaQA from '~icons/aha/aha-qna';
+import IconAhaQrCode from '~icons/aha/aha-qr-code';
+import IconAhaQuestion from '~icons/aha/aha-question';
+import IconAhaRemote from '~icons/aha/aha-remote';
+import IconAhaRows from '~icons/aha/aha-rows';
+import IconAhaScissors from '~icons/aha/aha-scissors';
+import IconAhaShapes from '~icons/aha/aha-shapes';
+import IconAhaShareNetwork from '~icons/aha/aha-share-network';
+import IconAhaShieldCheck from '~icons/aha/aha-shield-check';
+import IconAhaShieldWarning from '~icons/aha/aha-shield-warning';
+import IconAhaShuffle from '~icons/aha/aha-shuffle';
+import IconAhaSignOut from '~icons/aha/aha-sign-out';
+import IconAhaSlidersHorizontal from '~icons/aha/aha-sliders-horizontal';
+import IconAhaSmiley from '~icons/aha/aha-smiley';
+import IconAhaSpeakerSimpleHigh from '~icons/aha/aha-speaker-simple-high';
+import IconAhaSpeakerSimpleX from '~icons/aha/aha-speaker-simple-x';
+import IconAhaSquaresFour from '~icons/aha/aha-squares-four';
+import IconAhaStackSimple from '~icons/aha/aha-stack-simple';
+import IconAhaStack from '~icons/aha/aha-stack';
+import IconAhaStop from '~icons/aha/aha-stop';
+import IconAhaTable from '~icons/aha/aha-table';
+import IconAhaTextT from '~icons/aha/aha-text-t';
+import IconAhaThumbsDown from '~icons/aha/aha-thumbs-down';
+import IconAhaThumbsUp from '~icons/aha/aha-thumbs-up';
+import IconAhaTimer from '~icons/aha/aha-timer';
+import IconAhaTrash from '~icons/aha/aha-trash';
+import IconAhaTrendDown from '~icons/aha/aha-trend-down';
+import IconAhaTrendUp from '~icons/aha/aha-trend-up';
+import IconAhaTrophySlash from '~icons/aha/aha-trophy-slash';
+import IconAhaTrophy from '~icons/aha/aha-trophy';
+import IconAhaUploadSimple from '~icons/aha/aha-upload-simple';
+import IconAhaUserCircle from '~icons/aha/aha-user-circle';
+import IconAhaUserPlus from '~icons/aha/aha-user-plus';
+import IconAhaUser from '~icons/aha/aha-user';
+import IconAhaUsersThree from '~icons/aha/aha-users-three';
+import IconAhaUsers from '~icons/aha/aha-users';
+import IconAhaVideo from '~icons/aha/aha-video';
+import IconAhaWallet from '~icons/aha/aha-wallet';
+import IconAhaWarningCircle from '~icons/aha/aha-warning-circle';
+import IconAhaWhatsappLogo from '~icons/aha/aha-whatsapp-logo';
+import IconAhaXCircle from '~icons/aha/aha-x-circle';
+import IconAhaX from '~icons/aha/aha-x';
 
 // Enable scrolling for this page
 onMounted(() => {
@@ -399,186 +399,186 @@ const searchQuery = ref('');
 
 // All icons list
 const icons = ref([
-  { name: 'system-align-center', component: IconSystemAlignCenter, displayName: 'AlignCenter' },
-  { name: 'system-align-left', component: IconSystemAlignLeft, displayName: 'AlignLeft' },
-  { name: 'system-align-right', component: IconSystemAlignRight, displayName: 'AlignRight' },
-  { name: 'system-animation', component: IconSystemAnimation, displayName: 'Animation' },
-  { name: 'system-arrow-clockwise', component: IconSystemArrowClockwise, displayName: 'ArrowClockwise' },
-  { name: 'system-arrow-counter-clockwise', component: IconSystemArrowCounterClockwise, displayName: 'ArrowCounterClockwise' },
-  { name: 'system-arrow-down', component: IconSystemArrowDown, displayName: 'ArrowDown' },
-  { name: 'system-arrow-left', component: IconSystemArrowLeft, displayName: 'ArrowLeft' },
-  { name: 'system-arrow-right', component: IconSystemArrowRight, displayName: 'ArrowRight' },
-  { name: 'system-arrow-square-out', component: IconSystemArrowSquareOut, displayName: 'ArrowSquareOut' },
-  { name: 'system-arrow-u-up-left', component: IconSystemArrowUUpLeft, displayName: 'ArrowUUpLeft' },
-  { name: 'system-arrow-u-up-right', component: IconSystemArrowUUpRight, displayName: 'ArrowUUpRight' },
-  { name: 'system-arrow-up', component: IconSystemArrowUp, displayName: 'ArrowUp' },
-  { name: 'system-arrows-clockwise', component: IconSystemArrowsClockwise, displayName: 'ArrowsClockwise' },
-  { name: 'system-arrows-down-up', component: IconSystemArrowsDownUp, displayName: 'ArrowsDownUp' },
-  { name: 'system-arrows-in-simple', component: IconSystemArrowsInSimple, displayName: 'ArrowsInSimple' },
-  { name: 'system-arrows-left-right', component: IconSystemArrowsLeftRight, displayName: 'ArrowsLeftRight' },
-  { name: 'system-arrows-out-cardinal', component: IconSystemArrowsOutCardinal, displayName: 'ArrowsOutCardinal' },
-  { name: 'system-arrows-out-simple', component: IconSystemArrowsOutSimple, displayName: 'ArrowsOutSimple' },
-  { name: 'system-asterisk', component: IconSystemAsterisk, displayName: 'Asterisk' },
-  { name: 'system-backstage', component: IconSystemBackstage, displayName: 'Backstage' },
-  { name: 'system-bell', component: IconSystemBell, displayName: 'Bell' },
-  { name: 'system-book', component: IconSystemBook, displayName: 'Book' },
-  { name: 'system-bookmark-simple', component: IconSystemBookmarkSimple, displayName: 'BookmarkSimple' },
-  { name: 'system-briefcase', component: IconSystemBriefcase, displayName: 'Briefcase' },
-  { name: 'system-calendar-dot', component: IconSystemCalendarDot, displayName: 'CalendarDot' },
-  { name: 'system-calendar-dots', component: IconSystemCalendarDots, displayName: 'CalendarDots' },
-  { name: 'system-cards-three', component: IconSystemCardsThree, displayName: 'CardsThree' },
-  { name: 'system-caret-down', component: IconSystemCaretDown, displayName: 'CaretDown' },
-  { name: 'system-caret-left', component: IconSystemCaretLeft, displayName: 'CaretLeft' },
-  { name: 'system-caret-right', component: IconSystemCaretRight, displayName: 'CaretRight' },
-  { name: 'system-caret-up', component: IconSystemCaretUp, displayName: 'CaretUp' },
-  { name: 'system-chart-bar', component: IconSystemChartBar, displayName: 'ChartBar' },
-  { name: 'system-chart-donut', component: IconSystemChartDonut, displayName: 'ChartDonut' },
-  { name: 'system-chart-line-up', component: IconSystemChartLineUp, displayName: 'ChartLineUp' },
-  { name: 'system-chart-pie', component: IconSystemChartPie, displayName: 'ChartPie' },
-  { name: 'system-chat-add', component: IconSystemChatAdd, displayName: 'ChatAdd' },
-  { name: 'system-chat-centered-text', component: IconSystemChatCenteredText, displayName: 'ChatCenteredText' },
-  { name: 'system-chat-circle', component: IconSystemChatCircle, displayName: 'ChatCircle' },
-  { name: 'system-chat-text', component: IconSystemChatText, displayName: 'ChatText' },
-  { name: 'system-chats-circle', component: IconSystemChatsCircle, displayName: 'ChatsCircle' },
-  { name: 'system-check-circle', component: IconSystemCheckCircle, displayName: 'CheckCircle' },
-  { name: 'system-check', component: IconSystemCheck, displayName: 'Check' },
-  { name: 'system-circle-notch', component: IconSystemCircleNotch, displayName: 'CircleNotch' },
-  { name: 'system-confetti', component: IconSystemConfetti, displayName: 'Confetti' },
-  { name: 'system-copy', component: IconSystemCopy, displayName: 'Copy' },
-  { name: 'system-credit-card', component: IconSystemCreditCard, displayName: 'CreditCard' },
-  { name: 'system-currency-circle-dollar', component: IconSystemCurrencyCircleDollar, displayName: 'CurrencyCircleDollar' },
-  { name: 'system-cursor-click', component: IconSystemCursorClick, displayName: 'CursorClick' },
-  { name: 'system-device-mobile', component: IconSystemDeviceMobile, displayName: 'DeviceMobile' },
-  { name: 'system-document-check', component: IconSystemDocumentCheck, displayName: 'DocumentCheck' },
-  { name: 'system-dots-three-vertical', component: IconSystemDotsThreeVertical, displayName: 'DotsThreeVertical' },
-  { name: 'system-dots-three', component: IconSystemDotsThree, displayName: 'DotsThree' },
-  { name: 'system-download-simple', component: IconSystemDownloadSimple, displayName: 'DownloadSimple' },
-  { name: 'system-drag', component: IconSystemDrag, displayName: 'Drag' },
-  { name: 'system-drum', component: IconSystemDrum, displayName: 'Drum' },
-  { name: 'system-duplicate', component: IconSystemDuplicate, displayName: 'Duplicate' },
-  { name: 'system-emoji-bubble', component: IconSystemEmojiBubble, displayName: 'EmojiBubble' },
-  { name: 'system-envelop', component: IconSystemEnvelop, displayName: 'Envelop' },
-  { name: 'system-envelope', component: IconSystemEnvelope, displayName: 'Envelope' },
-  { name: 'system-equation', component: IconSystemEquation, displayName: 'Equation' },
-  { name: 'system-exclamation-mark', component: IconSystemExclamationMark, displayName: 'ExclamationMark' },
-  { name: 'system-export', component: IconSystemExport, displayName: 'Export' },
-  { name: 'system-eye-slash', component: IconSystemEyeSlash, displayName: 'EyeSlash' },
-  { name: 'system-eye', component: IconSystemEye, displayName: 'Eye' },
-  { name: 'system-file-arrow-down', component: IconSystemFileArrowDown, displayName: 'FileArrowDown' },
-  { name: 'system-file-arrow-in', component: IconSystemFileArrowIn, displayName: 'FileArrowIn' },
-  { name: 'system-file-arrow-up', component: IconSystemFileArrowUp, displayName: 'FileArrowUp' },
-  { name: 'system-file-audio', component: IconSystemFileAudio, displayName: 'FileAudio' },
-  { name: 'system-file-check', component: IconSystemFileCheck, displayName: 'FileCheck' },
-  { name: 'system-file-xls', component: IconSystemFileXls, displayName: 'FileXls' },
-  { name: 'system-file', component: IconSystemFile, displayName: 'File' },
-  { name: 'system-fire', component: IconSystemFire, displayName: 'Fire' },
-  { name: 'system-folder-2', component: IconSystemFolder2, displayName: 'Folder2' },
-  { name: 'system-folder-simple-arrow', component: IconSystemFolderSimpleArrow, displayName: 'FolderSimpleArrow' },
-  { name: 'system-folder-simple-plus', component: IconSystemFolderSimplePlus, displayName: 'FolderSimplePlus' },
-  { name: 'system-folder-user', component: IconSystemFolderUser, displayName: 'FolderUser' },
-  { name: 'system-folder', component: IconSystemFolder, displayName: 'Folder' },
-  { name: 'system-form', component: IconSystemForm, displayName: 'Form' },
-  { name: 'system-frame-corners', component: IconSystemFrameCorners, displayName: 'FrameCorners' },
-  { name: 'system-gear', component: IconSystemGear, displayName: 'Gear' },
-  { name: 'system-gif', component: IconSystemGif, displayName: 'Gif' },
-  { name: 'system-gift', component: IconSystemGift, displayName: 'Gift' },
-  { name: 'system-globe-simple', component: IconSystemGlobeSimple, displayName: 'GlobeSimple' },
-  { name: 'system-hand-pointing', component: IconSystemHandPointing, displayName: 'HandPointing' },
-  { name: 'system-hand', component: IconSystemHand, displayName: 'Hand' },
-  { name: 'system-hands-clapping', component: IconSystemHandsClapping, displayName: 'HandsClapping' },
-  { name: 'system-heart-straight', component: IconSystemHeartStraight, displayName: 'HeartStraight' },
-  { name: 'system-hourglass-high', component: IconSystemHourglassHigh, displayName: 'HourglassHigh' },
-  { name: 'system-house', component: IconSystemHouse, displayName: 'House' },
-  { name: 'system-identification-card', component: IconSystemIdentificationCard, displayName: 'IdentificationCard' },
-  { name: 'system-image-square', component: IconSystemImageSquare, displayName: 'ImageSquare' },
-  { name: 'system-images', component: IconSystemImages, displayName: 'Images' },
-  { name: 'system-info', component: IconSystemInfo, displayName: 'Info' },
-  { name: 'system-invoice', component: IconSystemInvoice, displayName: 'Invoice' },
-  { name: 'system-k-square', component: IconSystemKSquare, displayName: 'KSquare' },
-  { name: 'system-key-return', component: IconSystemKeyReturn, displayName: 'KeyReturn' },
-  { name: 'system-layout', component: IconSystemLayout, displayName: 'Layout' },
-  { name: 'system-lightbulb-filament', component: IconSystemLightbulbFilament, displayName: 'LightbulbFilament' },
-  { name: 'system-line-weight', component: IconSystemLineWeight, displayName: 'LineWeight' },
-  { name: 'system-link', component: IconSystemLink, displayName: 'Link' },
-  { name: 'system-list-1', component: IconSystemList1, displayName: 'List1' },
-  { name: 'system-list-numbers', component: IconSystemListNumbers, displayName: 'ListNumbers' },
-  { name: 'system-list', component: IconSystemList, displayName: 'List' },
-  { name: 'system-lock-open', component: IconSystemLockOpen, displayName: 'LockOpen' },
-  { name: 'system-lock', component: IconSystemLock, displayName: 'Lock' },
-  { name: 'system-magic-wand', component: IconSystemMagicWand, displayName: 'MagicWand' },
-  { name: 'system-magnifying-glass', component: IconSystemMagnifyingGlass, displayName: 'MagnifyingGlass' },
-  { name: 'system-microphone', component: IconSystemMicrophone, displayName: 'Microphone' },
-  { name: 'system-microsoft-excel-logo', component: IconSystemMicrosoftExcelLogo, displayName: 'MicrosoftExcelLogo' },
-  { name: 'system-minus-square', component: IconSystemMinusSquare, displayName: 'MinusSquare' },
-  { name: 'system-minus', component: IconSystemMinus, displayName: 'Minus' },
-  { name: 'system-money-back', component: IconSystemMoneyBack, displayName: 'MoneyBack' },
-  { name: 'system-music-notes-simple', component: IconSystemMusicNotesSimple, displayName: 'MusicNotesSimple' },
-  { name: 'system-music-notes', component: IconSystemMusicNotes, displayName: 'MusicNotes' },
-  { name: 'system-note-filled', component: IconSystemNoteFilled, displayName: 'NoteFilled' },
-  { name: 'system-note', component: IconSystemNote, displayName: 'Note' },
-  { name: 'system-number-one', component: IconSystemNumberOne, displayName: 'NumberOne' },
-  { name: 'system-palette', component: IconSystemPalette, displayName: 'Palette' },
-  { name: 'system-paper-clip', component: IconSystemPaperClip, displayName: 'PaperClip' },
-  { name: 'system-paste', component: IconSystemPaste, displayName: 'Paste' },
-  { name: 'system-pause', component: IconSystemPause, displayName: 'Pause' },
-  { name: 'system-pencil-simple-line', component: IconSystemPencilSimpleLine, displayName: 'PencilSimpleLine' },
-  { name: 'system-pencil-simple', component: IconSystemPencilSimple, displayName: 'PencilSimple' },
-  { name: 'system-percent', component: IconSystemPercent, displayName: 'Percent' },
-  { name: 'system-pinned-filled', component: IconSystemPinnedFilled, displayName: 'PinnedFilled' },
-  { name: 'system-plan', component: IconSystemPlan, displayName: 'Plan' },
-  { name: 'system-play', component: IconSystemPlay, displayName: 'Play' },
-  { name: 'system-plus-square', component: IconSystemPlusSquare, displayName: 'PlusSquare' },
-  { name: 'system-plus', component: IconSystemPlus, displayName: 'Plus' },
-  { name: 'system-presentation-chart-one', component: IconSystemPresentationChartOne, displayName: 'PresentationChartOne' },
-  { name: 'system-presentation-chart', component: IconSystemPresentationChart, displayName: 'PresentationChart' },
-  { name: 'system-presentation-connect', component: IconSystemPresentationConnect, displayName: 'PresentationConnect' },
-  { name: 'system-presentation-disconnect', component: IconSystemPresentationDisconnect, displayName: 'PresentationDisconnect' },
-  { name: 'system-projector-screen-chart', component: IconSystemProjectorScreenChart, displayName: 'ProjectorScreenChart' },
-  { name: 'system-push-pin', component: IconSystemPushPin, displayName: 'PushPin' },
-  { name: 'system-q&a', component: IconSystemQA, displayName: 'Q&A' },
-  { name: 'system-qr-code', component: IconSystemQrCode, displayName: 'QrCode' },
-  { name: 'system-question', component: IconSystemQuestion, displayName: 'Question' },
-  { name: 'system-remote', component: IconSystemRemote, displayName: 'Remote' },
-  { name: 'system-rows', component: IconSystemRows, displayName: 'Rows' },
-  { name: 'system-scissors', component: IconSystemScissors, displayName: 'Scissors' },
-  { name: 'system-shapes', component: IconSystemShapes, displayName: 'Shapes' },
-  { name: 'system-share-network', component: IconSystemShareNetwork, displayName: 'ShareNetwork' },
-  { name: 'system-shield-check', component: IconSystemShieldCheck, displayName: 'ShieldCheck' },
-  { name: 'system-shield-warning', component: IconSystemShieldWarning, displayName: 'ShieldWarning' },
-  { name: 'system-shuffle', component: IconSystemShuffle, displayName: 'Shuffle' },
-  { name: 'system-sign-out', component: IconSystemSignOut, displayName: 'SignOut' },
-  { name: 'system-sliders-horizontal', component: IconSystemSlidersHorizontal, displayName: 'SlidersHorizontal' },
-  { name: 'system-smiley', component: IconSystemSmiley, displayName: 'Smiley' },
-  { name: 'system-sparkle', component: IconSystemSparkle, displayName: 'Sparkle' },
-  { name: 'system-speaker-simple-high', component: IconSystemSpeakerSimpleHigh, displayName: 'SpeakerSimpleHigh' },
-  { name: 'system-speaker-simple-x', component: IconSystemSpeakerSimpleX, displayName: 'SpeakerSimpleX' },
-  { name: 'system-squares-four', component: IconSystemSquaresFour, displayName: 'SquaresFour' },
-  { name: 'system-stack-simple', component: IconSystemStackSimple, displayName: 'StackSimple' },
-  { name: 'system-stack', component: IconSystemStack, displayName: 'Stack' },
-  { name: 'system-star', component: IconSystemStar, displayName: 'Star' },
-  { name: 'system-stop', component: IconSystemStop, displayName: 'Stop' },
-  { name: 'system-table', component: IconSystemTable, displayName: 'Table' },
-  { name: 'system-text-t', component: IconSystemTextT, displayName: 'TextT' },
-  { name: 'system-thumbs-down', component: IconSystemThumbsDown, displayName: 'ThumbsDown' },
-  { name: 'system-thumbs-up', component: IconSystemThumbsUp, displayName: 'ThumbsUp' },
-  { name: 'system-timer', component: IconSystemTimer, displayName: 'Timer' },
-  { name: 'system-trash', component: IconSystemTrash, displayName: 'Trash' },
-  { name: 'system-trend-down', component: IconSystemTrendDown, displayName: 'TrendDown' },
-  { name: 'system-trend-up', component: IconSystemTrendUp, displayName: 'TrendUp' },
-  { name: 'system-trophy-slash', component: IconSystemTrophySlash, displayName: 'TrophySlash' },
-  { name: 'system-trophy', component: IconSystemTrophy, displayName: 'Trophy' },
-  { name: 'system-upload-simple', component: IconSystemUploadSimple, displayName: 'UploadSimple' },
-  { name: 'system-user-circle', component: IconSystemUserCircle, displayName: 'UserCircle' },
-  { name: 'system-user-plus', component: IconSystemUserPlus, displayName: 'UserPlus' },
-  { name: 'system-user', component: IconSystemUser, displayName: 'User' },
-  { name: 'system-users-three', component: IconSystemUsersThree, displayName: 'UsersThree' },
-  { name: 'system-users', component: IconSystemUsers, displayName: 'Users' },
-  { name: 'system-video', component: IconSystemVideo, displayName: 'Video' },
-  { name: 'system-wallet', component: IconSystemWallet, displayName: 'Wallet' },
-  { name: 'system-warning-circle', component: IconSystemWarningCircle, displayName: 'WarningCircle' },
-  { name: 'system-whatsapp-logo', component: IconSystemWhatsappLogo, displayName: 'WhatsappLogo' },
-  { name: 'system-x-circle', component: IconSystemXCircle, displayName: 'XCircle' },
-  { name: 'system-x', component: IconSystemX, displayName: 'X' },
+  { name: 'aha-align-center', component: IconAhaAlignCenter, displayName: 'AlignCenter' },
+  { name: 'aha-align-left', component: IconAhaAlignLeft, displayName: 'AlignLeft' },
+  { name: 'aha-align-right', component: IconAhaAlignRight, displayName: 'AlignRight' },
+  { name: 'aha-animation', component: IconAhaAnimation, displayName: 'Animation' },
+  { name: 'aha-arrow-clockwise', component: IconAhaArrowClockwise, displayName: 'ArrowClockwise' },
+  { name: 'aha-arrow-counter-clockwise', component: IconAhaArrowCounterClockwise, displayName: 'ArrowCounterClockwise' },
+  { name: 'aha-arrow-down', component: IconAhaArrowDown, displayName: 'ArrowDown' },
+  { name: 'aha-arrow-left', component: IconAhaArrowLeft, displayName: 'ArrowLeft' },
+  { name: 'aha-arrow-right', component: IconAhaArrowRight, displayName: 'ArrowRight' },
+  { name: 'aha-arrow-square-out', component: IconAhaArrowSquareOut, displayName: 'ArrowSquareOut' },
+  { name: 'aha-arrow-u-up-left', component: IconAhaArrowUUpLeft, displayName: 'ArrowUUpLeft' },
+  { name: 'aha-arrow-u-up-right', component: IconAhaArrowUUpRight, displayName: 'ArrowUUpRight' },
+  { name: 'aha-arrow-up', component: IconAhaArrowUp, displayName: 'ArrowUp' },
+  { name: 'aha-arrows-clockwise', component: IconAhaArrowsClockwise, displayName: 'ArrowsClockwise' },
+  { name: 'aha-arrows-down-up', component: IconAhaArrowsDownUp, displayName: 'ArrowsDownUp' },
+  { name: 'aha-arrows-in-simple', component: IconAhaArrowsInSimple, displayName: 'ArrowsInSimple' },
+  { name: 'aha-arrows-left-right', component: IconAhaArrowsLeftRight, displayName: 'ArrowsLeftRight' },
+  { name: 'aha-arrows-out-cardinal', component: IconAhaArrowsOutCardinal, displayName: 'ArrowsOutCardinal' },
+  { name: 'aha-arrows-out-simple', component: IconAhaArrowsOutSimple, displayName: 'ArrowsOutSimple' },
+  { name: 'aha-asterisk', component: IconAhaAsterisk, displayName: 'Asterisk' },
+  { name: 'aha-backstage', component: IconAhaBackstage, displayName: 'Backstage' },
+  { name: 'aha-bell', component: IconAhaBell, displayName: 'Bell' },
+  { name: 'aha-book', component: IconAhaBook, displayName: 'Book' },
+  { name: 'aha-bookmark-simple', component: IconAhaBookmarkSimple, displayName: 'BookmarkSimple' },
+  { name: 'aha-briefcase', component: IconAhaBriefcase, displayName: 'Briefcase' },
+  { name: 'aha-calendar-dot', component: IconAhaCalendarDot, displayName: 'CalendarDot' },
+  { name: 'aha-calendar-dots', component: IconAhaCalendarDots, displayName: 'CalendarDots' },
+  { name: 'aha-cards-three', component: IconAhaCardsThree, displayName: 'CardsThree' },
+  { name: 'aha-caret-down', component: IconAhaCaretDown, displayName: 'CaretDown' },
+  { name: 'aha-caret-left', component: IconAhaCaretLeft, displayName: 'CaretLeft' },
+  { name: 'aha-caret-right', component: IconAhaCaretRight, displayName: 'CaretRight' },
+  { name: 'aha-caret-up', component: IconAhaCaretUp, displayName: 'CaretUp' },
+  { name: 'aha-chart-bar', component: IconAhaChartBar, displayName: 'ChartBar' },
+  { name: 'aha-chart-donut', component: IconAhaChartDonut, displayName: 'ChartDonut' },
+  { name: 'aha-chart-line-up', component: IconAhaChartLineUp, displayName: 'ChartLineUp' },
+  { name: 'aha-chart-pie', component: IconAhaChartPie, displayName: 'ChartPie' },
+  { name: 'aha-chat-add', component: IconAhaChatAdd, displayName: 'ChatAdd' },
+  { name: 'aha-chat-centered-text', component: IconAhaChatCenteredText, displayName: 'ChatCenteredText' },
+  { name: 'aha-chat-circle', component: IconAhaChatCircle, displayName: 'ChatCircle' },
+  { name: 'aha-chat-text', component: IconAhaChatText, displayName: 'ChatText' },
+  { name: 'aha-chats-circle', component: IconAhaChatsCircle, displayName: 'ChatsCircle' },
+  { name: 'aha-check-circle', component: IconAhaCheckCircle, displayName: 'CheckCircle' },
+  { name: 'aha-check', component: IconAhaCheck, displayName: 'Check' },
+  { name: 'aha-circle-notch', component: IconAhaCircleNotch, displayName: 'CircleNotch' },
+  { name: 'aha-confetti', component: IconAhaConfetti, displayName: 'Confetti' },
+  { name: 'aha-copy', component: IconAhaCopy, displayName: 'Copy' },
+  { name: 'aha-credit-card', component: IconAhaCreditCard, displayName: 'CreditCard' },
+  { name: 'aha-currency-circle-dollar', component: IconAhaCurrencyCircleDollar, displayName: 'CurrencyCircleDollar' },
+  { name: 'aha-cursor-click', component: IconAhaCursorClick, displayName: 'CursorClick' },
+  { name: 'aha-device-mobile', component: IconAhaDeviceMobile, displayName: 'DeviceMobile' },
+  { name: 'aha-document-check', component: IconAhaDocumentCheck, displayName: 'DocumentCheck' },
+  { name: 'aha-dots-three-vertical', component: IconAhaDotsThreeVertical, displayName: 'DotsThreeVertical' },
+  { name: 'aha-dots-three', component: IconAhaDotsThree, displayName: 'DotsThree' },
+  { name: 'aha-download-simple', component: IconAhaDownloadSimple, displayName: 'DownloadSimple' },
+  { name: 'aha-drag', component: IconAhaDrag, displayName: 'Drag' },
+  { name: 'aha-drum', component: IconAhaDrum, displayName: 'Drum' },
+  { name: 'aha-duplicate', component: IconAhaDuplicate, displayName: 'Duplicate' },
+  { name: 'aha-emoji-bubble', component: IconAhaEmojiBubble, displayName: 'EmojiBubble' },
+  { name: 'aha-envelop', component: IconAhaEnvelop, displayName: 'Envelop' },
+  { name: 'aha-envelope', component: IconAhaEnvelope, displayName: 'Envelope' },
+  { name: 'aha-equation', component: IconAhaEquation, displayName: 'Equation' },
+  { name: 'aha-exclamation-mark', component: IconAhaExclamationMark, displayName: 'ExclamationMark' },
+  { name: 'aha-export', component: IconAhaExport, displayName: 'Export' },
+  { name: 'aha-eye-slash', component: IconAhaEyeSlash, displayName: 'EyeSlash' },
+  { name: 'aha-eye', component: IconAhaEye, displayName: 'Eye' },
+  { name: 'aha-file-arrow-down', component: IconAhaFileArrowDown, displayName: 'FileArrowDown' },
+  { name: 'aha-file-arrow-in', component: IconAhaFileArrowIn, displayName: 'FileArrowIn' },
+  { name: 'aha-file-arrow-up', component: IconAhaFileArrowUp, displayName: 'FileArrowUp' },
+  { name: 'aha-file-audio', component: IconAhaFileAudio, displayName: 'FileAudio' },
+  { name: 'aha-file-check', component: IconAhaFileCheck, displayName: 'FileCheck' },
+  { name: 'aha-file-xls', component: IconAhaFileXls, displayName: 'FileXls' },
+  { name: 'aha-file', component: IconAhaFile, displayName: 'File' },
+  { name: 'aha-fire', component: IconAhaFire, displayName: 'Fire' },
+  { name: 'aha-folder-2', component: IconAhaFolder2, displayName: 'Folder2' },
+  { name: 'aha-folder-simple-arrow', component: IconAhaFolderSimpleArrow, displayName: 'FolderSimpleArrow' },
+  { name: 'aha-folder-simple-plus', component: IconAhaFolderSimplePlus, displayName: 'FolderSimplePlus' },
+  { name: 'aha-folder-user', component: IconAhaFolderUser, displayName: 'FolderUser' },
+  { name: 'aha-folder', component: IconAhaFolder, displayName: 'Folder' },
+  { name: 'aha-form', component: IconAhaForm, displayName: 'Form' },
+  { name: 'aha-frame-corners', component: IconAhaFrameCorners, displayName: 'FrameCorners' },
+  { name: 'aha-gear', component: IconAhaGear, displayName: 'Gear' },
+  { name: 'aha-gif', component: IconAhaGif, displayName: 'Gif' },
+  { name: 'aha-gift', component: IconAhaGift, displayName: 'Gift' },
+  { name: 'aha-globe-simple', component: IconAhaGlobeSimple, displayName: 'GlobeSimple' },
+  { name: 'aha-hand-pointing', component: IconAhaHandPointing, displayName: 'HandPointing' },
+  { name: 'aha-hand', component: IconAhaHand, displayName: 'Hand' },
+  { name: 'aha-hands-clapping', component: IconAhaHandsClapping, displayName: 'HandsClapping' },
+  { name: 'aha-heart-straight', component: IconAhaHeartStraight, displayName: 'HeartStraight' },
+  { name: 'aha-hourglass-high', component: IconAhaHourglassHigh, displayName: 'HourglassHigh' },
+  { name: 'aha-house', component: IconAhaHouse, displayName: 'House' },
+  { name: 'aha-identification-card', component: IconAhaIdentificationCard, displayName: 'IdentificationCard' },
+  { name: 'aha-image-square', component: IconAhaImageSquare, displayName: 'ImageSquare' },
+  { name: 'aha-images', component: IconAhaImages, displayName: 'Images' },
+  { name: 'aha-info', component: IconAhaInfo, displayName: 'Info' },
+  { name: 'aha-invoice', component: IconAhaInvoice, displayName: 'Invoice' },
+  { name: 'aha-k-square', component: IconAhaKSquare, displayName: 'KSquare' },
+  { name: 'aha-key-return', component: IconAhaKeyReturn, displayName: 'KeyReturn' },
+  { name: 'aha-layout', component: IconAhaLayout, displayName: 'Layout' },
+  { name: 'aha-lightbulb-filament', component: IconAhaLightbulbFilament, displayName: 'LightbulbFilament' },
+  { name: 'aha-line-weight', component: IconAhaLineWeight, displayName: 'LineWeight' },
+  { name: 'aha-link', component: IconAhaLink, displayName: 'Link' },
+  { name: 'aha-list-1', component: IconAhaList1, displayName: 'List1' },
+  { name: 'aha-list-numbers', component: IconAhaListNumbers, displayName: 'ListNumbers' },
+  { name: 'aha-list', component: IconAhaList, displayName: 'List' },
+  { name: 'aha-lock-open', component: IconAhaLockOpen, displayName: 'LockOpen' },
+  { name: 'aha-lock', component: IconAhaLock, displayName: 'Lock' },
+  { name: 'aha-magic-wand', component: IconAhaMagicWand, displayName: 'MagicWand' },
+  { name: 'aha-magnifying-glass', component: IconAhaMagnifyingGlass, displayName: 'MagnifyingGlass' },
+  { name: 'aha-microphone', component: IconAhaMicrophone, displayName: 'Microphone' },
+  { name: 'aha-microsoft-excel-logo', component: IconAhaMicrosoftExcelLogo, displayName: 'MicrosoftExcelLogo' },
+  { name: 'aha-minus-square', component: IconAhaMinusSquare, displayName: 'MinusSquare' },
+  { name: 'aha-minus', component: IconAhaMinus, displayName: 'Minus' },
+  { name: 'aha-money-back', component: IconAhaMoneyBack, displayName: 'MoneyBack' },
+  { name: 'aha-music-notes-simple', component: IconAhaMusicNotesSimple, displayName: 'MusicNotesSimple' },
+  { name: 'aha-music-notes', component: IconAhaMusicNotes, displayName: 'MusicNotes' },
+  { name: 'aha-note-filled', component: IconAhaNoteFilled, displayName: 'NoteFilled' },
+  { name: 'aha-note', component: IconAhaNote, displayName: 'Note' },
+  { name: 'aha-number-one', component: IconAhaNumberOne, displayName: 'NumberOne' },
+  { name: 'aha-palette', component: IconAhaPalette, displayName: 'Palette' },
+  { name: 'aha-paper-clip', component: IconAhaPaperClip, displayName: 'PaperClip' },
+  { name: 'aha-paste', component: IconAhaPaste, displayName: 'Paste' },
+  { name: 'aha-pause', component: IconAhaPause, displayName: 'Pause' },
+  { name: 'aha-pencil-simple-line', component: IconAhaPencilSimpleLine, displayName: 'PencilSimpleLine' },
+  { name: 'aha-pencil-simple', component: IconAhaPencilSimple, displayName: 'PencilSimple' },
+  { name: 'aha-percent', component: IconAhaPercent, displayName: 'Percent' },
+  { name: 'aha-pinned-filled', component: IconAhaPinnedFilled, displayName: 'PinnedFilled' },
+  { name: 'aha-plan', component: IconAhaPlan, displayName: 'Plan' },
+  { name: 'aha-play', component: IconAhaPlay, displayName: 'Play' },
+  { name: 'aha-plus-square', component: IconAhaPlusSquare, displayName: 'PlusSquare' },
+  { name: 'aha-plus', component: IconAhaPlus, displayName: 'Plus' },
+  { name: 'aha-presentation-chart-one', component: IconAhaPresentationChartOne, displayName: 'PresentationChartOne' },
+  { name: 'aha-presentation-chart', component: IconAhaPresentationChart, displayName: 'PresentationChart' },
+  { name: 'aha-presentation-connect', component: IconAhaPresentationConnect, displayName: 'PresentationConnect' },
+  { name: 'aha-presentation-disconnect', component: IconAhaPresentationDisconnect, displayName: 'PresentationDisconnect' },
+  { name: 'aha-projector-screen-chart', component: IconAhaProjectorScreenChart, displayName: 'ProjectorScreenChart' },
+  { name: 'aha-push-pin', component: IconAhaPushPin, displayName: 'PushPin' },
+  { name: 'aha-q&a', component: IconAhaQA, displayName: 'Q&A' },
+  { name: 'aha-qr-code', component: IconAhaQrCode, displayName: 'QrCode' },
+  { name: 'aha-question', component: IconAhaQuestion, displayName: 'Question' },
+  { name: 'aha-remote', component: IconAhaRemote, displayName: 'Remote' },
+  { name: 'aha-rows', component: IconAhaRows, displayName: 'Rows' },
+  { name: 'aha-scissors', component: IconAhaScissors, displayName: 'Scissors' },
+  { name: 'aha-shapes', component: IconAhaShapes, displayName: 'Shapes' },
+  { name: 'aha-share-network', component: IconAhaShareNetwork, displayName: 'ShareNetwork' },
+  { name: 'aha-shield-check', component: IconAhaShieldCheck, displayName: 'ShieldCheck' },
+  { name: 'aha-shield-warning', component: IconAhaShieldWarning, displayName: 'ShieldWarning' },
+  { name: 'aha-shuffle', component: IconAhaShuffle, displayName: 'Shuffle' },
+  { name: 'aha-sign-out', component: IconAhaSignOut, displayName: 'SignOut' },
+  { name: 'aha-sliders-horizontal', component: IconAhaSlidersHorizontal, displayName: 'SlidersHorizontal' },
+  { name: 'aha-smiley', component: IconAhaSmiley, displayName: 'Smiley' },
+  { name: 'aha-sparkle', component: IconAhaSparkle, displayName: 'Sparkle' },
+  { name: 'aha-speaker-simple-high', component: IconAhaSpeakerSimpleHigh, displayName: 'SpeakerSimpleHigh' },
+  { name: 'aha-speaker-simple-x', component: IconAhaSpeakerSimpleX, displayName: 'SpeakerSimpleX' },
+  { name: 'aha-squares-four', component: IconAhaSquaresFour, displayName: 'SquaresFour' },
+  { name: 'aha-stack-simple', component: IconAhaStackSimple, displayName: 'StackSimple' },
+  { name: 'aha-stack', component: IconAhaStack, displayName: 'Stack' },
+  { name: 'aha-star', component: IconAhaStar, displayName: 'Star' },
+  { name: 'aha-stop', component: IconAhaStop, displayName: 'Stop' },
+  { name: 'aha-table', component: IconAhaTable, displayName: 'Table' },
+  { name: 'aha-text-t', component: IconAhaTextT, displayName: 'TextT' },
+  { name: 'aha-thumbs-down', component: IconAhaThumbsDown, displayName: 'ThumbsDown' },
+  { name: 'aha-thumbs-up', component: IconAhaThumbsUp, displayName: 'ThumbsUp' },
+  { name: 'aha-timer', component: IconAhaTimer, displayName: 'Timer' },
+  { name: 'aha-trash', component: IconAhaTrash, displayName: 'Trash' },
+  { name: 'aha-trend-down', component: IconAhaTrendDown, displayName: 'TrendDown' },
+  { name: 'aha-trend-up', component: IconAhaTrendUp, displayName: 'TrendUp' },
+  { name: 'aha-trophy-slash', component: IconAhaTrophySlash, displayName: 'TrophySlash' },
+  { name: 'aha-trophy', component: IconAhaTrophy, displayName: 'Trophy' },
+  { name: 'aha-upload-simple', component: IconAhaUploadSimple, displayName: 'UploadSimple' },
+  { name: 'aha-user-circle', component: IconAhaUserCircle, displayName: 'UserCircle' },
+  { name: 'aha-user-plus', component: IconAhaUserPlus, displayName: 'UserPlus' },
+  { name: 'aha-user', component: IconAhaUser, displayName: 'User' },
+  { name: 'aha-users-three', component: IconAhaUsersThree, displayName: 'UsersThree' },
+  { name: 'aha-users', component: IconAhaUsers, displayName: 'Users' },
+  { name: 'aha-video', component: IconAhaVideo, displayName: 'Video' },
+  { name: 'aha-wallet', component: IconAhaWallet, displayName: 'Wallet' },
+  { name: 'aha-warning-circle', component: IconAhaWarningCircle, displayName: 'WarningCircle' },
+  { name: 'aha-whatsapp-logo', component: IconAhaWhatsappLogo, displayName: 'WhatsappLogo' },
+  { name: 'aha-x-circle', component: IconAhaXCircle, displayName: 'XCircle' },
+  { name: 'aha-x', component: IconAhaX, displayName: 'X' },
 ]);
 
 // Filter icons based on search
@@ -600,7 +600,7 @@ const copyIconImport = (iconName: string) => {
 
 // Copy example import
 const copyExampleImport = () => {
-  const importStatement = `import IconSystemStar from '~icons/aha/system-star'`;
+  const importStatement = `import IconAhaStar from '~icons/aha/aha-star'`;
   navigator.clipboard.writeText(importStatement);
   message.success('Example import copied to clipboard!');
 };

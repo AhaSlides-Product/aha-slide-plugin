@@ -1,5 +1,6 @@
 const AliasTokens = {
-  colorLunarNewYear: '#cf291d',
+  borderWidth: '1px',
+  borderStyle: 'solid',
 }
 
 export default AliasTokens;
