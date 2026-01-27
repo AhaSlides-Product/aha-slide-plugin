@@ -1,4 +1,4 @@
-name: 'Checkout'
+name: 'Checkout submodules'
 description: 'Checkout repository and update submodules'
 inputs:
   plugins_branch:
@@ -7,11 +7,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-
     - name: Checkout Submodule Branch
       shell: bash
       run: |
