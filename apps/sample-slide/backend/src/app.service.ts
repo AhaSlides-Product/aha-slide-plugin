@@ -5,9 +5,6 @@ import { getBucket } from '@aha/common';
 @Injectable()
 export class AppService {
   private readonly logger = new Logger(AppService.name);
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   /**
    * Process ranking slide answer submission

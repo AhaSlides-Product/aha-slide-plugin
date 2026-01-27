@@ -1,0 +1,20 @@
+name: 'Checkout submodules'
+description: 'Checkout repository and update submodules'
+inputs:
+  plugins_branch:
+    description: 'Branch of plugin submodules to build from'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Submodule Branch
+      shell: bash
+      run: |
+        for dir in apps/*; do
+          if [ -d "$dir" ] && ([ -f "$dir/.git" ] || [ -d "$dir/.git" ]); then
+            echo "Checking out submodule $dir to branch ${{ inputs.plugins_branch }}"
+            git -C "$dir" fetch origin
+            git -C "$dir" checkout ${{ inputs.plugins_branch }}
+            git -C "$dir" pull origin ${{ inputs.plugins_branch }}
+          fi
+        done

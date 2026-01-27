@@ -12,6 +12,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+
+      - name: Checkout submodules
+        uses: ./.github/actions/checkout
+        with:
+          plugins_branch: staging
 
       - name: Build
         uses: ./.github/actions/build-app
