@@ -40,15 +40,6 @@
           <a-typography-text code>Ant Design (code)</a-typography-text>
         </ComponentDemo>
 
-        <ComponentDemo title="Icon" :span="12">
-          <a-space size="large">
-            <HomeOutlined style="font-size: 24px" />
-            <SettingOutlined style="font-size: 24px" />
-            <UserOutlined style="font-size: 24px" />
-            <HeartOutlined style="font-size: 24px" />
-            <StarOutlined style="font-size: 24px" />
-          </a-space>
-        </ComponentDemo>
       </ComponentSection>
 
       <!-- LAYOUT -->
@@ -458,14 +449,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
-import {
-  HomeOutlined,
-  SettingOutlined,
-  UserOutlined,
-  HeartOutlined,
-  StarOutlined,
-  UploadOutlined,
-} from '@ant-design/icons-vue';
+
 import ComponentSection from '../../components/ComponentSection.vue';
 import ComponentDemo from '../../components/ComponentDemo.vue';
 import { ahaSlidesDefaultTheme } from '@aha/ui';
