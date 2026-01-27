@@ -7,34 +7,29 @@
       <p class="text-base-70">All custom SVG icons loaded via unplugin-icons from @aha/ui package</p>
     </div>
 
-    <h3 class="font-bold">Usage</h3>
-    <p>Import the icon</p>
-    <pre>
+    <h3 class="font-bold text-(length:--aha-fontSizeHeading3)">Usage</h3>
+    <p class="mb-2">Import the icon</p>
+    <pre class="bg-(--aha-colorBgLayout) mb-4">
       import IconAhaStar from '~icons/aha/aha-star';
     </pre>
-    <p>Use the icon</p>
-    <pre>
-      {{ '<IconAhaStar />' }}
-    </pre>
+    <p class="mb-2">Use the icon in the template tag</p>
+    <pre class="bg-(--aha-colorBgLayout) mb-4">
+      {{ '<IconAhaStar />' }}</pre>
     <p>Icon size: Use <code>width</code> and <code>height</code> props like so</p>
-    <pre>
-      {{ '<IconAhaStar width="24" height="24" />' }}
-    </pre>
-    <p>Icon color: change the <code>color</code> property of the icon. Should be done via CSS classes</p>
-    <pre>
-      {{ '<IconAhaStar :style="{ color: \'red\' }" />' }}
-    </pre>
-    <p>Use within <code>{{ '<a-button>' }}</code></p>
-    <pre>
-  {{ `
-      <a-button>
+    <pre class="bg-(--aha-colorBgLayout) mb-4">
+      {{ '<IconAhaStar width="24" height="24" />' }}</pre>
+    <p class="mb-2">Icon color: change the <code>color</code> property of the icon. Should be done via CSS classes</p>
+    <pre class="bg-(--aha-colorBgLayout) mb-4">
+      {{ '<IconAhaStar :style="{ color: \'red\' }" />' }}</pre>
+    <p class="mb-2">Use within <code>{{ '<a-button>' }}</code></p>
+    <pre class="bg-(--aha-colorBgLayout) mb-4">
+    {{ `<a-button>
         <template #icon>
           <IconAhaStar class='inline mr-2' />
         </template>
         Button Text
       </a-button>
-  ` }}
-    </pre>
+  ` }}</pre>
 
     <!-- Search and Filter -->
     <div class="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
