@@ -8,7 +8,7 @@
 
     <!-- Navigation -->
       <div class="mb-6">
-      <a-button type="link" @click="$router.back()" :icon="h(AhaStar)">
+      <a-button type="link" @click="$router.back()">
         ← Back
       </a-button>
             </div>
@@ -30,9 +30,6 @@
             <a-button type="primary" loading>Loading</a-button>
             <a-button type="primary" size="large">Large</a-button>
             <a-button type="primary" size="small">Small</a-button>
-            <a-button type="primary" :icon="AhaStar">
-              With icon
-            </a-button>
           </a-space>
         </ComponentDemo>
 
@@ -480,7 +477,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, h } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import {
   HomeOutlined,
@@ -490,7 +487,6 @@ import {
   StarOutlined,
   UploadOutlined,
 } from '@ant-design/icons-vue';
-import {AhaStar} from '@aha/ui/icons';
 import ComponentSection from '../components/ComponentSection.vue';
 import ComponentDemo from '../components/ComponentDemo.vue';
 
