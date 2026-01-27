@@ -43,14 +43,6 @@ This is a **monorepo** managed by **Turborepo** and **npm workspaces**, containi
   - Pause/resume functionality to prevent loops
   - Initial state handling
 
-#### Iframe Communication (`iframe.ts`)
-- `execRequest`: Request/response pattern for cross-window messaging
-- **Test Scenarios**:
-  - Request/response matching with unique IDs
-  - Timeout handling
-  - Origin security checks
-  - Error handling
-
 #### Zoid Components (`zoid.ts`)
 - `PresenterSlidePluginIframe`: Cross-domain component for presenter view
 - `AudienceSlidePluginIframe`: Cross-domain component for audience view
@@ -138,7 +130,6 @@ This is a **monorepo** managed by **Turborepo** and **npm workspaces**, containi
 
 **Examples**:
 - `useSync` function behavior
-- `execRequest` timeout and error handling
 - DTO validation
 - Color transformation functions
 
@@ -277,7 +268,7 @@ apps/sample-slide/
 ## 🔍 Key Testing Priorities
 
 1. **Critical Path**: State synchronization (`useSync`, `useSyncReadOnly`)
-2. **Security**: Cross-origin communication (`execRequest`, Zoid)
+2. **Security**: Cross-origin communication (Zoid)
 3. **Reliability**: Error handling and edge cases
 4. **Integration**: Backend API endpoints
 5. **User Experience**: E2E flows for presenter and audience
