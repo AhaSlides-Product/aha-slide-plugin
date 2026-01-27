@@ -11,7 +11,9 @@ jobs:
       group: github-runner-arm64
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout
+        with:
+          plugins_branch: staging
 
       - name: Build
         uses: ./.github/actions/build-app
