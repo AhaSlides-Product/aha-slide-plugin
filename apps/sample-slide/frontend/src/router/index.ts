@@ -4,7 +4,6 @@ import Settings from '../pages/Settings.vue'
 import Audience from '../pages/Audience.vue'
 import ComponentsShowcase from '../pages/AntDesignComponentsShowcase.vue'
 import IconsShowcase from '../pages/IconsShowcase.vue'
-import IconsShowcaseV2 from '../pages/IconsShowcaseV2.vue'
 
 const routes = [
     {
@@ -36,11 +35,6 @@ const routes = [
         name: 'IconsShowcase',
         component: IconsShowcase
     },
-    {
-        path: '/icons-v2',
-        name: 'IconsShowcaseV2',
-        component: IconsShowcaseV2
-    }
 ]
 
 const router = createRouter({
