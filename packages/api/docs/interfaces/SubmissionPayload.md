@@ -6,7 +6,7 @@
 
 # Interface: SubmissionPayload\<T\>
 
-Defined in: [submission.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L1)
+Defined in: [submission.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L1)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [submission.ts:1](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **attributes**: `T`
 
-Defined in: [submission.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L6)
+Defined in: [submission.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L6)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [submission.ts:6](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **presentationId**: `string` \| `number`
 
-Defined in: [submission.ts:5](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L5)
+Defined in: [submission.ts:5](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L5)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [submission.ts:5](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **slideId**: `string` \| `number`
 
-Defined in: [submission.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L2)
+Defined in: [submission.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L2)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [submission.ts:2](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **slideVersion**: `string` \| `number`
 
-Defined in: [submission.ts:3](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L3)
+Defined in: [submission.ts:3](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L3)
 
 ***
 
@@ -52,4 +52,4 @@ Defined in: [submission.ts:3](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **type**: `string`
 
-Defined in: [submission.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/api/src/submission.ts#L4)
+Defined in: [submission.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L4)
