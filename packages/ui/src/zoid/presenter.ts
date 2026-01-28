@@ -116,14 +116,7 @@ export const PresenterSlidePluginIframe = zoid.create({
   },
 });
 
-/**
- * Hook for Presenter Plugins (Canvas, Settings).
- * Provides access to presentation and slide data, as well as actions to manage slide attributes.
- * 
- * @param options - Configure hook behavior (e.g., disable auto-height).
- * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
- */
-export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): BaseSlidePluginReturn & {
+export type PresenterPluginReturn = BaseSlidePluginReturn & {
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
   onKeyboard: ((callback: (event: PluginKeyboardEvent) => void) => void) | undefined;
@@ -131,7 +124,23 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
   uploadImage: ((file: File) => Promise<ImageUploadResult>) | undefined;
   openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
   openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
-} {
+  /** 
+   * Action to fetch values from a specific bucket and optional key from the parent application.
+   * 
+   * @param params - The parameters containing bucket and optional key.
+   * @returns A promise resolving to an array of objects containing key, path, and value.
+   */
+  getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
+}
+
+/**
+ * Hook for Presenter Plugins (Canvas, Settings).
+ * Provides access to presentation and slide data, as well as actions to manage slide attributes.
+ * 
+ * @param options - Configure hook behavior (e.g., disable auto-height).
+ * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
+ */
+export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): PresenterPluginReturn {
   const baseHook = useBaseSlidePlugin(options);
   const { xprops } = baseHook;
 
@@ -165,6 +174,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
+    getValues: xprops.getValues,
     audienceSendCountingUniqueAction: baseHook.audienceSendCountingUniqueAction,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
