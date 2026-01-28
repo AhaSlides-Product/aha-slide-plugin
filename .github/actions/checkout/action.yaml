@@ -18,3 +18,5 @@ runs:
             git -C "$dir" pull origin ${{ inputs.plugins_branch }}
           fi
         done
+        echo "Removing redundant package-lock.json files in apps/*/backend"
+        rm -f apps/*/backend/package-lock.json
