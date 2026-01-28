@@ -32,6 +32,10 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+    
+    - name: Dynamic add backend modules
+      shell: bash
+      run: npm run prebuild -w @aha/backend-main
 
     - name: Install dependencies
       shell: bash
