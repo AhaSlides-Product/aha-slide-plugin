@@ -29,7 +29,7 @@ export class AppService {
     // echo the submission to subscribers
     const broadcast: Sync = [{
       path: getBucket('sample-submissions', { presentationId, slideId, slideVersion }),
-      value: key,
+      value: JSON.stringify(payload),
     }];
 
     const response: SubmissionResult = {
