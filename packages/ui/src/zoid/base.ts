@@ -230,7 +230,7 @@ export interface BaseSlidePluginReturn {
 export function useBaseSlidePlugin(
   options: UseSlidePluginOptions = { autoHeight: true },
   onPropsExtension?: (newProps: any) => void
-) {
+): BaseSlidePluginReturn & { xprops: any } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
   const presentationColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationColorPalette);
   const presentationLighterColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationLighterColorPalette);
