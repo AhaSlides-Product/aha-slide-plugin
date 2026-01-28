@@ -6,6 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf dist *.tsbuildinfo",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
   },
   "devDependencies": {

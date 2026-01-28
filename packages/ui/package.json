@@ -35,6 +35,7 @@
   ],
   "scripts": {
     "build": "npm run build:icons && npm run build:ts && npm run build:css && npm run build:antd-vars && npm run build:icons",
+    "clean": "rm -rf dist *.tsbuildinfo",
     "build:icons": "node scripts/generate-icons.js",
     "build:ts": "tsc",
     "build:css": "postcss src/styles.css -o dist/styles.css",

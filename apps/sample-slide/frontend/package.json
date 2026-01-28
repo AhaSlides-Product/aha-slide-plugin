@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "clean": "rm -rf dist *.tsbuildinfo node_modules/.vite",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "nest build",
+    "clean": "rm -rf dist *.tsbuildinfo",
     "prebuild": "node scripts/generate-app-module.js",
     "prestart": "node scripts/generate-app-module.js",
     "start": "nest start",
