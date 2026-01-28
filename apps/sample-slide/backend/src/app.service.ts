@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SubmissionRequest, SubmissionResult, CountTotal } from '@aha/backend-utils';
+import { SubmissionRequest, SubmissionResult, CountTotal, Sync } from '@aha/backend-utils';
 import { getBucket } from '@aha/common';
 
 @Injectable()
@@ -18,14 +18,23 @@ export class AppService {
     } = payload;
     const bucket = getBucket('sample-slide', { presentationId, slideId, slideVersion })
     const { increase, key } = attributes
+
+    // aggregate into a count 
     const count_total: CountTotal = [{
       bucket,
       key,
-      increase_by: increase, // highest rank gets highest points
+      increase_by: increase,
+    }];
+
+    // echo the submission to subscribers
+    const broadcast: Sync = [{
+      path: getBucket('sample-submissions', { presentationId, slideId, slideVersion }),
+      value: key,
     }];
 
     const response: SubmissionResult = {
       count_total,
+      sync: broadcast,
     };
     this.logger.log('Processing submission response', { response });
     return response;

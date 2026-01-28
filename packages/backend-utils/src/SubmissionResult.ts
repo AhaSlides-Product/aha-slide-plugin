@@ -30,10 +30,20 @@ export interface CountUniqueItem {
 export type CountUnique = CountUniqueItem[];
 
 
+export interface SyncItem {
+  /** EMQX topic that clients should subscribe to to receive updates. */
+  path: string;
+  /** The value to be sent to the topic. */
+  value: string;
+}
+
+export type Sync = SyncItem[];
+
 /**
  * Represents the result of an audience answer submission processed by the backend.
  */
 export interface SubmissionResult {
   count_total?: CountTotal;
   count_unique?: CountUnique;
+  sync?: Sync;
 }
