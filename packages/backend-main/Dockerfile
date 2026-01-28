@@ -9,7 +9,7 @@ COPY --chown=node:node node_modules ./node_modules
 # Note: These are needed because node_modules contains symlinks to them
 COPY --chown=node:node packages/backend-utils ./packages/backend-utils
 COPY --chown=node:node packages/common ./packages/common
-COPY --chown=node:node apps/sample-slide/backend ./apps/sample-slide/backend
+COPY --chown=node:node apps/ ./apps/
 
 # Copy the actual application package and its build output
 COPY --chown=node:node packages/backend-main/package.json ./packages/backend-main/

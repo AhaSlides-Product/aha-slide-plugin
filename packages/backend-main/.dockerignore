@@ -5,3 +5,5 @@ tsconfig.json
 nest-cli.json
 .turbo
 *.tsbuildinfo
+apps/*
+!apps/*/backend
