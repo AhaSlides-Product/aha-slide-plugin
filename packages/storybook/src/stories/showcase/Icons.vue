@@ -155,6 +155,10 @@ import IconAhaArrowClockwise from '~icons/aha/aha-arrow-clockwise';
 import IconAhaArrowCounterClockwise from '~icons/aha/aha-arrow-counter-clockwise';
 import IconAhaArrowDown from '~icons/aha/aha-arrow-down';
 import IconAhaArrowLeft from '~icons/aha/aha-arrow-left';
+import IconAhaArrowRightBig from '~icons/aha/aha-arrow-right-big';
+import IconAhaArrowLeftBig from '~icons/aha/aha-arrow-left-big';
+import IconAhaArrowDownBig from '~icons/aha/aha-arrow-down-big';
+import IconAhaArrowUpBig from '~icons/aha/aha-arrow-up-big';
 import IconAhaArrowRight from '~icons/aha/aha-arrow-right';
 import IconAhaArrowSquareOut from '~icons/aha/aha-arrow-square-out';
 import IconAhaArrowUUpLeft from '~icons/aha/aha-arrow-u-up-left';
@@ -341,12 +345,16 @@ const icons = ref([
   { name: 'aha-arrow-clockwise', component: IconAhaArrowClockwise, displayName: 'ArrowClockwise' },
   { name: 'aha-arrow-counter-clockwise', component: IconAhaArrowCounterClockwise, displayName: 'ArrowCounterClockwise' },
   { name: 'aha-arrow-down', component: IconAhaArrowDown, displayName: 'ArrowDown' },
+  { name: 'aha-arrow-down-big', component: IconAhaArrowDownBig, displayName: 'ArrowDownBig' },
   { name: 'aha-arrow-left', component: IconAhaArrowLeft, displayName: 'ArrowLeft' },
+  { name: 'aha-arrow-left-big', component: IconAhaArrowLeftBig, displayName: 'ArrowLeftBig' },
+  { name: 'aha-arrow-right-big', component: IconAhaArrowRightBig, displayName: 'ArrowRightBig' },
   { name: 'aha-arrow-right', component: IconAhaArrowRight, displayName: 'ArrowRight' },
   { name: 'aha-arrow-square-out', component: IconAhaArrowSquareOut, displayName: 'ArrowSquareOut' },
   { name: 'aha-arrow-u-up-left', component: IconAhaArrowUUpLeft, displayName: 'ArrowUUpLeft' },
   { name: 'aha-arrow-u-up-right', component: IconAhaArrowUUpRight, displayName: 'ArrowUUpRight' },
   { name: 'aha-arrow-up', component: IconAhaArrowUp, displayName: 'ArrowUp' },
+  { name: 'aha-arrow-up-big', component: IconAhaArrowUpBig, displayName: 'ArrowUpBig' },
   { name: 'aha-arrows-clockwise', component: IconAhaArrowsClockwise, displayName: 'ArrowsClockwise' },
   { name: 'aha-arrows-down-up', component: IconAhaArrowsDownUp, displayName: 'ArrowsDownUp' },
   { name: 'aha-arrows-in-simple', component: IconAhaArrowsInSimple, displayName: 'ArrowsInSimple' },
