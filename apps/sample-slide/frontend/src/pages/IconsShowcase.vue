@@ -209,12 +209,6 @@ import IconAhaAlignRight from '~icons/aha/aha-align-right';
 import IconAhaAnimation from '~icons/aha/aha-animation';
 import IconAhaArrowClockwise from '~icons/aha/aha-arrow-clockwise';
 import IconAhaArrowCounterClockwise from '~icons/aha/aha-arrow-counter-clockwise';
-import IconAhaStar from '~icons/aha/aha-star';
-import IconAhaHeart from '~icons/aha/aha-heart-straight';
-import IconAhaGift from '~icons/aha/aha-gift';
-import IconAhaBell from '~icons/aha/aha-bell';
-import IconAhaFire from '~icons/aha/aha-fire';
-import IconAhaSparkle from '~icons/aha/aha-sparkle';
 
 
 // Enable scrolling for this page
