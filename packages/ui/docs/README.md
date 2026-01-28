@@ -10,8 +10,7 @@
 - [BaseSlidePluginProps](interfaces/BaseSlidePluginProps.md)
 - [BaseSlidePluginReturn](interfaces/BaseSlidePluginReturn.md)
 - [ImageUploadResult](interfaces/ImageUploadResult.md)
-- [RequestMessage](interfaces/RequestMessage.md)
-- [ResponseMessage](interfaces/ResponseMessage.md)
+- [PluginKeyboardEvent](interfaces/PluginKeyboardEvent.md)
 - [SlidePluginProps](interfaces/SlidePluginProps.md)
 - [TrackingElement](interfaces/TrackingElement.md)
 - [UseSlidePluginOptions](interfaces/UseSlidePluginOptions.md)
@@ -26,10 +25,9 @@
 ## Functions
 
 - [autoReportHeight](functions/autoReportHeight.md)
-- [execRequest](functions/execRequest.md)
 - [uploadImage](functions/uploadImage.md)
 - [useAudiencePlugin](functions/useAudiencePlugin.md)
-- [useColors](functions/useColors.md)
+- [useBaseSlidePlugin](functions/useBaseSlidePlugin.md)
 - [usePresenterPlugin](functions/usePresenterPlugin.md)
 - [useSync](functions/useSync.md)
 - [useSyncReadOnly](functions/useSyncReadOnly.md)

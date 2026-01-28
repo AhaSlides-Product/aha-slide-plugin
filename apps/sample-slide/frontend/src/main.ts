@@ -10,8 +10,6 @@ const app = createApp(App);
 app.use(router)
 app.use(Antd)
 
-// Register global icon component
-
 // Initialize Zoid components
 if (PresenterSlidePluginIframe) {
   console.log('PresenterSlidePluginIframe initialized');

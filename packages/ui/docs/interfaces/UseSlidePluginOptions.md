@@ -6,7 +6,7 @@
 
 # Interface: UseSlidePluginOptions
 
-Defined in: [packages/ui/src/zoid.ts:372](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L372)
+Defined in: [packages/ui/src/zoid/base.ts:202](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L202)
 
 Options for the composition hooks.
 
@@ -16,6 +16,6 @@ Options for the composition hooks.
 
 > `optional` **autoHeight**: `boolean`
 
-Defined in: [packages/ui/src/zoid.ts:376](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/403f83f2cd6eb475da8c8eab1790751e8bbb3484/packages/ui/src/zoid.ts#L376)
+Defined in: [packages/ui/src/zoid/base.ts:206](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/base.ts#L206)
 
 Whether to automatically report content height to the parent.
