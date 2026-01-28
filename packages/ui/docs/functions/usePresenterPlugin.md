@@ -8,7 +8,7 @@
 
 > **usePresenterPlugin**(`options`): [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid/presenter.ts:126](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/zoid/presenter.ts#L126)
+Defined in: [packages/ui/src/zoid/presenter.ts:126](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/084fa1a64aab79408b40af8fe107c55abe7287fa/packages/ui/src/zoid/presenter.ts#L126)
 
 Hook for Presenter Plugins (Canvas, Settings).
 Provides access to presentation and slide data, as well as actions to manage slide attributes.
