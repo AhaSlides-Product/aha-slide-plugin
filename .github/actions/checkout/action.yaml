@@ -46,8 +46,8 @@ runs:
         git add .
         if ! git diff --cached --quiet; then
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
-          git -c http.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${{ inputs.token }}" | base64 | tr -d '\n')" \
-            push https://github.com/${{ github.repository }}.git ${{ inputs.target_branch }}:anything
+          # Use token in URL for most reliable authentication in GitHub Actions
+          git push https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git ${{ inputs.target_branch }}
         else
           echo "No submodule changes to commit"
         fi
