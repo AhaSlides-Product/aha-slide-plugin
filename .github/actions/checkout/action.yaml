@@ -31,16 +31,13 @@ runs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
 
-    - name: Debug Token Scopes
+    - name: Debug Repo Permissions
       shell: bash
       run: |
-        echo "Checking token info..."
-        # Print all headers starting with X- to see scopes, SSO, and rate limits
-        curl -s -I -H "Authorization: token ${{ inputs.token }}" https://api.github.com/ | grep -i "^x-"
-        
-        # Verify which user is actually authenticated
-        echo "Authenticated as:"
-        curl -s -H "Authorization: token ${{ inputs.token }}" https://api.github.com/user | grep -oP '"login":\s*"\K[^"]+' || echo "Could not determine login"
+        echo "Querying repository permissions for this token..."
+        curl -s -H "Authorization: token ${{ inputs.token }}" \
+          https://api.github.com/repos/${{ github.repository }} | \
+          grep -A 15 '"permissions":' || echo "Could not retrieve permissions (Token might lack Metadata access)"
 
     - name: Commit Submodule Changes
       shell: bash
@@ -50,7 +47,7 @@ runs:
         if ! git diff --cached --quiet; then
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
           git -c http.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${{ inputs.token }}" | base64 | tr -d '\n')" \
-            push https://github.com/${{ github.repository }}.git ${{ inputs.target_branch }}
+            push https://github.com/${{ github.repository }}.git anything-branch
         else
           echo "No submodule changes to commit"
         fi
