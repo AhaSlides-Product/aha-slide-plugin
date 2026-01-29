@@ -5,7 +5,7 @@ import { autoReportHeight, type UseSlidePluginOptions } from './base';
 /**
  * Properties for the report slide plugin.
  */
-export interface ReportSlidePluginProps {
+export interface ReportProps {
     /** The token for authentication/authorization */
     token: string;
     /** The current language code (e.g., 'en', 'vi') */
@@ -20,12 +20,12 @@ export interface ReportSlidePluginProps {
 }
 
 /**
- * ReportSlidePluginIframe is a cross-domain component (zoid) that allows
+ * ReportIframe is a cross-domain component (zoid) that allows
  * Ahaslides parent applications to communicate with plugin iframes in the report view.
  */
-export const ReportSlidePluginIframe = zoid.create({
+export const ReportIframe = zoid.create({
     tag: 'report-app-iframe',
-    url: ({ props }: { props: ReportSlidePluginProps & { url: string } }) => props.url,
+    url: ({ props }: { props: ReportProps & { url: string } }) => props.url,
     props: {
         url: {
             type: 'string',
@@ -51,7 +51,7 @@ export const ReportSlidePluginIframe = zoid.create({
 /**
  * Return type for the report slide plugin hook.
  */
-export interface ReportSlidePluginReturn {
+export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
 }
@@ -62,9 +62,9 @@ export interface ReportSlidePluginReturn {
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for token and currentLanguage.
  */
-export function useReportSlidePlugin(
+export function useReportPlugin(
     options: UseSlidePluginOptions = { autoHeight: true }
-): ReportSlidePluginReturn & { xprops: any } {
+): ReportReturn & { xprops: any } {
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
 
