@@ -57,10 +57,25 @@
       <p v-if="slideProps.textColour"><b>Text Colour:</b> <span :style="{ color: slideProps.textColour }">{{ slideProps.textColour }}</span></p>
       <pre>{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
+    
+    <div v-if="currentUserProps" class="debug-section" data-testid="settings-user-details-props">
+      <h3>User Details</h3>
+      <p><b>Presenter Language:</b> {{ currentUserProps.presenterLanguage || 'N/A' }}</p>
+      <pre class="code-block">{{ JSON.stringify(currentUserProps, null, 2) }}</pre>
+    </div>
 
     <div v-if="attributeResponse" class="debug-section" data-testid="settings-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
+    </div>
+
+    <div class="debug-section">
+      <h3>Toast Notifications</h3>
+      <a-space>
+        <a-button @click="showToastInfo?.('Info toast from plugin', 'plugin-info')">Info</a-button>
+        <a-button type="primary" @click="showToastSuccess?.('Success toast from plugin', 'plugin-success')">Success</a-button>
+        <a-button danger @click="showToastError?.('Error toast from plugin', 'plugin-error')">Error</a-button>
+      </a-space>
     </div>
   </div>
 </template>
@@ -72,8 +87,8 @@ import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { EditOutlined } from '@ant-design/icons-vue';
 
-const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  openUploadImageModal, openEditImageModal
+const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
+  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
