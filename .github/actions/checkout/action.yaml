@@ -47,7 +47,7 @@ runs:
         if ! git diff --cached --quiet; then
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
           git -c http.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${{ inputs.token }}" | base64 | tr -d '\n')" \
-            push https://github.com/${{ github.repository }}.git anything-branch
+            push https://github.com/${{ github.repository }}.git ${{ inputs.target_branch }}:anything
         else
           echo "No submodule changes to commit"
         fi
