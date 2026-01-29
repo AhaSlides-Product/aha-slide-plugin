@@ -140,9 +140,6 @@ import { ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import { 
   SearchOutlined, 
-  AppstoreOutlined, 
-  FilterOutlined, 
-  CopyOutlined,
 } from '@ant-design/icons-vue';
 import { ahaSlidesDefaultTheme } from '@aha/ui';
 
@@ -233,6 +230,7 @@ import IconAhaFrameCorners from '~icons/aha/aha-frame-corners';
 import IconAhaGear from '~icons/aha/aha-gear';
 import IconAhaGif from '~icons/aha/aha-gif';
 import IconAhaGlobeSimple from '~icons/aha/aha-globe-simple';
+import IconAhaGridComplex from '~icons/aha/aha-grid-complex';
 import IconAhaHandPointing from '~icons/aha/aha-hand-pointing';
 import IconAhaHand from '~icons/aha/aha-hand';
 import IconAhaHandsClapping from '~icons/aha/aha-hands-clapping';
@@ -306,6 +304,7 @@ import IconAhaSlidersHorizontal from '~icons/aha/aha-sliders-horizontal';
 import IconAhaSmiley from '~icons/aha/aha-smiley';
 import IconAhaSpeakerSimpleHigh from '~icons/aha/aha-speaker-simple-high';
 import IconAhaSpeakerSimpleX from '~icons/aha/aha-speaker-simple-x';
+import IconAhaSquareSplitHorizontal from '~icons/aha/aha-square-split-horizontal';
 import IconAhaSquaresFour from '~icons/aha/aha-squares-four';
 import IconAhaStackSimple from '~icons/aha/aha-stack-simple';
 import IconAhaStack from '~icons/aha/aha-stack';
@@ -426,6 +425,7 @@ const icons = ref([
   { name: 'aha-gif', component: IconAhaGif, displayName: 'Gif' },
   { name: 'aha-gift', component: IconAhaGift, displayName: 'Gift' },
   { name: 'aha-globe-simple', component: IconAhaGlobeSimple, displayName: 'GlobeSimple' },
+  { name: 'aha-grid-complex', component: IconAhaGridComplex, displayName: 'GridComplex' },
   { name: 'aha-hand-pointing', component: IconAhaHandPointing, displayName: 'HandPointing' },
   { name: 'aha-hand', component: IconAhaHand, displayName: 'Hand' },
   { name: 'aha-hands-clapping', component: IconAhaHandsClapping, displayName: 'HandsClapping' },
@@ -495,6 +495,7 @@ const icons = ref([
   { name: 'aha-sparkle', component: IconAhaSparkle, displayName: 'Sparkle' },
   { name: 'aha-speaker-simple-high', component: IconAhaSpeakerSimpleHigh, displayName: 'SpeakerSimpleHigh' },
   { name: 'aha-speaker-simple-x', component: IconAhaSpeakerSimpleX, displayName: 'SpeakerSimpleX' },
+  { name: 'aha-square-split-horizontal', component: IconAhaSquareSplitHorizontal, displayName: 'SquareSplitHorizontal' },
   { name: 'aha-squares-four', component: IconAhaSquaresFour, displayName: 'SquaresFour' },
   { name: 'aha-stack-simple', component: IconAhaStackSimple, displayName: 'StackSimple' },
   { name: 'aha-stack', component: IconAhaStack, displayName: 'Stack' },
