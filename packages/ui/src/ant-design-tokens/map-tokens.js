@@ -1,5 +1,5 @@
 const MapTokens = {
-  borderRadiusXL: 14,
+  borderRadiusXL: 12,
 }
 
 export default MapTokens;

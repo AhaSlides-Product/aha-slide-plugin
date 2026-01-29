@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import Antd from 'ant-design-vue'
 import '@aha/ui/ahaslides-vars.css' // must import this to use variables
 import './style.css'
+import '@aha/ui/ahaslides-antd-extensions.css'
 import App from './App.vue'
 import router from './router';
 import { PresenterSlidePluginIframe, AudienceSlidePluginIframe } from '@aha/ui';

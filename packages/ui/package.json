@@ -16,7 +16,7 @@
       "default": "./tailwind.config.js"
     },
     "./ahaslides-vars.css": "./dist/assets/ahaslides-vars.css",
-    "./ahaslides-antd-extension.css": "./dist/assets/ahaslides-antd-extension.css",
+    "./ahaslides-antd-extensions.css": "./dist/assets/ahaslides-antd-extensions.css",
     "./vite.config.icon": {
       "types": "./src/vite.config.icon.d.ts",
       "import": "./src/vite.config.icon.js",
@@ -34,11 +34,11 @@
     "tailwind.config.d.ts"
   ],
   "scripts": {
-    "build": "npm run build:icons && npm run build:ts && npm run build:css && npm run build:antd-css-vars && npm run build:antd-extension && npm run build:icons",
+    "build": "npm run build:ts && npm run build:antd-css-vars && npm run build:css",
     "clean": "rm -rf dist *.tsbuildinfo",
     "build:icons": "node scripts/generate-icons.js",
     "build:ts": "tsc",
-    "build:css": "postcss src/ahaslides-antd-extension.css -o dist/assets/ahaslides-antd-extension.css",
+    "build:css": "postcss src/ahaslides-antd-extensions.css -o dist/assets/ahaslides-antd-extensions.css",
     "build:antd-css-vars": "node scripts/generate-css-vars.js",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
