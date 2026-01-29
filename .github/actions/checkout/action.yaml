@@ -34,8 +34,13 @@ runs:
     - name: Debug Token Scopes
       shell: bash
       run: |
-        echo "Checking token scopes..."
-        curl -s -I -H "Authorization: token ${{ inputs.token }}" https://api.github.com/ | grep -i "x-oauth-scopes" || echo "Could not find scopes header"
+        echo "Checking token info..."
+        # Print all headers starting with X- to see scopes, SSO, and rate limits
+        curl -s -I -H "Authorization: token ${{ inputs.token }}" https://api.github.com/ | grep -i "^x-"
+        
+        # Verify which user is actually authenticated
+        echo "Authenticated as:"
+        curl -s -H "Authorization: token ${{ inputs.token }}" https://api.github.com/user | grep -oP '"login":\s*"\K[^"]+' || echo "Could not determine login"
 
     - name: Commit Submodule Changes
       shell: bash
