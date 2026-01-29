@@ -20,8 +20,9 @@ jobs:
         with:
           # note those token is used to checkout code from submodule repo 
           # but it seem to be persisted to use for next step 
-          # so we use one with write permission
-          token: ${{ secrets.GH_PAT_WRITE }}
+          # so we need tokens that can read for all submodules
+          # and write for main repo
+          token: ${{ secrets.GH_PLUGINS_PAT }}
           submodules: recursive
       - name: Update submodules
         uses: ./.github/actions/checkout
