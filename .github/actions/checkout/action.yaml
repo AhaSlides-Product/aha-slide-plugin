@@ -47,8 +47,8 @@ runs:
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
           
           # Clean token and push using origin override to bypass credential caching
-          TOKEN=$(echo "${{ inputs.token }}" | tr -d '\r\n')
-          git remote set-url origin "https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git"
+          # TOKEN=$(echo "${{ inputs.token }}" | tr -d '\r\n')
+          # git remote set-url origin "https://x-access-token:$TOKEN@github.com/${{ github.repository }}.git"
           git push origin ${{ inputs.target_branch }}
         else
           echo "No submodule changes to commit"
