@@ -1,4 +1,5 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
+import { ref, type Ref } from 'vue';
 import { ImageUploadResult } from '../image';
 import {
   BaseSlidePluginProps,
@@ -15,6 +16,14 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   presentation?: BaseSlidePluginProps['presentation'] & {
     /** The teamplay object used in the presentation */
     teamplay?: Record<string, any>;
+  };
+  /**
+   * Information about the current user.
+   */
+  currentUser?: {
+    /** The language code of the presenter */
+    presenterLanguage?: string;
+    [key: string]: any;
   };
   /** 
    * Action to fetch all custom attributes for the current slide from the parent application.
@@ -42,6 +51,30 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param event - The keyboard event data to emit.
    */
   emitKeyboardEvent?: (event: PluginKeyboardEvent) => void;
+  /**
+   * Show an info toast message in the parent app.
+   * @param text - The message to display.
+   * @param uniqName - A unique identifier for the toast.
+   * @param action - An optional action object.
+   * @param options - Additional toast options.
+   */
+  showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /**
+   * Show a success toast message in the parent app.
+   * @param text - The message to display.
+   * @param uniqName - A unique identifier for the toast.
+   * @param action - An optional action object.
+   * @param options - Additional toast options.
+   */
+  showToastSuccess?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /**
+   * Show an error toast message in the parent app.
+   * @param text - The message to display.
+   * @param uniqName - A unique identifier for the toast.
+   * @param action - An optional action object.
+   * @param options - Additional toast options.
+   */
+  showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
 }
 
 /**
@@ -66,6 +99,10 @@ export const PresenterSlidePluginIframe = zoid.create({
       required: false,
     },
     slide: {
+      type: 'object',
+      required: false,
+    },
+    currentUser: {
       type: 'object',
       required: false,
     },
@@ -113,6 +150,18 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    showToastInfo: {
+      type: 'function',
+      required: false,
+    },
+    showToastSuccess: {
+      type: 'function',
+      required: false,
+    },
+    showToastError: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -124,6 +173,10 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   uploadImage: ((file: File) => Promise<ImageUploadResult>) | undefined;
   openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
   openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
+  currentUserProps: Ref<Record<string, any> | undefined>;
+  showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   /** 
    * Action to fetch values from a specific bucket and optional key from the parent application.
    * 
@@ -141,7 +194,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
  * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
  */
 export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): PresenterPluginReturn {
-  const baseHook = useBaseSlidePlugin(options);
+  const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
+  
+  const baseHook = useBaseSlidePlugin(options, (newProps) => {
+    if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
+  });
   const { xprops } = baseHook;
 
   const originalGetAttributes = xprops?.getSlideAttributesAction;
@@ -171,6 +228,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     presentationColorPaletteProps: baseHook.presentationColorPaletteProps,
     presentationLighterColorPaletteProps: baseHook.presentationLighterColorPaletteProps,
     slideProps: baseHook.slideProps,
+    currentUserProps,
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
@@ -183,5 +241,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     emitKeyboardEvent,
     openUploadImageModal,
     openEditImageModal,
+    showToastInfo: xprops?.showToastInfo,
+    showToastSuccess: xprops?.showToastSuccess,
+    showToastError: xprops?.showToastError,
   };
 }
