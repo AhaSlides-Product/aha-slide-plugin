@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
     branches:
       - staging
+  repository_dispatch:
+    types: [update-slide-types-submodules]
 
 jobs:
   build:
