@@ -6,7 +6,7 @@
 
 # Interface: CountUniqueItem
 
-Defined in: [SubmissionResult.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L18)
+Defined in: [SubmissionResult.ts:18](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/backend-utils/src/SubmissionResult.ts#L18)
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: [SubmissionResult.ts:18](https://github.com/AhaSlides-Product/aha-sl
 
 > **bucket**: `string`
 
-Defined in: [SubmissionResult.ts:20](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L20)
+Defined in: [SubmissionResult.ts:20](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/backend-utils/src/SubmissionResult.ts#L20)
 
 The bucket name for aggregation (e.g., slide-specific path).
 
@@ -24,7 +24,7 @@ The bucket name for aggregation (e.g., slide-specific path).
 
 > **item**: `string`
 
-Defined in: [SubmissionResult.ts:24](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L24)
+Defined in: [SubmissionResult.ts:24](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/backend-utils/src/SubmissionResult.ts#L24)
 
 item identifier.
 
@@ -34,6 +34,6 @@ item identifier.
 
 > **key**: `string`
 
-Defined in: [SubmissionResult.ts:22](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/backend-utils/src/SubmissionResult.ts#L22)
+Defined in: [SubmissionResult.ts:22](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/backend-utils/src/SubmissionResult.ts#L22)
 
 The key within the bucket (e.g., the answer option).

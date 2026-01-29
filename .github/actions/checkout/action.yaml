@@ -1,8 +1,14 @@
-name: 'Checkout submodules'
-description: 'Checkout repository and update submodules'
+name: 'Pull submodules'
+description: 'Pull submodules'
 inputs:
   plugins_branch:
     description: 'Branch of plugin submodules to build from'
+    required: true
+  target_branch:
+    description: 'Branch of main repo to push to'
+    required: true
+  token:
+    description: 'GitHub token for authentication'
     required: true
 runs:
   using: "composite"
@@ -18,5 +24,21 @@ runs:
             git -C "$dir" pull origin ${{ inputs.plugins_branch }}
           fi
         done
-        echo "Removing redundant package-lock.json files in apps/*/backend"
-        rm -f apps/*/backend/package-lock.json
+
+    - name: Configure Git
+      shell: bash
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+
+    - name: Commit Submodule Changes
+      shell: bash
+      run: |
+        git checkout ${{ inputs.target_branch }}
+        git add .
+        if ! git diff --cached --quiet; then
+          git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
+          git push https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git ${{ inputs.target_branch }}
+        else
+          echo "No submodule changes to commit"
+        fi

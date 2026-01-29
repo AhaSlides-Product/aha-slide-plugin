@@ -6,7 +6,7 @@
 
 # Class: ApiClient
 
-Defined in: [submission.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/api/src/submission.ts#L9)
+Defined in: [submission.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L9)
 
 ## Constructors
 
@@ -14,7 +14,7 @@ Defined in: [submission.ts:9](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **new ApiClient**(`baseUrl`): `ApiClient`
 
-Defined in: [submission.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/api/src/submission.ts#L12)
+Defined in: [submission.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L12)
 
 #### Parameters
 
@@ -32,7 +32,7 @@ Defined in: [submission.ts:12](https://github.com/AhaSlides-Product/aha-slide-pl
 
 > **sendSubmission**\<`T`\>(`payload`): `Promise`\<`Response`\>
 
-Defined in: [submission.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/api/src/submission.ts#L16)
+Defined in: [submission.ts:16](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L16)
 
 #### Type Parameters
 

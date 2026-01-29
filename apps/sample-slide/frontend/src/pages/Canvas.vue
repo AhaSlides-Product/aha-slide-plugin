@@ -37,6 +37,11 @@
     </div>
 
     <div class="debug-section mqtt-section" data-testid="canvas-mqtt">
+      <h3>Initial values of bucket ({{ bucket }})</h3>
+      <pre class="code-block">{{ initialValues }}</pre>
+    </div>
+
+    <div class="debug-section mqtt-section" data-testid="canvas-mqtt">
       <h3>Realtime Messages ({{ countTopic }})</h3>
       <div v-if="mqttMessages.length === 0" class="no-messages">
         Waiting for messages...
@@ -93,23 +98,32 @@ const {
   subscribeTopic,
   unsubscribeTopic,
   onKeyboard,
-  emitKeyboardEvent
+  emitKeyboardEvent,
+  getValues,
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);
 const lastKeyboardEvent = ref<string>('');
 const mqttMessages = ref<string[]>([]);
+const initialValues = ref<string>("");
 const submitTestMessages = ref<string[]>([]);
 const countTopic = `plugin-counting/slide-${slideId}`;
-const submitTestTopic = `${getBucket('sample-slide', {
+const bucket = getBucket('sample-slide', {
   presentationId: presentationProps.value?.id,
   slideId: slideProps.value?.id,
   slideVersion: slideProps.value?.version,
-})}/submit-test`;
+})
+const submitTestTopic = `${bucket}/submit-test`;
 
 onMounted(async () => {
   document.body.classList.add('enable-scroll');
+  // get the initial values
+  const result = await getValues?.({
+    bucket 
+  })
+  initialValues.value = JSON.stringify(result);
+  console.log('[Slide Plugin] initialValues', initialValues.value)
   
   // MQTT Integration
   if (subscribeTopic) {

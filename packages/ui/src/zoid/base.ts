@@ -215,6 +215,28 @@ export interface BaseSlidePluginReturn {
   presentationLighterColorPaletteProps: Ref<string[] | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   baseUrl: Ref<string | undefined>;
+  /** 
+   * Subscribe to a specific MQTT topic.
+   * 
+   * The topic is typically constructed using a bucket and a key: `${bucket}/${key}`.
+   * You can also subscribe to multiple topics using a prefix followed by a `#` wildcard (e.g., `bucket/#`).
+   * 
+   * @example
+   * ```typescript
+   * subscribeTopic({
+   *   topic: 'my-bucket/my-key',
+   *   callback: (topic, message) => console.log(topic, message)
+   * });
+   * ```
+   * 
+   * Or subscribing to all changes in the bucket:
+   * ```typescript
+   * subscribeTopic({
+   *   topic: 'my-bucket/#',
+   *   callback: (topic, message) => console.log(topic, message)
+   * });
+   * ```
+   */
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
   audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;

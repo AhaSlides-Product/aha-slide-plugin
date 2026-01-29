@@ -8,7 +8,7 @@
 
 > **useSync**\<`T`\>(`name`, `initialState`): `Ref`\<`T`\>
 
-Defined in: [packages/ui/src/sync.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/68e242b1a3734c506525f815fb958e13c2f7e87c/packages/ui/src/sync.ts#L11)
+Defined in: [packages/ui/src/sync.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/sync.ts#L11)
 
 Synchronize a reactive state ref across multiple browser tabs bidirectionally.
 

@@ -15,6 +15,7 @@ function generate() {
   for (const app of apps) {
     const backendPath = path.join(appsDir, app, 'backend');
     const packageJsonPath = path.join(backendPath, 'package.json');
+    const packageLockJsonPath = path.join(backendPath, 'package-lock.json');
 
     if (fs.existsSync(packageJsonPath)) {
       const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
@@ -25,6 +26,12 @@ function generate() {
           moduleName: 'AppModule'
         });
       }
+    }
+
+    if (fs.existsSync(packageLockJsonPath)) {
+      fs.unlinkSync(packageLockJsonPath);
+      console.log(`Removed ${packageLockJsonPath}`);
+
     }
   }
 

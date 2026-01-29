@@ -1,0 +1,25 @@
+name: "Update Slide Types - staging"
+
+on:
+  workflow_dispatch:
+    branches:
+      - staging
+
+jobs:
+  build:
+    runs-on:
+      group: github-runner-arm64
+    if: github.ref == 'refs/heads/staging'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+      - name: Update submodules
+        uses: ./.github/actions/checkout
+        with:
+          plugins_branch: staging
+          target_branch: staging 
+          token: ${{ secrets.GH_PAT }}
+

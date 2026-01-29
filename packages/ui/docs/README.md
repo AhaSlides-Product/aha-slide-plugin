@@ -15,6 +15,10 @@
 - [TrackingElement](interfaces/TrackingElement.md)
 - [UseSlidePluginOptions](interfaces/UseSlidePluginOptions.md)
 
+## Type Aliases
+
+- [PresenterPluginReturn](type-aliases/PresenterPluginReturn.md)
+
 ## Variables
 
 - [ahaSlidesDefaultTheme](variables/ahaSlidesDefaultTheme.md)
