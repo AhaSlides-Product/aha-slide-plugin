@@ -31,13 +31,12 @@ runs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
 
-    - name: Debug Repo Permissions
+    - name: Debug Repo Permissions and SSO
       shell: bash
       run: |
-        echo "Querying repository permissions for this token..."
-        curl -s -H "Authorization: token ${{ inputs.token }}" \
-          https://api.github.com/repos/${{ github.repository }} | \
-          grep -A 15 '"permissions":' || echo "Could not retrieve permissions (Token might lack Metadata access)"
+        echo "Checking repository permissions and SAML SSO status..."
+        curl -s -I -H "Authorization: token ${{ inputs.token }}" \
+          https://api.github.com/repos/${{ github.repository }} | grep -iE "^permissions|^x-github-sso" || echo "No permissions/SSO headers found."
 
     - name: Commit Submodule Changes
       shell: bash

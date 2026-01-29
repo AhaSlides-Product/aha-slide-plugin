@@ -8,10 +8,12 @@ on:
     types: [update-slide-types-submodules]
 
 jobs:
-  build:
+  update-modules:
     runs-on:
       group: github-runner-arm64
     if: github.ref == 'refs/heads/staging'
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
