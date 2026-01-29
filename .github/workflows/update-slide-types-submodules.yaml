@@ -18,12 +18,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
+          # note those token is used to checkout code from submodule repo 
+          # but it seem to be persisted to use for next step 
+          # so we use one with write permission
           token: ${{ secrets.GH_PAT_WRITE }}
           submodules: recursive
       - name: Update submodules
         uses: ./.github/actions/checkout
         with:
           plugins_branch: staging
-          target_branch: staging 
-          token: ${{ secrets.GH_PAT_WRITE }}
-
+          target_branch: staging
