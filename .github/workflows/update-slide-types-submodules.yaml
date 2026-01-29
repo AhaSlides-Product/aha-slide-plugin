@@ -21,5 +21,5 @@ jobs:
         with:
           plugins_branch: staging
           target_branch: staging 
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GH_PAT_WRITE }}
 
