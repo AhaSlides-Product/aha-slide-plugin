@@ -31,6 +31,12 @@ runs:
         git config --global user.email "action@github.com"
         git config --global user.name "GitHub Action"
 
+    - name: Debug Token Scopes
+      shell: bash
+      run: |
+        echo "Checking token scopes..."
+        curl -s -I -H "Authorization: token ${{ inputs.token }}" https://api.github.com/ | grep -i "x-oauth-scopes" || echo "Could not find scopes header"
+
     - name: Commit Submodule Changes
       shell: bash
       run: |
@@ -38,7 +44,7 @@ runs:
         git add .
         if ! git diff --cached --quiet; then
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
-          git -c http.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${{ inputs.token }}" | base64)" \
+          git -c http.extraheader="AUTHORIZATION: basic $(echo -n "x-access-token:${{ inputs.token }}" | base64 | tr -d '\n')" \
             push https://github.com/${{ github.repository }}.git ${{ inputs.target_branch }}
         else
           echo "No submodule changes to commit"
