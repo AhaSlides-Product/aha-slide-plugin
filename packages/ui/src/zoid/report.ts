@@ -7,9 +7,9 @@ import { autoReportHeight, type UseSlidePluginOptions } from './base';
  */
 export interface ReportProps {
     /** The token for authentication/authorization */
-    token: string;
+    token?: string;
     /** The current language code (e.g., 'en', 'vi') */
-    currentLanguage: string;
+    currentLanguage?: string;
     /** 
      * Callback to report height changes from the child to the parent. 
      * Sending null signals the parent to use 100% height.
@@ -64,7 +64,7 @@ export interface ReportReturn {
  */
 export function useReportPlugin(
     options: UseSlidePluginOptions = { autoHeight: true }
-): ReportReturn & { xprops: any } {
+): ReportReturn {
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
 
@@ -89,11 +89,8 @@ export function useReportPlugin(
         return cleanup;
     });
 
-    const xprops = (window as any).xprops;
-
     return {
         token,
         currentLanguage,
-        xprops,
     };
 }
