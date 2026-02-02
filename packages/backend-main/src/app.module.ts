@@ -19,4 +19,4 @@ import { AppModule as SampleSlideModule } from '@aha/sample-slide-backend';
     ]),
   ],
 })
-export class AppModule { }
+export class AppModule {}

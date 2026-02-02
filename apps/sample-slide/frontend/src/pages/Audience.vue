@@ -52,6 +52,17 @@
         <a-button type="default" size="large" @click="handleSubmitSubmission" :loading="submitting" style="margin-top: 10px;">
           📝 Submit Sample Essay
         </a-button>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+          <a-button @click="handleUploadImage" :loading="uploading">
+            Upload Image
+          </a-button>
+          <a-button @click="handleShowToast">
+            Show Toast
+          </a-button>
+        </div>
+        <div v-if="uploadedFile" style="margin-top: 10px;">
+          <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
+        </div>
       </div>
     </div>
   </div>
@@ -81,7 +92,40 @@ const {
   unsubscribeTopic,
   audienceSendCountingUniqueAction,
   baseUrl,
+  uploadImage,
+  showToastSuccess,
 } = useAudiencePlugin();
+
+const uploadedFile = ref<any>(null);
+const uploading = ref(false);
+
+const handleUploadImage = async () => {
+  if (uploadImage) {
+    try {
+      uploading.value = true;
+      const result = await uploadImage();
+      console.log('Upload result:', result);
+      uploadedFile.value = result;
+      if (showToastSuccess) {
+        showToastSuccess('Image uploaded successfully!');
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      uploading.value = false;
+    }
+  } else {
+    console.warn('uploadImage function not available');
+  }
+};
+
+const handleShowToast = () => {
+  if (showToastSuccess) {
+    showToastSuccess('This is a test toast from sample plugin!', 'test-toast');
+  } else {
+    console.warn('showToastSuccess function not available');
+  }
+};
 
 const voting = ref(false);
 const countTopic = computed(() => `plugin-counting/slide-${slideId}`);
