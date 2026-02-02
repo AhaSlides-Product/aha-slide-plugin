@@ -1,3 +1,5 @@
+import { SlideType } from "./slideType";
+
 export interface SubmissionPayload<T = any> {
   slideId: string | number;
   slideVersion: string | number;
@@ -13,8 +15,8 @@ export class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  async sendSubmission<T>(payload: SubmissionPayload<T>): Promise<Response> {
-    const url = `${this.baseUrl}/api/live/submissions?slide_type=${payload.type}`;
+  async sendSubmission<T>(slideType: SlideType, payload: SubmissionPayload<T>): Promise<Response> {
+    const url = `${this.baseUrl}/api/live/submissions?slide_type=${slideType}`;
 
     return fetch(url, {
       method: "POST",

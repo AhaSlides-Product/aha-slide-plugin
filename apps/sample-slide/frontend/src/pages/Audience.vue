@@ -62,6 +62,7 @@ import { useRoute } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
+import { SlideType } from '@aha/api';
 
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -130,7 +131,7 @@ const handleSubmitSubmission = async () => {
   try {
     console.log('Audience: Submitting to liveproxy...', payload);
     const client = new ApiClient(baseUrl.value);
-    const response = await client.sendSubmission(payload);
+    const response = await client.sendSubmission(SlideType.SampleSlide, payload);
 
     console.log('Audience: Liveproxy response status:', response.status);
     

@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "generate-slide-type-enum": "node scripts/generate-slide-type-enum.js",
+    "build": "npm run generate-slide-type-enum && tsc -p tsconfig.json",
     "clean": "rm -rf dist *.tsbuildinfo",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
   },
