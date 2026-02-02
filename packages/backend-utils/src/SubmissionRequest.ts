@@ -18,4 +18,6 @@ export interface SubmissionRequest {
   audienceName: string;
   /** The emoji representation of the audience member. */
   audienceEmoji: string;
+  /** The type of the submission. */
+  type: string;
 }
