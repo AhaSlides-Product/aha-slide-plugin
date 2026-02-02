@@ -17,6 +17,12 @@ export interface ReportProps {
      * @param height - The new height in pixels, or null for 100% height.
      */
     onHeightChange?: (height: number | null) => void;
+    /** 
+     * Action to track events to GA4 and Mixpanel.
+     * 
+     * @param payload - The event payload to track.
+     */
+    trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
 }
 
 /**
@@ -54,6 +60,7 @@ export const ReportIframe = zoid.create({
 export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
+    trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
 }
 
 /**
@@ -67,6 +74,7 @@ export function useReportPlugin(
 ): ReportReturn {
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
+    const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
 
     onMounted(() => {
         let cleanup = () => { };
@@ -92,5 +100,6 @@ export function useReportPlugin(
     return {
         token,
         currentLanguage,
+        trackGA4AndMixpanel,
     };
 }
