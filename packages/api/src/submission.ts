@@ -21,7 +21,7 @@ export class ApiClient {
       throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
     }
 
-    return response.json();
+    return response.status === 202 ? {} : response.json();
   }
 
   /**

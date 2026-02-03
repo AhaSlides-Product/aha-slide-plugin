@@ -181,13 +181,7 @@ const handleSubmitSubmission = async () => {
     const client = new ApiClient(baseUrl.value);
     const response = await client.sendLiveSubmission(SlideType.SampleSlide, payload);
 
-    console.log('Audience: Liveproxy response status:', response.status);
-    
-    if (response.ok) {
-      console.log('Audience: Submission successful');
-    } else {
-      console.warn('Audience: Submission failed');
-    }
+    console.log('Audience: Liveproxy response result:', response);
   } catch (error) {
     console.error('Audience: Submission error:', error);
   } finally {
