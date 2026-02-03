@@ -23,6 +23,8 @@ export interface ReportProps {
      * @param payload - The event payload to track.
      */
     trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
+    changeRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
 }
 
 /**
@@ -51,6 +53,18 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
+        trackGA4AndMixpanel: {
+            type: 'function',
+            required: false,
+        },
+        changeRoute: {
+            type: 'function',
+            required: false,
+        },
+        pushRoute: {
+            type: 'function',
+            required: false,
+        },
     },
 });
 
@@ -61,6 +75,8 @@ export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
     trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
+    changeRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
 }
 
 /**
@@ -75,6 +91,8 @@ export function useReportPlugin(
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
     const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
+    const changeRoute = (window as any).xprops?.changeRoute;
+    const pushRoute = (window as any).xprops?.pushRoute;
 
     onMounted(() => {
         let cleanup = () => { };
@@ -101,5 +119,7 @@ export function useReportPlugin(
         token,
         currentLanguage,
         trackGA4AndMixpanel,
+        changeRoute,
+        pushRoute,
     };
 }
