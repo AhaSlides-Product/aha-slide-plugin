@@ -27,9 +27,10 @@ export class AppService {
     }];
 
     // echo the submission to subscribers
-    const broadcast: Sync = [{
+    const broadcast = [{
       path: getBucket('sample-submissions', { presentationId, slideId, slideVersion }),
       value: JSON.stringify(payload),
+      type: 'string',
     }];
 
     const response: SubmissionResult = {
