@@ -175,7 +175,7 @@ const handleSubmitSubmission = async () => {
   try {
     console.log('Audience: Submitting to liveproxy...', payload);
     const client = new ApiClient(baseUrl.value);
-    const response = await client.sendSubmission(SlideType.SampleSlide, payload);
+    const response = await client.sendLiveSubmission(SlideType.SampleSlide, payload);
 
     console.log('Audience: Liveproxy response status:', response.status);
     
