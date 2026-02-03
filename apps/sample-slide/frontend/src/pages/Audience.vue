@@ -74,6 +74,8 @@ import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
+import { watch } from 'vue';
+import { SubmissionSenderType } from '@aha/common';
 
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -163,6 +165,8 @@ const handleSubmitSubmission = async () => {
     slideVersion: slideProps.value?.version || 2,
     type: "sample-slide",
     presentationId: presentationProps.value?.id || 0,
+    senderId: audienceId.value?.toString() ?? "sample-audienceId",
+    senderType: SubmissionSenderType.Audience,
     attributes: {
       text: "Long essay response",
       wordCount: 250,
@@ -214,7 +218,6 @@ onUnmounted(() => {
   }
 });
 
-import { watch } from 'vue';
 </script>
 
 <style scoped>
