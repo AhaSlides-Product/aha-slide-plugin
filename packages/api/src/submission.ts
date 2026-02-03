@@ -1,13 +1,6 @@
 import { SlideType } from "./slideType";
-
-export interface SubmissionPayload<T = any> {
-  slideId: string | number;
-  slideVersion: string | number;
-  type: string;
-  presentationId: string | number;
-  attributes: T;
-}
-
+import { SubmissionPayload } from "@aha/common";
+export { SubmissionPayload } from "@aha/common";
 export class ApiClient {
   private baseUrl: string;
   private headers = {

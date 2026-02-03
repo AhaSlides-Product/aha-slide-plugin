@@ -17,6 +17,9 @@
     "clean": "rm -rf dist *.tsbuildinfo",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
   },
+  "dependencies": {
+    "@aha/common": "*"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
   }
