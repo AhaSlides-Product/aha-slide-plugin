@@ -21,7 +21,7 @@ export class ApiClient {
       throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
     }
 
-    return response.status === 202 ? {} : response.json();
+    return [202, 204].includes(response.status) ? {} : response.json();
   }
 
   /**
@@ -59,5 +59,26 @@ export class ApiClient {
       method: "PATCH",
       body: JSON.stringify(payload),
     });
+  }
+
+  /**
+   * List by slideId with optional slideVersion and type (query params)
+   * @param slideId 
+   * @param slideVersion 
+   * @param type 
+   * @returns 
+   */
+  async getSubmissions<T>({ slideId, slideVersion, type }: {
+    slideId: string,
+    slideVersion?: string,
+    type?: string
+  }): Promise<SubmissionPayload<T>[]> {
+    const params = new URLSearchParams();
+    params.append("slideId", slideId);
+    if (slideVersion) params.append("slideVersion", slideVersion);
+    if (type) params.append("type", type);
+
+    const url = `${this.baseUrl}/api/submissions?${params.toString()}`;
+    return this.fetchUrl(url);
   }
 }
