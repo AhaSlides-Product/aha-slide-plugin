@@ -60,6 +60,12 @@
             Show Toast
           </a-button>
         </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; align-items: center; justify-content: center;">
+          <a-input v-model:value="newName" placeholder="New Name" style="width: 200px" />
+          <a-button @click="handleUpdateData" type="dashed">
+            Update Profile
+          </a-button>
+        </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
           <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
         </div>
@@ -70,11 +76,10 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
-import { watch } from 'vue';
 import { SubmissionSenderType } from '@aha/common';
 
 const route = useRoute();
@@ -96,10 +101,26 @@ const {
   baseUrl,
   uploadImage,
   showToastSuccess,
+  updateAudienceData,
 } = useAudiencePlugin();
 
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
+const newName = ref('');
+
+const handleUpdateData = () => {
+  if (updateAudienceData) {
+    updateAudienceData({
+      audienceName: newName.value || 'New Tester',
+      audienceEmoji: '🚀',
+    });
+    if (showToastSuccess) {
+      showToastSuccess('Sent update request!');
+    }
+  } else {
+    console.warn('updateAudienceData function not available');
+  }
+};
 
 const handleUploadImage = async () => {
   if (uploadImage) {

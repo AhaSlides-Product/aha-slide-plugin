@@ -45,6 +45,19 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * Show an error toast message in the parent app.
    */
   showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /**
+   * Update audience data such as name, email, and emoji.
+   * 
+   * @param payload - The audience data to update.
+   */
+  updateAudienceData?: (payload: {
+    /** The new audience name */
+    audienceName?: string;
+    /** The new audience email */
+    audienceEmail?: string;
+    /** The new audience emoji */
+    audienceEmoji?: string;
+  }) => void;
 }
 
 /**
@@ -140,6 +153,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    updateAudienceData: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -161,6 +178,11 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  updateAudienceData: ((payload: {
+    audienceName?: string;
+    audienceEmail?: string;
+    audienceEmoji?: string;
+  }) => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -175,6 +197,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const showToastInfo = xprops?.showToastInfo;
   const showToastSuccess = xprops?.showToastSuccess;
   const showToastError = xprops?.showToastError;
+  const updateAudienceData = xprops?.updateAudienceData;
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -207,5 +230,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     showToastInfo,
     showToastSuccess,
     showToastError,
+    updateAudienceData,
   };
 }
