@@ -29,6 +29,22 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * Custom attributes associated with the current slide.
    */
   slideAttributes?: Record<string, any>;
+  /** 
+   * Action to upload an image from the plugin iframe.
+   */
+  uploadImage?: () => Promise<any>;
+  /** 
+   * Show an info toast message in the parent app.
+   */
+  showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /** 
+   * Show a success toast message in the parent app.
+   */
+  showToastSuccess?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /** 
+   * Show an error toast message in the parent app.
+   */
+  showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
 }
 
 /**
@@ -108,6 +124,22 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    uploadImage: {
+      type: 'function',
+      required: false,
+    },
+    showToastInfo: {
+      type: 'function',
+      required: false,
+    },
+    showToastSuccess: {
+      type: 'function',
+      required: false,
+    },
+    showToastError: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -125,6 +157,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceId: Ref<string | number | undefined>;
   audienceEmail: Ref<string | undefined>;
   audienceTeam: Ref<string | undefined>;
+  uploadImage: (() => Promise<any>) | undefined;
+  showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -134,6 +170,11 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const audienceId = ref<string | number | undefined>(xprops?.audienceId);
   const audienceEmail = ref<string | undefined>(xprops?.audienceEmail);
   const audienceTeam = ref<string | undefined>(xprops?.audienceTeam);
+
+  const uploadImage = xprops?.uploadImage;
+  const showToastInfo = xprops?.showToastInfo;
+  const showToastSuccess = xprops?.showToastSuccess;
+  const showToastError = xprops?.showToastError;
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -162,5 +203,9 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceId,
     audienceEmail,
     audienceTeam,
+    uploadImage,
+    showToastInfo,
+    showToastSuccess,
+    showToastError,
   };
 }

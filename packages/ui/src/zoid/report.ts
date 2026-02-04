@@ -7,9 +7,9 @@ import { autoReportHeight, type UseSlidePluginOptions } from './base';
  */
 export interface ReportProps {
     /** The token for authentication/authorization */
-    token: string;
+    token?: string;
     /** The current language code (e.g., 'en', 'vi') */
-    currentLanguage: string;
+    currentLanguage?: string;
     /** 
      * Callback to report height changes from the child to the parent. 
      * Sending null signals the parent to use 100% height.
@@ -17,6 +17,14 @@ export interface ReportProps {
      * @param height - The new height in pixels, or null for 100% height.
      */
     onHeightChange?: (height: number | null) => void;
+    /** 
+     * Action to track events to GA4 and Mixpanel.
+     * 
+     * @param payload - The event payload to track.
+     */
+    trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
+    changeRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
 }
 
 /**
@@ -45,6 +53,18 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
+        trackGA4AndMixpanel: {
+            type: 'function',
+            required: false,
+        },
+        changeRoute: {
+            type: 'function',
+            required: false,
+        },
+        pushRoute: {
+            type: 'function',
+            required: false,
+        },
     },
 });
 
@@ -54,6 +74,9 @@ export const ReportIframe = zoid.create({
 export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
+    trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
+    changeRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
 }
 
 /**
@@ -64,9 +87,12 @@ export interface ReportReturn {
  */
 export function useReportPlugin(
     options: UseSlidePluginOptions = { autoHeight: true }
-): ReportReturn & { xprops: any } {
+): ReportReturn {
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
+    const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
+    const changeRoute = (window as any).xprops?.changeRoute;
+    const pushRoute = (window as any).xprops?.pushRoute;
 
     onMounted(() => {
         let cleanup = () => { };
@@ -89,11 +115,11 @@ export function useReportPlugin(
         return cleanup;
     });
 
-    const xprops = (window as any).xprops;
-
     return {
         token,
         currentLanguage,
-        xprops,
+        trackGA4AndMixpanel,
+        changeRoute,
+        pushRoute,
     };
 }
