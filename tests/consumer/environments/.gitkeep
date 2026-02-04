@@ -1,0 +1,3 @@
+# Environment Tests
+
+Tests for different environments (Node.js, browser, bundlers).
