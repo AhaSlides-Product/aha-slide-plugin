@@ -3,12 +3,15 @@ import { SubmissionPayload } from "@aha/common";
 export { SubmissionPayload } from "@aha/common";
 export class ApiClient {
   private baseUrl: string;
-  private headers = {
+  private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string, accessToken?: string) {
     this.baseUrl = baseUrl;
+    if (accessToken) {
+      this.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
   }
 
   async fetchUrl(url: string, options?: RequestInit): Promise<any> {
@@ -21,7 +24,7 @@ export class ApiClient {
       throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
     }
 
-    return [202, 204].includes(response.status) ? {} : response.json();
+    return [202, 204].includes(response.status) ? undefined : response.json();
   }
 
   /**
@@ -72,13 +75,14 @@ export class ApiClient {
     slideId: string,
     slideVersion?: string,
     type?: string
-  }): Promise<SubmissionPayload<T>[]> {
+  }): Promise<(SubmissionPayload<T> & { id: string })[]> {
     const params = new URLSearchParams();
     params.append("slideId", slideId);
     if (slideVersion) params.append("slideVersion", slideVersion);
     if (type) params.append("type", type);
 
     const url = `${this.baseUrl}/api/submissions?${params.toString()}`;
-    return this.fetchUrl(url);
+    const result = await this.fetchUrl(url);
+    return result || [];
   }
 }
