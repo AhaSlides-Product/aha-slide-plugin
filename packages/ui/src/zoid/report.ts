@@ -25,6 +25,7 @@ export interface ReportProps {
     trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
     changeRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    openExportModalForPresentation?: (presentation: any) => void;
 }
 
 /**
@@ -65,6 +66,10 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
+        openExportModalForPresentation: {
+            type: 'function',
+            required: false,
+        },
     },
 });
 
@@ -77,6 +82,7 @@ export interface ReportReturn {
     trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
     changeRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    openExportModalForPresentation: ((presentation: any) => void) | undefined;
 }
 
 /**
@@ -93,6 +99,7 @@ export function useReportPlugin(
     const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
     const changeRoute = (window as any).xprops?.changeRoute;
     const pushRoute = (window as any).xprops?.pushRoute;
+    const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
 
     onMounted(() => {
         let cleanup = () => { };
@@ -121,5 +128,6 @@ export function useReportPlugin(
         trackGA4AndMixpanel,
         changeRoute,
         pushRoute,
+        openExportModalForPresentation,
     };
 }
