@@ -16,7 +16,8 @@
     "baseUrl": "..",
     "paths": {
       "@aha/ui": ["../../packages/ui/src"],
-      "@aha/backend-utils": ["../../packages/backend-utils/src"]
+      "@aha/backend-utils": ["../../packages/backend-utils/src"],
+      "@aha/common": ["../../packages/common/src"]
     }
   },
   "include": [
