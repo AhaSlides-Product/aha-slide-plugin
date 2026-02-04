@@ -38,20 +38,39 @@ describe('@aha/ui - Composables', () => {
     });
 
     it('should broadcast state changes via postMessage', async () => {
-      const TestComponent = defineComponent({
-        setup() {
-          const state = useSync('useSync-broadcast-test', { count: 0 });
-          return { state };
-        },
-        template: '<div>{{ state.count }}</div>',
+      const channelName = 'useSync-broadcast-test';
+      type ChannelInstance = { name: string; postMessage: (m: unknown) => void };
+      const instances: ChannelInstance[] = [];
+      const OriginalBC = global.BroadcastChannel as new (name: string) => ChannelInstance;
+      const ctorSpy = vi.spyOn(global, 'BroadcastChannel' as any).mockImplementation(function (this: any, name: unknown) {
+        const instance = new OriginalBC(name as string);
+        instances.push(instance);
+        return instance;
       });
-      const wrapper = mount(TestComponent);
-      const stateRef = wrapper.vm.state as { value: { count: number } } | { count: number };
-      if ('value' in stateRef) stateRef.value = { count: 1 };
-      else (wrapper.vm as any).state = { count: 1 };
-      await nextTick();
-      const value = stateRef && 'value' in stateRef ? stateRef.value : (wrapper.vm as any).state;
-      expect(value).toEqual({ count: 1 });
+      try {
+        const TestComponent = defineComponent({
+          setup() {
+            const state = useSync(channelName, { count: 0 });
+            return { state };
+          },
+          template: '<div>{{ state.count }}</div>',
+        });
+        const wrapper = mount(TestComponent);
+        const channel = instances.find((c) => c.name === channelName);
+        expect(channel).toBeDefined();
+        const postMessageSpy = vi.spyOn(channel!, 'postMessage');
+
+        const stateRef = wrapper.vm.state as { value: { count: number } } | { count: number };
+        if ('value' in stateRef) stateRef.value = { count: 1 };
+        else (wrapper.vm as any).state = { count: 1 };
+        await nextTick();
+
+        expect(postMessageSpy).toHaveBeenCalledWith({ count: 1 });
+        const value = stateRef && 'value' in stateRef ? stateRef.value : (wrapper.vm as any).state;
+        expect(value).toEqual({ count: 1 });
+      } finally {
+        ctorSpy.mockRestore();
+      }
     });
 
     it('should accept object and primitive initial state', () => {
