@@ -162,6 +162,10 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    token: {
+      type: 'string',
+      required: false,
+    },
   },
 });
 
@@ -184,6 +188,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * @returns A promise resolving to an array of objects containing key, path, and value.
    */
   getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
+
+  /**
+   * Access token for the current user.
+   */
+  accessToken: string | undefined;
 }
 
 /**
@@ -195,7 +204,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
  */
 export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): PresenterPluginReturn {
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
-  
+
   const baseHook = useBaseSlidePlugin(options, (newProps) => {
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
   });
@@ -244,5 +253,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     showToastInfo: xprops?.showToastInfo,
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
+    accessToken: xprops?.token,
   };
 }

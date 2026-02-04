@@ -86,6 +86,7 @@ import { useRoute } from 'vue-router';
 import { useSync, usePresenterPlugin, type PluginKeyboardEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { getBucket } from '@aha/common';
+import { ApiClient } from '@aha/api';
 
 const route = useRoute();
 const slideId = route.params.slideId as string;
@@ -100,6 +101,8 @@ const {
   onKeyboard,
   emitKeyboardEvent,
   getValues,
+  baseUrl,
+  accessToken,
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
@@ -187,6 +190,16 @@ onMounted(async () => {
     if (attributes && attributes.greeting) {
       slideGreeting.value = attributes.greeting;
     }
+  }
+
+  if (baseUrl.value) {
+  const apiClient = new ApiClient(baseUrl.value, accessToken);
+    const submissions = await apiClient.getSubmissions({
+      slideId: slideId,
+      slideVersion: slideProps.value?.version,
+      type: 'sample-slide',
+    });
+    console.log('[Canvas] Submissions:', submissions);
   }
 });
 
