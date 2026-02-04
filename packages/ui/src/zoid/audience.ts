@@ -15,16 +15,19 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
     /** The teamplay object used in the presentation */
     teamPlay?: Record<string, any>;
   };
-  /** The name of the audience participant */
-  audienceName?: string;
-  /** The emoji chosen by the audience participant */
-  audienceEmoji?: string;
-  /** The unique identifier of the audience participant */
-  audienceId?: string | number;
-  /** The email of the audience participant */
-  audienceEmail?: string;
-  /** The team name of the audience participant */
-  audienceTeam?: string;
+  /** Audience information such as name, email, emoji, ID, and team. */
+  audience?: {
+    /** The name of the audience participant */
+    audienceName?: string;
+    /** The emoji chosen by the audience participant */
+    audienceEmoji?: string;
+    /** The unique identifier of the audience participant */
+    audienceId?: string | number;
+    /** The email of the audience participant */
+    audienceEmail?: string;
+    /** The team name of the audience participant */
+    audienceTeam?: string;
+  };
   /** 
    * Custom attributes associated with the current slide.
    */
@@ -61,7 +64,7 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
   /**
    * Open a full-screen modal in the audience app.
    */
-  openPluginModal?: () => void;
+  openPluginModal?: (path?: string) => void;
   /**
    * Close the currently open plugin modal in the audience app.
    */
@@ -97,24 +100,8 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
-    audienceName: {
-      type: 'string',
-      required: false,
-    },
-    audienceEmoji: {
-      type: 'string',
-      required: false,
-    },
-    audienceId: {
-      type: 'string',
-      required: false,
-    },
-    audienceEmail: {
-      type: 'string',
-      required: false,
-    },
-    audienceTeam: {
-      type: 'string',
+    audience: {
+      type: 'object',
       required: false,
     },
     onHeightChange: {
@@ -199,17 +186,18 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmail?: string;
     audienceEmoji?: string;
   }) => void) | undefined;
-  openPluginModal: (() => void) | undefined;
+  openPluginModal: ((path?: string) => void) | undefined;
   closePluginModal: (() => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
+  console.log('[useAudiencePlugin] Rendering with xprops:', xprops);
   const slideAttributesProps = ref<Record<string, any> | undefined>(xprops?.slideAttributes);
-  const audienceName = ref<string | undefined>(xprops?.audienceName);
-  const audienceEmoji = ref<string | undefined>(xprops?.audienceEmoji);
-  const audienceId = ref<string | number | undefined>(xprops?.audienceId);
-  const audienceEmail = ref<string | undefined>(xprops?.audienceEmail);
-  const audienceTeam = ref<string | undefined>(xprops?.audienceTeam);
+  const audienceName = ref<string | undefined>(xprops?.audience?.audienceName);
+  const audienceEmoji = ref<string | undefined>(xprops?.audience?.audienceEmoji);
+  const audienceId = ref<string | number | undefined>(xprops?.audience?.audienceId);
+  const audienceEmail = ref<string | undefined>(xprops?.audience?.audienceEmail);
+  const audienceTeam = ref<string | undefined>(xprops?.audience?.audienceTeam);
 
   const uploadImage = xprops?.uploadImage;
   const showToastInfo = xprops?.showToastInfo;
@@ -222,11 +210,13 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
     if (newProps.slideAttributes) slideAttributesProps.value = { ...newProps.slideAttributes };
-    if (newProps.audienceName) audienceName.value = newProps.audienceName;
-    if (newProps.audienceEmoji) audienceEmoji.value = newProps.audienceEmoji;
-    if (newProps.audienceId) audienceId.value = newProps.audienceId;
-    if (newProps.audienceEmail) audienceEmail.value = newProps.audienceEmail;
-    if (newProps.audienceTeam) audienceTeam.value = newProps.audienceTeam;
+    if (newProps.audience) {
+      if (newProps.audience.audienceName !== undefined) audienceName.value = newProps.audience.audienceName;
+      if (newProps.audience.audienceEmoji !== undefined) audienceEmoji.value = newProps.audience.audienceEmoji;
+      if (newProps.audience.audienceId !== undefined) audienceId.value = newProps.audience.audienceId;
+      if (newProps.audience.audienceEmail !== undefined) audienceEmail.value = newProps.audience.audienceEmail;
+      if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
+    }
   };
 
   const baseHook = useBaseSlidePlugin(options, handleAudienceProps);

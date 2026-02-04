@@ -16,6 +16,11 @@
       </div>
     </div>
 
+    <div class="debug-section">
+      <h3>Audience Debug Info</h3>
+      <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam }, null, 2) }}</pre>
+    </div>
+
     <div v-if="presentationProps" class="debug-section" data-testid="audience-presentation-props">
       <h3>Presentation Info</h3>
       <p><b>Access Code:</b> {{ presentationProps.accessCode }}</p>
@@ -67,8 +72,11 @@
           </a-button>
         </div>
         <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-          <a-button @click="handleOpenModal" type="primary">
-            Open Plugin Modal
+          <a-button @click="handleOpenModal()" type="primary">
+            Open Default Modal
+          </a-button>
+          <a-button @click="handleOpenModal('custom-path')" type="default">
+            Open Custom Path Modal
           </a-button>
         </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
@@ -114,9 +122,13 @@ const uploadedFile = ref<any>(null);
 const uploading = ref(false);
 const newName = ref('');
 
-const handleOpenModal = () => {
+const handleOpenModal = (path?: string) => {
   if (openPluginModal) {
-    openPluginModal();
+    if (path) {
+      openPluginModal(path);
+    } else {
+      openPluginModal();
+    }
   } else {
     console.warn('openPluginModal function not available');
   }
