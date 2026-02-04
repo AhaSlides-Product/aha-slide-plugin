@@ -12,8 +12,12 @@ interface MockBroadcastChannelInstance {
   close: () => void;
 }
 
+// Shared map: channel name -> instances (simulates multiple tabs/components on same channel).
+const channelInstancesByName = new Map<string, MockBroadcastChannelInstance[]>();
+
 // Mock BroadcastChannel for useSync tests. Must work when called with or without 'new'
 // (some bundlers may call BroadcastChannel(name) without new).
+// postMessage delivers to other instances of the same channel, not just this instance's listeners.
 function MockBroadcastChannel(this: MockBroadcastChannelInstance, name: string): MockBroadcastChannelInstance {
   if (!(this instanceof MockBroadcastChannel)) {
     return new (MockBroadcastChannel as any)(name);
@@ -22,10 +26,20 @@ function MockBroadcastChannel(this: MockBroadcastChannelInstance, name: string):
   this.onmessage = null;
   this.onmessageerror = null;
   this.listeners = [];
+  if (!channelInstancesByName.has(name)) {
+    channelInstancesByName.set(name, []);
+  }
+  channelInstancesByName.get(name)!.push(this);
+
   this.postMessage = (message: unknown) => {
     const event = { data: message } as MessageEvent;
-    this.listeners.forEach((l) => l(event));
-    if (this.onmessage) this.onmessage(event);
+    const instances = channelInstancesByName.get(this.name) || [];
+    instances.forEach((instance) => {
+      if (instance !== this) {
+        instance.listeners.forEach((l) => l(event));
+        if (instance.onmessage) instance.onmessage(event);
+      }
+    });
   };
   this.addEventListener = (_type: string, listener: (event: MessageEvent) => void) => {
     this.listeners.push(listener);
@@ -35,6 +49,9 @@ function MockBroadcastChannel(this: MockBroadcastChannelInstance, name: string):
     if (i > -1) this.listeners.splice(i, 1);
   };
   this.close = () => {
+    const instances = channelInstancesByName.get(this.name) || [];
+    const index = instances.indexOf(this);
+    if (index > -1) instances.splice(index, 1);
     this.listeners = [];
     this.onmessage = null;
     this.onmessageerror = null;
