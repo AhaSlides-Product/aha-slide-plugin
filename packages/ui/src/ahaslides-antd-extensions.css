@@ -1,0 +1,6 @@
+.ant-btn.ant-btn-xl {
+  height: var(--aha-buttonHeightXL);
+  font-size: var(--aha-fontSizeXL);
+  padding-inline: var(--aha-buttonPaddingHorizontalXL);
+  border-radius: var(--aha-borderRadiusXL);
+}

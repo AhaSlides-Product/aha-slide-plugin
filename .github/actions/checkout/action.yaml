@@ -7,9 +7,6 @@ inputs:
   target_branch:
     description: 'Branch of main repo to push to'
     required: true
-  token:
-    description: 'GitHub token for authentication'
-    required: true
 runs:
   using: "composite"
   steps:
@@ -38,7 +35,7 @@ runs:
         git add .
         if ! git diff --cached --quiet; then
           git commit -m "Update submodules to ${{ inputs.plugins_branch }} branch"
-          git push https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git ${{ inputs.target_branch }}
+          git push origin ${{ inputs.target_branch }}
         else
           echo "No submodule changes to commit"
         fi

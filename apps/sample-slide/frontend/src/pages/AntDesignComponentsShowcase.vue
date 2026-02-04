@@ -4,7 +4,9 @@
     <div class="mb-8">
       <h1 class="text-4xl font-bold text-base-100 mb-2">Ant Design Vue Components</h1>
       <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
+      
     </div>
+    <a-button type="primary" class="ant-btn-xl">Extra large button</a-button>
 
     <!-- Navigation -->
       <div class="mb-6">
