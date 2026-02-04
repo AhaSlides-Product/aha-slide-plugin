@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Canvas from '../pages/Canvas.vue'
 import Settings from '../pages/Settings.vue'
 import Audience from '../pages/Audience.vue'
+import AudienceModal from '../pages/AudienceModal.vue'
 import ComponentsShowcase from '../pages/AntDesignComponentsShowcase.vue'
 import IconsShowcase from '../pages/IconsShowcase.vue'
 
@@ -24,6 +25,11 @@ const routes = [
         path: '/:type/audience/:slideId',
         name: 'Audience',
         component: Audience
+    },
+    {
+        path: '/:type/audience-modal/:slideId',
+        name: 'AudienceModal',
+        component: AudienceModal
     },
     {
         path: '/components',

@@ -58,6 +58,14 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
     /** The new audience emoji */
     audienceEmoji?: string;
   }) => void;
+  /**
+   * Open a full-screen modal in the audience app.
+   */
+  openPluginModal?: () => void;
+  /**
+   * Close the currently open plugin modal in the audience app.
+   */
+  closePluginModal?: () => void;
 }
 
 /**
@@ -157,6 +165,14 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    openPluginModal: {
+      type: 'function',
+      required: false,
+    },
+    closePluginModal: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -183,6 +199,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmail?: string;
     audienceEmoji?: string;
   }) => void) | undefined;
+  openPluginModal: (() => void) | undefined;
+  closePluginModal: (() => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -198,6 +216,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const showToastSuccess = xprops?.showToastSuccess;
   const showToastError = xprops?.showToastError;
   const updateAudienceData = xprops?.updateAudienceData;
+  const openPluginModal = xprops?.openPluginModal;
+  const closePluginModal = xprops?.closePluginModal;
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -231,5 +251,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     showToastSuccess,
     showToastError,
     updateAudienceData,
+    openPluginModal,
+    closePluginModal,
   };
 }

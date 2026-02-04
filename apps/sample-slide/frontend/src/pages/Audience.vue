@@ -66,6 +66,11 @@
             Update Profile
           </a-button>
         </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+          <a-button @click="handleOpenModal" type="primary">
+            Open Plugin Modal
+          </a-button>
+        </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
           <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
         </div>
@@ -102,11 +107,20 @@ const {
   uploadImage,
   showToastSuccess,
   updateAudienceData,
+  openPluginModal,
 } = useAudiencePlugin();
 
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
 const newName = ref('');
+
+const handleOpenModal = () => {
+  if (openPluginModal) {
+    openPluginModal();
+  } else {
+    console.warn('openPluginModal function not available');
+  }
+};
 
 const handleUpdateData = () => {
   if (updateAudienceData) {
