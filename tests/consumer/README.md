@@ -37,10 +37,14 @@ consumer/
 ├── ui/
 │   ├── imports.test.ts     # Phase 1: import tests
 │   ├── composables.test.ts # Phase 2: useSync, usePresenterPlugin, useAudiencePlugin
-│   └── utilities.test.ts   # Phase 2: uploadImage, autoReportHeight
-├── backend-utils/          # Tests for @aha/backend-utils package
-├── integration/            # Cross-package integration tests (Phase 4)
-├── environments/           # Environment-specific tests (Phase 4)
+│   ├── utilities.test.ts   # Phase 2: uploadImage, autoReportHeight
+│   ├── components.test.ts # Phase 3: AhaIcon, Zoid components
+│   └── types.test.ts       # Phase 3: UI types
+├── backend-utils/
+│   ├── imports.test.ts     # Phase 1
+│   └── types.test.ts       # Phase 3: backend-utils types
+├── integration/            # Phase 4: frontend-backend, sample-app patterns
+├── environments/           # Phase 4: Node, browser, bundlers
 ├── fixtures/               # Test fixtures and mocks
 └── helpers/                # Test helpers
 ```

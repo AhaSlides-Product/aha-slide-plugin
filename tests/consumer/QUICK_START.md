@@ -99,9 +99,17 @@ npm run test:consumer:coverage
 ### Phase 3: Components & Types ✅
 
 - ✅ **AhaIcon** – rendering, props (size, width, height, class), placeholder
-- ✅ **Zoid Components** – PresenterSlidePluginIframe, AudienceSlidePluginIframe exports
+- ✅ **Zoid Components** – PresenterSlidePluginIframe, AudienceSlidePluginIframe, ReportIframe
 - ✅ **UI Types** – ImageUploadResult, UseSlidePluginOptions, SlidePluginProps, etc.
 - ✅ **Backend Utils Types** – SubmissionResult, CountTotalItem, CountUniqueItem, SyncItem
+
+### Phase 4: Integration & Environments ✅
+
+- ✅ **Frontend–backend** – SubmissionRequest/SubmissionResult, CountTotal/Sync compatibility
+- ✅ **Sample-app patterns** – theme, useSync, usePresenterPlugin, useAudiencePlugin, SlidePluginProps
+- ✅ **Node.js** – @aha/backend-utils importable in Node-like context
+- ✅ **Browser** – BroadcastChannel, window.xprops, ResizeObserver, @aha/ui exports
+- ✅ **Bundlers** – dynamic/named/namespace import for @aha/ui and @aha/backend-utils; AhaIcon.vue subpath
 
 ## 🧪 Test Examples
 

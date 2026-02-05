@@ -4,7 +4,7 @@ import { defineComponent, nextTick } from 'vue';
 import { useSync, useSyncReadOnly, usePresenterPlugin, useAudiencePlugin } from '@aha/ui';
 
 /**
- * Phase 2: Vue composables consumer tests
+ * Vue composables consumer tests
  */
 describe('@aha/ui - Composables', () => {
   describe('useSync', () => {
@@ -192,11 +192,13 @@ describe('@aha/ui - Composables', () => {
         slide: { id: '2' },
         baseUrl: 'https://audience.ahaslide.com',
         slideAttributes: { custom: 'data' },
-        audienceName: 'Alice',
-        audienceEmoji: '👍',
-        audienceId: 'aud-1',
-        audienceEmail: 'alice@test.com',
-        audienceTeam: 'Team A',
+        audience: {
+          audienceName: 'Alice',
+          audienceEmoji: '👍',
+          audienceId: 'aud-1',
+          audienceEmail: 'alice@test.com',
+          audienceTeam: 'Team A',
+        },
         onHeightChange: vi.fn(),
         subscribeTopic: vi.fn(),
         unsubscribeTopic: vi.fn(),
@@ -205,6 +207,23 @@ describe('@aha/ui - Composables', () => {
     });
 
     it('should return base refs and audience-specific refs', () => {
+      (window as any).xprops = {
+        presentation: { id: '1' },
+        slide: { id: '2' },
+        baseUrl: 'https://audience.ahaslide.com',
+        slideAttributes: { custom: 'data' },
+        audience: {
+          audienceName: 'Alice',
+          audienceEmoji: '👍',
+          audienceId: 'aud-1',
+          audienceEmail: 'alice@test.com',
+          audienceTeam: 'Team A',
+        },
+        onHeightChange: vi.fn(),
+        subscribeTopic: vi.fn(),
+        unsubscribeTopic: vi.fn(),
+        audienceSendCountingUniqueAction: vi.fn(),
+      };
       const TestComponent = defineComponent({
         setup() {
           const hook = useAudiencePlugin({ autoHeight: false });
@@ -213,14 +232,20 @@ describe('@aha/ui - Composables', () => {
         template: '<div />',
       });
       const wrapper = mount(TestComponent);
-      expect(wrapper.vm.hook.presentationProps).toBeDefined();
-      expect(wrapper.vm.hook.slideProps).toBeDefined();
-      expect(wrapper.vm.hook.slideAttributesProps).toBeDefined();
-      expect(wrapper.vm.hook.audienceName?.value).toBe('Alice');
-      expect(wrapper.vm.hook.audienceEmoji?.value).toBe('👍');
-      expect(wrapper.vm.hook.audienceId?.value).toBe('aud-1');
-      expect(wrapper.vm.hook.audienceEmail?.value).toBe('alice@test.com');
-      expect(wrapper.vm.hook.audienceTeam?.value).toBe('Team A');
+      const hook = wrapper.vm.hook;
+      expect(hook.presentationProps).toBeDefined();
+      expect(hook.slideProps).toBeDefined();
+      expect(hook.slideAttributesProps).toBeDefined();
+      const audienceName = hook.audienceName?.value ?? (hook as any).audienceName;
+      const audienceEmoji = hook.audienceEmoji?.value ?? (hook as any).audienceEmoji;
+      const audienceId = hook.audienceId?.value ?? (hook as any).audienceId;
+      const audienceEmail = hook.audienceEmail?.value ?? (hook as any).audienceEmail;
+      const audienceTeam = hook.audienceTeam?.value ?? (hook as any).audienceTeam;
+      expect(audienceName).toBe('Alice');
+      expect(audienceEmoji).toBe('👍');
+      expect(audienceId).toBe('aud-1');
+      expect(audienceEmail).toBe('alice@test.com');
+      expect(audienceTeam).toBe('Team A');
     });
   });
 });
