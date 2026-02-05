@@ -6,7 +6,7 @@
 
 # Interface: BaseSlidePluginReturn
 
-Defined in: [packages/ui/src/zoid/base.ts:212](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L212)
+Defined in: [packages/ui/src/zoid/base.ts:212](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L212)
 
 Common return type for slide plugin hooks.
 
@@ -16,7 +16,7 @@ Common return type for slide plugin hooks.
 
 > **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\> \| `undefined`
 
-Defined in: [packages/ui/src/zoid/base.ts:242](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L242)
+Defined in: [packages/ui/src/zoid/base.ts:242](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L242)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/zoid/base.ts:242](https://github.com/AhaSlides-Prod
 
 > **baseUrl**: `Ref`\<`string` \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/base.ts:217](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L217)
+Defined in: [packages/ui/src/zoid/base.ts:217](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L217)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/zoid/base.ts:217](https://github.com/AhaSlides-Prod
 
 > **presentationColorPaletteProps**: `Ref`\<`string`[] \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/base.ts:214](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L214)
+Defined in: [packages/ui/src/zoid/base.ts:214](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L214)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/zoid/base.ts:214](https://github.com/AhaSlides-Prod
 
 > **presentationLighterColorPaletteProps**: `Ref`\<`string`[] \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/base.ts:215](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L215)
+Defined in: [packages/ui/src/zoid/base.ts:215](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L215)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/ui/src/zoid/base.ts:215](https://github.com/AhaSlides-Prod
 
 > **presentationProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/base.ts:213](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L213)
+Defined in: [packages/ui/src/zoid/base.ts:213](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L213)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: [packages/ui/src/zoid/base.ts:213](https://github.com/AhaSlides-Prod
 
 > **slideProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/base.ts:216](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L216)
+Defined in: [packages/ui/src/zoid/base.ts:216](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L216)
 
 ***
 
@@ -64,7 +64,7 @@ Defined in: [packages/ui/src/zoid/base.ts:216](https://github.com/AhaSlides-Prod
 
 > **subscribeTopic**: (`options`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/base.ts:240](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L240)
+Defined in: [packages/ui/src/zoid/base.ts:240](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L240)
 
 Subscribe to a specific MQTT topic.
 
@@ -94,4 +94,4 @@ subscribeTopic({
 
 > **unsubscribeTopic**: (`topic`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/base.ts:241](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L241)
+Defined in: [packages/ui/src/zoid/base.ts:241](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L241)

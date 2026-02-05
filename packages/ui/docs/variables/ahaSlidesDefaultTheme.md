@@ -8,7 +8,7 @@
 
 > `const` **ahaSlidesDefaultTheme**: `ThemeConfig`
 
-Defined in: [packages/ui/src/theme.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/theme.ts#L17)
+Defined in: [packages/ui/src/theme.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/theme.ts#L17)
 
 Base theme configuration for Aha Slide applications using Ant Design.
 Colors are sourced from the Tailwind config to maintain design consistency.

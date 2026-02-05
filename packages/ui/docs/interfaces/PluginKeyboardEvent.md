@@ -6,7 +6,7 @@
 
 # Interface: PluginKeyboardEvent
 
-Defined in: [packages/ui/src/zoid/base.ts:123](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L123)
+Defined in: [packages/ui/src/zoid/base.ts:123](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L123)
 
 Represents a serializable subset of a KeyboardEvent.
 Used for cross-domain communication via Zoid.
@@ -17,7 +17,7 @@ Used for cross-domain communication via Zoid.
 
 > **altKey**: `boolean`
 
-Defined in: [packages/ui/src/zoid/base.ts:133](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L133)
+Defined in: [packages/ui/src/zoid/base.ts:133](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L133)
 
 Whether the Alt key was pressed
 
@@ -27,7 +27,7 @@ Whether the Alt key was pressed
 
 > **code**: `string`
 
-Defined in: [packages/ui/src/zoid/base.ts:127](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L127)
+Defined in: [packages/ui/src/zoid/base.ts:127](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L127)
 
 The physical key code of the event
 
@@ -37,7 +37,7 @@ The physical key code of the event
 
 > **ctrlKey**: `boolean`
 
-Defined in: [packages/ui/src/zoid/base.ts:129](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L129)
+Defined in: [packages/ui/src/zoid/base.ts:129](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L129)
 
 Whether the Ctrl key was pressed
 
@@ -47,7 +47,7 @@ Whether the Ctrl key was pressed
 
 > **key**: `string`
 
-Defined in: [packages/ui/src/zoid/base.ts:125](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L125)
+Defined in: [packages/ui/src/zoid/base.ts:125](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L125)
 
 The key value of the event
 
@@ -57,7 +57,7 @@ The key value of the event
 
 > **keyCode**: `number`
 
-Defined in: [packages/ui/src/zoid/base.ts:141](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L141)
+Defined in: [packages/ui/src/zoid/base.ts:141](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L141)
 
 The legacy keyCode of the event
 
@@ -67,7 +67,7 @@ The legacy keyCode of the event
 
 > **location**: `number`
 
-Defined in: [packages/ui/src/zoid/base.ts:139](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L139)
+Defined in: [packages/ui/src/zoid/base.ts:139](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L139)
 
 The location of the key on the keyboard
 
@@ -77,7 +77,7 @@ The location of the key on the keyboard
 
 > **metaKey**: `boolean`
 
-Defined in: [packages/ui/src/zoid/base.ts:135](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L135)
+Defined in: [packages/ui/src/zoid/base.ts:135](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L135)
 
 Whether the Meta key was pressed
 
@@ -87,7 +87,7 @@ Whether the Meta key was pressed
 
 > **repeat**: `boolean`
 
-Defined in: [packages/ui/src/zoid/base.ts:137](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L137)
+Defined in: [packages/ui/src/zoid/base.ts:137](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L137)
 
 Whether the event is repeating
 
@@ -97,6 +97,6 @@ Whether the event is repeating
 
 > **shiftKey**: `boolean`
 
-Defined in: [packages/ui/src/zoid/base.ts:131](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/base.ts#L131)
+Defined in: [packages/ui/src/zoid/base.ts:131](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/base.ts#L131)
 
 Whether the Shift key was pressed

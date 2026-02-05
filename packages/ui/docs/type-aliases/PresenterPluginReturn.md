@@ -8,9 +8,19 @@
 
 > **PresenterPluginReturn** = [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid/presenter.ts:119](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/ui/src/zoid/presenter.ts#L119)
+Defined in: [packages/ui/src/zoid/presenter.ts:172](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/presenter.ts#L172)
 
 ## Type Declaration
+
+### accessToken
+
+> **accessToken**: `string` \| `undefined`
+
+Access token for the current user.
+
+### currentUserProps
+
+> **currentUserProps**: `Ref`\<`Record`\<`string`, `any`\> \| `undefined`\>
 
 ### emitKeyboardEvent
 
@@ -55,6 +65,18 @@ A promise resolving to an array of objects containing key, path, and value.
 ### openUploadImageModal
 
 > **openUploadImageModal**: () => `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\> \| `undefined`
+
+### showToastError
+
+> **showToastError**: (`text`, `uniqName?`, `action?`, `options?`) => `void` \| `undefined`
+
+### showToastInfo
+
+> **showToastInfo**: (`text`, `uniqName?`, `action?`, `options?`) => `void` \| `undefined`
+
+### showToastSuccess
+
+> **showToastSuccess**: (`text`, `uniqName?`, `action?`, `options?`) => `void` \| `undefined`
 
 ### uploadImage
 

@@ -8,7 +8,7 @@
 
 > **getBucket**(`bucketName`, `__namedParameters`): `string`
 
-Defined in: [emqx.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/common/src/emqx.ts#L1)
+Defined in: [emqx.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/common/src/emqx.ts#L1)
 
 ## Parameters
 
@@ -28,7 +28,7 @@ Defined in: [emqx.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/bl
 
 #### slideVersion
 
-`number`
+`string` \| `number`
 
 ## Returns
 
