@@ -65,17 +65,17 @@
       </ul>
     </div>
 
-    <div class="debug-section keyboard-section" data-testid="canvas-keyboard">
-      <h3>Last Keyboard Event</h3>
-      <div v-if="!lastKeyboardEvent" class="no-messages">
-        Waiting for keyboard events from host...
-      </div>
-      <div v-else class="last-event">
-        {{ lastKeyboardEvent }}
-      </div>
+
+    <div class="debug-section interact-section">
+      <h3>Plugin to Host Communication</h3>
+      <button 
+        @click="sendDemoVote" 
+        class="demo-button"
+        data-testid="canvas-send-vote-button"
+      >
+        Send Vote Count (10) to Host
+      </button>
     </div>
-
-
 
   </div>
 </template>
@@ -100,6 +100,7 @@ const {
   unsubscribeTopic,
   onKeyboard,
   emitKeyboardEvent,
+  sendVoteOutcome,
   getValues,
   baseUrl,
   accessToken,
@@ -210,6 +211,18 @@ onUnmounted(() => {
     unsubscribeTopic(submitTestTopic);
   }
 });
+
+const sendDemoVote = () => {
+  if (sendVoteOutcome) {
+    console.log('[Canvas] Sending demo vote outcome to Host');
+    sendVoteOutcome({
+      voteCount: 10,
+      tooltip: 'Hello from Plugin'
+    });
+  } else {
+    console.warn('[Canvas] sendVoteOutcome action not available');
+  }
+};
 </script>
 
 <style scoped>
@@ -251,6 +264,22 @@ onUnmounted(() => {
 }
 .submit-test-section {
   border-left-color: #722ed1;
+}
+.interact-section {
+  border-left-color: #faad14;
+}
+.demo-button {
+  background: #faad14;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+.demo-button:hover {
+  opacity: 0.8;
 }
 .last-event {
   padding: 10px;

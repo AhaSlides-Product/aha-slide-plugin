@@ -75,6 +75,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param options - Additional toast options.
    */
   showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  /**
+   * Send a vote outcome (vote count and tooltip) to the presenter app.
+   * @param payload - The vote outcome data.
+   */
+  sendVoteOutcome?: (payload: { voteCount: number; tooltip?: string }) => void;
 }
 
 /**
@@ -162,6 +167,17 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    /**
+     * Action to send a vote outcome (vote count and tooltip) from the plugin iframe to the parent.
+     * @type {function}
+     * @param {object} payload - The vote outcome data.
+     * @param {number} payload.voteCount - The number of votes to display.
+     * @param {string} [payload.tooltip] - Optional tooltip text to display on hover.
+     */
+    sendVoteOutcome: {
+      type: 'function',
+      required: false,
+    },
     token: {
       type: 'string',
       required: false,
@@ -181,6 +197,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  sendVoteOutcome: ((payload: { voteCount: number; tooltip?: string }) => void) | undefined;
   /** 
    * Action to fetch values from a specific bucket and optional key from the parent application.
    * 
@@ -253,6 +270,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     showToastInfo: xprops?.showToastInfo,
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
+    sendVoteOutcome: xprops?.sendVoteOutcome,
     accessToken: xprops?.token,
   };
 }
