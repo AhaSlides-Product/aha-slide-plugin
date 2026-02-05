@@ -102,16 +102,21 @@ describe('@aha/ui - Components', () => {
     });
 
     it('should have PresenterSlidePluginIframe with correct tag', () => {
-      // Zoid components are created with zoid.create() which returns a component-like object
-      // We can check that it exists and has expected properties
+      // Zoid components use a tag for the custom element (e.g. <presenter-slide-plugin-iframe>).
+      // We assert the component exists; if the implementation exposes .tag, we assert its value.
       expect(PresenterSlidePluginIframe).toBeDefined();
-      // The tag is set during creation: 'presenter-slide-plugin-iframe'
-      // In a real environment, this would be registered as a custom element
+      const tag = (PresenterSlidePluginIframe as any).tag;
+      if (tag !== undefined) {
+        expect(tag).toBe('presenter-slide-plugin-iframe');
+      }
     });
 
     it('should have AudienceSlidePluginIframe with correct tag', () => {
       expect(AudienceSlidePluginIframe).toBeDefined();
-      // The tag is set during creation: 'audience-slide-plugin-iframe'
+      const tag = (AudienceSlidePluginIframe as any).tag;
+      if (tag !== undefined) {
+        expect(tag).toBe('audience-slide-plugin-iframe');
+      }
     });
 
     it('should allow PresenterSlidePluginIframe to be instantiated (type check)', () => {
@@ -139,21 +144,6 @@ describe('@aha/ui - Components', () => {
     it('should export useReportPlugin', () => {
       expect(useReportPlugin).toBeDefined();
       expect(typeof useReportPlugin).toBe('function');
-    });
-
-    it('should have PresenterSlidePluginIframe tag string when available', () => {
-      // Zoid components may expose .tag or similar; if so, verify consumer contract
-      const C = PresenterSlidePluginIframe as { tag?: string };
-      if (typeof C.tag === 'string') {
-        expect(C.tag).toBe('presenter-slide-plugin-iframe');
-      }
-    });
-
-    it('should have AudienceSlidePluginIframe tag string when available', () => {
-      const C = AudienceSlidePluginIframe as { tag?: string };
-      if (typeof C.tag === 'string') {
-        expect(C.tag).toBe('audience-slide-plugin-iframe');
-      }
     });
   });
 });
