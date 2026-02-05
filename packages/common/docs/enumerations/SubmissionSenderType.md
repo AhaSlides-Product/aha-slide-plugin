@@ -6,7 +6,7 @@
 
 # Enumeration: SubmissionSenderType
 
-Defined in: [types.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/common/src/types.ts#L1)
+Defined in: [types.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L1)
 
 ## Enumeration Members
 
@@ -14,7 +14,7 @@ Defined in: [types.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/b
 
 > **Audience**: `"audience"`
 
-Defined in: [types.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/common/src/types.ts#L2)
+Defined in: [types.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L2)
 
 ***
 
@@ -22,4 +22,4 @@ Defined in: [types.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/b
 
 > **Presenter**: `"presenter"`
 
-Defined in: [types.ts:3](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/common/src/types.ts#L3)
+Defined in: [types.ts:3](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L3)

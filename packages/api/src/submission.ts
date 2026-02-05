@@ -100,7 +100,7 @@ export class ApiClient {
    * @param offset
    * @returns 
    */
-  async getAudienceSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
+  async getParticipantSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
     audienceId: string,
     slideId: string,
     slideVersion: string,

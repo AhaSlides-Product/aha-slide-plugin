@@ -6,7 +6,7 @@
 
 # Interface: ReportReturn
 
-Defined in: [packages/ui/src/zoid/report.ts:79](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L79)
+Defined in: [packages/ui/src/zoid/report.ts:79](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L79)
 
 Return type for the report slide plugin hook.
 
@@ -16,7 +16,7 @@ Return type for the report slide plugin hook.
 
 > **currentLanguage**: `Ref`\<`string` \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/report.ts:81](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L81)
+Defined in: [packages/ui/src/zoid/report.ts:81](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L81)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [packages/ui/src/zoid/report.ts:81](https://github.com/AhaSlides-Pro
 
 > **openExportModalForPresentation**: (`presentation`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/report.ts:85](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L85)
+Defined in: [packages/ui/src/zoid/report.ts:85](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L85)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [packages/ui/src/zoid/report.ts:85](https://github.com/AhaSlides-Pro
 
 > **pushRoute**: (`location`, `onComplete?`, `onAbort?`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/report.ts:84](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L84)
+Defined in: [packages/ui/src/zoid/report.ts:84](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L84)
 
 ***
 
@@ -40,7 +40,7 @@ Defined in: [packages/ui/src/zoid/report.ts:84](https://github.com/AhaSlides-Pro
 
 > **replaceRoute**: (`location`, `onComplete?`, `onAbort?`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/report.ts:83](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L83)
+Defined in: [packages/ui/src/zoid/report.ts:83](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L83)
 
 ***
 
@@ -48,7 +48,7 @@ Defined in: [packages/ui/src/zoid/report.ts:83](https://github.com/AhaSlides-Pro
 
 > **token**: `Ref`\<`string` \| `undefined`\>
 
-Defined in: [packages/ui/src/zoid/report.ts:80](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L80)
+Defined in: [packages/ui/src/zoid/report.ts:80](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L80)
 
 ***
 
@@ -56,4 +56,4 @@ Defined in: [packages/ui/src/zoid/report.ts:80](https://github.com/AhaSlides-Pro
 
 > **trackGA4AndMixpanel**: (`eventName`, `payload`) => `void` \| `undefined`
 
-Defined in: [packages/ui/src/zoid/report.ts:82](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/report.ts#L82)
+Defined in: [packages/ui/src/zoid/report.ts:82](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L82)

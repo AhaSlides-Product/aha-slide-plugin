@@ -8,7 +8,7 @@
 
 > **PresenterPluginReturn** = [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid/presenter.ts:172](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/7a5cd0cf313da47e6a844ced4db8487ff81b2936/packages/ui/src/zoid/presenter.ts#L172)
+Defined in: [packages/ui/src/zoid/presenter.ts:172](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/presenter.ts#L172)
 
 ## Type Declaration
 
