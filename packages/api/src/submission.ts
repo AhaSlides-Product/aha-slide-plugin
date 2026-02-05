@@ -69,6 +69,8 @@ export class ApiClient {
    * @param slideId 
    * @param slideVersion 
    * @param type 
+   * @param limit
+   * @param offset
    * @returns 
    */
   async getSubmissions<T>({ slideId, slideVersion, type }: {
@@ -94,6 +96,8 @@ export class ApiClient {
    * @param slideId 
    * @param slideVersion 
    * @param type 
+   * @param limit
+   * @param offset
    * @returns 
    */
   async getAudienceSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
