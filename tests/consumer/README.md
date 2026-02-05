@@ -70,6 +70,11 @@ describe('useSync', () => {
 });
 ```
 
+## Documentation (Phase 5)
+
+- **[TEST_PATTERNS.md](./docs/TEST_PATTERNS.md)** – Patterns used across consumer tests
+- **[ADDING_TESTS.md](./docs/ADDING_TESTS.md)** – How to add new consumer tests
+
 ## See Also
 
 - [Full Consumer Test Plan](../CONSUMER_TEST_PLAN.md) - Detailed planning document
