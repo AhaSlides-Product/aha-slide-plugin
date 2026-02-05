@@ -74,14 +74,42 @@ export class ApiClient {
   async getSubmissions<T>({ slideId, slideVersion, type }: {
     slideId: string,
     slideVersion?: string,
-    type?: string
-  }): Promise<(SubmissionPayload<T> & { id: string })[]> {
+    type?: string,
+  }, { limit, offset }: { limit?: number, offset?: number } = {}): Promise<(SubmissionPayload<T> & { id: string })[]> {
     const params = new URLSearchParams();
     params.append("slideId", slideId);
     if (slideVersion) params.append("slideVersion", slideVersion);
     if (type) params.append("type", type);
+    if (limit !== undefined) params.append("limit", limit.toString());
+    if (offset !== undefined) params.append("offset", offset.toString());
 
     const url = `${this.baseUrl}/api/submissions?${params.toString()}`;
+    const result = await this.fetchUrl(url);
+    return result || [];
+  }
+
+  /**
+   * List submissions of an audience
+   * @param audienceId 
+   * @param slideId 
+   * @param slideVersion 
+   * @param type 
+   * @returns 
+   */
+  async getAudienceSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
+    audienceId: string,
+    slideId: string,
+    slideVersion: string,
+    type?: string,
+  }, { limit, offset }: { limit?: number, offset?: number } = {}): Promise<(SubmissionPayload<T> & { id: string })[]> {
+    const params = new URLSearchParams();
+    params.append("slideId", slideId);
+    if (slideVersion) params.append("slideVersion", slideVersion);
+    if (type) params.append("type", type);
+    if (limit !== undefined) params.append("limit", limit.toString());
+    if (offset !== undefined) params.append("offset", offset.toString());
+
+    const url = `${this.baseUrl}/api/audiences/${audienceId}/submissions?${params.toString()}`;
     const result = await this.fetchUrl(url);
     return result || [];
   }
