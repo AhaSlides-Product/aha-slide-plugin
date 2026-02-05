@@ -171,14 +171,14 @@ describe('@aha/ui - Types', () => {
       expect(typeof props.onHeightChange).toBe('function');
     });
 
-    it('should have optional trackGA4AndMixpanel, changeRoute, pushRoute', () => {
+    it('should have optional trackGA4AndMixpanel, replaceRoute, pushRoute', () => {
       const props: ReportProps = {
         trackGA4AndMixpanel: () => {},
-        changeRoute: () => {},
+        replaceRoute: () => {},
         pushRoute: () => {},
       };
       expect(typeof props.trackGA4AndMixpanel).toBe('function');
-      expect(typeof props.changeRoute).toBe('function');
+      expect(typeof props.replaceRoute).toBe('function');
       expect(typeof props.pushRoute).toBe('function');
     });
   });
@@ -189,8 +189,9 @@ describe('@aha/ui - Types', () => {
         token: { value: undefined } as any,
         currentLanguage: { value: undefined } as any,
         trackGA4AndMixpanel: undefined,
-        changeRoute: undefined,
+        replaceRoute: undefined,
         pushRoute: undefined,
+        openExportModalForPresentation: undefined,
       };
       expect(ret.token).toBeDefined();
       expect(ret.currentLanguage).toBeDefined();
@@ -267,18 +268,20 @@ describe('@aha/ui - Types', () => {
     it('should have optional audience-specific properties', () => {
       const props: AudienceSlidePluginProps = {
         url: 'https://example.com',
-        audienceName: 'Alice',
-        audienceEmoji: '👍',
-        audienceId: 'aud-123',
-        audienceEmail: 'alice@example.com',
-        audienceTeam: 'Team A',
+        audience: {
+          audienceName: 'Alice',
+          audienceEmoji: '👍',
+          audienceId: 'aud-123',
+          audienceEmail: 'alice@example.com',
+          audienceTeam: 'Team A',
+        },
         slideAttributes: { custom: 'data' },
       };
-      expect(props.audienceName).toBe('Alice');
-      expect(props.audienceEmoji).toBe('👍');
-      expect(props.audienceId).toBe('aud-123');
-      expect(props.audienceEmail).toBe('alice@example.com');
-      expect(props.audienceTeam).toBe('Team A');
+      expect(props.audience?.audienceName).toBe('Alice');
+      expect(props.audience?.audienceEmoji).toBe('👍');
+      expect(props.audience?.audienceId).toBe('aud-123');
+      expect(props.audience?.audienceEmail).toBe('alice@example.com');
+      expect(props.audience?.audienceTeam).toBe('Team A');
       expect(props.slideAttributes).toEqual({ custom: 'data' });
     });
 
