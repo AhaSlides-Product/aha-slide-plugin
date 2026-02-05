@@ -96,6 +96,13 @@ npm run test:consumer:coverage
 - ✅ **uploadImage** – returns Promise resolving to object
 - ✅ **autoReportHeight** – cleanup function, onHeightChange behavior
 
+### Phase 3: Components & Types ✅
+
+- ✅ **AhaIcon** – rendering, props (size, width, height, class), placeholder
+- ✅ **Zoid Components** – PresenterSlidePluginIframe, AudienceSlidePluginIframe exports
+- ✅ **UI Types** – ImageUploadResult, UseSlidePluginOptions, SlidePluginProps, etc.
+- ✅ **Backend Utils Types** – SubmissionResult, CountTotalItem, CountUniqueItem, SyncItem
+
 ## 🧪 Test Examples
 
 ### Example: Testing Imports
