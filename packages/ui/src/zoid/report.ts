@@ -23,7 +23,7 @@ export interface ReportProps {
      * @param payload - The event payload to track.
      */
     trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
-    changeRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    replaceRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     openExportModalForPresentation?: (presentation: any) => void;
 }
@@ -58,7 +58,7 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
-        changeRoute: {
+        replaceRoute: {
             type: 'function',
             required: false,
         },
@@ -80,7 +80,7 @@ export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
     trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
-    changeRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    replaceRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     openExportModalForPresentation: ((presentation: any) => void) | undefined;
 }
@@ -97,7 +97,7 @@ export function useReportPlugin(
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
     const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
-    const changeRoute = (window as any).xprops?.changeRoute;
+    const replaceRoute = (window as any).xprops?.replaceRoute;
     const pushRoute = (window as any).xprops?.pushRoute;
     const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
 
@@ -126,7 +126,7 @@ export function useReportPlugin(
         token,
         currentLanguage,
         trackGA4AndMixpanel,
-        changeRoute,
+        replaceRoute,
         pushRoute,
         openExportModalForPresentation,
     };
