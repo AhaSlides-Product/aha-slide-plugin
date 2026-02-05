@@ -26,6 +26,8 @@ export interface ReportProps {
     replaceRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     openExportModalForPresentation?: (presentation: any) => void;
+    locale?: string;
+    translationMap?: Record<string, string>;
 }
 
 /**
@@ -70,6 +72,15 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
+        locale: {
+            type: 'string',
+            required: false,
+            defaultValue: 'en',
+        },
+        translationMap: {
+            type: 'object',
+            required: false,
+        },
     },
 });
 
@@ -83,6 +94,8 @@ export interface ReportReturn {
     replaceRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     openExportModalForPresentation: ((presentation: any) => void) | undefined;
+    locale: Ref<string | undefined>;
+    translationMap: Ref<Record<string, string> | undefined>;
 }
 
 /**
@@ -100,6 +113,8 @@ export function useReportPlugin(
     const replaceRoute = (window as any).xprops?.replaceRoute;
     const pushRoute = (window as any).xprops?.pushRoute;
     const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
+    const locale = ref<string | undefined>((window as any).xprops?.locale);
+    const translationMap = ref<Record<string, string> | undefined>((window as any).xprops?.translationMap);
 
     onMounted(() => {
         let cleanup = () => { };
@@ -129,5 +144,7 @@ export function useReportPlugin(
         replaceRoute,
         pushRoute,
         openExportModalForPresentation,
+        locale,
+        translationMap,
     };
 }
