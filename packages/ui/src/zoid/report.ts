@@ -23,8 +23,11 @@ export interface ReportProps {
      * @param payload - The event payload to track.
      */
     trackGA4AndMixpanel?: (eventName: string, payload: any) => void;
-    changeRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    replaceRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
     pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
+    openExportModalForPresentation?: (presentation: any) => void;
+    locale?: string;
+    translationMap?: Record<string, string>;
 }
 
 /**
@@ -57,12 +60,25 @@ export const ReportIframe = zoid.create({
             type: 'function',
             required: false,
         },
-        changeRoute: {
+        replaceRoute: {
             type: 'function',
             required: false,
         },
         pushRoute: {
             type: 'function',
+            required: false,
+        },
+        openExportModalForPresentation: {
+            type: 'function',
+            required: false,
+        },
+        locale: {
+            type: 'string',
+            required: false,
+            defaultValue: 'en',
+        },
+        translationMap: {
+            type: 'object',
             required: false,
         },
     },
@@ -75,8 +91,11 @@ export interface ReportReturn {
     token: Ref<string | undefined>;
     currentLanguage: Ref<string | undefined>;
     trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
-    changeRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    replaceRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
     pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
+    openExportModalForPresentation: ((presentation: any) => void) | undefined;
+    locale: Ref<string | undefined>;
+    translationMap: Ref<Record<string, string> | undefined>;
 }
 
 /**
@@ -91,8 +110,11 @@ export function useReportPlugin(
     const token = ref<string | undefined>((window as any).xprops?.token);
     const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
     const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
-    const changeRoute = (window as any).xprops?.changeRoute;
+    const replaceRoute = (window as any).xprops?.replaceRoute;
     const pushRoute = (window as any).xprops?.pushRoute;
+    const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
+    const locale = ref<string | undefined>((window as any).xprops?.locale);
+    const translationMap = ref<Record<string, string> | undefined>((window as any).xprops?.translationMap);
 
     onMounted(() => {
         let cleanup = () => { };
@@ -119,7 +141,10 @@ export function useReportPlugin(
         token,
         currentLanguage,
         trackGA4AndMixpanel,
-        changeRoute,
+        replaceRoute,
         pushRoute,
+        openExportModalForPresentation,
+        locale,
+        translationMap,
     };
 }

@@ -8,7 +8,6 @@
 
 - [CountTotalItem](interfaces/CountTotalItem.md)
 - [CountUniqueItem](interfaces/CountUniqueItem.md)
-- [SubmissionRequest](interfaces/SubmissionRequest.md)
 - [SubmissionResult](interfaces/SubmissionResult.md)
 - [SyncItem](interfaces/SyncItem.md)
 
@@ -16,4 +15,5 @@
 
 - [CountTotal](type-aliases/CountTotal.md)
 - [CountUnique](type-aliases/CountUnique.md)
+- [SubmissionRequest](type-aliases/SubmissionRequest.md)
 - [Sync](type-aliases/Sync.md)

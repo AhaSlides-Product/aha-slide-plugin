@@ -26,6 +26,31 @@ export class PresenterPage {
     await iframeLocator.waitFor({ state: 'visible', timeout: 25000 });
   }
 
+  async getSettingsPresentationProps(): Promise<Locator> {
+    return this.page.getByTestId('settings-presentation-props');
+  }
 
+  async getSettingsSlideDetailsProps(): Promise<Locator> {
+    return this.page.getByTestId('settings-slide-details-props');
+  }
 
+  async getSettingsSlideAttributes(): Promise<Locator> {
+    return this.page.getByTestId('settings-slide-attributes');
+  }
+
+  async getCanvasPresentationDetailsProps(): Promise<Locator> {
+    return this.page.getByTestId('canvas-presentation-details-props');
+  }
+
+  async getCanvasSlideDetailsProps(): Promise<Locator> {
+    return this.page.getByTestId('canvas-slide-details-props');
+  }
+
+  async getCanvasSlideAttributes(): Promise<Locator> {
+    return this.page.getByTestId('canvas-slide-attributes');
+  }
+
+  async getCanvasMqtt(): Promise<Locator> {
+    return this.page.getByTestId('canvas-mqtt');
+  }
 }

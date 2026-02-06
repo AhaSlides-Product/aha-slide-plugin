@@ -8,4 +8,4 @@
 
 > **Sync** = [`SyncItem`](../interfaces/SyncItem.md)[]
 
-Defined in: [SubmissionResult.ts:40](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/backend-utils/src/SubmissionResult.ts#L40)
+Defined in: [SubmissionResult.ts:40](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/backend-utils/src/SubmissionResult.ts#L40)

@@ -6,7 +6,7 @@
 
 # Interface: SubmissionPayload\<T\>
 
-Defined in: [submission.ts:1](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L1)
+Defined in: common/dist/types/types.d.ts:5
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [submission.ts:1](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **attributes**: `T`
 
-Defined in: [submission.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L6)
+Defined in: common/dist/types/types.d.ts:12
 
 ***
 
@@ -28,7 +28,23 @@ Defined in: [submission.ts:6](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **presentationId**: `string` \| `number`
 
-Defined in: [submission.ts:5](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L5)
+Defined in: common/dist/types/types.d.ts:9
+
+***
+
+### senderId
+
+> **senderId**: `string`
+
+Defined in: common/dist/types/types.d.ts:10
+
+***
+
+### senderType
+
+> **senderType**: `SubmissionSenderType`
+
+Defined in: common/dist/types/types.d.ts:11
 
 ***
 
@@ -36,7 +52,7 @@ Defined in: [submission.ts:5](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **slideId**: `string` \| `number`
 
-Defined in: [submission.ts:2](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L2)
+Defined in: common/dist/types/types.d.ts:6
 
 ***
 
@@ -44,7 +60,7 @@ Defined in: [submission.ts:2](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **slideVersion**: `string` \| `number`
 
-Defined in: [submission.ts:3](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L3)
+Defined in: common/dist/types/types.d.ts:7
 
 ***
 
@@ -52,4 +68,4 @@ Defined in: [submission.ts:3](https://github.com/AhaSlides-Product/aha-slide-plu
 
 > **type**: `string`
 
-Defined in: [submission.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/5e374373abd8385ebf5d75eb0914a8916e99b31e/packages/api/src/submission.ts#L4)
+Defined in: common/dist/types/types.d.ts:8

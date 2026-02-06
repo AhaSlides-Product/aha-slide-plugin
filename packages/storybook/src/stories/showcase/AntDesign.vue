@@ -7,23 +7,97 @@
       <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
     </div>
 
+    <!-- Developer Guide -->
+    <div class="mb-10 p-6 bg-white rounded-xl shadow-xs border border-base-20">
+      <h2 class="text-2xl font-bold mb-6 text-base-100 flex items-center gap-2">
+        <span>📚</span> Developer Guide
+      </h2>
+
+      <div class="space-y-8">
+        <!-- Setup -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">Setup</h3>
+          <p class="text-base-70 mb-3">To use the AhaSlides custom Ant Design extensions (like extra sizes, colors), you need to import the CSS file.</p>
+          <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80 overflow-x-auto">
+            <div><span class="text-primary-80">import</span> <span class="text-emerald-70">'@aha/ui/ahaslides-antd-extensions.css'</span>;</div>
+          </div>
+        </div>
+
+        <!-- Usage -->
+        <div>
+          <h3 class="font-semibold text-lg text-base-90 mb-3 border-b border-base-10 pb-2">Usage</h3>
+          <p class="text-base-70 mb-3">Apply utility classes to Ant Design components to use extended styles.</p>
+          <div class="bg-base-5 p-4 rounded-lg border border-base-10 font-mono text-sm text-base-80">
+            &lt;<span class="text-primary-90">a-button</span> <span class="text-purple-60">type</span>=<span class="text-emerald-70">"primary"</span> <span class="text-purple-60">class</span>=<span class="text-emerald-70">"ant-btn-xl"</span>&gt;Extra Large Button&lt;/<span class="text-primary-90">a-button</span>&gt;
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Component Categories -->
     <a-space direction="vertical" size="large" class="w-full">
       
       <!-- GENERAL -->
       <ComponentSection title="General" description="Basic UI elements">
         <ComponentDemo title="Button" :span="24">
-          <a-space wrap>
-            <a-button type="primary">Primary</a-button>
-            <a-button>Default</a-button>
-            <a-button type="dashed">Dashed</a-button>
-            <a-button type="text">Text</a-button>
-            <a-button type="link">Link</a-button>
-            <a-button danger>Danger</a-button>
-            <a-button type="primary" disabled>Disabled</a-button>
-            <a-button type="primary" loading>Loading</a-button>
-            <a-button type="primary" size="large">Large</a-button>
-            <a-button type="primary" size="small">Small</a-button>
+          <a-space direction="vertical" class="w-full" size="middle">
+            <!-- Types -->
+            <div>
+              <a-typography-title :level="5">Types</a-typography-title>
+              <a-space wrap>
+                <a-button type="primary">Primary</a-button>
+                <a-button>Default</a-button>
+                <a-button type="dashed">Dashed</a-button>
+                <a-button type="text">Text</a-button>
+                <a-button type="link">Link</a-button>
+              </a-space>
+            </div>
+
+            <!-- Sizes -->
+            <div>
+              <a-typography-title :level="5">Sizes</a-typography-title>
+              <a-space wrap align="center">
+                <a-button type="primary" class="ant-btn-xl">Extra Large</a-button>
+                <a-button type="primary" size="large">Large</a-button>
+                <a-button type="primary">Default</a-button>
+                <a-button type="primary" size="small">Small</a-button>
+              </a-space>
+            </div>
+
+            <!-- States -->
+            <div>
+              <a-typography-title :level="5">States</a-typography-title>
+              <a-space wrap>
+                <a-button type="primary" loading>Loading</a-button>
+                <a-button type="primary" disabled>Disabled</a-button>
+                <a-button danger>Danger Default</a-button>
+                <a-button type="primary" danger>Danger Primary</a-button>
+                <a-button type="text" danger>Danger Text</a-button>
+                <a-button type="dashed" danger>Danger Dashed</a-button>
+              </a-space>
+            </div>
+
+            <!-- Shapes -->
+            <div>
+              <a-typography-title :level="5">Shapes</a-typography-title>
+              <a-space wrap>
+                <a-button type="primary" shape="circle">A</a-button>
+                <a-button type="primary" shape="round">Round Button</a-button>
+                <a-button shape="circle">B</a-button>
+                <a-button shape="round">Round Default</a-button>
+              </a-space>
+            </div>
+
+            <!-- Ghost -->
+            <div class="p-4 bg-gray-400 rounded">
+              <a-typography-title :level="5" class="!text-white">Ghost</a-typography-title>
+              <a-space wrap>
+                <a-button type="primary" ghost>Primary</a-button>
+                <a-button ghost>Default</a-button>
+                <a-button type="dashed" ghost>Dashed</a-button>
+                <a-button type="primary" danger ghost>Danger</a-button>
+              </a-space>
+            </div>
           </a-space>
         </ComponentDemo>
 
@@ -447,6 +521,7 @@
 </template>
 
 <script setup lang="ts">
+import '@aha/ui/ahaslides-antd-extensions.css'
 import { ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
 

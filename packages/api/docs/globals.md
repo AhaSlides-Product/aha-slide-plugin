@@ -4,6 +4,10 @@
 
 # @aha/api
 
+## Enumerations
+
+- [SlideType](enumerations/SlideType.md)
+
 ## Classes
 
 - [ApiClient](classes/ApiClient.md)
