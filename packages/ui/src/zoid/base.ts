@@ -1,4 +1,5 @@
 import { ref, onMounted, type Ref } from 'vue';
+import { throttle } from '../utils';
 
 /**
  * Common properties shared between presenter and audience slide plugins.
@@ -142,6 +143,29 @@ export interface PluginKeyboardEvent {
 }
 
 /**
+ * Reports the document height to the parent application.
+ */
+export function reportHeight() {
+  if (typeof window === 'undefined') return;
+
+  const xprops = (window as any).xprops;
+  if (!xprops || typeof xprops.onHeightChange !== 'function') {
+    return;
+  }
+
+  const app = document.getElementById('app');
+  const height = Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight,
+    app ? app.scrollHeight : 0
+  );
+  console.log('[SlidePlugin] Reporting height:', height);
+  xprops.onHeightChange(height);
+}
+
+/**
  * Automatically reports the height of the document body to the parent via zoid xprops.
  * This should be called in the child application (iframe).
  * 
@@ -156,6 +180,10 @@ export function autoReportHeight() {
     return () => { };
   }
 
+  const throtledOnHeightChange = throttle((height: number) => {
+    xprops.onHeightChange(height);
+  }, 300);
+
   const sendHeight = () => {
     const app = document.getElementById('app');
     const height = Math.max(
@@ -166,7 +194,7 @@ export function autoReportHeight() {
       app ? app.scrollHeight : 0
     );
     console.log('[SlidePlugin] Reporting height:', height);
-    xprops.onHeightChange(height);
+    throtledOnHeightChange(height);
   };
 
   const observer = new ResizeObserver(() => sendHeight());
@@ -215,6 +243,10 @@ export interface BaseSlidePluginReturn {
   presentationLighterColorPaletteProps: Ref<string[] | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   baseUrl: Ref<string | undefined>;
+  /** 
+   * Manually trigger a report of the current content height to the parent.
+   */
+  reportHeight: () => void;
   /** 
    * Subscribe to a specific MQTT topic.
    * 
@@ -303,6 +335,7 @@ export function useBaseSlidePlugin(
     subscribeTopic,
     unsubscribeTopic,
     audienceSendCountingUniqueAction,
+    reportHeight,
     xprops,
   };
 }

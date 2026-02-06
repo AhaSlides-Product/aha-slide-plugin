@@ -243,5 +243,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     updateAudienceData,
     openPluginModal,
     closePluginModal,
+    reportHeight: baseHook.reportHeight,
   };
 }

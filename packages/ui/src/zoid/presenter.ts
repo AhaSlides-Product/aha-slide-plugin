@@ -299,6 +299,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     sendVoteOutcome: xprops?.sendVoteOutcome,
     openPluginModal: xprops?.openPluginModal,
     closePluginModal: xprops?.closePluginModal,
+    reportHeight: baseHook.reportHeight,
     accessToken: xprops?.token,
   };
 }
