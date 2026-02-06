@@ -75,6 +75,15 @@
       >
         Send Vote Count (10) to Host
       </button>
+
+      <button 
+        @click="openModalDemo" 
+        class="demo-button modal-demo-button"
+        data-testid="canvas-open-modal-button"
+        style="margin-left: 10px;"
+      >
+        Open Modal Demo
+      </button>
     </div>
 
   </div>
@@ -104,6 +113,7 @@ const {
   getValues,
   baseUrl,
   accessToken,
+  openPluginModal,
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
@@ -223,6 +233,15 @@ const sendDemoVote = () => {
     console.warn('[Canvas] sendVoteOutcome action not available');
   }
 };
+
+const openModalDemo = () => {
+  if (openPluginModal) {
+    console.log('[Canvas] Opening plugin modal');
+    openPluginModal('canvas-modal');
+  } else {
+    console.warn('[Canvas] openPluginModal action not available');
+  }
+};
 </script>
 
 <style scoped>
@@ -280,6 +299,9 @@ const sendDemoVote = () => {
 }
 .demo-button:hover {
   opacity: 0.8;
+}
+.modal-demo-button {
+  background: #1890ff;
 }
 .last-event {
   padding: 10px;

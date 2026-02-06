@@ -80,6 +80,15 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param payload - The vote outcome data.
    */
   sendVoteOutcome?: (payload: { voteCount: number; tooltip?: string }) => void;
+  /**
+   * Open a full-screen modal with a custom path.
+   * @param path - The custom path for the modal iframe.
+   */
+  openPluginModal?: (path?: string) => void;
+  /**
+   * Close the currently open plugin modal.
+   */
+  closePluginModal?: () => void;
 }
 
 /**
@@ -178,6 +187,14 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    openPluginModal: {
+      type: 'function',
+      required: false,
+    },
+    closePluginModal: {
+      type: 'function',
+      required: false,
+    },
     token: {
       type: 'string',
       required: false,
@@ -198,6 +215,15 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   sendVoteOutcome: ((payload: { voteCount: number; tooltip?: string }) => void) | undefined;
+  /**
+   * Open a full-screen modal with a custom path.
+   * @param path - The custom path for the modal iframe.
+   */
+  openPluginModal: ((path?: string) => void) | undefined;
+  /**
+   * Close the currently open plugin modal.
+   */
+  closePluginModal: (() => void) | undefined;
   /** 
    * Action to fetch values from a specific bucket and optional key from the parent application.
    * 
@@ -271,6 +297,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
     sendVoteOutcome: xprops?.sendVoteOutcome,
+    openPluginModal: xprops?.openPluginModal,
+    closePluginModal: xprops?.closePluginModal,
     accessToken: xprops?.token,
   };
 }
