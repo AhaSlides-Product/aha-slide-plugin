@@ -6,7 +6,9 @@
       <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
       
     </div>
-    <a-button type="primary" class="ant-btn-xl">Extra large button</a-button>
+    <a-button type="primary" class="ant-btn-xl">
+      <IconThumbsUp />
+    </a-button>
 
     <!-- Navigation -->
       <div class="mb-6">
@@ -491,7 +493,7 @@ import {
 } from '@ant-design/icons-vue';
 import ComponentSection from '../components/ComponentSection.vue';
 import ComponentDemo from '../components/ComponentDemo.vue';
-
+import IconThumbsUp from '~icons/aha/aha-thumbs-up';
 
 // Enable scrolling for this page
 onMounted(() => {
