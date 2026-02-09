@@ -24,7 +24,10 @@ runs:
 
     - name: Build Report App
       shell: bash
-      run: npm run build-only -w domains/report --mode ${{ inputs.mode }}
+      run: npm run build -- \
+        --filter=@aha/ui \
+        --filter=aha-report \
+        -- --mode {{ inputs.mode }}
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
