@@ -64,7 +64,7 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
   /**
    * Open a full-screen modal in the audience app.
    */
-  openPluginModal?: (path?: string) => void;
+  openPluginModal?: (path?: string, data?: any) => void;
   /**
    * Close the currently open plugin modal in the audience app.
    */
@@ -186,7 +186,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmail?: string;
     audienceEmoji?: string;
   }) => void) | undefined;
-  openPluginModal: ((path?: string) => void) | undefined;
+  openPluginModal: ((path?: string, data?: any) => void) | undefined;
   closePluginModal: (() => void) | undefined;
 } {
   // Audience-specific reactive refs
@@ -243,5 +243,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     updateAudienceData,
     openPluginModal,
     closePluginModal,
+    reportHeight: baseHook.reportHeight,
   };
 }

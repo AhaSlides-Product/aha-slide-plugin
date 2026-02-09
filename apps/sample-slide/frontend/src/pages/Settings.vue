@@ -77,6 +77,18 @@
         <a-button danger @click="showToastError?.('Error toast from plugin', 'plugin-error')">Error</a-button>
       </a-space>
     </div>
+
+    <div class="debug-section">
+      <h3>Height Change Test (Long Select)</h3>
+      <a-select v-model:value="selectedTestValue" placeholder="Select to test height change" style="width: 100%">
+        <a-select-option v-for="i in 50" :key="i" :value="'Option ' + i">
+          Option {{ i }} - This is a very long option text to test if it affects anything else as well.
+        </a-select-option>
+      </a-select>
+      <div style="margin-top: 10px;">
+        <a-button type="primary" @click="handleManualReportHeight">Trigger Manual Height Report</a-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -88,10 +100,17 @@ import { useSlideImage } from '../composables/useSlideImage';
 import { EditOutlined } from '@ant-design/icons-vue';
 
 const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError
+  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
+
+const selectedTestValue = ref('');
+
+const handleManualReportHeight = () => {
+  reportHeight();
+  showToastInfo?.('Manual height report triggered', 'manual-height-report');
+};
 
 const { imageUrl } = useSlideImage(slideId);
 

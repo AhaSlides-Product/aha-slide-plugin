@@ -3,6 +3,7 @@ import Canvas from '../pages/Canvas.vue'
 import Settings from '../pages/Settings.vue'
 import Audience from '../pages/Audience.vue'
 import AudienceModal from '../pages/AudienceModal.vue'
+import CanvasModal from '../pages/CanvasModal.vue'
 import ComponentsShowcase from '../pages/AntDesignComponentsShowcase.vue'
 import IconsShowcase from '../pages/IconsShowcase.vue'
 
@@ -30,6 +31,11 @@ const routes = [
         path: '/:type/audience-modal/:slideId',
         name: 'AudienceModal',
         component: AudienceModal
+    },
+    {
+        path: '/:type/:slideId/canvas-modal',
+        name: 'CanvasModal',
+        component: CanvasModal
     },
     {
         path: '/components',
