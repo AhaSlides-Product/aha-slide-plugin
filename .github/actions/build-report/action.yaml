@@ -27,7 +27,7 @@ runs:
       run: npm run build -- \
         --filter=@aha/ui \
         --filter=aha-report \
-        -- --mode {{ inputs.mode }}
+        -- --mode ${{ inputs.mode }}
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
