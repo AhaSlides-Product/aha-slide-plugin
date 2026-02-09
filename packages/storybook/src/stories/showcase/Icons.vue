@@ -330,6 +330,7 @@ import IconAhaWallet from '~icons/aha/aha-wallet';
 import IconAhaWarningCircle from '~icons/aha/aha-warning-circle';
 import IconAhaWhatsappLogo from '~icons/aha/aha-whatsapp-logo';
 import IconAhaXCircle from '~icons/aha/aha-x-circle';
+import IconAhaXSquare from '~icons/aha/aha-x-square';
 import IconAhaX from '~icons/aha/aha-x';
 
 // Search state
@@ -522,6 +523,7 @@ const icons = ref([
   { name: 'aha-warning-circle', component: IconAhaWarningCircle, displayName: 'WarningCircle' },
   { name: 'aha-whatsapp-logo', component: IconAhaWhatsappLogo, displayName: 'WhatsappLogo' },
   { name: 'aha-x-circle', component: IconAhaXCircle, displayName: 'XCircle' },
+  { name: 'aha-x-square', component: IconAhaXSquare, displayName: 'XSquare' },
   { name: 'aha-x', component: IconAhaX, displayName: 'X' },
 ]);
 
