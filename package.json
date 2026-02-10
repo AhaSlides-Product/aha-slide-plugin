@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "build:report:staging": "turbo run build:report:staging --filter=aha-report --filter=@aha/ui",
     "clean": "turbo run clean && rm -rf .turbo node_modules/.cache",
     "test": "turbo run test",
     "docs": "turbo run docs",
