@@ -8,7 +8,7 @@
 
 > **PresenterPluginReturn** = [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid/presenter.ts:172](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/presenter.ts#L172)
+Defined in: [packages/ui/src/zoid/presenter.ts:220](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/presenter.ts#L220)
 
 ## Type Declaration
 
@@ -17,6 +17,12 @@ Defined in: [packages/ui/src/zoid/presenter.ts:172](https://github.com/AhaSlides
 > **accessToken**: `string` \| `undefined`
 
 Access token for the current user.
+
+### closePluginModal
+
+> **closePluginModal**: () => `void` \| `undefined`
+
+Close the currently open plugin modal.
 
 ### currentUserProps
 
@@ -62,9 +68,37 @@ A promise resolving to an array of objects containing key, path, and value.
 
 > **openEditImageModal**: (`currentImageUrl`) => `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\> \| `undefined`
 
+### openPluginModal
+
+> **openPluginModal**: (`path?`) => `void` \| `undefined`
+
+Open a full-screen modal with a custom path.
+
+#### Param
+
+The custom path for the modal iframe.
+
 ### openUploadImageModal
 
 > **openUploadImageModal**: () => `Promise`\<[`ImageUploadResult`](../interfaces/ImageUploadResult.md)\> \| `undefined`
+
+### setSubmissionCount
+
+> **setSubmissionCount**: (`payload`) => `void` \| `undefined`
+
+### showConfirmModal
+
+> **showConfirmModal**: (`payload`) => `Promise`\<`boolean`\> \| `undefined`
+
+Show a confirm modal in the parent app.
+
+#### Param
+
+The confirm modal data.
+
+#### Returns
+
+A promise resolving to a boolean indicating whether the user confirmed.
 
 ### showToastError
 

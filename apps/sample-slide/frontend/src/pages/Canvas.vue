@@ -84,6 +84,15 @@
       >
         Open Modal Demo
       </button>
+
+      <button 
+        @click="showConfirm" 
+        class="demo-button modal-demo-button"
+        data-testid="canvas-show-confirm-button"
+        style="margin-left: 10px;"
+      >
+        Show Confirm Demo
+      </button>
     </div>
 
   </div>
@@ -114,6 +123,7 @@ const {
   baseUrl,
   accessToken,
   openPluginModal,
+  showConfirmModal,
 } = usePresenterPlugin();
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
@@ -242,6 +252,18 @@ const openModalDemo = () => {
     console.warn('[Canvas] openPluginModal action not available');
   }
 };
+
+const showConfirm = async () => {
+  const confirm = await showConfirmModal?.({
+    title: 'Sample confirm',
+    content: 'This is a sample confirm modal',
+    okText: 'OK',
+    cancelText: 'Cancel',
+    variant: 'danger'
+  })
+  console.log('Confirm:', confirm);
+}
+
 </script>
 
 <style scoped>

@@ -8,7 +8,7 @@
 
 > `const` **emitActionPlugin**: `Plugin`
 
-Defined in: [packages/ui/src/tracking.ts:261](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/tracking.ts#L261)
+Defined in: [packages/ui/src/tracking.ts:261](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/tracking.ts#L261)
 
 Vue 3 Plugin to register the emit-action directive
 

@@ -88,6 +88,10 @@
       <div style="margin-top: 10px;">
         <a-button type="primary" @click="handleManualReportHeight">Trigger Manual Height Report</a-button>
       </div>
+
+      <div style="margin-top: 10px;">
+        <a-button type="primary" @click="showConfirm">Show Confim Modal</a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -99,8 +103,12 @@ import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { EditOutlined } from '@ant-design/icons-vue';
 
-const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight
+const { 
+  presentationProps, 
+  presentationColorPaletteProps, 
+  presentationLighterColorPaletteProps, 
+  slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
+  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight, showConfirmModal
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -195,6 +203,17 @@ const debouncedUpdate = debounce((newGreeting: string) => {
     upsertSlideAttributeAction({ slideId: slideId.value, attributeKey: 'greeting', attributeValue: newGreeting })
   }
 }, 500);
+
+const showConfirm = async () => {
+  const confirm = await showConfirmModal?.({
+    title: 'Sample confirm',
+    content: 'This is a sample confirm modal',
+    okText: 'OK',
+    cancelText: 'Cancel',
+    variant: 'danger'
+  })
+  console.log('Confirm:', confirm);
+}
 
 watch(slideGreeting, (newGreeting) => {
   debouncedUpdate(newGreeting);

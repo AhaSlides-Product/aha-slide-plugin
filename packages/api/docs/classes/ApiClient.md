@@ -6,7 +6,7 @@
 
 # Class: ApiClient
 
-Defined in: [api/src/submission.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L4)
+Defined in: [api/src/submission.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L4)
 
 ## Constructors
 
@@ -14,7 +14,7 @@ Defined in: [api/src/submission.ts:4](https://github.com/AhaSlides-Product/aha-s
 
 > **new ApiClient**(`baseUrl`, `accessToken?`): `ApiClient`
 
-Defined in: [api/src/submission.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L10)
+Defined in: [api/src/submission.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L10)
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: [api/src/submission.ts:10](https://github.com/AhaSlides-Product/aha-
 
 > **deleteSubmission**(`submissionId`): `Promise`\<`Response`\>
 
-Defined in: [api/src/submission.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L50)
+Defined in: [api/src/submission.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L50)
 
 This API is used by presenter to delete a submission.
 
@@ -56,7 +56,7 @@ This API is used by presenter to delete a submission.
 
 > **fetchUrl**(`url`, `options?`): `Promise`\<`any`\>
 
-Defined in: [api/src/submission.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L17)
+Defined in: [api/src/submission.ts:17](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L17)
 
 #### Parameters
 
@@ -78,7 +78,7 @@ Defined in: [api/src/submission.ts:17](https://github.com/AhaSlides-Product/aha-
 
 > **getParticipantSubmissions**\<`T`\>(`audienceId`, `slideId`): `Promise`\<[`SubmissionPayload`](../interfaces/SubmissionPayload.md)\<`T`\> & `object`[]\>
 
-Defined in: [api/src/submission.ts:103](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L103)
+Defined in: [api/src/submission.ts:103](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L103)
 
 List submissions of an audience
 
@@ -128,7 +128,7 @@ List submissions of an audience
 
 > **getSubmissions**\<`T`\>(`slideId`, `slideVersion`): `Promise`\<[`SubmissionPayload`](../interfaces/SubmissionPayload.md)\<`T`\> & `object`[]\>
 
-Defined in: [api/src/submission.ts:76](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L76)
+Defined in: [api/src/submission.ts:76](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L76)
 
 List by slideId with optional slideVersion and type (query params)
 
@@ -174,7 +174,7 @@ List by slideId with optional slideVersion and type (query params)
 
 > **sendLiveSubmission**\<`T`\>(`slideType`, `payload`): `Promise`\<`Response`\>
 
-Defined in: [api/src/submission.ts:36](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L36)
+Defined in: [api/src/submission.ts:36](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L36)
 
 Send submission to liveproxy. This API is used by audience to submit their response.
 
@@ -204,7 +204,7 @@ Send submission to liveproxy. This API is used by audience to submit their respo
 
 > **updateSubmission**\<`T`\>(`submissionId`, `payload`): `Promise`\<`Response`\>
 
-Defined in: [api/src/submission.ts:58](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/api/src/submission.ts#L58)
+Defined in: [api/src/submission.ts:58](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/api/src/submission.ts#L58)
 
 #### Type Parameters
 
