@@ -92,6 +92,10 @@
       <div style="margin-top: 10px;">
         <a-button type="primary" @click="showConfirm">Show Confim Modal</a-button>
       </div>
+
+      <div style="margin-top: 10px;">
+        <a-button type="danger" @click="onClearSlideData">Clear Slide Data</a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -108,7 +112,9 @@ const {
   presentationColorPaletteProps, 
   presentationLighterColorPaletteProps, 
   slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight, showConfirmModal
+  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight, 
+  showConfirmModal, 
+  clearSlideData
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -213,6 +219,19 @@ const showConfirm = async () => {
     variant: 'danger'
   })
   console.log('Confirm:', confirm);
+}
+
+const onClearSlideData = async () => {
+  const confirm = await showConfirmModal?.({
+    title: 'Clear Slide Data',
+    content: 'Are you sure you want to clear the slide data?',
+    okText: 'OK',
+    cancelText: 'Cancel',
+    variant: 'danger'
+  })
+  if (confirm) {
+    clearSlideData?.(slideId.value);
+  }
 }
 
 watch(slideGreeting, (newGreeting) => {
