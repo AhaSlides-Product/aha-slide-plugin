@@ -6,7 +6,7 @@
 
 # Interface: CountTotalItem
 
-Defined in: [SubmissionResult.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/backend-utils/src/SubmissionResult.ts#L4)
+Defined in: [SubmissionResult.ts:4](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/backend-utils/src/SubmissionResult.ts#L4)
 
 Represents a single item in the aggregated statistics.
 
@@ -16,7 +16,7 @@ Represents a single item in the aggregated statistics.
 
 > **bucket**: `string`
 
-Defined in: [SubmissionResult.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/backend-utils/src/SubmissionResult.ts#L6)
+Defined in: [SubmissionResult.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/backend-utils/src/SubmissionResult.ts#L6)
 
 The bucket name for aggregation (e.g., slide-specific path).
 
@@ -26,7 +26,7 @@ The bucket name for aggregation (e.g., slide-specific path).
 
 > **increase\_by**: `number`
 
-Defined in: [SubmissionResult.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/backend-utils/src/SubmissionResult.ts#L10)
+Defined in: [SubmissionResult.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/backend-utils/src/SubmissionResult.ts#L10)
 
 The amount to increase the stat by.
 
@@ -36,6 +36,6 @@ The amount to increase the stat by.
 
 > **key**: `string`
 
-Defined in: [SubmissionResult.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/backend-utils/src/SubmissionResult.ts#L8)
+Defined in: [SubmissionResult.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/backend-utils/src/SubmissionResult.ts#L8)
 
 The key within the bucket (e.g., the answer option).

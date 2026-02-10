@@ -8,7 +8,7 @@
 
 > **useAudiencePlugin**(`options`): [`BaseSlidePluginReturn`](../interfaces/BaseSlidePluginReturn.md) & `object`
 
-Defined in: [packages/ui/src/zoid/audience.ts:173](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L173)
+Defined in: [packages/ui/src/zoid/audience.ts:169](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L169)
 
 Hook for Audience Plugins.
 Provides access to presentation, slide, and slideAttributes data.

@@ -34,6 +34,7 @@
 ## Functions
 
 - [autoReportHeight](functions/autoReportHeight.md)
+- [reportHeight](functions/reportHeight.md)
 - [uploadImage](functions/uploadImage.md)
 - [useAudiencePlugin](functions/useAudiencePlugin.md)
 - [useBaseSlidePlugin](functions/useBaseSlidePlugin.md)
