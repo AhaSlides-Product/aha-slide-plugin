@@ -254,7 +254,6 @@ const openModalDemo = () => {
 };
 
 const showConfirm = async () => {
-  console.log('===== ', showConfirmModal )
   const confirm = await showConfirmModal?.({
     title: 'Sample confirm',
     content: 'This is a sample confirm modal',
