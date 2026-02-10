@@ -144,10 +144,6 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
-    audienceSendCountingUniqueAction: {
-      type: 'function',
-      required: false,
-    },
     trackGA4AndMixpanel: {
       type: 'function',
       required: false,
@@ -285,7 +281,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
     getValues: xprops.getValues,
-    audienceSendCountingUniqueAction: baseHook.audienceSendCountingUniqueAction,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
     uploadImage,

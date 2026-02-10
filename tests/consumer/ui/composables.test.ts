@@ -134,7 +134,6 @@ describe('@aha/ui - Composables', () => {
         upsertSlideAttributeAction: vi.fn(),
         subscribeTopic: vi.fn(),
         unsubscribeTopic: vi.fn(),
-        audienceSendCountingUniqueAction: vi.fn(),
         uploadImage: vi.fn(),
         getValues: vi.fn(),
       };
@@ -200,7 +199,6 @@ describe('@aha/ui - Composables', () => {
         onHeightChange: vi.fn(),
         subscribeTopic: vi.fn(),
         unsubscribeTopic: vi.fn(),
-        audienceSendCountingUniqueAction: vi.fn(),
       };
     });
 

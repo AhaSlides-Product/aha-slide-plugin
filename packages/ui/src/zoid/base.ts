@@ -103,13 +103,6 @@ export interface BaseSlidePluginProps {
    */
   unsubscribeTopic?: (topic: string) => void;
   /** 
-   * Action to send counting data from the audience to the parent application.
-   * 
-   * @param payload - Optional payload for counting.
-   * @returns A promise resolving when the counting is handled.
-   */
-  audienceSendCountingUniqueAction?: (payload?: any) => Promise<any>;
-  /** 
    * Action to track events to GA4 and Mixpanel.
    * 
    * @param payload - The event payload to track.
@@ -271,7 +264,6 @@ export interface BaseSlidePluginReturn {
    */
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
-  audienceSendCountingUniqueAction: ((payload?: any) => Promise<any>) | undefined;
 }
 
 /**
@@ -324,7 +316,6 @@ export function useBaseSlidePlugin(
   const xprops = (window as any).xprops;
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
-  const audienceSendCountingUniqueAction = xprops?.audienceSendCountingUniqueAction;
 
   return {
     presentationProps,
@@ -334,7 +325,6 @@ export function useBaseSlidePlugin(
     baseUrl,
     subscribeTopic,
     unsubscribeTopic,
-    audienceSendCountingUniqueAction,
     reportHeight,
     xprops,
   };

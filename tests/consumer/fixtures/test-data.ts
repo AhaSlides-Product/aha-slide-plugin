@@ -46,6 +46,5 @@ export const mockXProps = {
   upsertSlideAttributeAction: vi.fn(),
   subscribeTopic: vi.fn(),
   unsubscribeTopic: vi.fn(),
-  audienceSendCountingUniqueAction: vi.fn(),
   uploadImage: vi.fn(),
 };
