@@ -51,7 +51,7 @@
     <div class="vote-section">
       <h3>Realtime Vote</h3>
       <div class="vote-controls">
-        <a-button type="primary" size="large" @click="handleVote" :loading="voting">
+        <a-button ref="submitButtonRef" type="primary" size="large" @click="handleVote" :loading="voting">
           🔥 Vote Now!
         </a-button>
         <a-button type="default" size="large" @click="handleSubmitSubmission" :loading="submitting" style="margin-top: 10px;">
@@ -115,7 +115,10 @@ const {
   showToastSuccess,
   updateAudienceData,
   openPluginModal,
+  onSubmitButtonHeightChange,
 } = useAudiencePlugin();
+
+const submitButtonRef = ref<any>(null);
 
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
@@ -250,6 +253,32 @@ onMounted(() => {
         });
       }
     }, { immediate: true });
+  }
+
+  if (onSubmitButtonHeightChange) {
+    const reportButtonHeight = () => {
+      const buttonEl = submitButtonRef.value?.$el || submitButtonRef.value;
+      if (buttonEl) {
+        const rect = buttonEl.getBoundingClientRect();
+        // Get absolute top relative to the iframe document body
+        const absoluteTop = rect.top + window.scrollY;
+        console.log('[Plugin] Reporting submit button height:', absoluteTop);
+        onSubmitButtonHeightChange(absoluteTop);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(reportButtonHeight);
+    if (document.body) resizeObserver.observe(document.body);
+    
+    // Also report on initial mount and after some delay to ensure layout is stable
+    reportButtonHeight();
+    setTimeout(reportButtonHeight, 500);
+    setTimeout(reportButtonHeight, 1000);
+    setTimeout(reportButtonHeight, 2000);
+
+    onUnmounted(() => {
+      resizeObserver.disconnect();
+    });
   }
 });
 

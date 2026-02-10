@@ -69,6 +69,10 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * Close the currently open plugin modal in the audience app.
    */
   closePluginModal?: () => void;
+  /**
+   * Callback function to report the vertical position of the submit button.
+   */
+  onSubmitButtonHeightChange?: (height: number) => void;
 }
 
 /**
@@ -156,6 +160,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    onSubmitButtonHeightChange: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -184,6 +192,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   }) => void) | undefined;
   openPluginModal: ((path?: string, data?: any) => void) | undefined;
   closePluginModal: (() => void) | undefined;
+  onSubmitButtonHeightChange: ((height: number) => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -202,6 +211,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const updateAudienceData = xprops?.updateAudienceData;
   const openPluginModal = xprops?.openPluginModal;
   const closePluginModal = xprops?.closePluginModal;
+  const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -242,6 +252,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     updateAudienceData,
     openPluginModal,
     closePluginModal,
+    onSubmitButtonHeightChange,
     reportHeight: baseHook.reportHeight,
   };
 }
