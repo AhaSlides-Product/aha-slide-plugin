@@ -132,6 +132,8 @@ export function useReportPlugin(
             xprops.onProps((newProps: any) => {
                 if (newProps.token) token.value = newProps.token;
                 if (newProps.currentLanguage) currentLanguage.value = newProps.currentLanguage;
+                if (newProps.locale) locale.value = newProps.locale;
+                if (newProps.translationMap) translationMap.value = newProps.translationMap;
             });
         }
         return cleanup;
