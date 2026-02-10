@@ -110,7 +110,6 @@ const {
   audienceTeam,
   subscribeTopic,
   unsubscribeTopic,
-  audienceSendCountingUniqueAction,
   baseUrl,
   uploadImage,
   showToastSuccess,
@@ -180,24 +179,25 @@ const voting = ref(false);
 const countTopic = computed(() => `plugin-counting/slide-${slideId}`);
 
 const handleVote = async () => {
-  if (!audienceSendCountingUniqueAction) {
-    console.error('audienceSendCountingUniqueAction is not available');
-    return;
-  }
+  // if (!audienceSendCountingUniqueAction) {
+  //   console.error('audienceSendCountingUniqueAction is not available');
+  //   return;
+  // }
   
-  voting.value = true;
-  try {
-    await audienceSendCountingUniqueAction({
-      "bucket": "plugin-counting",
-      "key": `slide-${slideId.value}`,
-      "item": (Math.random() * 10).toString()
-    });
-    console.log('Vote submitted successfully');
-  } catch (error) {
-    console.error('Failed to submit vote:', error);
-  } finally {
-    voting.value = false;
-  }
+  // voting.value = true;
+  // try {
+  //   await audienceSendCountingUniqueAction({
+  //     "bucket": "plugin-counting",
+  //     "key": `slide-${slideId.value}`,
+  //     "item": (Math.random() * 10).toString()
+  //   });
+  //   console.log('Vote submitted successfully');
+  // } catch (error) {
+  //   console.error('Failed to submit vote:', error);
+  // } finally {
+  //   voting.value = false;
+  // }
+  console.warn('please use sendLiveSubmission API instead')
 };
 
 const submitting = ref(false);

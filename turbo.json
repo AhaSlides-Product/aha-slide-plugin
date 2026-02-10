@@ -1,6 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "build:report:staging": {
+      "dependsOn": ["^build:report:staging"],
+      "outputs": [
+        "dist/**"
+      ]
+    },
     "build": {
       "dependsOn": [
         "^build"

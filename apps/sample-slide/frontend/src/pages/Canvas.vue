@@ -109,7 +109,7 @@ const {
   unsubscribeTopic,
   onKeyboard,
   emitKeyboardEvent,
-  sendVoteOutcome,
+  setSubmissionCount,
   getValues,
   baseUrl,
   accessToken,
@@ -223,10 +223,10 @@ onUnmounted(() => {
 });
 
 const sendDemoVote = () => {
-  if (sendVoteOutcome) {
+  if (setSubmissionCount) {
     console.log('[Canvas] Sending demo vote outcome to Host');
-    sendVoteOutcome({
-      voteCount: 10,
+    setSubmissionCount({
+      count: 10,
       tooltip: 'Hello from Plugin'
     });
   } else {

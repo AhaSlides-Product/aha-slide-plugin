@@ -124,10 +124,6 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
-    audienceSendCountingUniqueAction: {
-      type: 'function',
-      required: false,
-    },
     trackGA4AndMixpanel: {
       type: 'function',
       required: false,
@@ -209,7 +205,11 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
-    if (newProps.slideAttributes) slideAttributesProps.value = { ...newProps.slideAttributes };
+
+    if (newProps.slideAttributes) {
+      slideAttributesProps.value = { ...newProps.slideAttributes };
+      console.log('[handleAudienceProps] slideAttributesProps:', slideAttributesProps.value);
+    }
     if (newProps.audience) {
       if (newProps.audience.audienceName !== undefined) audienceName.value = newProps.audience.audienceName;
       if (newProps.audience.audienceEmoji !== undefined) audienceEmoji.value = newProps.audience.audienceEmoji;
@@ -229,7 +229,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
-    audienceSendCountingUniqueAction: baseHook.audienceSendCountingUniqueAction,
     slideAttributesProps,
     audienceName,
     audienceEmoji,

@@ -144,10 +144,6 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
-    audienceSendCountingUniqueAction: {
-      type: 'function',
-      required: false,
-    },
     trackGA4AndMixpanel: {
       type: 'function',
       required: false,
@@ -214,7 +210,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
-  sendVoteOutcome: ((payload: { voteCount: number; tooltip?: string }) => void) | undefined;
+  setSubmissionCount: ((payload: { count: number; tooltip?: string }) => void) | undefined;
   /**
    * Open a full-screen modal with a custom path.
    * @param path - The custom path for the modal iframe.
@@ -285,7 +281,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
     getValues: xprops.getValues,
-    audienceSendCountingUniqueAction: baseHook.audienceSendCountingUniqueAction,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
     uploadImage,
@@ -296,7 +291,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     showToastInfo: xprops?.showToastInfo,
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
-    sendVoteOutcome: xprops?.sendVoteOutcome,
+    // rename sendVoteCount to setSubmissionCount to avoid confusion 
+    setSubmissionCount: (payload: { count: number, tooltip?: string }) => xprops?.sendVoteOutcome({ voteCount: payload.count, ...payload }),
     openPluginModal: xprops?.openPluginModal,
     closePluginModal: xprops?.closePluginModal,
     reportHeight: baseHook.reportHeight,

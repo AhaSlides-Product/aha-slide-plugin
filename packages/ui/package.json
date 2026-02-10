@@ -36,6 +36,7 @@
   "scripts": {
     "build": "npm run build:ts && npm run build:antd-css-vars && npm run build:css",
     "clean": "rm -rf dist *.tsbuildinfo",
+    "build:report:staging": "npm run build:ts && npm run build:antd-css-vars && npm run build:css",
     "build:icons": "node scripts/generate-icons.js",
     "build:ts": "tsc",
     "build:css": "postcss src/ahaslides-antd-extensions.css -o dist/assets/ahaslides-antd-extensions.css",
