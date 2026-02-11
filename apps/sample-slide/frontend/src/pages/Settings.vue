@@ -64,9 +64,16 @@
       <pre class="code-block">{{ JSON.stringify(currentUserProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="attributeResponse" class="debug-section" data-testid="settings-slide-attributes">
+    <div v-if="attributeResponse && showSlideAttributes" class="debug-section" data-testid="settings-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
+    </div>
+
+    <div class="debug-section">
+      <h3>Slide Attributes Control</h3>
+      <a-button @click="showSlideAttributes = !showSlideAttributes">
+        {{ showSlideAttributes ? 'Hide' : 'Show' }} Slide Attributes
+      </a-button>
     </div>
 
     <div class="debug-section">
@@ -97,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from 'vue';
+import { onMounted, watch, ref, computed, nextTick } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
@@ -113,6 +120,7 @@ const {
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
 
+const showSlideAttributes = ref(false);
 const selectedTestValue = ref('');
 
 const handleManualReportHeight = () => {
@@ -214,6 +222,11 @@ const showConfirm = async () => {
   })
   console.log('Confirm:', confirm);
 }
+
+watch(showSlideAttributes, async () => {
+  await nextTick();
+  reportHeight();
+});
 
 watch(slideGreeting, (newGreeting) => {
   debouncedUpdate(newGreeting);

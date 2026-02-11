@@ -146,14 +146,10 @@ export function reportHeight() {
     return;
   }
 
-  const app = document.getElementById('app');
-  const height = Math.max(
-    document.body.scrollHeight,
-    document.documentElement.scrollHeight,
-    document.body.offsetHeight,
-    document.documentElement.offsetHeight,
-    app ? app.scrollHeight : 0
-  );
+  const app = document.getElementById('app') || document.getElementById('root');
+  const height = app 
+    ? app.scrollHeight 
+    : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
   console.log('[SlidePlugin] Reporting height:', height);
   xprops.onHeightChange(height);
 }
@@ -178,14 +174,10 @@ export function autoReportHeight() {
   }, 300);
 
   const sendHeight = () => {
-    const app = document.getElementById('app');
-    const height = Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight,
-      app ? app.scrollHeight : 0
-    );
+    const app = document.getElementById('app') || document.getElementById('root');
+    const height = app 
+      ? app.scrollHeight 
+      : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
     console.log('[SlidePlugin] Reporting height:', height);
     throtledOnHeightChange(height);
   };
