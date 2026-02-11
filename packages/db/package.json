@@ -1,0 +1,26 @@
+{
+  "name": "@aha/db",
+  "version": "1.0.0",
+  "description": "Indexeddb wrapper for slide plugin",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+  },
+  "dependencies": {
+    "@aha/common": "*",
+    "idb": "^8.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

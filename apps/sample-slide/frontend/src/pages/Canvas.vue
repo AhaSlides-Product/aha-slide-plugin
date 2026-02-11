@@ -1,7 +1,7 @@
 <template>
   <div class="canvas-page">
     <h1>Canvas View</h1>
-    <p>Welcome to the Canvas for Slide: {{ slideId }}</p>
+    <p>Welcome to the Canvas for Slide: {{ slideId }} version {{ slideVersion }}</p>
     <div class="greeting-display">
       <h2>Greeting: {{ slideGreeting }}</h2>
        <div v-if="imageUrl" style="margin-top: 10px;">
@@ -125,6 +125,7 @@ const {
   openPluginModal,
   showConfirmModal,
 } = usePresenterPlugin();
+const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);

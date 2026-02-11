@@ -94,7 +94,7 @@ import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
 import { SubmissionSenderType } from '@aha/common';
-
+import { getSubmissions, saveSubmission } from '@aha/db';
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
 const { 
@@ -232,14 +232,20 @@ const handleSubmitSubmission = async () => {
     const response = await client.sendLiveSubmission(SlideType.SampleSlide, payload);
 
     console.log('Audience: Liveproxy response result:', response);
+
+    // save submission locally
+    const result = await saveSubmission({...payload, slideType: SlideType.SampleSlide});
+    console.log('Audience: Submission saved locally:', result);
   } catch (error) {
     console.error('Audience: Submission error:', error);
   } finally {
     submitting.value = false;
   }
+
+
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (subscribeTopic) {
     watch(countTopic, (newTopic, oldTopic) => {
       if (oldTopic && unsubscribeTopic) unsubscribeTopic(oldTopic);
@@ -275,6 +281,13 @@ onMounted(() => {
     setTimeout(reportButtonHeight, 500);
     setTimeout(reportButtonHeight, 1000);
     setTimeout(reportButtonHeight, 2000);
+
+    const pastSubmission = await getSubmissions({ 
+      slideId: slideProps.value?.id ?? 0, 
+      slideVersion: slideProps.value?.version ?? 0, 
+      senderId: audienceId.value?.toString() ?? ""  
+    });
+    console.log('Audience: Past submission:', pastSubmission);
 
     onUnmounted(() => {
       resizeObserver.disconnect();

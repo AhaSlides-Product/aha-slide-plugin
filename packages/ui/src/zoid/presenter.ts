@@ -104,6 +104,8 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   closePluginModal?: () => void;
 
   showConfirmModal?: (payload: ConfirmModalPayload) => Promise<boolean>;
+
+  clearSlideData?: (slideId: string) => Promise<void>;
 }
 
 /**
@@ -258,6 +260,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * @returns A promise resolving to a boolean indicating whether the user confirmed.
    */
   showConfirmModal: ((payload: ConfirmModalPayload) => Promise<boolean>) | undefined;
+
+  /**
+   * Clear the slide data in the parent app.
+   */
+  clearSlideData: ((slideId: string) => Promise<void>) | undefined;
 }
 
 /**
@@ -324,5 +331,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     reportHeight: baseHook.reportHeight,
     accessToken: xprops?.token,
     showConfirmModal: xprops?.showConfirmModal,
+    clearSlideData: xprops?.clearSlideData,
   };
 }
