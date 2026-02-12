@@ -2,6 +2,7 @@ import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { SubmissionPayload } from '@aha/common';
 
 type SubmissionUpsert = SubmissionPayload & { slideType: string }
+type Submission = SubmissionUpsert & { id: number }
 
 const DB_NAME = 'AhaSlides';
 const STORE_NAME = 'submissions';
@@ -11,7 +12,7 @@ const slideIdSlideVersionAudienceIdIndex = 'slideId-slideVersion-audienceId';
 interface AhaDB extends DBSchema {
   [STORE_NAME]: {
     key: number;
-    value: SubmissionUpsert;
+    value: Submission;
     indexes: {
       [slideIdSlideVersionAudienceIdIndex]: [number, number, string];
     };
@@ -50,6 +51,9 @@ function getDB() {
       // This happens if the browser closes the database unexpectedly.
       dbPromise = null;
     },
+  }).catch((err) => {
+    dbPromise = null;
+    throw err;
   });
 
   return dbPromise;
@@ -57,10 +61,16 @@ function getDB() {
 
 export async function saveSubmission(submission: SubmissionUpsert): Promise<number> {
   const db = await getDB();
-  return db.put(STORE_NAME, submission);
+  return db.put(STORE_NAME, submission as any);
 }
 
-export async function getSubmissions({ slideId, slideVersion, senderId }: { slideId: number, slideVersion: number, senderId: string }): Promise<SubmissionUpsert[]> {
+export async function getSubmissions({ slideId, slideVersion, senderId }: { slideId: number, slideVersion: number, senderId: string }): Promise<Submission[]> {
   const db = await getDB();
   return db.getAllFromIndex(STORE_NAME, slideIdSlideVersionAudienceIdIndex, [slideId, slideVersion, senderId]);
 }
+
+export async function deleteSubmission(id: number): Promise<void> {
+  const db = await getDB();
+  await db.delete(STORE_NAME, id);
+}
+
