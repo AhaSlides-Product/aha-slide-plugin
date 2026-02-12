@@ -186,6 +186,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceId: Ref<string | number | undefined>;
   audienceEmail: Ref<string | undefined>;
   audienceTeam: Ref<string | undefined>;
+  participantInfo: Ref<ParticipantInfo[] | undefined>;
   uploadImage: (() => Promise<any>) | undefined;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -196,7 +197,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmoji?: string;
     participantInfo?: ParticipantInfo[];
   }) => void) | undefined;
-  getParticipantInfo: (() => Promise<ParticipantInfo[]>) | undefined;
   openPluginModal: ((path?: string, data?: any) => void) | undefined;
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
@@ -210,6 +210,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const audienceId = ref<string | number | undefined>(xprops?.audience?.audienceId);
   const audienceEmail = ref<string | undefined>(xprops?.audience?.audienceEmail);
   const audienceTeam = ref<string | undefined>(xprops?.audience?.audienceTeam);
+  const participantInfo = ref<ParticipantInfo[] | undefined>(xprops?.audience?.participantInfo);
 
   const uploadImage = xprops?.uploadImage;
   const showToastInfo = xprops?.showToastInfo;
@@ -233,6 +234,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       if (newProps.audience.audienceId !== undefined) audienceId.value = newProps.audience.audienceId;
       if (newProps.audience.audienceEmail !== undefined) audienceEmail.value = newProps.audience.audienceEmail;
       if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
+      if (newProps.audience.participantInfo !== undefined) participantInfo.value = newProps.audience.participantInfo;
     }
   };
 
@@ -260,7 +262,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     openPluginModal,
     closePluginModal,
     onSubmitButtonHeightChange,
+    participantInfo,
     reportHeight: baseHook.reportHeight,
-    getParticipantInfo: xprops?.getParticipantInfo,
   };
 }

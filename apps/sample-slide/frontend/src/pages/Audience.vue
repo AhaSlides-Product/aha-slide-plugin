@@ -18,7 +18,7 @@
 
     <div class="debug-section">
       <h3>Audience Debug Info</h3>
-      <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam }, null, 2) }}</pre>
+      <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam, participantInfo }, null, 2) }}</pre>
     </div>
 
     <div v-if="presentationProps" class="debug-section" data-testid="audience-presentation-props">
@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
-import { useAudiencePlugin } from '@aha/ui';
+import { useAudiencePlugin, type ParticipantInfo } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
 import { SubmissionSenderType } from '@aha/common';
@@ -108,6 +108,7 @@ const {
   audienceId,
   audienceEmail,
   audienceTeam,
+  participantInfo,
   subscribeTopic,
   unsubscribeTopic,
   baseUrl,
@@ -141,7 +142,7 @@ const handleUpdateData = () => {
     updateAudienceData({
       audienceName: newName.value || 'New Tester',
       audienceEmoji: '🚀',
-      participantInfo: [{type: 'myfield', value: 'myvalue'}]
+      participantInfo: [{type: 'hello', value: 'myvalue'}]
     });
     if (showToastSuccess) {
       showToastSuccess('Sent update request!');
