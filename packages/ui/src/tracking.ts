@@ -134,12 +134,13 @@ function _getObjectName(vnode: VNode): string {
     // In Vue 3, props are accessed differently
     const nameFromAttr = lodashGet(vnode, 'props.name', '')
     const nameFromComponent = lodashGet(vnode, 'type.name', '') || lodashGet(vnode, 'type.__name', '')
+    const nameFromFirstChild = lodashGet(vnode, 'el.firstElementChild.name', '')
 
-    if (!nameFromAttr && !nameFromComponent) {
+    if (!nameFromAttr && !nameFromComponent && !nameFromFirstChild) {
         return ANONYMOUS_ELEMENT
     }
 
-    const name = nameFromAttr || nameFromComponent
+    const name = nameFromAttr || nameFromComponent || nameFromFirstChild
     return snakeCase(name as string)
 }
 
