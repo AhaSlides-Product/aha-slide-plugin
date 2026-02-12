@@ -77,41 +77,7 @@ npm run test:consumer:watch
 npm run test:consumer:coverage
 ```
 
-## 📝 What's Tested
 
-### Phase 1: Basic Imports ✅
-
-- ✅ All `@aha/ui` exports are importable
-- ✅ All `@aha/backend-utils` exports are importable
-- ✅ Named imports work
-- ✅ Namespace imports work
-- ✅ Type-only imports work
-
-### Phase 2: Core Functionality ✅
-
-- ✅ **useSync** – ref, BroadcastChannel name, broadcast, initial state
-- ✅ **useSyncReadOnly** – readonly ref, channel name
-- ✅ **usePresenterPlugin** – refs from xprops, actions, autoHeight: false
-- ✅ **useAudiencePlugin** – base + audience refs
-- ✅ **uploadImage** – returns Promise resolving to object
-- ✅ **autoReportHeight** – cleanup function, onHeightChange behavior
-
-## 🧪 Test Examples
-
-### Example: Testing Imports
-
-```typescript
-// tests/consumer/ui/imports.test.ts
-import { describe, it, expect } from 'vitest';
-
-describe('@aha/ui - Imports', () => {
-  it('should export useSync', async () => {
-    const { useSync } = await import('@aha/ui');
-    expect(useSync).toBeDefined();
-    expect(typeof useSync).toBe('function');
-  });
-});
-```
 
 ## 🔧 Configuration
 
@@ -130,20 +96,14 @@ Located at `tests/consumer/config/tsconfig.json`:
 - Includes Vitest and Vue Test Utils types
 - Configured for ES modules
 
-## 📋 Next Steps (Phase 2)
+## Documentation
 
-1. **Test Vue Composables**
-   - `useSync` with BroadcastChannel mock
-   - `useSyncReadOnly` with BroadcastChannel mock
-   - `usePresenterPlugin` with Zoid mock
-   - `useAudiencePlugin` with Zoid mock
+- **[docs/TEST_PATTERNS.md](./docs/TEST_PATTERNS.md)** – Test patterns (imports, composables, types, integration, environments)
+- **[docs/ADDING_TESTS.md](./docs/ADDING_TESTS.md)** – How to add new consumer tests
 
-2. **Test Utility Functions**
-   - `autoReportHeight` with ResizeObserver mock
-   - `uploadImage` with fetch mock
 
-3. **Test Components**
-   - `AhaIcon` component rendering
+## 📋 Next Steps (Maintenance)
+
 
 ## 🐛 Troubleshooting
 
