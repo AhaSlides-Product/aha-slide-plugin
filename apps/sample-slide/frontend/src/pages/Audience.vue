@@ -141,6 +141,7 @@ const handleUpdateData = () => {
     updateAudienceData({
       audienceName: newName.value || 'New Tester',
       audienceEmoji: '🚀',
+      participantInfo: [{type: 'myfield', value: 'myvalue'}]
     });
     if (showToastSuccess) {
       showToastSuccess('Sent update request!');

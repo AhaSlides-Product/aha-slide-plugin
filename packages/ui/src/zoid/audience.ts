@@ -167,6 +167,11 @@ export const AudienceSlidePluginIframe = zoid.create({
   },
 });
 
+export type ParticipantInfo = {
+  type: string;
+  value: string;
+};
+
 /**
  * Hook for Audience Plugins.
  * Provides access to presentation, slide, and slideAttributes data.
@@ -189,7 +194,9 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceName?: string;
     audienceEmail?: string;
     audienceEmoji?: string;
+    participantInfo?: ParticipantInfo[];
   }) => void) | undefined;
+  getParticipantInfo: (() => Promise<ParticipantInfo[]>) | undefined;
   openPluginModal: ((path?: string, data?: any) => void) | undefined;
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
@@ -254,5 +261,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     closePluginModal,
     onSubmitButtonHeightChange,
     reportHeight: baseHook.reportHeight,
+    getParticipantInfo: xprops?.getParticipantInfo,
   };
 }
