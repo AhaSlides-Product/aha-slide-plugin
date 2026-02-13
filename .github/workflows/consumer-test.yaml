@@ -41,8 +41,14 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch || 'staging' }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run consumer tests
         run: npm run test:consumer
@@ -202,7 +208,7 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Run on Branch:*\n${{ inputs.branch || 'staging' }}"
+                      "text": "*Run on Branch:*\n${{ inputs.branch || github.event.workflow_run.head_branch || github.ref_name }}"
                     },
                     {
                       "type": "mrkdwn",
