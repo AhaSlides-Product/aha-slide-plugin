@@ -5,10 +5,17 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [vue() as any],
   test: {
+    reporters: ['default', 'junit', 'json', 'html'],
+    outputFile: {
+      junit: 'test-results/vitest/junit-report.xml',
+      json: 'test-results/vitest/json-report.json',
+      html: 'test-results/vitest/html-report/index.html',
+    },
     globals: true,
     environment: 'jsdom',
     setupFiles: [resolve(__dirname, '../helpers/setup.ts')],
     include: ['consumer/**/*.test.ts', 'consumer/**/*.spec.ts'],
+    testTimeout: 30000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
