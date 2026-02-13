@@ -22,7 +22,17 @@
       "import": "./src/vite.config.icon.js",
       "default": "./src/vite.config.icon.js"
     },
-    "./AhaIcon.vue": "./src/AhaIcon.vue"
+    "./AhaIcon.vue": "./src/AhaIcon.vue",
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "default": "./dist/core/index.js"
+    }
   },
   "files": [
     "dist",
@@ -64,7 +74,28 @@
     "ant-design-vue": "^4.0.0",
     "vite": "^7.0.0",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.0.0",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "@ant-design/icons-vue": {
+      "optional": true
+    },
+    "@vueuse/core": {
+      "optional": true
+    },
+    "ant-design-vue": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "vue-router": {
+      "optional": true
+    }
   },
   "dependencies": {
     "zoid": "^9.0.86"

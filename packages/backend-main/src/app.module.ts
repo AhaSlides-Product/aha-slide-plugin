@@ -5,13 +5,31 @@
 import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
+import { AppModule as IdeaBoardModule } from '@aha/idea-board-backend';
+import { AppModule as PinOnImageModule } from '@aha/pin-on-image-slide-backend';
+import { AppModule as RankingModule } from '@aha/ranking-slide-backend';
 import { AppModule as SampleSlideModule } from '@aha/sample-slide-backend';
 
 @Module({
   imports: [
     HealthModule,
+    IdeaBoardModule,
+    PinOnImageModule,
+    RankingModule,
     SampleSlideModule,
     RouterModule.register([
+      {
+        path: 'ideaBoard',
+        module: IdeaBoardModule,
+      },
+      {
+        path: 'pinOnImage',
+        module: PinOnImageModule,
+      },
+      {
+        path: 'ranking',
+        module: RankingModule,
+      },
       {
         path: 'sample-slide',
         module: SampleSlideModule,
