@@ -1,5 +1,8 @@
 name: "Regression Test"
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -64,22 +67,27 @@ jobs:
       - name: Extract Deployment Metadata
         id: extract-metadata
         shell: bash
+        env:
+          PR_JSON: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_ACTOR: ${{ github.event.workflow_run.actor.login }}
+          GITHUB_ACTOR: ${{ github.actor }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            DEPLOYER="${{ github.event.workflow_run.actor.login }}"
+          if [ "$EVENT_NAME" == "workflow_run" ]; then
+            DEPLOYER="$WORKFLOW_ACTOR"
 
-            # Extract PR info safely
-            PR_NUM=$(echo '${{ toJSON(github.event.workflow_run.pull_requests) }}' | jq -r '.[0].number // empty')
-            PR_TITLE=$(echo '${{ toJSON(github.event.workflow_run.pull_requests) }}' | jq -r '.[0].title // empty')
-            PR_LINK=$(echo '${{ toJSON(github.event.workflow_run.pull_requests) }}' | jq -r '.[0].html_url // empty')
+            # Extract PR info safely from environment variable
+            PR_NUM=$(echo "$PR_JSON" | jq -r '.[0].number // empty')
+            PR_TITLE=$(echo "$PR_JSON" | jq -r '.[0].title // empty')
+            PR_LINK=$(echo "$PR_JSON" | jq -r '.[0].html_url // empty')
 
-            if [ -z "$PR_NUM" ]; then
+            if [ -z "$PR_NUM" ] || [ "$PR_NUM" == "null" ]; then
               PR_NUM="N/A"
               PR_TITLE="Push to staging"
               PR_LINK="N/A"
             fi
           else
-             DEPLOYER="${{ github.actor }}"
+             DEPLOYER="$GITHUB_ACTOR"
              PR_NUM="N/A"
              PR_TITLE="Manual Trigger"
              PR_LINK="N/A"
