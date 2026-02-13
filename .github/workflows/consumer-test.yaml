@@ -70,37 +70,48 @@ jobs:
 
       - name: Extract Deployment Metadata
         id: extract-metadata
-        shell: bash
+        uses: actions/github-script@v6
         env:
-          PR_JSON: ${{ toJSON(github.event.workflow_run.pull_requests) }}
           EVENT_NAME: ${{ github.event_name }}
-          WORKFLOW_ACTOR: ${{ github.event.workflow_run.actor.login }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        run: |
-          if [ "$EVENT_NAME" == "workflow_run" ]; then
-            DEPLOYER="$WORKFLOW_ACTOR"
+          # For workflow_run, use the head_sha of the triggering workflow run
+          # For workflow_dispatch, use the sha of the current run
+          LATEST_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        with:
+          github-token: ${{ secrets.QA_ACCESS_TOKEN_FOR_DISPATCH }}
+          script: |
+            const sha = process.env.LATEST_SHA;
+            const event = process.env.EVENT_NAME;
 
-            # Extract PR info safely from environment variable
-            PR_NUM=$(echo "$PR_JSON" | jq -r '.[0].number // empty')
-            PR_TITLE=$(echo "$PR_JSON" | jq -r '.[0].title // empty')
-            PR_LINK=$(echo "$PR_JSON" | jq -r '.[0].html_url // empty')
+            let title = "Manual Trigger", link = "N/A", num = "N/A", deployer = context.actor;
 
-            if [ -z "$PR_NUM" ] || [ "$PR_NUM" == "null" ]; then
-              PR_NUM="N/A"
-              PR_TITLE="Push to staging"
-              PR_LINK="N/A"
-            fi
-          else
-             DEPLOYER="$GITHUB_ACTOR"
-             PR_NUM="N/A"
-             PR_TITLE="Manual Trigger"
-             PR_LINK="N/A"
-          fi
+            if (event === 'workflow_run') {
+               try {
+                 const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                    owner: context.repo.owner, repo: context.repo.repo, commit_sha: sha
+                 });
+                 const pr = prs.find(p => p.merged_at) || prs[0];
+                 
+                 if (pr) {
+                    title = pr.title; link = pr.html_url; num = pr.number; deployer = pr.user.login;
+                 } else {
+                    const { data: c } = await github.rest.repos.getCommit({
+                      owner: context.repo.owner, repo: context.repo.repo, ref: sha
+                    });
+                    title = `Commit: ${(c.commit.message || "").split('\n')[0]}`;
+                    link = c.html_url;
+                    deployer = c.author?.login || c.committer?.login || c.commit.author.name;
+                 }
+               } catch (e) {
+                 console.error(e);
+                 title = "Error fetching metadata";
+               }
+            }
 
-          echo "deployer=${DEPLOYER}" >> $GITHUB_OUTPUT
-          echo "pr_num=${PR_NUM}" >> $GITHUB_OUTPUT
-          echo "pr_title=${PR_TITLE}" >> $GITHUB_OUTPUT
-          echo "pr_link=${PR_LINK}" >> $GITHUB_OUTPUT
+            core.setOutput("deployer", deployer);
+            core.setOutput("pr_num", num);
+            core.setOutput("pr_title", title);
+            core.setOutput("pr_link", link);
+          result-encoding: string
 
       - name: Install AWS CLI
         shell: bash
@@ -128,44 +139,20 @@ jobs:
         id: s3-upload
         shell: bash
         run: |
-          # Generate report path
-          REPO=$(basename ${{ github.repository }})
-          TDATE=$(TZ=Asia/Ho_Chi_Minh date +'%Y-%m-%d/%H%M')
-
-          # Determine inputs based on event type
-          if [ "${{ github.event_name }}" == "workflow_run" ]; then
-            ENV="staging"
-            RUN_ID="${{ github.event.workflow_run.id }}"
-          else
-            ENV="${{ inputs.environment }}"
-            RUN_ID="${{ github.run_id }}"
-          fi
-
-          REPORTPATH=${TDATE}-${REPO}-${ENV}-${RUN_ID}
-          REPORT_URL="https://testreport.staging.ahaslide.com/${REPORTPATH}/vitest/html-report/index.html"
-
-          # Output for other steps
-          echo "url=${REPORT_URL}" >> $GITHUB_OUTPUT
-
-          # Upload to S3
-          aws s3 cp --recursive tests/test-results/ s3://testreport.staging.ahaslide.com/${REPORTPATH}/
+          ENV="${{ github.event_name == 'workflow_run' && 'staging' || inputs.environment }}"
+          RUN_ID="${{ github.event_name == 'workflow_run' && github.event.workflow_run.id || github.run_id }}"
+          REPORTPATH=$(TZ=Asia/Ho_Chi_Minh date +'%Y-%m-%d/%H%M')-$(basename ${{ github.repository }})-${ENV}-${RUN_ID}
+          echo "url=https://testreport.staging.ahaslide.com/${REPORTPATH}/vitest/html-report/index.html" >> $GITHUB_OUTPUT
+          aws s3 cp --recursive tests/test-results/ s3://testreport.staging.ahaslide.com/${REPORTPATH}/ --exclude "*.meta.json.gz"
+          aws s3 cp tests/test-results/vitest/html-report/html.meta.json.gz s3://testreport.staging.ahaslide.com/${REPORTPATH}/vitest/html-report/html.meta.json.gz --content-encoding gzip --content-type application/json
 
       - name: Extract Test Statistics
         id: extract-stats
         if: always()
         shell: bash
         run: |
-          # Extract Test Statistics
-          TOTAL_TESTS=$(jq '.numTotalTests // 0' tests/test-results/vitest/json-report.json)
-          PASSED_TESTS=$(jq '.numPassedTests // 0' tests/test-results/vitest/json-report.json)
-          FAILED_TESTS=$(jq '.numFailedTests // 0' tests/test-results/vitest/json-report.json)
-          SKIPPED_TESTS=$(jq '.numPendingTests // 0' tests/test-results/vitest/json-report.json)
-
-          # Output for other steps
-          echo "total_tests=${TOTAL_TESTS}" >> $GITHUB_OUTPUT
-          echo "passed_tests=${PASSED_TESTS}" >> $GITHUB_OUTPUT
-          echo "failed_tests=${FAILED_TESTS}" >> $GITHUB_OUTPUT
-          echo "skipped_tests=${SKIPPED_TESTS}" >> $GITHUB_OUTPUT
+          STATS=$(jq -r '"total_tests=\(.numTotalTests // 0)\npassed_tests=\(.numPassedTests // 0)\nfailed_tests=\(.numFailedTests // 0)\nskipped_tests=\(.numPendingTests // 0)"' tests/test-results/vitest/json-report.json)
+          echo -e "$STATS" >> $GITHUB_OUTPUT
 
       - name: Post report to Slack
         if: always()
