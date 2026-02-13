@@ -23,6 +23,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: consumer-test
+  cancel-in-progress: false
+
 jobs:
   consumer-test:
     runs-on: ubuntu-latest
