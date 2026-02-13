@@ -1,4 +1,4 @@
-name: "Regression Test"
+name: "Consumer Test"
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ on:
       - completed
 
 jobs:
-  regression-test:
+  consumer-test:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     steps:
