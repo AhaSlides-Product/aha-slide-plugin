@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
-import { useAudiencePlugin, type ParticipantInfo } from '@aha/ui';
+import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
 import { SubmissionSenderType } from '@aha/common';
