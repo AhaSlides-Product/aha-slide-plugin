@@ -1,0 +1,249 @@
+name: "Consumer Test"
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to test"
+        required: true
+        default: "staging"
+      environment:
+        description: "Environment to test"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+
+  workflow_run:
+    workflows: ["Staging Deploy"]
+    types:
+      - completed
+
+jobs:
+  consumer-test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Wait for 5 minutes
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: sleep 300
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch || 'staging' }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run consumer tests
+        run: npm run test:consumer
+
+      - name: Upload JUnit Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: tests/test-results/vitest/junit-report.xml
+
+      - name: Upload JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-report
+          path: tests/test-results/vitest/json-report.json
+
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report
+          path: tests/test-results/vitest/html-report
+
+      - name: Extract Deployment Metadata
+        id: extract-metadata
+        shell: bash
+        env:
+          PR_JSON: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_ACTOR: ${{ github.event.workflow_run.actor.login }}
+          GITHUB_ACTOR: ${{ github.actor }}
+        run: |
+          if [ "$EVENT_NAME" == "workflow_run" ]; then
+            DEPLOYER="$WORKFLOW_ACTOR"
+
+            # Extract PR info safely from environment variable
+            PR_NUM=$(echo "$PR_JSON" | jq -r '.[0].number // empty')
+            PR_TITLE=$(echo "$PR_JSON" | jq -r '.[0].title // empty')
+            PR_LINK=$(echo "$PR_JSON" | jq -r '.[0].html_url // empty')
+
+            if [ -z "$PR_NUM" ] || [ "$PR_NUM" == "null" ]; then
+              PR_NUM="N/A"
+              PR_TITLE="Push to staging"
+              PR_LINK="N/A"
+            fi
+          else
+             DEPLOYER="$GITHUB_ACTOR"
+             PR_NUM="N/A"
+             PR_TITLE="Manual Trigger"
+             PR_LINK="N/A"
+          fi
+
+          echo "deployer=${DEPLOYER}" >> $GITHUB_OUTPUT
+          echo "pr_num=${PR_NUM}" >> $GITHUB_OUTPUT
+          echo "pr_title=${PR_TITLE}" >> $GITHUB_OUTPUT
+          echo "pr_link=${PR_LINK}" >> $GITHUB_OUTPUT
+
+      - name: Install AWS CLI
+        shell: bash
+        run: |
+          if ! command -v aws >/dev/null 2>&1; then
+            SUDO=""
+            if [ "$(id -u)" -ne 0 ]; then
+              SUDO="sudo"
+            fi
+            $SUDO apt-get update -y && $SUDO apt-get install -y unzip
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -q awscliv2.zip
+            $SUDO ./aws/install
+            rm -rf aws awscliv2.zip
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload Reports to S3
+        id: s3-upload
+        shell: bash
+        run: |
+          # Generate report path
+          REPO=$(basename ${{ github.repository }})
+          TDATE=$(TZ=Asia/Ho_Chi_Minh date +'%Y-%m-%d/%H%M')
+
+          # Determine inputs based on event type
+          if [ "${{ github.event_name }}" == "workflow_run" ]; then
+            ENV="staging"
+            RUN_ID="${{ github.event.workflow_run.id }}"
+          else
+            ENV="${{ inputs.environment }}"
+            RUN_ID="${{ github.run_id }}"
+          fi
+
+          REPORTPATH=${TDATE}-${REPO}-${ENV}-${RUN_ID}
+          REPORT_URL="https://testreport.staging.ahaslide.com/${REPORTPATH}/vitest/html-report/index.html"
+
+          # Output for other steps
+          echo "url=${REPORT_URL}" >> $GITHUB_OUTPUT
+
+          # Upload to S3
+          aws s3 cp --recursive tests/test-results/ s3://testreport.staging.ahaslide.com/${REPORTPATH}/
+
+      - name: Extract Test Statistics
+        id: extract-stats
+        if: always()
+        shell: bash
+        run: |
+          # Extract Test Statistics
+          TOTAL_TESTS=$(jq '.numTotalTests // 0' tests/test-results/vitest/json-report.json)
+          PASSED_TESTS=$(jq '.numPassedTests // 0' tests/test-results/vitest/json-report.json)
+          FAILED_TESTS=$(jq '.numFailedTests // 0' tests/test-results/vitest/json-report.json)
+          SKIPPED_TESTS=$(jq '.numPendingTests // 0' tests/test-results/vitest/json-report.json)
+
+          # Output for other steps
+          echo "total_tests=${TOTAL_TESTS}" >> $GITHUB_OUTPUT
+          echo "passed_tests=${PASSED_TESTS}" >> $GITHUB_OUTPUT
+          echo "failed_tests=${FAILED_TESTS}" >> $GITHUB_OUTPUT
+          echo "skipped_tests=${SKIPPED_TESTS}" >> $GITHUB_OUTPUT
+
+      - name: Post report to Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_REGRESSION }}
+          payload: |
+            {
+              "text": "🎭 Consumer Test Results",
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Environment:*\n${{ inputs.environment || 'staging' }}"
+                    },
+                    {
+                      "type": "mrkdwn", 
+                      "text": "*Test Type:*\nConsumer"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job Status:*\n${{ job.status }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployer:*\n${{ steps.extract-metadata.outputs.deployer }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PR:*\n${{ steps.extract-metadata.outputs.pr_link != 'N/A' && format('<{0}|#{1} {2}>', steps.extract-metadata.outputs.pr_link, steps.extract-metadata.outputs.pr_num, steps.extract-metadata.outputs.pr_title) || 'N/A' }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*📊 Test Statistics:*\n• Total: ${{ steps.extract-stats.outputs.total_tests }}\n• ✅ Passed: ${{ steps.extract-stats.outputs.passed_tests }}\n• ❌ Failed: ${{ steps.extract-stats.outputs.failed_tests }}\n• ⏭️ Skipped: ${{ steps.extract-stats.outputs.skipped_tests }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Run on Branch:*\n${{ inputs.branch || 'staging' }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Triggered By:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📊 View HTML Report"
+                      },
+                      "url": "${{ steps.s3-upload.outputs.url }}",
+                      "style": "primary"
+                    },
+                    {
+                      "type": "button", 
+                      "text": {
+                        "type": "plain_text",
+                        "text": "📋 View Action Logs"
+                      },
+                      "url": "https://github.com/AhaSlides-Product/aha-slide-plugin/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
