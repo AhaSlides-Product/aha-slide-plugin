@@ -13,6 +13,7 @@
     "@aha/ui": "*",
     "@aha/common": "*",
     "@aha/api": "*",
+    "@aha/db": "*",
     "@ant-design/icons-vue": "^7.0.0",
     "ant-design-vue": "4.2.6",
     "lodash-es": "^4.17.21",

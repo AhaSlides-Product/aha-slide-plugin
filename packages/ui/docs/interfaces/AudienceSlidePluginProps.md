@@ -6,7 +6,7 @@
 
 # Interface: AudienceSlidePluginProps
 
-Defined in: [packages/ui/src/zoid/audience.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L13)
+Defined in: [packages/ui/src/zoid/audience.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L13)
 
 Interface for the properties expected by the AudienceSlidePluginIframe component.
 
@@ -20,7 +20,7 @@ Interface for the properties expected by the AudienceSlidePluginIframe component
 
 > `optional` **audience**: `object`
 
-Defined in: [packages/ui/src/zoid/audience.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L19)
+Defined in: [packages/ui/src/zoid/audience.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L19)
 
 Audience information such as name, email, emoji, ID, and team.
 
@@ -56,39 +56,11 @@ The team name of the audience participant
 
 ***
 
-### audienceSendCountingUniqueAction()?
-
-> `optional` **audienceSendCountingUniqueAction**: (`payload?`) => `Promise`\<`any`\>
-
-Defined in: [packages/ui/src/zoid/base.ts:110](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L110)
-
-Action to send counting data from the audience to the parent application.
-
-#### Parameters
-
-##### payload?
-
-`any`
-
-Optional payload for counting.
-
-#### Returns
-
-`Promise`\<`any`\>
-
-A promise resolving when the counting is handled.
-
-#### Inherited from
-
-[`BaseSlidePluginProps`](BaseSlidePluginProps.md).[`audienceSendCountingUniqueAction`](BaseSlidePluginProps.md#audiencesendcountinguniqueaction)
-
-***
-
 ### baseUrl?
 
 > `optional` **baseUrl**: `string`
 
-Defined in: [packages/ui/src/zoid/base.ts:91](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L91)
+Defined in: [packages/ui/src/zoid/base.ts:92](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L92)
 
 The base URL of the parent application
 
@@ -102,7 +74,7 @@ The base URL of the parent application
 
 > `optional` **closePluginModal**: () => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:71](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L71)
+Defined in: [packages/ui/src/zoid/audience.ts:71](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L71)
 
 Close the currently open plugin modal in the audience app.
 
@@ -116,7 +88,7 @@ Close the currently open plugin modal in the audience app.
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid/base.ts:89](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L89)
+Defined in: [packages/ui/src/zoid/base.ts:90](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L90)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -141,9 +113,9 @@ The new height in pixels, or null for 100% height.
 
 ### openPluginModal()?
 
-> `optional` **openPluginModal**: (`path?`) => `void`
+> `optional` **openPluginModal**: (`path?`, `data?`) => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:67](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L67)
+Defined in: [packages/ui/src/zoid/audience.ts:67](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L67)
 
 Open a full-screen modal in the audience app.
 
@@ -152,6 +124,10 @@ Open a full-screen modal in the audience app.
 ##### path?
 
 `string`
+
+##### data?
+
+`any`
 
 #### Returns
 
@@ -163,7 +139,7 @@ Open a full-screen modal in the audience app.
 
 > `optional` **presentation**: `object` & `object`
 
-Defined in: [packages/ui/src/zoid/audience.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L14)
+Defined in: [packages/ui/src/zoid/audience.ts:14](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L14)
 
 Presentation-wide settings and data that affect the plugin's appearance and behavior.
 
@@ -253,7 +229,7 @@ The teamplay object used in the presentation
 
 > `optional` **presentationColorPalette**: `string`[]
 
-Defined in: [packages/ui/src/zoid/base.ts:40](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L40)
+Defined in: [packages/ui/src/zoid/base.ts:41](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L41)
 
 Presentation-wide color palette attributes.
 
@@ -267,7 +243,7 @@ Presentation-wide color palette attributes.
 
 > `optional` **presentationLighterColorPalette**: `string`[]
 
-Defined in: [packages/ui/src/zoid/base.ts:44](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L44)
+Defined in: [packages/ui/src/zoid/base.ts:45](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L45)
 
 Presentation-wide lighter color palette attributes.
 
@@ -281,7 +257,7 @@ Presentation-wide lighter color palette attributes.
 
 > `optional` **showToastError**: (`text`, `uniqName?`, `action?`, `options?`) => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L50)
+Defined in: [packages/ui/src/zoid/audience.ts:50](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L50)
 
 Show an error toast message in the parent app.
 
@@ -313,7 +289,7 @@ Show an error toast message in the parent app.
 
 > `optional` **showToastInfo**: (`text`, `uniqName?`, `action?`, `options?`) => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L42)
+Defined in: [packages/ui/src/zoid/audience.ts:42](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L42)
 
 Show an info toast message in the parent app.
 
@@ -345,7 +321,7 @@ Show an info toast message in the parent app.
 
 > `optional` **showToastSuccess**: (`text`, `uniqName?`, `action?`, `options?`) => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:46](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L46)
+Defined in: [packages/ui/src/zoid/audience.ts:46](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L46)
 
 Show a success toast message in the parent app.
 
@@ -377,7 +353,7 @@ Show a success toast message in the parent app.
 
 > `optional` **slide**: `object`
 
-Defined in: [packages/ui/src/zoid/base.ts:48](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L48)
+Defined in: [packages/ui/src/zoid/base.ts:49](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L49)
 
 Data specific to the currently active slide.
 
@@ -491,7 +467,7 @@ The version of the slide
 
 > `optional` **slideAttributes**: `Record`\<`string`, `any`\>
 
-Defined in: [packages/ui/src/zoid/audience.ts:34](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L34)
+Defined in: [packages/ui/src/zoid/audience.ts:34](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L34)
 
 Custom attributes associated with the current slide.
 
@@ -501,7 +477,7 @@ Custom attributes associated with the current slide.
 
 > `optional` **subscribeTopic**: (`options`) => `void`
 
-Defined in: [packages/ui/src/zoid/base.ts:97](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L97)
+Defined in: [packages/ui/src/zoid/base.ts:98](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L98)
 
 Subscribe to a specific MQTT topic.
 
@@ -537,7 +513,7 @@ Subscription options including type, topic, and callback.
 
 > `optional` **trackGA4AndMixpanel**: (`payload`) => `void`
 
-Defined in: [packages/ui/src/zoid/base.ts:116](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L116)
+Defined in: [packages/ui/src/zoid/base.ts:110](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L110)
 
 Action to track events to GA4 and Mixpanel.
 
@@ -563,7 +539,7 @@ The event payload to track.
 
 > `optional` **unsubscribeTopic**: (`topic`) => `void`
 
-Defined in: [packages/ui/src/zoid/base.ts:103](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L103)
+Defined in: [packages/ui/src/zoid/base.ts:104](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L104)
 
 Unsubscribe from a specific MQTT topic.
 
@@ -589,7 +565,7 @@ The topic to unsubscribe from.
 
 > `optional` **updateAudienceData**: (`payload`) => `void`
 
-Defined in: [packages/ui/src/zoid/audience.ts:56](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L56)
+Defined in: [packages/ui/src/zoid/audience.ts:56](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L56)
 
 Update audience data such as name, email, and emoji.
 
@@ -627,7 +603,7 @@ The new audience name
 
 > `optional` **uploadImage**: () => `Promise`\<`any`\>
 
-Defined in: [packages/ui/src/zoid/audience.ts:38](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/audience.ts#L38)
+Defined in: [packages/ui/src/zoid/audience.ts:38](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/audience.ts#L38)
 
 Action to upload an image from the plugin iframe.
 
@@ -641,7 +617,7 @@ Action to upload an image from the plugin iframe.
 
 > **url**: `string`
 
-Defined in: [packages/ui/src/zoid/base.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/base.ts#L8)
+Defined in: [packages/ui/src/zoid/base.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/base.ts#L9)
 
 The URL of the plugin to be loaded in the iframe
 

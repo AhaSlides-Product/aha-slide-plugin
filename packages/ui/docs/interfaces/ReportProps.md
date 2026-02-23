@@ -6,7 +6,7 @@
 
 # Interface: ReportProps
 
-Defined in: [packages/ui/src/zoid/report.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L8)
+Defined in: [packages/ui/src/zoid/report.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L8)
 
 Properties for the report slide plugin.
 
@@ -16,9 +16,17 @@ Properties for the report slide plugin.
 
 > `optional` **currentLanguage**: `string`
 
-Defined in: [packages/ui/src/zoid/report.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L12)
+Defined in: [packages/ui/src/zoid/report.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L12)
 
 The current language code (e.g., 'en', 'vi')
+
+***
+
+### locale?
+
+> `optional` **locale**: `string`
+
+Defined in: [packages/ui/src/zoid/report.ts:29](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L29)
 
 ***
 
@@ -26,7 +34,7 @@ The current language code (e.g., 'en', 'vi')
 
 > `optional` **onHeightChange**: (`height`) => `void`
 
-Defined in: [packages/ui/src/zoid/report.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L19)
+Defined in: [packages/ui/src/zoid/report.ts:19](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L19)
 
 Callback to report height changes from the child to the parent. 
 Sending null signals the parent to use 100% height.
@@ -49,7 +57,7 @@ The new height in pixels, or null for 100% height.
 
 > `optional` **openExportModalForPresentation**: (`presentation`) => `void`
 
-Defined in: [packages/ui/src/zoid/report.ts:28](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L28)
+Defined in: [packages/ui/src/zoid/report.ts:28](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L28)
 
 #### Parameters
 
@@ -67,7 +75,7 @@ Defined in: [packages/ui/src/zoid/report.ts:28](https://github.com/AhaSlides-Pro
 
 > `optional` **pushRoute**: (`location`, `onComplete?`, `onAbort?`) => `void`
 
-Defined in: [packages/ui/src/zoid/report.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L27)
+Defined in: [packages/ui/src/zoid/report.ts:27](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L27)
 
 #### Parameters
 
@@ -93,7 +101,7 @@ Defined in: [packages/ui/src/zoid/report.ts:27](https://github.com/AhaSlides-Pro
 
 > `optional` **replaceRoute**: (`location`, `onComplete?`, `onAbort?`) => `void`
 
-Defined in: [packages/ui/src/zoid/report.ts:26](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L26)
+Defined in: [packages/ui/src/zoid/report.ts:26](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L26)
 
 #### Parameters
 
@@ -119,7 +127,7 @@ Defined in: [packages/ui/src/zoid/report.ts:26](https://github.com/AhaSlides-Pro
 
 > `optional` **token**: `string`
 
-Defined in: [packages/ui/src/zoid/report.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L10)
+Defined in: [packages/ui/src/zoid/report.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L10)
 
 The token for authentication/authorization
 
@@ -129,7 +137,7 @@ The token for authentication/authorization
 
 > `optional` **trackGA4AndMixpanel**: (`eventName`, `payload`) => `void`
 
-Defined in: [packages/ui/src/zoid/report.ts:25](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/ui/src/zoid/report.ts#L25)
+Defined in: [packages/ui/src/zoid/report.ts:25](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L25)
 
 Action to track events to GA4 and Mixpanel.
 
@@ -148,3 +156,11 @@ The event payload to track.
 #### Returns
 
 `void`
+
+***
+
+### translationMap?
+
+> `optional` **translationMap**: `Record`\<`string`, `string`\>
+
+Defined in: [packages/ui/src/zoid/report.ts:30](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/ui/src/zoid/report.ts#L30)

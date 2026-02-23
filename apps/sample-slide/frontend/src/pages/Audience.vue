@@ -18,7 +18,7 @@
 
     <div class="debug-section">
       <h3>Audience Debug Info</h3>
-      <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam }, null, 2) }}</pre>
+      <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam, participantInfo }, null, 2) }}</pre>
     </div>
 
     <div v-if="presentationProps" class="debug-section" data-testid="audience-presentation-props">
@@ -51,7 +51,7 @@
     <div class="vote-section">
       <h3>Realtime Vote</h3>
       <div class="vote-controls">
-        <a-button type="primary" size="large" @click="handleVote" :loading="voting">
+        <a-button ref="submitButtonRef" type="primary" size="large" @click="handleVote" :loading="voting">
           🔥 Vote Now!
         </a-button>
         <a-button type="default" size="large" @click="handleSubmitSubmission" :loading="submitting" style="margin-top: 10px;">
@@ -94,7 +94,7 @@ import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
 import { SubmissionSenderType } from '@aha/common';
-
+import { getSubmissions, saveSubmission } from '@aha/db';
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
 const { 
@@ -108,6 +108,7 @@ const {
   audienceId,
   audienceEmail,
   audienceTeam,
+  participantInfo,
   subscribeTopic,
   unsubscribeTopic,
   baseUrl,
@@ -115,7 +116,10 @@ const {
   showToastSuccess,
   updateAudienceData,
   openPluginModal,
+  onSubmitButtonHeightChange,
 } = useAudiencePlugin();
+
+const submitButtonRef = ref<any>(null);
 
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
@@ -138,6 +142,7 @@ const handleUpdateData = () => {
     updateAudienceData({
       audienceName: newName.value || 'New Tester',
       audienceEmoji: '🚀',
+      participantInfo: [{type: 'hello', value: 'myvalue'}]
     });
     if (showToastSuccess) {
       showToastSuccess('Sent update request!');
@@ -229,14 +234,20 @@ const handleSubmitSubmission = async () => {
     const response = await client.sendLiveSubmission(SlideType.SampleSlide, payload);
 
     console.log('Audience: Liveproxy response result:', response);
+
+    // save submission locally
+    const result = await saveSubmission({...payload, slideType: SlideType.SampleSlide});
+    console.log('Audience: Submission saved locally:', result);
   } catch (error) {
     console.error('Audience: Submission error:', error);
   } finally {
     submitting.value = false;
   }
+
+
 };
 
-onMounted(() => {
+onMounted(async () => {
   if (subscribeTopic) {
     watch(countTopic, (newTopic, oldTopic) => {
       if (oldTopic && unsubscribeTopic) unsubscribeTopic(oldTopic);
@@ -250,6 +261,39 @@ onMounted(() => {
         });
       }
     }, { immediate: true });
+  }
+
+  if (onSubmitButtonHeightChange) {
+    const reportButtonHeight = () => {
+      const buttonEl = submitButtonRef.value?.$el || submitButtonRef.value;
+      if (buttonEl) {
+        const rect = buttonEl.getBoundingClientRect();
+        // Get absolute top relative to the iframe document body
+        const absoluteTop = rect.top + window.scrollY;
+        console.log('[Plugin] Reporting submit button height:', absoluteTop);
+        onSubmitButtonHeightChange(absoluteTop);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(reportButtonHeight);
+    if (document.body) resizeObserver.observe(document.body);
+    
+    // Also report on initial mount and after some delay to ensure layout is stable
+    reportButtonHeight();
+    setTimeout(reportButtonHeight, 500);
+    setTimeout(reportButtonHeight, 1000);
+    setTimeout(reportButtonHeight, 2000);
+
+    const pastSubmission = await getSubmissions({ 
+      slideId: slideProps.value?.id ?? 0, 
+      slideVersion: slideProps.value?.version ?? 0, 
+      senderId: audienceId.value?.toString() ?? ""  
+    });
+    console.log('Audience: Past submission:', pastSubmission);
+
+    onUnmounted(() => {
+      resizeObserver.disconnect();
+    });
   }
 });
 

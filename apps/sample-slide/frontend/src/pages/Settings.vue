@@ -64,9 +64,16 @@
       <pre class="code-block">{{ JSON.stringify(currentUserProps, null, 2) }}</pre>
     </div>
 
-    <div v-if="attributeResponse" class="debug-section" data-testid="settings-slide-attributes">
+    <div v-if="attributeResponse && showSlideAttributes" class="debug-section" data-testid="settings-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(attributeResponse, null, 2) }}</pre>
+    </div>
+
+    <div class="debug-section">
+      <h3>Slide Attributes Control</h3>
+      <a-button @click="showSlideAttributes = !showSlideAttributes">
+        {{ showSlideAttributes ? 'Hide' : 'Show' }} Slide Attributes
+      </a-button>
     </div>
 
     <div class="debug-section">
@@ -88,23 +95,38 @@
       <div style="margin-top: 10px;">
         <a-button type="primary" @click="handleManualReportHeight">Trigger Manual Height Report</a-button>
       </div>
+
+      <div style="margin-top: 10px;">
+        <a-button type="primary" @click="showConfirm">Show Confim Modal</a-button>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <a-button type="danger" @click="onClearSlideData">Clear Slide Data</a-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch, ref, computed } from 'vue';
+import { onMounted, watch, ref, computed, nextTick } from 'vue';
 import { debounce } from 'lodash-es';
 import { useSync, usePresenterPlugin } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { EditOutlined } from '@ant-design/icons-vue';
 
-const { presentationProps, presentationColorPaletteProps, presentationLighterColorPaletteProps, slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
-  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight
+const { 
+  presentationProps, 
+  presentationColorPaletteProps, 
+  presentationLighterColorPaletteProps, 
+  slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
+  openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight, 
+  showConfirmModal, 
+  clearSlideData
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
 
+const showSlideAttributes = ref(false);
 const selectedTestValue = ref('');
 
 const handleManualReportHeight = () => {
@@ -195,6 +217,35 @@ const debouncedUpdate = debounce((newGreeting: string) => {
     upsertSlideAttributeAction({ slideId: slideId.value, attributeKey: 'greeting', attributeValue: newGreeting })
   }
 }, 500);
+
+const showConfirm = async () => {
+  const confirm = await showConfirmModal?.({
+    title: 'Sample confirm',
+    content: 'This is a sample confirm modal',
+    okText: 'OK',
+    cancelText: 'Cancel',
+    variant: 'danger'
+  })
+  console.log('Confirm:', confirm);
+}
+
+watch(showSlideAttributes, async () => {
+  await nextTick();
+  reportHeight();
+});
+
+const onClearSlideData = async () => {
+  const confirm = await showConfirmModal?.({
+    title: 'Clear Slide Data',
+    content: 'Are you sure you want to clear the slide data?',
+    okText: 'OK',
+    cancelText: 'Cancel',
+    variant: 'danger'
+  })
+  if (confirm) {
+    clearSlideData?.(slideId.value);
+  }
+}
 
 watch(slideGreeting, (newGreeting) => {
   debouncedUpdate(newGreeting);

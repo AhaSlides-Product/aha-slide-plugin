@@ -9,6 +9,19 @@ import {
   useBaseSlidePlugin
 } from './base';
 
+
+type ConfirmModalPayload = {
+  /** The title of the confirm modal */
+  title: string,
+  /** The content of the confirm modal */
+  content: string,
+  /** The text to display on the ok button */
+  okText?: string,
+  /** The text to display on the cancel button */
+  cancelText?: string,
+  /** The variant of the confirm modal */
+  variant?: 'primary' | 'danger'
+}
 /**
  * Interface for the properties expected by the PresenterSlidePluginIframe component.
  */
@@ -89,6 +102,10 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * Close the currently open plugin modal.
    */
   closePluginModal?: () => void;
+
+  showConfirmModal?: (payload: ConfirmModalPayload) => Promise<boolean>;
+
+  clearSlideData?: (slideId: string) => Promise<void>;
 }
 
 /**
@@ -195,6 +212,10 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'string',
       required: false,
     },
+    showConfirmModal: {
+      type: 'function',
+      required: false,
+    }
   },
 });
 
@@ -232,6 +253,18 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Access token for the current user.
    */
   accessToken: string | undefined;
+
+  /**
+   * Show a confirm modal in the parent app.
+   * @param payload - The confirm modal data.
+   * @returns A promise resolving to a boolean indicating whether the user confirmed.
+   */
+  showConfirmModal: ((payload: ConfirmModalPayload) => Promise<boolean>) | undefined;
+
+  /**
+   * Clear the slide data in the parent app.
+   */
+  clearSlideData: ((slideId: string) => Promise<void>) | undefined;
 }
 
 /**
@@ -297,5 +330,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     closePluginModal: xprops?.closePluginModal,
     reportHeight: baseHook.reportHeight,
     accessToken: xprops?.token,
+    showConfirmModal: xprops?.showConfirmModal,
+    clearSlideData: xprops?.clearSlideData,
   };
 }

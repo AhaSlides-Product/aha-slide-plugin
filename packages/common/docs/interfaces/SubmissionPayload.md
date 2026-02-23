@@ -6,7 +6,7 @@
 
 # Interface: SubmissionPayload\<T\>
 
-Defined in: [types.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L6)
+Defined in: [types.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L6)
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [types.ts:6](https://github.com/AhaSlides-Product/aha-slide-plugin/b
 
 > **attributes**: `T`
 
-Defined in: [types.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L13)
+Defined in: [types.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L13)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [types.ts:13](https://github.com/AhaSlides-Product/aha-slide-plugin/
 
 > **presentationId**: `string` \| `number`
 
-Defined in: [types.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L10)
+Defined in: [types.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L10)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [types.ts:10](https://github.com/AhaSlides-Product/aha-slide-plugin/
 
 > **senderId**: `string`
 
-Defined in: [types.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L11)
+Defined in: [types.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L11)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [types.ts:11](https://github.com/AhaSlides-Product/aha-slide-plugin/
 
 > **senderType**: [`SubmissionSenderType`](../enumerations/SubmissionSenderType.md)
 
-Defined in: [types.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L12)
+Defined in: [types.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L12)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [types.ts:12](https://github.com/AhaSlides-Product/aha-slide-plugin/
 
 > **slideId**: `string` \| `number`
 
-Defined in: [types.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L7)
+Defined in: [types.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L7)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: [types.ts:7](https://github.com/AhaSlides-Product/aha-slide-plugin/b
 
 > **slideVersion**: `string` \| `number`
 
-Defined in: [types.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L8)
+Defined in: [types.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L8)
 
 ***
 
@@ -68,4 +68,4 @@ Defined in: [types.ts:8](https://github.com/AhaSlides-Product/aha-slide-plugin/b
 
 > **type**: `string`
 
-Defined in: [types.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/924cf70c3514213c6fa8e9f8a90e3dcc697a9b79/packages/common/src/types.ts#L9)
+Defined in: [types.ts:9](https://github.com/AhaSlides-Product/aha-slide-plugin/blob/d91fbb66824f17fb34de92a758af66be8664842a/packages/common/src/types.ts#L9)

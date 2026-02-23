@@ -24,7 +24,7 @@ runs:
 
     - name: Build Report App
       shell: bash
-      run: npm run build:report:${{ inputs.mode }}
+      run: npm run build:report -- -- --mode=${{ inputs.mode }}
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
