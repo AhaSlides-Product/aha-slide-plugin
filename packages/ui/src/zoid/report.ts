@@ -30,6 +30,7 @@ export interface ReportProps {
   currentUser?: object;
   featureFlags?: object;
   translationMap?: Record<string, string>;
+  iframePath?: string;
 }
 
 /**
@@ -91,6 +92,10 @@ export const ReportIframe = zoid.create({
       type: 'object',
       required: false,
     },
+    iframePath: {
+      type: 'string',
+      required: false,
+    },
   },
 });
 
@@ -106,6 +111,7 @@ export interface ReportReturn {
   openExportModalForPresentation: ((presentation: any) => void) | undefined;
   locale: Ref<string | undefined>;
   translationMap: Ref<Record<string, string> | undefined>;
+  iframePath: Ref<string | undefined>;
   featureFlags: Ref<Record<string, string> | undefined>;
 }
 
@@ -127,6 +133,7 @@ export function useReportPlugin(
   const locale = ref<string | undefined>((window as any).xprops?.locale);
   const translationMap = ref<Record<string, string> | undefined>((window as any).xprops?.translationMap);
   const featureFlags = ref<Record<string, string> | undefined>((window as any).xprops?.featureFlags);
+  const iframePath = ref<string | undefined>((window as any).xprops?.iframePath);
 
   onMounted(() => {
     let cleanup = () => { };
@@ -147,6 +154,7 @@ export function useReportPlugin(
         if (newProps.locale) locale.value = newProps.locale;
         if (newProps.translationMap) translationMap.value = newProps.translationMap;
         if (newProps.featureFlags) featureFlags.value = newProps.featureFlags;
+        if (newProps.iframePath || newProps.iframePath === '') iframePath.value = newProps.iframePath;
       });
     }
     return cleanup;
@@ -162,5 +170,6 @@ export function useReportPlugin(
     locale,
     translationMap,
     featureFlags,
+    iframePath,
   };
 }
