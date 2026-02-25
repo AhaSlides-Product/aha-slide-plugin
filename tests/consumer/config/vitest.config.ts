@@ -33,6 +33,7 @@ export default defineConfig({
     alias: {
       '@aha/ui': resolve(__dirname, '../../../packages/ui/src'),
       '@aha/backend-utils': resolve(__dirname, '../../../packages/backend-utils/src'),
+      '@aha/common': resolve(__dirname, '../../../packages/common/src'),
     },
   },
 });

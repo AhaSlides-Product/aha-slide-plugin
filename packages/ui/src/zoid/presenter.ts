@@ -28,7 +28,7 @@ type ConfirmModalPayload = {
 export interface SlidePluginProps extends BaseSlidePluginProps {
   presentation?: BaseSlidePluginProps['presentation'] & {
     /** The teamplay object used in the presentation */
-    teamplay?: Record<string, any>;
+    teamPlay?: Record<string, any>;
   };
   /**
    * Information about the current user.
@@ -125,8 +125,8 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
-    presentationAttributeColorPalette: {
-      type: 'object',
+    presentationColorPalette: {
+      type: 'array',
       required: false,
     },
     slide: {
@@ -325,7 +325,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
     // rename sendVoteCount to setSubmissionCount to avoid confusion 
-    setSubmissionCount: (payload: { count: number, tooltip?: string }) => xprops?.sendVoteOutcome({ voteCount: payload.count, ...payload }),
+    setSubmissionCount: (payload: { count: number, tooltip?: string }) => xprops?.sendVoteOutcome({ voteCount: payload.count, tooltip: payload.tooltip }),
     openPluginModal: xprops?.openPluginModal,
     closePluginModal: xprops?.closePluginModal,
     reportHeight: baseHook.reportHeight,
