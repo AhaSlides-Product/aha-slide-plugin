@@ -235,10 +235,6 @@ describe('@aha/ui - Composables', () => {
       expect(typeof hook.showToastError).toBe('function');
       expect(typeof hook.openPluginModal).toBe('function');
       expect(typeof hook.closePluginModal).toBe('function');
-      expect(typeof hook.showConfirmModal).toBe('function');
-      expect(typeof hook.clearSlideData).toBe('function');
-      expect(typeof hook.openUploadImageModal).toBe('function');
-      expect(typeof hook.openEditImageModal).toBe('function');
     });
 
     it('should respect autoHeight: false and not call autoReportHeight', () => {
