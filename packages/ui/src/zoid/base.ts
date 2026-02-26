@@ -79,6 +79,9 @@ export interface BaseSlidePluginProps {
     imageSubmission?: boolean;
     /** The limit on the number of choices */
     limitChoice?: number;
+
+    /** slide title */
+    title?: string;
     [key: string]: any;
   };
   /** 
