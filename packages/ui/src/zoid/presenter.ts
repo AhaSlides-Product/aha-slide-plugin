@@ -274,7 +274,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
  */
-export function usePresenterPlugin(options: UseSlidePluginOptions = { autoHeight: true }): PresenterPluginReturn {
+export function usePresenterPlugin(options: UseSlidePluginOptions = {}): PresenterPluginReturn {
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
 
   const baseHook = useBaseSlidePlugin(options, (newProps) => {

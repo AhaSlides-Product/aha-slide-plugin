@@ -147,8 +147,8 @@ export function reportHeight() {
   }
 
   const app = document.getElementById('app') || document.getElementById('root');
-  const height = app 
-    ? app.scrollHeight 
+  const height = app
+    ? app.scrollHeight
     : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
   console.log('[SlidePlugin] Reporting height:', height);
   xprops.onHeightChange(height);
@@ -160,7 +160,7 @@ export function reportHeight() {
  * 
  * @returns A cleanup function to stop observing height changes.
  */
-export function autoReportHeight() {
+export function autoReportHeight(wrapperId?: string) {
   console.log('[SlidePlugin] autoReportHeight called');
   if (typeof window === 'undefined') return () => { };
 
@@ -169,33 +169,33 @@ export function autoReportHeight() {
     return () => { };
   }
 
-  const throtledOnHeightChange = throttle((height: number) => {
-    xprops.onHeightChange(height);
-  }, 300);
-
   const sendHeight = () => {
-    const app = document.getElementById('app') || document.getElementById('root');
-    const height = app 
-      ? app.scrollHeight 
+    const app = document.getElementById(wrapperId || 'app') || document.getElementById('root');
+    const height = app
+      ? app.scrollHeight
       : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
     console.log('[SlidePlugin] Reporting height:', height);
-    throtledOnHeightChange(height);
+    xprops.onHeightChange(height);
   };
+  const throttledSendHeight = throttle(sendHeight, 100);
 
-  const observer = new ResizeObserver(() => sendHeight());
+  const observer = new ResizeObserver(() => throttledSendHeight());
   observer.observe(document.body);
-  const app = document.getElementById('app');
+  const app = document.getElementById(wrapperId || 'app');
   if (app) {
     observer.observe(app);
   }
 
   // Fallback for changes that might not trigger ResizeObserver on the containers
-  const mutObserver = new MutationObserver(() => sendHeight());
-  mutObserver.observe(document.body, {
-    attributes: true,
-    childList: true,
-    subtree: true,
-  });
+  let mutObserver: MutationObserver | undefined;
+  if (!wrapperId) {
+    mutObserver = new MutationObserver(() => throttledSendHeight());
+    mutObserver.observe(document.body, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
+  }
 
   // Initial report
   sendHeight();
@@ -205,7 +205,7 @@ export function autoReportHeight() {
 
   return () => {
     observer.disconnect();
-    mutObserver.disconnect();
+    mutObserver?.disconnect();
   };
 }
 
@@ -216,7 +216,7 @@ export interface UseSlidePluginOptions {
   /** 
    * Whether to automatically report content height to the parent.
    */
-  autoHeight?: boolean;
+  autoHeight?: boolean | string;
 }
 
 /**
@@ -266,7 +266,7 @@ export interface BaseSlidePluginReturn {
  * @returns Reactive refs for common presentation and slide props, and shared actions.
  */
 export function useBaseSlidePlugin(
-  options: UseSlidePluginOptions = { autoHeight: true },
+  options: UseSlidePluginOptions = { autoHeight: false },
   onPropsExtension?: (newProps: any) => void
 ): BaseSlidePluginReturn & { xprops: any } {
   const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
@@ -277,8 +277,8 @@ export function useBaseSlidePlugin(
 
   onMounted(() => {
     let cleanup = () => { };
-    if (options.autoHeight !== false) {
-      cleanup = autoReportHeight();
+    if (options.autoHeight) {
+      cleanup = autoReportHeight(typeof options.autoHeight === 'string' ? options.autoHeight : undefined);
     } else {
       const xprops = (window as any).xprops;
       if (xprops && typeof xprops.onHeightChange === 'function') {
