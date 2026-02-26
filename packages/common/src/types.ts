@@ -4,11 +4,16 @@ export enum SubmissionSenderType {
 }
 
 export interface SubmissionPayload<T = any> {
-  slideId: string | number;
-  slideVersion: string | number;
+  presentationId: number;
+  presentationVersion: number;
+
+  slideId: number;
+  slideVersion: number;
+
   type: string;
-  presentationId: string | number;
+
   senderId: string;
   senderType: SubmissionSenderType;
+
   attributes: T;
 }
