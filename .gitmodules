@@ -13,9 +13,6 @@
 [submodule "domains/report"]
 	path = domains/report
 	url = git@github.com:AhaSlides-Product/aha-report.git
-[submodule "apps/slide-plugin-markdown"]
-	path = apps/slide-plugin-markdown
-	url = git@github.com:AhaSlides-Product/slide-plugin-markdown.git
 [submodule "apps/markdown"]
 	path = apps/markdown
 	url = git@github.com:AhaSlides-Product/slide-plugin-markdown.git
