@@ -5,7 +5,7 @@ export enum SubmissionSenderType {
 
 export interface SubmissionPayload<T = any> {
   presentationId: number;
-  presentationVersion: number;
+  presentationVersion?: number;
 
   slideId: number;
   slideVersion: number;
