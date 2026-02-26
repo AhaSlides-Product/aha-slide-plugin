@@ -73,7 +73,7 @@ npm run docs --workspaces
 
 You can view existing components and icons in the storybook https://plugins.dev.ahaslide.com/storybook/
 ```
-npm run storybook 
+npm run storybook
 ```
 
 ### Running the Sample App
@@ -84,7 +84,13 @@ To start the sample slide frontend in development mode:
 npm run dev -w @aha/sample-slide-frontend
 ```
 
-This will launch the Vite development server.
+This will launch the Vite development server. You can go to https://presenter.sandbox.ahaslide.com/ and add a sample slide to see the result.
+
+You can also start the sample slide from a different package:
+```bash
+npm run dev -w @aha/<package-name>
+```
+Refer to: `apps/<slide-type>/frontend/package.json` to obtain the correct package name.
 
 ### Running the Unified Backend
 
@@ -101,19 +107,19 @@ When you build or start `backend-main`, it triggers an auto-generation script (`
 This module also auto-prefixes all routes with `/api/plugins` to align with the API gateway configuration.
 So backend api paths become `/api/plugins/{slide-type}/**`
 
-If plugin providers want to expose a custom api, please prefix the api path with `external/`. For example `/api/plugins/ideas-board/external/auto-group-ideas` 
+If plugin providers want to expose a custom api, please prefix the api path with `external/`. For example `/api/plugins/ideas-board/external/auto-group-ideas`
 
 ```
 curl https://plugins.dev.ahaslide.com/api/plugins/sample-slide/external/example
 ```
 
-### Environments 
+### Environments
 
-#### Local development 
+#### Local development
 
-For local development, please use Ahaslides' sandbox environment at `https://presenter.sandbox.ahaslide.com`. The environment is pre-configured with `localhost:5173` for slide types `ranking`, `pin on image` and `ideas board`. 
+For local development, please use Ahaslides' sandbox environment at `https://presenter.sandbox.ahaslide.com`. The environment is pre-configured with `localhost:5173` for slide types `ranking`, `pin on image` and `ideas board`.
 
-#### Staging 
+#### Staging
 
-Plugins are deployed at `plugins.dev.ahaslide.com` and can be tested with `https://presenter.dev.ahaslides.com` 
+Plugins are deployed at `plugins.dev.ahaslide.com` and can be tested with `https://presenter.dev.ahaslides.com`
 
