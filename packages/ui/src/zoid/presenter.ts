@@ -332,5 +332,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     accessToken: xprops?.token,
     showConfirmModal: xprops?.showConfirmModal,
     clearSlideData: xprops?.clearSlideData,
+    trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
   };
 }

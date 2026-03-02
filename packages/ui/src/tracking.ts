@@ -130,17 +130,28 @@ function getUserInput(eventTarget: HTMLInputElement | HTMLSelectElement | HTMLTe
     return eventTarget.value
 }
 
+function _getNameFromDescendant(vnode: VNode): string {
+    const el = vnode.el as HTMLElement | null
+    if (!el) return ''
+    const firstNamedElement = el.querySelector('[name]')
+    let nameFromDescendant = ''
+    if (firstNamedElement) {
+      nameFromDescendant = firstNamedElement.getAttribute('name') || ''
+    }
+    return nameFromDescendant
+}
+
 function _getObjectName(vnode: VNode): string {
     // In Vue 3, props are accessed differently
     const nameFromAttr = lodashGet(vnode, 'props.name', '')
     const nameFromComponent = lodashGet(vnode, 'type.name', '') || lodashGet(vnode, 'type.__name', '')
-    const nameFromFirstChild = lodashGet(vnode, 'el.firstElementChild.name', '')
+    const nameFromDescendant = _getNameFromDescendant(vnode)
 
-    if (!nameFromAttr && !nameFromComponent && !nameFromFirstChild) {
+    if (!nameFromAttr && !nameFromComponent && !nameFromDescendant) {
         return ANONYMOUS_ELEMENT
     }
 
-    const name = nameFromAttr || nameFromComponent || nameFromFirstChild
+    const name = nameFromAttr || nameFromComponent || nameFromDescendant
     return snakeCase(name as string)
 }
 

@@ -264,5 +264,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     onSubmitButtonHeightChange,
     participantInfo,
     reportHeight: baseHook.reportHeight,
+    trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
   };
 }
