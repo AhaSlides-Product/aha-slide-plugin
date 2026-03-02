@@ -107,7 +107,7 @@ import { getBucket } from '@aha/common';
 import { ApiClient } from '@aha/api';
 
 const route = useRoute();
-const slideId = route.params.slideId as string;
+const slideId = Number(route.params.slideId);
 const { 
   presentationProps, 
   presentationColorPaletteProps,
