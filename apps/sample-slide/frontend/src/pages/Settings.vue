@@ -4,7 +4,19 @@
     
     <div class="settings-form">
       <h3>Slide Greeting</h3>
-      <a-input v-model:value="slideGreeting" placeholder="Enter slide greeting" style="width: 300px" />
+      <a-input v-aha-emit-action name='greeting' v-model:value="slideGreeting" placeholder="Enter slide greeting" style="width: 300px" />
+    </div>
+    <div class="settings-form">
+      <h3>Slide Text Area</h3>
+      <a-textarea v-aha-emit-action name='aha-slide-area-test' placeholder="Enter slide greeting" style="width: 300px" />
+    </div>
+    <div class="settings-form">
+      <h3>Slide Number</h3>
+      <a-input-number v-aha-emit-action name='aha-slide-input-number' placeholder="Enter slide greeting" style="width: 300px" />
+    </div>
+    <div class="settings-form">
+      <h3>Test tracking button</h3>
+      <a-button @click="testTrackingMethod">Test tracking method</a-button>
     </div>
     <div>
       <a-typography-title>Heading 1</a-typography-title>
@@ -121,7 +133,8 @@ const {
   slideProps, currentUserProps, upsertSlideAttributeAction, getSlideAttributesAction,
   openUploadImageModal, openEditImageModal, showToastInfo, showToastSuccess, showToastError, reportHeight, 
   showConfirmModal, 
-  clearSlideData
+  clearSlideData,
+  trackGA4AndMixpanel,
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -135,6 +148,12 @@ const handleManualReportHeight = () => {
 };
 
 const { imageUrl } = useSlideImage(slideId);
+
+const testTrackingMethod = () => {
+  if (!trackGA4AndMixpanel) return;
+  const trackingEventName = "trackingEventName"
+  trackGA4AndMixpanel(trackingEventName, { eventAction: trackingEventName, otherPropertyNeedToTrack: 'test' });
+};
 
 const handleImageUpload = async () => {
   try {

@@ -231,6 +231,7 @@ export interface BaseSlidePluginReturn {
   presentationLighterColorPaletteProps: Ref<string[] | undefined>;
   slideProps: Ref<Record<string, any> | undefined>;
   baseUrl: Ref<string | undefined>;
+  trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
   /** 
    * Manually trigger a report of the current content height to the parent.
    */
@@ -277,6 +278,7 @@ export function useBaseSlidePlugin(
   const presentationLighterColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationLighterColorPalette);
   const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
   const baseUrl = ref<string | undefined>((window as any).xprops?.baseUrl);
+  const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
 
   onMounted(() => {
     let cleanup = () => { };
@@ -322,5 +324,6 @@ export function useBaseSlidePlugin(
     unsubscribeTopic,
     reportHeight,
     xprops,
+    trackGA4AndMixpanel,
   };
 }
