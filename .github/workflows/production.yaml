@@ -36,7 +36,7 @@ jobs:
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
-          s3_bucket: ${{ secrets.AWS_S3_BUCKET_CANARY }}
+          s3_bucket: plugins2.ahaslides.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
@@ -65,7 +65,7 @@ jobs:
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
-          s3_bucket: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
+          s3_bucket: plugins.ahaslides.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1

@@ -1,0 +1,61 @@
+{
+  "family": "us01-plugins-default",
+  "containerDefinitions": [
+    {
+      "name": "plugins",
+      "image": "",
+      "cpu": 1024,
+      "portMappings": [
+        {
+          "name": "plugins-3000-tcp",
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "ENABLE_GLOBAL_AUDIT_LOG",
+          "value": "true"
+        },
+        {
+          "name": "ECS_LOGLEVEL",
+          "value": "error"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "secrets": [
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-openai_api_key"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/us01-plugins-default",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "systemControls": [],
+      "stopTimeout": 120
+    }
+  ],
+  "taskRoleArn": "arn:aws:iam::018208337430:role/us01-plugins-task-role",
+  "executionRoleArn": "arn:aws:iam::018208337430:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "placementConstraints": [],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "runtimePlatform": {
+    "cpuArchitecture": "ARM64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
