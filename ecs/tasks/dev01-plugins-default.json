@@ -26,7 +26,12 @@
       ],
       "mountPoints": [],
       "volumesFrom": [],
-      "secrets": [],
+      "secrets": [
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-openai_api_key"
+        }
+      ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
