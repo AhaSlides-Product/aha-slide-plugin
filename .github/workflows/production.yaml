@@ -40,6 +40,7 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+          cloudfront_distribution_id: E1IKEL4KIY7OL5
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs
@@ -69,6 +70,7 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+          cloudfront_distribution_id: E280LS9794B888
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs

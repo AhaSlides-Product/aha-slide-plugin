@@ -29,13 +29,13 @@
       "secrets": [
         {
           "name": "OPENAI_API_KEY",
-          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-openai_api_key"
+          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/us01-plugins-default-openai_api_key"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/us01-plugins-default",
+          "awslogs-group": "/ecs/us01-plugins-canary",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
