@@ -73,6 +73,11 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * Callback function to report the vertical position of the submit button.
    */
   onSubmitButtonHeightChange?: (height: number) => void;
+  /**
+   * Remaining time for the current slide if hasTimeLimit is true.
+   * @type {number|null}
+   */
+  timeLimit?: number | null;
 }
 
 /**
@@ -164,6 +169,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    timeLimit: {
+      type: 'number',
+      required: false,
+    },
   },
 });
 
@@ -200,6 +209,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   openPluginModal: ((path?: string, data?: any) => void) | undefined;
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
+  timeLimit: Ref<number | null | undefined>;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -220,6 +230,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const openPluginModal = xprops?.openPluginModal;
   const closePluginModal = xprops?.closePluginModal;
   const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
+  const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -235,6 +246,9 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       if (newProps.audience.audienceEmail !== undefined) audienceEmail.value = newProps.audience.audienceEmail;
       if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
       if (newProps.audience.participantInfo !== undefined) participantInfo.value = newProps.audience.participantInfo;
+    }
+    if (newProps.timeLimit !== undefined) {
+      timeLimit.value = newProps.timeLimit;
     }
   };
 
@@ -262,6 +276,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     openPluginModal,
     closePluginModal,
     onSubmitButtonHeightChange,
+    timeLimit,
     participantInfo,
     reportHeight: baseHook.reportHeight,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,

@@ -16,6 +16,23 @@
       </div>
     </div>
 
+    <!-- Progress Bar Demo -->
+    <div class="progress-section" v-if="timeLimit !== null">
+      <h3>Slide Timer (Sync from Parent)</h3>
+      <div class="timer-container">
+        <div class="timer-value" :class="{ 'timer-low': (timeLimit || 0) <= 5 }">
+          {{ timeLimit }}s
+        </div>
+        <div class="timer-bar-wrapper">
+          <div class="timer-bar" :style="{ width: timerWidth + '%' }"></div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-section" v-else>
+      <h3>Slide Timer</h3>
+      <p>No timer active (null received from parent)</p>
+    </div>
+
     <div class="debug-section">
       <h3>Audience Debug Info</h3>
       <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam, participantInfo }, null, 2) }}</pre>
@@ -117,7 +134,15 @@ const {
   updateAudienceData,
   openPluginModal,
   onSubmitButtonHeightChange,
+  timeLimit,
 } = useAudiencePlugin();
+
+const timerWidth = computed(() => {
+  if (timeLimit.value === null || timeLimit.value === undefined) return 0;
+  // Fallback to timeToAnswer from slideProps if available, otherwise assume 30s for demo bar
+  const total = slideProps.value?.timeToAnswer ? parseInt(slideProps.value.timeToAnswer) : 30;
+  return Math.min(100, (timeLimit.value / total) * 100);
+});
 
 const submitButtonRef = ref<any>(null);
 
@@ -378,5 +403,51 @@ onUnmounted(() => {
   padding: 4px;
   border-bottom: 1px solid #f0f0f0;
   font-family: monospace;
+}
+
+.progress-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 8px;
+}
+
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.timer-low {
+  color: #ff4d4f;
+  animation: pulse 1s infinite;
+}
+
+.timer-bar-wrapper {
+  width: 100%;
+  height: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  background: #1890ff;
+  transition: width 0.3s linear;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 </style>
