@@ -1,4 +1,4 @@
-name: "Production Deploy"
+name: "Canary Deploy"
 
 on:
   workflow_dispatch:
@@ -24,8 +24,8 @@ jobs:
           aws_region: us-east-1
           platform: linux/arm64
 
-  deploy_production:
-    name: Deploy Production
+  deploy_canary:
+    name: Deploy Canary
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -35,11 +35,11 @@ jobs:
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
-          s3_bucket: plugins.ahaslides.com
+          s3_bucket: plugins2.ahaslides.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
-          cloudfront_distribution_id: E280LS9794B888
+          cloudfront_distribution_id: E1IKEL4KIY7OL5
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs
@@ -50,5 +50,5 @@ jobs:
           repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
           commit_sha: ${{ github.sha }}
           ecs_cluster: us01-plugins
-          ecs_service: us01-plugins-default
-          ecs_task_definition: ecs/tasks/us01-plugins-default.json
+          ecs_service: us01-plugins-canary
+          ecs_task_definition: ecs/tasks/us01-plugins-canary.json
