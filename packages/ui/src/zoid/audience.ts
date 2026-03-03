@@ -78,6 +78,11 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * @type {number|null}
    */
   timeLimit?: number | null;
+  /**
+   * Scroll the parent app to a specific offset relative to the iframe top.
+   * @param yOffset - The vertical offset relative to the iframe top.
+   */
+  scrollTo?: (yOffset: number) => void;
 }
 
 /**
@@ -173,6 +178,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'number',
       required: false,
     },
+    scrollTo: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -210,6 +219,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
   timeLimit: Ref<number | null | undefined>;
+  scrollTo: ((yOffset: number) => void) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -231,6 +241,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const closePluginModal = xprops?.closePluginModal;
   const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
   const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
+  const scrollTo = xprops?.scrollTo;
 
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
@@ -277,6 +288,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     closePluginModal,
     onSubmitButtonHeightChange,
     timeLimit,
+    scrollTo,
     participantInfo,
     reportHeight: baseHook.reportHeight,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,

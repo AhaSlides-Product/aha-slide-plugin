@@ -33,7 +33,7 @@
       <p>No timer active (null received from parent)</p>
     </div>
 
-    <div class="debug-section">
+    <div class="debug-section" ref="debugInfoRef">
       <h3>Audience Debug Info</h3>
       <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam, participantInfo }, null, 2) }}</pre>
     </div>
@@ -96,6 +96,14 @@
             Open Custom Path Modal
           </a-button>
         </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+          <a-button @click="handleScrollTo(0)" type="dashed">
+            📍 Scroll to Iframe Top
+          </a-button>
+          <a-button @click="handleScrollToDebugInfo" type="primary" ghost>
+            🔍 Scroll to Debug Info
+          </a-button>
+        </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
           <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
         </div>
@@ -135,6 +143,7 @@ const {
   openPluginModal,
   onSubmitButtonHeightChange,
   timeLimit,
+  scrollTo,
 } = useAudiencePlugin();
 
 const timerWidth = computed(() => {
@@ -159,6 +168,24 @@ const handleOpenModal = (path?: string) => {
     }
   } else {
     console.warn('openPluginModal function not available');
+  }
+};
+
+const debugInfoRef = ref<HTMLElement | null>(null);
+
+const handleScrollTo = (yOffset: number) => {
+  if (scrollTo) {
+    console.log('[Plugin] Requesting scroll to offset:', yOffset);
+    scrollTo(yOffset);
+  } else {
+    console.warn('scrollTo function not available');
+  }
+};
+
+const handleScrollToDebugInfo = () => {
+  if (debugInfoRef.value) {
+    const offsetTop = debugInfoRef.value.offsetTop;
+    handleScrollTo(offsetTop);
   }
 };
 
