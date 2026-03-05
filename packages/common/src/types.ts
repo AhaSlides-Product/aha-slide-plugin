@@ -3,6 +3,10 @@ export enum SubmissionSenderType {
   Presenter = 'presenter',
 }
 
+export enum SubmissionType {
+  Response = 'response',
+}
+
 export interface SubmissionPayload<T = any> {
   presentationId: number;
   presentationVersion?: number;
@@ -10,7 +14,7 @@ export interface SubmissionPayload<T = any> {
   slideId: number;
   slideVersion: number;
 
-  type: string;
+  type: SubmissionType | string;
 
   senderId: string;
   senderType: SubmissionSenderType;

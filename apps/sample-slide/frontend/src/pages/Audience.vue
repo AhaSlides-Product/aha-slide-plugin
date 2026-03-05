@@ -118,7 +118,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
-import { SubmissionSenderType } from '@aha/common';
+import { SubmissionSenderType, SubmissionType } from '@aha/common';
 import { getSubmissions, saveSubmission } from '@aha/db';
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -267,7 +267,7 @@ const handleSubmitSubmission = async () => {
   const payload: SubmissionPayload = {
     slideId: slideProps.value?.id || 3,
     slideVersion: slideProps.value?.version || 2,
-    type: "sample-slide",
+    type: SubmissionType.Response,
     presentationId: presentationProps.value?.id || 0,
     senderId: audienceId.value?.toString() ?? "sample-audienceId",
     senderType: SubmissionSenderType.Audience,
