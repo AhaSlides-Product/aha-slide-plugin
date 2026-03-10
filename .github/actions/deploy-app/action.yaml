@@ -54,6 +54,11 @@ runs:
         INVALIDATION_PATHS=""
         for app_dir in deployment_artifacts/*/; do
           app_name=$(basename "$app_dir")
+          if [ -d "${app_dir}slides_agent" ]; then
+            echo "Copying slides agents spec for ${app_name}..."
+            # Copy all files inside folders to bucket/slide_types_schemas/
+            aws s3 cp "${app_dir}slides_agent" "s3://${{ inputs.slides_agent_bucket }}/slide_types_schemas/" --recursive
+          fi
           if [ -d "${app_dir}frontend/dist" ]; then
             echo "Deploying ${app_name}..."
             # Sync all files except index.html first
@@ -76,15 +81,3 @@ runs:
           echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
           aws cloudfront create-invalidation --distribution-id "${{ inputs.cloudfront_distribution_id }}" --paths $INVALIDATION_PATHS
         fi
-
-        # Loop through each app directory and copy items inside slides_agent to S3
-        INVALIDATION_PATHS=""
-        echo "Deploying slides agents spec to ${{ inputs.slides_agent_bucket }}"
-        for app_dir in deployment_artifacts/*/; do
-          app_name=$(basename "$app_dir")
-          if [ -d "${app_dir}slides_agent" ]; then
-            echo "Copying slides agents spec for ${app_name}..."
-            # Copy all files inside folders to bucket/slide_types_schemas/
-            aws s3 cp "${app_dir}slides_agent" "s3://${{ inputs.slides_agent_bucket }}/slide_types_schemas/" --recursive
-          fi
-        done
