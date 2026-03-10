@@ -124,6 +124,7 @@ const {
   accessToken,
   openPluginModal,
   showConfirmModal,
+  allowPDFRender,
 } = usePresenterPlugin();
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
@@ -149,6 +150,9 @@ onMounted(async () => {
   })
   initialValues.value = JSON.stringify(result);
   console.log('[Slide Plugin] initialValues', initialValues.value)
+
+  // Allow PDF rendering after initial data is loaded and components are mounted
+  allowPDFRender?.();
   
   // MQTT Integration
   if (subscribeTopic) {
