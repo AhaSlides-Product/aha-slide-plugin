@@ -106,6 +106,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   showConfirmModal?: (payload: ConfirmModalPayload) => Promise<boolean>;
 
   clearSlideData?: (slideId: string) => Promise<void>;
+
+  /**
+   * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
+   */
+  allowPDFRender?: () => void;
 }
 
 /**
@@ -215,6 +220,10 @@ export const PresenterSlidePluginIframe = zoid.create({
     showConfirmModal: {
       type: 'function',
       required: false,
+    },
+    allowPDFRender: {
+      type: 'function',
+      required: false,
     }
   },
 });
@@ -265,6 +274,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Clear the slide data in the parent app.
    */
   clearSlideData: ((slideId: string) => Promise<void>) | undefined;
+
+  /**
+   * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
+   */
+  allowPDFRender: (() => void) | undefined;
 }
 
 /**
@@ -333,5 +347,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     showConfirmModal: xprops?.showConfirmModal,
     clearSlideData: xprops?.clearSlideData,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
+    allowPDFRender: xprops?.allowPDFRender,
   };
 }
