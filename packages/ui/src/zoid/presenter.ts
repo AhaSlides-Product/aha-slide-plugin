@@ -250,13 +250,6 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Close the currently open plugin modal.
    */
   closePluginModal: (() => void) | undefined;
-  /** 
-   * Action to fetch values from a specific bucket and optional key from the parent application.
-   * 
-   * @param params - The parameters containing bucket and optional key.
-   * @returns A promise resolving to an array of objects containing key, path, and value.
-   */
-  getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
 
   /**
    * Access token for the current user.
@@ -327,7 +320,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
-    getValues: xprops.getValues,
+    getValues: baseHook.getValues,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
     uploadImage,

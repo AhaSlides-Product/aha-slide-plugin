@@ -292,5 +292,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     participantInfo,
     reportHeight: baseHook.reportHeight,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
+    getValues: baseHook.getValues,
   };
 }

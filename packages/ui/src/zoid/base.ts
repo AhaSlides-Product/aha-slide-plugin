@@ -184,7 +184,7 @@ export function autoReportHeight(wrapperId?: string) {
   }
 
   sharedReportingState.count++;
-  
+
   // If already reporting with the same effectiveId, just return a cleanup that decrements the count
   if (sharedReportingState.observer && sharedReportingState.wrapperId === effectiveId) {
     return () => {
@@ -303,6 +303,14 @@ export interface BaseSlidePluginReturn {
    */
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
+
+  /** 
+   * Action to fetch values from a specific bucket and optional key from the parent application.
+   * 
+   * @param params - The parameters containing bucket and optional key.
+   * @returns A promise resolving to an array of objects containing key, path, and value.
+   */
+  getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
 }
 
 /**
@@ -368,5 +376,6 @@ export function useBaseSlidePlugin(
     reportHeight,
     xprops,
     trackGA4AndMixpanel,
+    getValues: xprops?.getValues,
   };
 }
