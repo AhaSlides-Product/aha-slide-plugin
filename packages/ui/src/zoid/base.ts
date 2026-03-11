@@ -158,19 +158,53 @@ export function reportHeight() {
 }
 
 /**
+ * Internal state for shared height reporting to prevent spam from multiple hooks.
+ */
+const sharedReportingState = {
+  observer: null as ResizeObserver | null,
+  mutObserver: null as MutationObserver | null,
+  count: 0,
+  wrapperId: undefined as string | undefined,
+};
+
+/**
  * Automatically reports the height of the document body to the parent via zoid xprops.
  * This should be called in the child application (iframe).
  * 
  * @returns A cleanup function to stop observing height changes.
  */
 export function autoReportHeight(wrapperId?: string) {
-  console.log('[SlidePlugin] autoReportHeight called');
+  console.log('[SlidePlugin] autoReportHeight called', { wrapperId, currentCount: sharedReportingState.count });
   if (typeof window === 'undefined') return () => { };
 
   const xprops = (window as any).xprops;
   if (!xprops || typeof xprops.onHeightChange !== 'function') {
     return () => { };
   }
+
+  sharedReportingState.count++;
+  
+  // If already reporting with the same wrapperId, just return a cleanup that decrements the count
+  if (sharedReportingState.observer && sharedReportingState.wrapperId === wrapperId) {
+    return () => {
+      sharedReportingState.count--;
+      if (sharedReportingState.count <= 0) {
+        sharedReportingState.observer?.disconnect();
+        sharedReportingState.mutObserver?.disconnect();
+        sharedReportingState.observer = null;
+        sharedReportingState.mutObserver = null;
+        sharedReportingState.wrapperId = undefined;
+      }
+    };
+  }
+
+  // If reporting with a different wrapperId, disconnect previous and start new (last one wins for wrapperId)
+  if (sharedReportingState.observer) {
+    sharedReportingState.observer.disconnect();
+    sharedReportingState.mutObserver?.disconnect();
+  }
+
+  sharedReportingState.wrapperId = wrapperId;
 
   const sendHeight = () => {
     const app = document.getElementById(wrapperId || 'app') || document.getElementById('root');
@@ -188,16 +222,17 @@ export function autoReportHeight(wrapperId?: string) {
   if (app) {
     observer.observe(app);
   }
+  sharedReportingState.observer = observer;
 
   // Fallback for changes that might not trigger ResizeObserver on the containers
-  let mutObserver: MutationObserver | undefined;
   if (!wrapperId) {
-    mutObserver = new MutationObserver(() => throttledSendHeight());
+    const mutObserver = new MutationObserver(() => throttledSendHeight());
     mutObserver.observe(document.body, {
       attributes: true,
       childList: true,
       subtree: true,
     });
+    sharedReportingState.mutObserver = mutObserver;
   }
 
   // Initial report
@@ -207,8 +242,14 @@ export function autoReportHeight(wrapperId?: string) {
   setTimeout(sendHeight, 300);
 
   return () => {
-    observer.disconnect();
-    mutObserver?.disconnect();
+    sharedReportingState.count--;
+    if (sharedReportingState.count <= 0) {
+      sharedReportingState.observer?.disconnect();
+      sharedReportingState.mutObserver?.disconnect();
+      sharedReportingState.observer = null;
+      sharedReportingState.mutObserver = null;
+      sharedReportingState.wrapperId = undefined;
+    }
   };
 }
 
