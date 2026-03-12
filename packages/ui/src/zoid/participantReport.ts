@@ -13,6 +13,8 @@ export interface ParticipantReportPluginProps {
   answers?: any;
   /** Callback to report height changes from the child to the parent */
   onHeightChange?: (height: number | null) => void;
+  imageUrl?: string,
+  presentationColorPalette?: object,
 }
 
 /**
@@ -29,6 +31,14 @@ export const ParticipantReportPluginIframe = zoid.create({
       required: true,
       queryParam: false,
     },
+    imageUrl: {
+      type: 'string',
+      required: false,
+    },
+    presentationColorPalette: {
+      type: 'object',
+      required: false,
+    },
     answers: {
       type: 'array',
       required: false,
@@ -37,6 +47,11 @@ export const ParticipantReportPluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+  },
+  prerenderTemplate({ doc }: { doc: Document }) {
+    if (!doc) return null
+    doc.body.style.overflow = 'hidden'
+    return doc.documentElement
   },
 });
 
