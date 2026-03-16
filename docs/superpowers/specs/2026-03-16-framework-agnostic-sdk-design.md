@@ -21,8 +21,7 @@ The AhaSlides slide plugin SDK (`@aha/ui`) is tightly coupled to Vue 3. Plugin a
 ### Package Dependency Graph
 
 ```
-@aha/core          ← NEW: vanilla JS, zero framework deps
-  └── @aha/common  ← (existing, unchanged)
+@aha/core          ← NEW: vanilla JS, zero framework deps (no dependencies)
 
 @aha/ui            ← MODIFIED: Vue adapter, re-exports deprecated composables
   ├── @aha/core    ← NEW dependency
@@ -159,7 +158,12 @@ interface PluginBase {
   reportHeight(): void
   subscribeTopic(options: { type?: string; topic: string; callback: (topic: string, message: any) => void }): void
   unsubscribeTopic(topic: string): void
-  trackGA4AndMixpanel(eventName: string, payload: any): void
+  /**
+   * Track events to GA4 and Mixpanel via the host app.
+   * Note: The presenter/audience host xprop accepts a single payload argument `(payload: any) => void`.
+   * This wrapper normalizes the call — if the host only accepts one arg, the payload is passed as-is.
+   */
+  trackGA4AndMixpanel(payload: any): void
   getValues(params: { bucket: string; key?: string }): Promise<{ key: string; path: string; value: string }[]>
 
   // Lifecycle
@@ -214,8 +218,10 @@ function createPresenterPlugin(options?: PluginBaseOptions): PresenterPlugin
 
 **Implementation notes:**
 - Internally calls `createPluginBase(options)` and extends it
+- Default `autoHeight: false` (matching current `usePresenterPlugin` default)
 - `getSlideAttributes` includes the array-to-object reduction logic currently in `usePresenterPlugin`
-- `setSubmissionCount` maps to `xprops.sendVoteOutcome` (same rename as current code)
+- `setSubmissionCount` maps to `xprops.sendVoteOutcome({ voteCount: payload.count, tooltip: payload.tooltip })` — intentionally does NOT spread the full payload to avoid sending `count` redundantly
+- `uploadImage`: The `SlidePluginProps` xprop declares this as `() => Promise<ImageUploadResult>` (zero args, opens a modal). However, the hook return type casts it as `(file: File) => ...`. The core API will match the xprop reality — see `openUploadImageModal()` for the zero-arg variant and `uploadImage(file)` for the file-based variant, both passed through from xprops as-is.
 - All actions return `undefined` / are no-ops if the corresponding xprop is not provided
 
 ### 5. createAudiencePlugin
@@ -274,6 +280,7 @@ interface ReportPlugin {
   getTranslationMap(): Record<string, string> | undefined
   getFeatureFlags(): Record<string, string> | undefined
   getIframePath(): string | undefined
+  getCurrentUser(): object | undefined
 
   // Subscriptions
   onTokenChange(fn: (val: string | undefined) => void): Unsubscribe
@@ -282,6 +289,7 @@ interface ReportPlugin {
   onTranslationMapChange(fn: (val: Record<string, string> | undefined) => void): Unsubscribe
   onFeatureFlagsChange(fn: (val: Record<string, string> | undefined) => void): Unsubscribe
   onIframePathChange(fn: (val: string | undefined) => void): Unsubscribe
+  onCurrentUserChange(fn: (val: object | undefined) => void): Unsubscribe
 
   // Actions
   trackGA4AndMixpanel(eventName: string, payload: any): void
@@ -307,7 +315,11 @@ function createReportPlugin(options?: PluginBaseOptions): ReportPlugin
 // participant-report-plugin.ts
 interface ParticipantReportPlugin {
   getAnswers(): any[] | undefined
+  getImageUrl(): string | undefined
+  getPresentationColorPalette(): object | undefined
   onAnswersChange(fn: (val: any[] | undefined) => void): Unsubscribe
+  onImageUrlChange(fn: (val: string | undefined) => void): Unsubscribe
+  onPresentationColorPaletteChange(fn: (val: object | undefined) => void): Unsubscribe
   reportHeight(): void
   init(): void
   destroy(): void
@@ -315,6 +327,10 @@ interface ParticipantReportPlugin {
 
 function createParticipantReportPlugin(options?: PluginBaseOptions): ParticipantReportPlugin
 ```
+
+**Implementation notes:**
+- Default `autoHeight: true` (matching current `useParticipantReportPlugin` default)
+- `imageUrl` and `presentationColorPalette` are included — they exist in the zoid prop definition and host passes them
 
 ### 8. Height Utilities
 
@@ -395,8 +411,8 @@ export { createReportPlugin } from './report-plugin'
 export { createParticipantReportPlugin } from './participant-report-plugin'
 export { createTracker } from './tracker'
 export { reportHeight, autoReportHeight } from './height'
-export { throttle } from './utils'
 export * from './types'
+// Note: throttle is internal-only (used by autoReportHeight), not exported
 ```
 
 ## `@aha/ui` Changes (Backward Compatibility Layer)
@@ -598,9 +614,6 @@ const { slideProps, presentationProps, uploadImage } = usePresenterPlugin({ auto
     "clean": "rm -rf dist *.tsbuildinfo",
     "test": "vitest"
   },
-  "dependencies": {
-    "@aha/common": "*"
-  },
   "devDependencies": {
     "typescript": "^5.0.0",
     "vitest": "^4.0.0"
@@ -638,6 +651,25 @@ Add `packages/core` — already covered by `"workspaces": ["packages/*"]` in roo
 2. **Existing consumer tests** must pass unchanged — they test via `@aha/ui` imports.
 
 3. **E2E tests** must pass unchanged — they test the full plugin integration.
+
+## Default `autoHeight` per Plugin Factory
+
+| Factory | Default `autoHeight` | Matches current |
+|---------|---------------------|-----------------|
+| `createPresenterPlugin` | `false` | `usePresenterPlugin` defaults to `{}` → false |
+| `createAudiencePlugin` | `true` | `useAudiencePlugin` defaults to `{ autoHeight: true }` |
+| `createReportPlugin` | `true` | `useReportPlugin` defaults to `{ autoHeight: true }` |
+| `createParticipantReportPlugin` | `true` | `useParticipantReportPlugin` defaults to `{ autoHeight: true }` |
+
+## Known Issues Fixed During Migration
+
+These are pre-existing bugs in `@aha/ui` that the new `@aha/core` + wrapper approach corrects:
+
+1. **Missing BroadcastChannel cleanup in `useSync`/`useSyncReadOnly`**: The current implementations never call `bc.close()` on component unmount — there is no `onUnmounted` hook. The updated `@aha/ui` wrappers add proper `onUnmounted` cleanup. This is an intentional behavior improvement, not a transparent delegation.
+
+2. **`participantInfo` missing from `AudienceSlidePluginProps` type**: The runtime code reads `xprops.audience.participantInfo` and exposes it, but the TypeScript interface omits it. `@aha/core` types include it correctly.
+
+3. **`upsertSlideAttributeAction` missing from `SlidePluginProps` type**: The zoid component registers it and the hook exposes it, but the TypeScript interface declaration was accidentally replaced. `@aha/core` types include it correctly.
 
 ## Migration Path
 
