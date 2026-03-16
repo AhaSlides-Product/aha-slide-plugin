@@ -671,6 +671,12 @@ These are pre-existing bugs in `@aha/ui` that the new `@aha/core` + wrapper appr
 
 3. **`upsertSlideAttributeAction` missing from `SlidePluginProps` type**: The zoid component registers it and the hook exposes it, but the TypeScript interface declaration was accidentally replaced. `@aha/core` types include it correctly.
 
+4. **`ReportPlugin.currentUser` not exposed reactively**: The zoid component registers `currentUser` as a prop and the host passes it, but `useReportPlugin` never exposes it as a ref and the `onProps` handler doesn't route `currentUser` changes. `@aha/core`'s `ReportPlugin` adds `getCurrentUser()` and `onCurrentUserChange()` as new functionality.
+
+5. **`ParticipantReportPlugin.imageUrl` and `presentationColorPalette` not exposed reactively**: The zoid component registers both props, but `useParticipantReportPlugin` only returns `{ answers, reportHeight }` and the `onProps` handler only watches `answers`. `@aha/core` adds getters and subscriptions for both as new functionality.
+
+6. **`setSubmissionCount` payload spread**: The current `usePresenterPlugin` maps via `{ voteCount: payload.count, ...payload }`, which sends both `voteCount` and `count` redundantly. `@aha/core` uses `{ voteCount: payload.count, tooltip: payload.tooltip }` — a clean mapping. The `@aha/ui` backward-compat wrapper adopts the clean mapping (not preserving the buggy spread).
+
 ## Migration Path
 
 1. Ship `@aha/core` as a new package — no breaking changes to anything.
