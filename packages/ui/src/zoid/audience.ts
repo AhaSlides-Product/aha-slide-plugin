@@ -1,10 +1,11 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
-import { ref, type Ref } from 'vue';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import { createAudiencePlugin } from '@aha/core';
+import type { ParticipantInfo } from '@aha/core';
 import {
   BaseSlidePluginProps,
   UseSlidePluginOptions,
   BaseSlidePluginReturn,
-  useBaseSlidePlugin
 } from './base';
 
 /**
@@ -28,29 +29,29 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
     /** The team name of the audience participant */
     audienceTeam?: string;
   };
-  /** 
+  /**
    * Custom attributes associated with the current slide.
    */
   slideAttributes?: Record<string, any>;
-  /** 
+  /**
    * Action to upload an image from the plugin iframe.
    */
   uploadImage?: () => Promise<any>;
-  /** 
+  /**
    * Show an info toast message in the parent app.
    */
   showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
-  /** 
+  /**
    * Show a success toast message in the parent app.
    */
   showToastSuccess?: (text: string, uniqName?: string, action?: any, options?: any) => void;
-  /** 
+  /**
    * Show an error toast message in the parent app.
    */
   showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
   /**
    * Update audience data such as name, email, and emoji.
-   * 
+   *
    * @param payload - The audience data to update.
    */
   updateAudienceData?: (payload: {
@@ -185,15 +186,13 @@ export const AudienceSlidePluginIframe = zoid.create({
   },
 });
 
-export type ParticipantInfo = {
-  type: string;
-  value: string;
-};
+export { ParticipantInfo };
 
 /**
  * Hook for Audience Plugins.
  * Provides access to presentation, slide, and slideAttributes data.
- * 
+ *
+ * @deprecated Use `createAudiencePlugin` from `@aha/core` instead.
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for presentation, slide, and slideAttributes props.
  */
@@ -221,77 +220,100 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   timeLimit: Ref<number | null | undefined>;
   scrollTo: ((yOffset: number) => void) | undefined;
 } {
-  // Audience-specific reactive refs
+  const plugin = createAudiencePlugin({
+    autoHeight: options.autoHeight ?? true,
+  });
+
+  const presentationProps = ref<Record<string, any> | undefined>(plugin.getPresentation());
+  const presentationColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationColorPalette());
+  const presentationLighterColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationLighterColorPalette());
+  const slideProps = ref<Record<string, any> | undefined>(plugin.getSlide());
+  const baseUrl = ref<string | undefined>(plugin.getBaseUrl());
+  const slideAttributesProps = ref<Record<string, any> | undefined>(plugin.getSlideAttributes());
+  const audienceName = ref<string | undefined>(plugin.getAudienceName());
+  const audienceEmoji = ref<string | undefined>(plugin.getAudienceEmoji());
+  const audienceId = ref<string | number | undefined>(plugin.getAudienceId());
+  const audienceEmail = ref<string | undefined>(plugin.getAudienceEmail());
+  const audienceTeam = ref<string | undefined>(plugin.getAudienceTeam());
+  const participantInfo = ref<ParticipantInfo[] | undefined>(plugin.getParticipantInfo());
+  const timeLimit = ref<number | null | undefined>(plugin.getTimeLimit());
+
+  const unsubs: (() => void)[] = [];
+
+  onMounted(() => {
+    plugin.init();
+
+    unsubs.push(plugin.onPresentationChange((val) => { presentationProps.value = val; }));
+    unsubs.push(plugin.onSlideChange((val) => { slideProps.value = val; }));
+    unsubs.push(plugin.onBaseUrlChange((val) => { baseUrl.value = val; }));
+    unsubs.push(plugin.onPresentationColorPaletteChange((val) => { presentationColorPaletteProps.value = val; }));
+    unsubs.push(plugin.onPresentationLighterColorPaletteChange((val) => { presentationLighterColorPaletteProps.value = val; }));
+    unsubs.push(plugin.onSlideAttributesChange((val) => { slideAttributesProps.value = val; }));
+    unsubs.push(plugin.onAudienceNameChange((val) => { audienceName.value = val; }));
+    unsubs.push(plugin.onAudienceEmojiChange((val) => { audienceEmoji.value = val; }));
+    unsubs.push(plugin.onAudienceIdChange((val) => { audienceId.value = val; }));
+    unsubs.push(plugin.onAudienceEmailChange((val) => { audienceEmail.value = val; }));
+    unsubs.push(plugin.onAudienceTeamChange((val) => { audienceTeam.value = val; }));
+    unsubs.push(plugin.onParticipantInfoChange((val) => { participantInfo.value = val; }));
+    unsubs.push(plugin.onTimeLimitChange((val) => { timeLimit.value = val; }));
+  });
+
+  onUnmounted(() => {
+    unsubs.forEach((fn) => fn());
+    plugin.destroy();
+  });
+
   const xprops = (window as any).xprops;
-  console.log('[useAudiencePlugin] Rendering with xprops:', xprops);
-  const slideAttributesProps = ref<Record<string, any> | undefined>(xprops?.slideAttributes);
-  const audienceName = ref<string | undefined>(xprops?.audience?.audienceName);
-  const audienceEmoji = ref<string | undefined>(xprops?.audience?.audienceEmoji);
-  const audienceId = ref<string | number | undefined>(xprops?.audience?.audienceId);
-  const audienceEmail = ref<string | undefined>(xprops?.audience?.audienceEmail);
-  const audienceTeam = ref<string | undefined>(xprops?.audience?.audienceTeam);
-  const participantInfo = ref<ParticipantInfo[] | undefined>(xprops?.audience?.participantInfo);
-
-  const uploadImage = xprops?.uploadImage;
-  const showToastInfo = xprops?.showToastInfo;
-  const showToastSuccess = xprops?.showToastSuccess;
-  const showToastError = xprops?.showToastError;
-  const updateAudienceData = xprops?.updateAudienceData;
-  const openPluginModal = xprops?.openPluginModal;
-  const closePluginModal = xprops?.closePluginModal;
-  const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
-  const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
-  const scrollTo = xprops?.scrollTo;
-
-  // Extension callback to handle audience-specific props
-  const handleAudienceProps = (newProps: any) => {
-
-    if (newProps.slideAttributes) {
-      slideAttributesProps.value = { ...newProps.slideAttributes };
-      console.log('[handleAudienceProps] slideAttributesProps:', slideAttributesProps.value);
-    }
-    if (newProps.audience) {
-      if (newProps.audience.audienceName !== undefined) audienceName.value = newProps.audience.audienceName;
-      if (newProps.audience.audienceEmoji !== undefined) audienceEmoji.value = newProps.audience.audienceEmoji;
-      if (newProps.audience.audienceId !== undefined) audienceId.value = newProps.audience.audienceId;
-      if (newProps.audience.audienceEmail !== undefined) audienceEmail.value = newProps.audience.audienceEmail;
-      if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
-      if (newProps.audience.participantInfo !== undefined) participantInfo.value = newProps.audience.participantInfo;
-    }
-    if (newProps.timeLimit !== undefined) {
-      timeLimit.value = newProps.timeLimit;
-    }
-  };
-
-  const baseHook = useBaseSlidePlugin(options, handleAudienceProps);
 
   return {
-    presentationProps: baseHook.presentationProps,
-    presentationColorPaletteProps: baseHook.presentationColorPaletteProps,
-    presentationLighterColorPaletteProps: baseHook.presentationLighterColorPaletteProps,
-    slideProps: baseHook.slideProps,
-    baseUrl: baseHook.baseUrl,
-    subscribeTopic: baseHook.subscribeTopic,
-    unsubscribeTopic: baseHook.unsubscribeTopic,
+    presentationProps,
+    presentationColorPaletteProps,
+    presentationLighterColorPaletteProps,
+    slideProps,
+    baseUrl,
+    subscribeTopic: xprops?.subscribeTopic ? (opts: any) => plugin.subscribeTopic(opts) : undefined,
+    unsubscribeTopic: xprops?.unsubscribeTopic ? (topic: string) => plugin.unsubscribeTopic(topic) : undefined,
     slideAttributesProps,
     audienceName,
     audienceEmoji,
     audienceId,
     audienceEmail,
     audienceTeam,
-    uploadImage,
-    showToastInfo,
-    showToastSuccess,
-    showToastError,
-    updateAudienceData,
-    openPluginModal,
-    closePluginModal,
-    onSubmitButtonHeightChange,
+    uploadImage: xprops?.uploadImage
+      ? () => plugin.uploadImage()
+      : undefined,
+    showToastInfo: xprops?.showToastInfo
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastInfo(text, uniqName, action, options)
+      : undefined,
+    showToastSuccess: xprops?.showToastSuccess
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastSuccess(text, uniqName, action, options)
+      : undefined,
+    showToastError: xprops?.showToastError
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastError(text, uniqName, action, options)
+      : undefined,
+    updateAudienceData: xprops?.updateAudienceData
+      ? (payload: any) => plugin.updateAudienceData(payload)
+      : undefined,
+    openPluginModal: xprops?.openPluginModal
+      ? (path?: string, data?: any) => plugin.openPluginModal(path, data)
+      : undefined,
+    closePluginModal: xprops?.closePluginModal
+      ? () => plugin.closePluginModal()
+      : undefined,
+    onSubmitButtonHeightChange: xprops?.onSubmitButtonHeightChange
+      ? (height: number) => plugin.onSubmitButtonHeightChange(height)
+      : undefined,
     timeLimit,
-    scrollTo,
+    scrollTo: xprops?.scrollTo
+      ? (yOffset: number) => plugin.scrollTo(yOffset)
+      : undefined,
     participantInfo,
-    reportHeight: baseHook.reportHeight,
-    trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
-    getValues: baseHook.getValues,
+    reportHeight: () => plugin.reportHeight(),
+    trackGA4AndMixpanel: xprops?.trackGA4AndMixpanel
+      ? (eventName: string, payload: any) => plugin.trackGA4AndMixpanel(payload)
+      : undefined,
+    getValues: xprops?.getValues
+      ? (params: any) => plugin.getValues(params)
+      : undefined,
   };
 }

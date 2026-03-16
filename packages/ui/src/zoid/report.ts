@@ -1,6 +1,7 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
-import { ref, onMounted, type Ref } from 'vue';
-import { autoReportHeight, type UseSlidePluginOptions } from './base';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import { createReportPlugin } from '@aha/core';
+import type { UseSlidePluginOptions } from './base';
 
 /**
  * Properties for the report slide plugin.
@@ -118,55 +119,59 @@ export interface ReportReturn {
 /**
 * Hook that provides functionality for the report slide plugin.
 *
+* @deprecated Use `createReportPlugin` from `@aha/core` instead.
 * @param options - Configure hook behavior (e.g., disable auto-height).
 * @returns Reactive refs for token and currentLanguage.
 */
 export function useReportPlugin(
   options: UseSlidePluginOptions = { autoHeight: true }
 ): ReportReturn {
-  const token = ref<string | undefined>((window as any).xprops?.token);
-  const currentLanguage = ref<string | undefined>((window as any).xprops?.currentLanguage);
-  const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
-  const replaceRoute = (window as any).xprops?.replaceRoute;
-  const pushRoute = (window as any).xprops?.pushRoute;
-  const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
-  const locale = ref<string | undefined>((window as any).xprops?.locale);
-  const translationMap = ref<Record<string, string> | undefined>((window as any).xprops?.translationMap);
-  const featureFlags = ref<Record<string, string> | undefined>((window as any).xprops?.featureFlags);
-  const iframePath = ref<string | undefined>((window as any).xprops?.iframePath);
+  const plugin = createReportPlugin({
+    autoHeight: options.autoHeight !== false,
+  });
+
+  const token = ref<string | undefined>(plugin.getToken());
+  const currentLanguage = ref<string | undefined>(plugin.getCurrentLanguage());
+  const locale = ref<string | undefined>(plugin.getLocale());
+  const translationMap = ref<Record<string, string> | undefined>(plugin.getTranslationMap());
+  const featureFlags = ref<Record<string, string> | undefined>(plugin.getFeatureFlags());
+  const iframePath = ref<string | undefined>(plugin.getIframePath());
+
+  const unsubs: (() => void)[] = [];
 
   onMounted(() => {
-    let cleanup = () => { };
-    if (options.autoHeight !== false) {
-      cleanup = autoReportHeight();
-    } else {
-      const xprops = (window as any).xprops;
-      if (xprops && typeof xprops.onHeightChange === 'function') {
-        xprops.onHeightChange(null);
-      }
-    }
+    plugin.init();
 
-    const xprops = (window as any).xprops;
-    if (xprops && typeof xprops.onProps === 'function') {
-      xprops.onProps((newProps: any) => {
-        if (newProps.token) token.value = newProps.token;
-        if (newProps.currentLanguage) currentLanguage.value = newProps.currentLanguage;
-        if (newProps.locale) locale.value = newProps.locale;
-        if (newProps.translationMap) translationMap.value = newProps.translationMap;
-        if (newProps.featureFlags) featureFlags.value = newProps.featureFlags;
-        if (newProps.iframePath || newProps.iframePath === '') iframePath.value = newProps.iframePath;
-      });
-    }
-    return cleanup;
+    unsubs.push(plugin.onTokenChange((val) => { token.value = val; }));
+    unsubs.push(plugin.onCurrentLanguageChange((val) => { currentLanguage.value = val; }));
+    unsubs.push(plugin.onLocaleChange((val) => { locale.value = val; }));
+    unsubs.push(plugin.onTranslationMapChange((val) => { translationMap.value = val; }));
+    unsubs.push(plugin.onFeatureFlagsChange((val) => { featureFlags.value = val; }));
+    unsubs.push(plugin.onIframePathChange((val) => { iframePath.value = val; }));
   });
+
+  onUnmounted(() => {
+    unsubs.forEach((fn) => fn());
+    plugin.destroy();
+  });
+
+  const xprops = (window as any).xprops;
 
   return {
     token,
     currentLanguage,
-    trackGA4AndMixpanel,
-    replaceRoute,
-    pushRoute,
-    openExportModalForPresentation,
+    trackGA4AndMixpanel: xprops?.trackGA4AndMixpanel
+      ? (eventName: string, payload: any) => plugin.trackGA4AndMixpanel(eventName, payload)
+      : undefined,
+    replaceRoute: xprops?.replaceRoute
+      ? (location: any, onComplete?: Function, onAbort?: Function) => plugin.replaceRoute(location, onComplete, onAbort)
+      : undefined,
+    pushRoute: xprops?.pushRoute
+      ? (location: any, onComplete?: Function, onAbort?: Function) => plugin.pushRoute(location, onComplete, onAbort)
+      : undefined,
+    openExportModalForPresentation: xprops?.openExportModalForPresentation
+      ? (presentation: any) => plugin.openExportModalForPresentation(presentation)
+      : undefined,
     locale,
     translationMap,
     featureFlags,

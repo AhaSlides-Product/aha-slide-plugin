@@ -1,6 +1,7 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
-import { ref, onMounted, type Ref } from 'vue';
-import { autoReportHeight, type UseSlidePluginOptions } from './base';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import { createParticipantReportPlugin } from '@aha/core';
+import type { UseSlidePluginOptions } from './base';
 
 /**
  * Properties for the participant report plugin iframe (e.g. pin-on-image).
@@ -65,38 +66,33 @@ export interface ParticipantReportPluginReturn {
 
 /**
  * Hook for child iframes to access participant report data passed via zoid xprops.
+ *
+ * @deprecated Use `createParticipantReportPlugin` from `@aha/core` instead.
  */
 export function useParticipantReportPlugin(
   options: UseSlidePluginOptions = { autoHeight: true }
 ): ParticipantReportPluginReturn {
-  const xprops = (window as any).xprops;
-  const answers = ref<any[] | undefined>(xprops?.answers);
-
-  onMounted(() => {
-    let cleanup = () => {};
-    if (options.autoHeight !== false) {
-      cleanup = autoReportHeight();
-    } else if (xprops && typeof xprops.onHeightChange === 'function') {
-      xprops.onHeightChange(null);
-    }
-
-    if (xprops && typeof xprops.onProps === 'function') {
-      xprops.onProps((newProps: any) => {
-        if (newProps.answers) answers.value = newProps.answers;
-      });
-    }
-    return cleanup;
+  const plugin = createParticipantReportPlugin({
+    autoHeight: options.autoHeight !== false,
   });
 
-  const reportHeight = () => {
-    if (xprops && typeof xprops.onHeightChange === 'function') {
-      const app = document.getElementById('app') || document.getElementById('root');
-      const height = app
-        ? app.scrollHeight
-        : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-      xprops.onHeightChange(height);
-    }
-  };
+  const answers = ref<any[] | undefined>(plugin.getAnswers());
 
-  return { answers, reportHeight };
+  const unsubs: (() => void)[] = [];
+
+  onMounted(() => {
+    plugin.init();
+
+    unsubs.push(plugin.onAnswersChange((val) => { answers.value = val; }));
+  });
+
+  onUnmounted(() => {
+    unsubs.forEach((fn) => fn());
+    plugin.destroy();
+  });
+
+  return {
+    answers,
+    reportHeight: () => plugin.reportHeight(),
+  };
 }

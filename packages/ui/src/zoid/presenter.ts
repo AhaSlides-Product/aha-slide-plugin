@@ -1,27 +1,15 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
-import { ref, type Ref } from 'vue';
-import { ImageUploadResult } from '../image';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import { createPresenterPlugin } from '@aha/core';
+import type { ImageUploadResult, PluginKeyboardEvent, ConfirmModalPayload } from '@aha/core';
 import {
   BaseSlidePluginProps,
-  PluginKeyboardEvent,
   UseSlidePluginOptions,
   BaseSlidePluginReturn,
-  useBaseSlidePlugin
 } from './base';
 
+export type { ConfirmModalPayload };
 
-type ConfirmModalPayload = {
-  /** The title of the confirm modal */
-  title: string,
-  /** The content of the confirm modal */
-  content: string,
-  /** The text to display on the ok button */
-  okText?: string,
-  /** The text to display on the cancel button */
-  cancelText?: string,
-  /** The variant of the confirm modal */
-  variant?: 'primary' | 'danger'
-}
 /**
  * Interface for the properties expected by the PresenterSlidePluginIframe component.
  */
@@ -38,64 +26,50 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
     presenterLanguage?: string;
     [key: string]: any;
   };
-  /** 
+  /**
    * Action to fetch all custom attributes for the current slide from the parent application.
-   * 
+   *
    * @param slideId - Optional override for the slide identifier.
    * @returns A promise resolving to an object containing slide attributes.
    */
   getSlideAttributesAction?: (slideId?: string | number) => Promise<any>;
-  /** 
+  /**
    * Action to create or update a specific attribute for the current slide in the parent application.
-   * 
+   *
    * @param payload - The attribute data to sync.
    * @returns A promise resolving when the update is complete.
    */
   uploadImage: () => Promise<ImageUploadResult>;
-  /** 
+  /**
    * Callback function to subscribe to keyboard events from the parent application.
-   * 
+   *
    * @param callback - The function to call when a keyboard event occurs.
    */
   onKeyboard?: (callback: (event: PluginKeyboardEvent) => void) => void;
-  /** 
+  /**
    * Action to emit a keyboard event from the plugin to the parent application.
-   * 
+   *
    * @param event - The keyboard event data to emit.
    */
   emitKeyboardEvent?: (event: PluginKeyboardEvent) => void;
   /**
    * Show an info toast message in the parent app.
-   * @param text - The message to display.
-   * @param uniqName - A unique identifier for the toast.
-   * @param action - An optional action object.
-   * @param options - Additional toast options.
    */
   showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
   /**
    * Show a success toast message in the parent app.
-   * @param text - The message to display.
-   * @param uniqName - A unique identifier for the toast.
-   * @param action - An optional action object.
-   * @param options - Additional toast options.
    */
   showToastSuccess?: (text: string, uniqName?: string, action?: any, options?: any) => void;
   /**
    * Show an error toast message in the parent app.
-   * @param text - The message to display.
-   * @param uniqName - A unique identifier for the toast.
-   * @param action - An optional action object.
-   * @param options - Additional toast options.
    */
   showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
   /**
    * Send a vote outcome (vote count and tooltip) to the presenter app.
-   * @param payload - The vote outcome data.
    */
   sendVoteOutcome?: (payload: { voteCount: number; tooltip?: string }) => void;
   /**
    * Open a full-screen modal with a custom path.
-   * @param path - The custom path for the modal iframe.
    */
   openPluginModal?: (path?: string) => void;
   /**
@@ -277,69 +251,103 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
 /**
  * Hook for Presenter Plugins (Canvas, Settings).
  * Provides access to presentation and slide data, as well as actions to manage slide attributes.
- * 
+ *
+ * @deprecated Use `createPresenterPlugin` from `@aha/core` instead.
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @returns Reactive refs for presentation and slide props, and actions for slide attributes.
  */
 export function usePresenterPlugin(options: UseSlidePluginOptions = {}): PresenterPluginReturn {
-  const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
-
-  const baseHook = useBaseSlidePlugin(options, (newProps) => {
-    if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
+  const plugin = createPresenterPlugin({
+    autoHeight: options.autoHeight ?? false,
   });
-  const { xprops } = baseHook;
 
-  const originalGetAttributes = xprops?.getSlideAttributesAction;
-  const getSlideAttributesAction = async (slideId?: string | number): Promise<any> => {
-    if (typeof originalGetAttributes !== 'function') return undefined;
-    const response = await originalGetAttributes(slideId);
-    if (Array.isArray(response)) {
-      return response.reduce((acc, item) => {
-        if (item && item.type) {
-          acc[item.type] = item.attributes;
-        }
-        return acc;
-      }, {} as Record<string, any>);
-    }
-    return response;
-  };
+  const presentationProps = ref<Record<string, any> | undefined>(plugin.getPresentation());
+  const presentationColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationColorPalette());
+  const presentationLighterColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationLighterColorPalette());
+  const slideProps = ref<Record<string, any> | undefined>(plugin.getSlide());
+  const baseUrl = ref<string | undefined>(plugin.getBaseUrl());
+  const currentUserProps = ref<Record<string, any> | undefined>(plugin.getCurrentUser());
 
-  const upsertSlideAttributeAction = xprops?.upsertSlideAttributeAction;
-  const uploadImage = xprops?.uploadImage;
-  const onKeyboard = xprops?.onKeyboard;
-  const emitKeyboardEvent = xprops?.emitKeyboardEvent;
-  const openUploadImageModal = xprops?.openUploadImageModal;
-  const openEditImageModal = xprops?.openEditImageModal;
+  const unsubs: (() => void)[] = [];
+
+  onMounted(() => {
+    plugin.init();
+
+    unsubs.push(plugin.onPresentationChange((val) => { presentationProps.value = val; }));
+    unsubs.push(plugin.onSlideChange((val) => { slideProps.value = val; }));
+    unsubs.push(plugin.onBaseUrlChange((val) => { baseUrl.value = val; }));
+    unsubs.push(plugin.onPresentationColorPaletteChange((val) => { presentationColorPaletteProps.value = val; }));
+    unsubs.push(plugin.onPresentationLighterColorPaletteChange((val) => { presentationLighterColorPaletteProps.value = val; }));
+    unsubs.push(plugin.onCurrentUserChange((val) => { currentUserProps.value = val; }));
+  });
+
+  onUnmounted(() => {
+    unsubs.forEach((fn) => fn());
+    plugin.destroy();
+  });
+
+  const xprops = (window as any).xprops;
 
   return {
-    presentationProps: baseHook.presentationProps,
-    presentationColorPaletteProps: baseHook.presentationColorPaletteProps,
-    presentationLighterColorPaletteProps: baseHook.presentationLighterColorPaletteProps,
-    slideProps: baseHook.slideProps,
+    presentationProps,
+    presentationColorPaletteProps,
+    presentationLighterColorPaletteProps,
+    slideProps,
     currentUserProps,
-    baseUrl: baseHook.baseUrl,
-    subscribeTopic: baseHook.subscribeTopic,
-    unsubscribeTopic: baseHook.unsubscribeTopic,
-    getValues: baseHook.getValues,
-    getSlideAttributesAction,
-    upsertSlideAttributeAction,
-    uploadImage,
-    onKeyboard,
-    emitKeyboardEvent,
-    openUploadImageModal,
-    openEditImageModal,
-    showToastInfo: xprops?.showToastInfo,
-    showToastSuccess: xprops?.showToastSuccess,
-    showToastError: xprops?.showToastError,
-    // rename sendVoteCount to setSubmissionCount to avoid confusion 
-    setSubmissionCount: (payload: { count: number, tooltip?: string }) => xprops?.sendVoteOutcome({ voteCount: payload.count, ...payload }),
-    openPluginModal: xprops?.openPluginModal,
-    closePluginModal: xprops?.closePluginModal,
-    reportHeight: baseHook.reportHeight,
-    accessToken: xprops?.token,
-    showConfirmModal: xprops?.showConfirmModal,
-    clearSlideData: xprops?.clearSlideData,
-    trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
-    allowPDFRender: xprops?.allowPDFRender,
+    baseUrl,
+    subscribeTopic: xprops?.subscribeTopic ? (opts: any) => plugin.subscribeTopic(opts) : undefined,
+    unsubscribeTopic: xprops?.unsubscribeTopic ? (topic: string) => plugin.unsubscribeTopic(topic) : undefined,
+    getValues: xprops?.getValues ? (params: any) => plugin.getValues(params) : undefined,
+    getSlideAttributesAction: (slideId?: string | number) => plugin.getSlideAttributes(slideId),
+    upsertSlideAttributeAction: xprops?.upsertSlideAttributeAction
+      ? (payload: any) => plugin.upsertSlideAttribute(payload)
+      : undefined,
+    uploadImage: xprops?.uploadImage
+      ? (file: File) => plugin.uploadImage(file)
+      : undefined,
+    onKeyboard: xprops?.onKeyboard
+      ? (callback: (event: PluginKeyboardEvent) => void) => plugin.onKeyboard(callback)
+      : undefined,
+    emitKeyboardEvent: xprops?.emitKeyboardEvent
+      ? (event: PluginKeyboardEvent) => plugin.emitKeyboardEvent(event)
+      : undefined,
+    openUploadImageModal: xprops?.openUploadImageModal
+      ? () => plugin.openUploadImageModal()
+      : undefined,
+    openEditImageModal: xprops?.openEditImageModal
+      ? (currentImageUrl: string) => plugin.openEditImageModal(currentImageUrl)
+      : undefined,
+    showToastInfo: xprops?.showToastInfo
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastInfo(text, uniqName, action, options)
+      : undefined,
+    showToastSuccess: xprops?.showToastSuccess
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastSuccess(text, uniqName, action, options)
+      : undefined,
+    showToastError: xprops?.showToastError
+      ? (text: string, uniqName?: string, action?: any, options?: any) => plugin.showToastError(text, uniqName, action, options)
+      : undefined,
+    setSubmissionCount: xprops?.sendVoteOutcome
+      ? (payload: { count: number; tooltip?: string }) => plugin.setSubmissionCount(payload)
+      : undefined,
+    openPluginModal: xprops?.openPluginModal
+      ? (path?: string) => plugin.openPluginModal(path)
+      : undefined,
+    closePluginModal: xprops?.closePluginModal
+      ? () => plugin.closePluginModal()
+      : undefined,
+    reportHeight: () => plugin.reportHeight(),
+    accessToken: plugin.getAccessToken(),
+    showConfirmModal: xprops?.showConfirmModal
+      ? (payload: ConfirmModalPayload) => plugin.showConfirmModal(payload)
+      : undefined,
+    clearSlideData: xprops?.clearSlideData
+      ? (slideId: string) => plugin.clearSlideData(slideId)
+      : undefined,
+    trackGA4AndMixpanel: xprops?.trackGA4AndMixpanel
+      ? (eventName: string, payload: any) => plugin.trackGA4AndMixpanel(payload)
+      : undefined,
+    allowPDFRender: xprops?.allowPDFRender
+      ? () => plugin.allowPDFRender()
+      : undefined,
   };
 }

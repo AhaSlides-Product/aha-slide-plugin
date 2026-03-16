@@ -1,8 +1,10 @@
-import { ref, watch, nextTick, readonly, unref, type Ref, type DeepReadonly } from 'vue';
+import { ref, watch, unref, readonly, onUnmounted, type Ref, type DeepReadonly } from 'vue';
+import { createSync as coreCreateSync, createSyncReadOnly as coreCreateSyncReadOnly } from '@aha/core';
 
 /**
  * Synchronize a reactive state ref across multiple browser tabs bidirectionally.
- * 
+ *
+ * @deprecated Use `createSync` from `@aha/core` instead.
  * @template T - The type of the state being synchronized.
  * @param name - The unique name of the synchronization channel (can be a Ref or string).
  * @param initialState - The initial value of the state.
@@ -10,57 +12,41 @@ import { ref, watch, nextTick, readonly, unref, type Ref, type DeepReadonly } fr
  */
 export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
   const state = ref(initialState) as Ref<T>;
-  let bc: BroadcastChannel | null = null;
-  let isInternalUpdate = false;
+  let sync = coreCreateSync<T>(unref(name) || '', initialState);
+  let unsub: (() => void) | null = null;
+  let isExternalUpdate = false;
 
-  const closeChannel = () => {
-    if (bc) {
-      bc.close();
-      bc = null;
-    }
-  };
-
-  const openChannel = (channelName: string) => {
-    closeChannel();
+  const setup = (channelName: string) => {
+    unsub?.();
+    sync.destroy();
     if (!channelName) return;
-
-    bc = new BroadcastChannel(channelName);
-    bc.onmessage = (event) => {
-      console.log(`[useSync:${channelName}] received:`, event.data);
-      if (event.data !== undefined && JSON.stringify(event.data) !== JSON.stringify(state.value)) {
-        isInternalUpdate = true;
-        state.value = event.data;
-        nextTick(() => {
-          isInternalUpdate = false;
-        });
-      }
-    };
+    sync = coreCreateSync<T>(channelName, state.value as T);
+    unsub = sync.onStateChange((val) => {
+      isExternalUpdate = true;
+      state.value = val as any;
+      isExternalUpdate = false;
+    });
   };
 
-  // Sync state changes to other tabs
   watch(state, (newValue) => {
-    if (isInternalUpdate) return;
-    if (bc) {
-      console.log(`[useSync:${unref(name)}] broadcasting:`, newValue);
-      bc.postMessage(JSON.parse(JSON.stringify(newValue)));
-    }
+    if (isExternalUpdate) return;
+    sync.setState(newValue as T);
   }, { deep: true });
 
-  // Handle name changes reactively
-  watch(() => unref(name), (newName) => {
-    if (newName) {
-      openChannel(newName);
-    } else {
-      closeChannel();
-    }
-  }, { immediate: true });
+  watch(() => unref(name), (newName) => setup(newName), { immediate: true });
+
+  onUnmounted(() => {
+    unsub?.();
+    sync.destroy();
+  });
 
   return state;
 }
 
 /**
  * Synchronize a state from other tabs, but do not broadcast local changes.
- * 
+ *
+ * @deprecated Use `createSyncReadOnly` from `@aha/core` instead.
  * @template T - The type of the state being synchronized.
  * @param name - The unique name of the synchronization channel.
  * @param initialState - The initial value of the state.
@@ -68,34 +54,25 @@ export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
  */
 export function useSyncReadOnly<T>(name: string | Ref<any>, initialState: T): DeepReadonly<Ref<T>> {
   const state = ref(initialState) as Ref<T>;
-  let bc: BroadcastChannel | null = null;
+  let sync = coreCreateSyncReadOnly<T>(unref(name) || '', initialState);
+  let unsub: (() => void) | null = null;
 
-  const closeChannel = () => {
-    if (bc) {
-      bc.close();
-      bc = null;
-    }
-  };
-
-  const openChannel = (channelName: string) => {
-    closeChannel();
+  const setup = (channelName: string) => {
+    unsub?.();
+    sync.destroy();
     if (!channelName) return;
-
-    bc = new BroadcastChannel(channelName);
-    bc.onmessage = (event) => {
-      if (event.data !== undefined) {
-        state.value = event.data;
-      }
-    };
+    sync = coreCreateSyncReadOnly<T>(channelName, state.value as T);
+    unsub = sync.onStateChange((val) => {
+      state.value = val as any;
+    });
   };
 
-  watch(() => unref(name), (newName) => {
-    if (newName) {
-      openChannel(newName);
-    } else {
-      closeChannel();
-    }
-  }, { immediate: true });
+  watch(() => unref(name), (newName) => setup(newName), { immediate: true });
+
+  onUnmounted(() => {
+    unsub?.();
+    sync.destroy();
+  });
 
   return readonly(state) as DeepReadonly<Ref<T>>;
 }

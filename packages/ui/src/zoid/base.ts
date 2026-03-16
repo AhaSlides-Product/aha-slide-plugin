@@ -1,13 +1,19 @@
-import { ref, onMounted, type Ref } from 'vue';
-import { throttle } from '../utils';
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import { createPluginBase, reportHeight as coreReportHeight, autoReportHeight as coreAutoReportHeight } from '@aha/core';
+import type { PluginBaseOptions, ImageUploadResult, PluginKeyboardEvent, PluginBase } from '@aha/core';
+
+// Re-export types and functions from @aha/core for backward compatibility
+export { coreReportHeight as reportHeight, coreAutoReportHeight as autoReportHeight };
+export type { PluginBaseOptions };
 
 /**
  * Common properties shared between presenter and audience slide plugins.
+ * @deprecated Import `BaseSlidePluginProps` from `@aha/core` instead.
  */
 export interface BaseSlidePluginProps {
   /** The URL of the plugin to be loaded in the iframe */
   url: string;
-  /** 
+  /**
    * Presentation-wide settings and data that affect the plugin's appearance and behavior.
    */
   presentation?: {
@@ -43,7 +49,7 @@ export interface BaseSlidePluginProps {
    * Presentation-wide lighter color palette attributes.
    */
   presentationLighterColorPalette?: string[];
-  /** 
+  /**
    * Data specific to the currently active slide.
    */
   slide?: {
@@ -84,30 +90,30 @@ export interface BaseSlidePluginProps {
     title?: string;
     [key: string]: any;
   };
-  /** 
-   * Callback to report height changes from the child to the parent. 
+  /**
+   * Callback to report height changes from the child to the parent.
    * Sending null signals the parent to use 100% height.
-   * 
+   *
    * @param height - The new height in pixels, or null for 100% height.
    */
   onHeightChange?: (height: number | null) => void;
   /** The base URL of the parent application */
   baseUrl?: string;
-  /** 
+  /**
    * Subscribe to a specific MQTT topic.
-   * 
+   *
    * @param options - Subscription options including type, topic, and callback.
    */
   subscribeTopic?: (options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void;
-  /** 
+  /**
    * Unsubscribe from a specific MQTT topic.
-   * 
+   *
    * @param topic - The topic to unsubscribe from.
    */
   unsubscribeTopic?: (topic: string) => void;
-  /** 
+  /**
    * Action to track events to GA4 and Mixpanel.
-   * 
+   *
    * @param payload - The event payload to track.
    */
   trackGA4AndMixpanel?: (payload: any) => void;
@@ -116,150 +122,15 @@ export interface BaseSlidePluginProps {
 /**
  * Represents a serializable subset of a KeyboardEvent.
  * Used for cross-domain communication via Zoid.
+ * @deprecated Import `PluginKeyboardEvent` from `@aha/core` instead.
  */
-export interface PluginKeyboardEvent {
-  /** The key value of the event */
-  key: string;
-  /** The physical key code of the event */
-  code: string;
-  /** Whether the Ctrl key was pressed */
-  ctrlKey: boolean;
-  /** Whether the Shift key was pressed */
-  shiftKey: boolean;
-  /** Whether the Alt key was pressed */
-  altKey: boolean;
-  /** Whether the Meta key was pressed */
-  metaKey: boolean;
-  /** Whether the event is repeating */
-  repeat: boolean;
-  /** The location of the key on the keyboard */
-  location: number;
-  /** The legacy keyCode of the event */
-  keyCode: number;
-}
-
-/**
- * Reports the document height to the parent application.
- */
-export function reportHeight() {
-  if (typeof window === 'undefined') return;
-
-  const xprops = (window as any).xprops;
-  if (!xprops || typeof xprops.onHeightChange !== 'function') {
-    return;
-  }
-
-  const app = document.getElementById('app') || document.getElementById('root');
-  const height = app
-    ? app.scrollHeight
-    : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-  console.log('[SlidePlugin] Reporting height:', height);
-  xprops.onHeightChange(height);
-}
-
-/**
- * Internal state for shared height reporting to prevent spam from multiple hooks.
- */
-const sharedReportingState = {
-  observer: null as ResizeObserver | null,
-  mutObserver: null as MutationObserver | null,
-  count: 0,
-  wrapperId: undefined as string | undefined,
-};
-
-/**
- * Automatically reports the height of the document body to the parent via zoid xprops.
- * This should be called in the child application (iframe).
- * 
- * @returns A cleanup function to stop observing height changes.
- */
-export function autoReportHeight(wrapperId?: string) {
-  const effectiveId = wrapperId || 'app';
-  console.log('[SlidePlugin] autoReportHeight called', { wrapperId, effectiveId, currentCount: sharedReportingState.count });
-  if (typeof window === 'undefined') return () => { };
-
-  const xprops = (window as any).xprops;
-  if (!xprops || typeof xprops.onHeightChange !== 'function') {
-    return () => { };
-  }
-
-  sharedReportingState.count++;
-
-  // If already reporting with the same effectiveId, just return a cleanup that decrements the count
-  if (sharedReportingState.observer && sharedReportingState.wrapperId === effectiveId) {
-    return () => {
-      sharedReportingState.count--;
-      if (sharedReportingState.count <= 0) {
-        sharedReportingState.observer?.disconnect();
-        sharedReportingState.mutObserver?.disconnect();
-        sharedReportingState.observer = null;
-        sharedReportingState.mutObserver = null;
-        sharedReportingState.wrapperId = undefined;
-      }
-    };
-  }
-
-  // If reporting with a different effectiveId, disconnect previous and start new (last one wins for wrapperId)
-  if (sharedReportingState.observer) {
-    sharedReportingState.observer.disconnect();
-    sharedReportingState.mutObserver?.disconnect();
-  }
-
-  sharedReportingState.wrapperId = effectiveId;
-
-  const sendHeight = () => {
-    const app = document.getElementById(effectiveId) || document.getElementById('root');
-    const height = app
-      ? app.scrollHeight
-      : Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    console.log('[SlidePlugin] Reporting height:', height);
-    xprops.onHeightChange(height);
-  };
-  const throttledSendHeight = throttle(sendHeight, 100);
-
-  const observer = new ResizeObserver(() => throttledSendHeight());
-  observer.observe(document.body);
-  const app = document.getElementById(effectiveId);
-  if (app) {
-    observer.observe(app);
-  }
-  sharedReportingState.observer = observer;
-
-  // Fallback for changes that might not trigger ResizeObserver on the containers
-  // Only add MutationObserver if no specific wrapperId was provided (using default)
-  if (!wrapperId) {
-    const mutObserver = new MutationObserver(() => throttledSendHeight());
-    mutObserver.observe(document.body, {
-      attributes: true,
-      childList: true,
-      subtree: true,
-    });
-    sharedReportingState.mutObserver = mutObserver;
-  }
-
-  // Initial report
-  sendHeight();
-
-  // Also report after a short delay for any late rendering
-  setTimeout(sendHeight, 300);
-
-  return () => {
-    sharedReportingState.count--;
-    if (sharedReportingState.count <= 0) {
-      sharedReportingState.observer?.disconnect();
-      sharedReportingState.mutObserver?.disconnect();
-      sharedReportingState.observer = null;
-      sharedReportingState.mutObserver = null;
-      sharedReportingState.wrapperId = undefined;
-    }
-  };
-}
+export { PluginKeyboardEvent };
 
 /**
  * Options for the composition hooks.
  */
 export interface UseSlidePluginOptions {
-  /** 
+  /**
    * Whether to automatically report content height to the parent.
    */
   autoHeight?: boolean | string;
@@ -275,16 +146,16 @@ export interface BaseSlidePluginReturn {
   slideProps: Ref<Record<string, any> | undefined>;
   baseUrl: Ref<string | undefined>;
   trackGA4AndMixpanel: ((eventName: string, payload: any) => void) | undefined;
-  /** 
+  /**
    * Manually trigger a report of the current content height to the parent.
    */
   reportHeight: () => void;
-  /** 
+  /**
    * Subscribe to a specific MQTT topic.
-   * 
+   *
    * The topic is typically constructed using a bucket and a key: `${bucket}/${key}`.
    * You can also subscribe to multiple topics using a prefix followed by a `#` wildcard (e.g., `bucket/#`).
-   * 
+   *
    * @example
    * ```typescript
    * subscribeTopic({
@@ -292,7 +163,7 @@ export interface BaseSlidePluginReturn {
    *   callback: (topic, message) => console.log(topic, message)
    * });
    * ```
-   * 
+   *
    * Or subscribing to all changes in the bucket:
    * ```typescript
    * subscribeTopic({
@@ -304,9 +175,9 @@ export interface BaseSlidePluginReturn {
   subscribeTopic: ((options: { type?: string; topic: string; callback: (topic: string, message: any) => void }) => void) | undefined;
   unsubscribeTopic: ((topic: string) => void) | undefined;
 
-  /** 
+  /**
    * Action to fetch values from a specific bucket and optional key from the parent application.
-   * 
+   *
    * @param params - The parameters containing bucket and optional key.
    * @returns A promise resolving to an array of objects containing key, path, and value.
    */
@@ -315,7 +186,8 @@ export interface BaseSlidePluginReturn {
 
 /**
  * Base hook that provides common functionality for both presenter and audience plugins.
- * 
+ *
+ * @deprecated Use `createPluginBase` from `@aha/core` instead.
  * @param options - Configure hook behavior (e.g., disable auto-height).
  * @param onPropsExtension - Optional callback to handle additional props updates.
  * @returns Reactive refs for common presentation and slide props, and shared actions.
@@ -324,46 +196,44 @@ export function useBaseSlidePlugin(
   options: UseSlidePluginOptions = { autoHeight: false },
   onPropsExtension?: (newProps: any) => void
 ): BaseSlidePluginReturn & { xprops: any } {
-  const presentationProps = ref<Record<string, any> | undefined>((window as any).xprops?.presentation);
-  const presentationColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationColorPalette);
-  const presentationLighterColorPaletteProps = ref<string[] | undefined>((window as any).xprops?.presentationLighterColorPalette);
-  const slideProps = ref<Record<string, any> | undefined>((window as any).xprops?.slide);
-  const baseUrl = ref<string | undefined>((window as any).xprops?.baseUrl);
-  const trackGA4AndMixpanel = (window as any).xprops?.trackGA4AndMixpanel;
+  const plugin = createPluginBase({
+    autoHeight: options.autoHeight ?? false,
+  });
+
+  const presentationProps = ref<Record<string, any> | undefined>(plugin.getPresentation());
+  const presentationColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationColorPalette());
+  const presentationLighterColorPaletteProps = ref<string[] | undefined>(plugin.getPresentationLighterColorPalette());
+  const slideProps = ref<Record<string, any> | undefined>(plugin.getSlide());
+  const baseUrl = ref<string | undefined>(plugin.getBaseUrl());
+
+  const unsubs: (() => void)[] = [];
 
   onMounted(() => {
-    let cleanup = () => { };
-    if (options.autoHeight) {
-      cleanup = autoReportHeight(typeof options.autoHeight === 'string' ? options.autoHeight : undefined);
-    } else {
+    plugin.init();
+
+    unsubs.push(plugin.onPresentationChange((val) => { presentationProps.value = val; }));
+    unsubs.push(plugin.onSlideChange((val) => { slideProps.value = val; }));
+    unsubs.push(plugin.onBaseUrlChange((val) => { baseUrl.value = val; }));
+    unsubs.push(plugin.onPresentationColorPaletteChange((val) => { presentationColorPaletteProps.value = val; }));
+    unsubs.push(plugin.onPresentationLighterColorPaletteChange((val) => { presentationLighterColorPaletteProps.value = val; }));
+
+    // Handle extension callback for derived hooks
+    if (onPropsExtension) {
       const xprops = (window as any).xprops;
-      if (xprops && typeof xprops.onHeightChange === 'function') {
-        xprops.onHeightChange(null);
+      if (xprops && typeof xprops.onProps === 'function') {
+        xprops.onProps((newProps: any) => {
+          onPropsExtension(newProps);
+        });
       }
     }
+  });
 
-    const xprops = (window as any).xprops;
-    if (xprops && typeof xprops.onProps === 'function') {
-      xprops.onProps((newProps: any) => {
-        // Handle base props
-        if (newProps.presentation) presentationProps.value = { ...newProps.presentation };
-        if (newProps.presentationColorPalette) presentationColorPaletteProps.value = [...newProps.presentationColorPalette];
-        if (newProps.presentationLighterColorPalette) presentationLighterColorPaletteProps.value = [...newProps.presentationLighterColorPalette];
-        if (newProps.slide) slideProps.value = { ...newProps.slide };
-        if (newProps.baseUrl) baseUrl.value = newProps.baseUrl;
-
-        // Call extension callback if provided
-        if (onPropsExtension) {
-          onPropsExtension(newProps);
-        }
-      });
-    }
-    return cleanup;
+  onUnmounted(() => {
+    unsubs.forEach((fn) => fn());
+    plugin.destroy();
   });
 
   const xprops = (window as any).xprops;
-  const subscribeTopic = xprops?.subscribeTopic;
-  const unsubscribeTopic = xprops?.unsubscribeTopic;
 
   return {
     presentationProps,
@@ -371,11 +241,11 @@ export function useBaseSlidePlugin(
     presentationLighterColorPaletteProps,
     slideProps,
     baseUrl,
-    subscribeTopic,
-    unsubscribeTopic,
-    reportHeight,
+    subscribeTopic: xprops?.subscribeTopic ? (opts: any) => plugin.subscribeTopic(opts) : undefined,
+    unsubscribeTopic: xprops?.unsubscribeTopic ? (topic: string) => plugin.unsubscribeTopic(topic) : undefined,
+    reportHeight: () => plugin.reportHeight(),
     xprops,
-    trackGA4AndMixpanel,
-    getValues: xprops?.getValues,
+    trackGA4AndMixpanel: xprops?.trackGA4AndMixpanel ? (eventName: string, payload: any) => plugin.trackGA4AndMixpanel(payload) : undefined,
+    getValues: xprops?.getValues ? (params: any) => plugin.getValues(params) : undefined,
   };
 }

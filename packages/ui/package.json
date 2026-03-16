@@ -67,6 +67,7 @@
     "vue-router": "^4.0.0"
   },
   "dependencies": {
+    "@aha/core": "*",
     "zoid": "^9.0.86"
   }
 }
