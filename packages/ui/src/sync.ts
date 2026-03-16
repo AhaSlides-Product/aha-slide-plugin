@@ -12,13 +12,14 @@ import { createSync as coreCreateSync, createSyncReadOnly as coreCreateSyncReadO
  */
 export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
   const state = ref(initialState) as Ref<T>;
-  let sync = coreCreateSync<T>(unref(name) || '', initialState);
+  let sync: ReturnType<typeof coreCreateSync<T>> | null = null;
   let unsub: (() => void) | null = null;
   let isExternalUpdate = false;
 
   const setup = (channelName: string) => {
     unsub?.();
-    sync.destroy();
+    sync?.destroy();
+    sync = null;
     if (!channelName) return;
     sync = coreCreateSync<T>(channelName, state.value as T);
     unsub = sync.onStateChange((val) => {
@@ -30,14 +31,14 @@ export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
 
   watch(state, (newValue) => {
     if (isExternalUpdate) return;
-    sync.setState(newValue as T);
+    sync?.setState(newValue as T);
   }, { deep: true });
 
   watch(() => unref(name), (newName) => setup(newName), { immediate: true });
 
   onUnmounted(() => {
     unsub?.();
-    sync.destroy();
+    sync?.destroy();
   });
 
   return state;
@@ -54,12 +55,13 @@ export function useSync<T>(name: string | Ref<any>, initialState: T): Ref<T> {
  */
 export function useSyncReadOnly<T>(name: string | Ref<any>, initialState: T): DeepReadonly<Ref<T>> {
   const state = ref(initialState) as Ref<T>;
-  let sync = coreCreateSyncReadOnly<T>(unref(name) || '', initialState);
+  let sync: ReturnType<typeof coreCreateSyncReadOnly<T>> | null = null;
   let unsub: (() => void) | null = null;
 
   const setup = (channelName: string) => {
     unsub?.();
-    sync.destroy();
+    sync?.destroy();
+    sync = null;
     if (!channelName) return;
     sync = coreCreateSyncReadOnly<T>(channelName, state.value as T);
     unsub = sync.onStateChange((val) => {
@@ -71,7 +73,7 @@ export function useSyncReadOnly<T>(name: string | Ref<any>, initialState: T): De
 
   onUnmounted(() => {
     unsub?.();
-    sync.destroy();
+    sync?.destroy();
   });
 
   return readonly(state) as DeepReadonly<Ref<T>>;
