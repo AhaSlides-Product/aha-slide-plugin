@@ -11,7 +11,8 @@
     "declarationMap": true,
     "outDir": "dist",
     "rootDir": "src",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/__tests__"]
