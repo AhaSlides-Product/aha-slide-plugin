@@ -2,6 +2,16 @@
   <div class="canvas-page">
     <h1>Canvas View</h1>
     <p>Welcome to the Canvas for Slide: {{ slideId }} version {{ slideVersion }}</p>
+    <div style="margin: 15px 0;">
+      <button 
+        @click="scrollToBottom" 
+        class="demo-button"
+        style="background: #52c41a;"
+        data-testid="canvas-scroll-bottom-button"
+      >
+        Scroll to Bottom
+      </button>
+    </div>
     <div class="greeting-display">
       <h2>Greeting: {{ slideGreeting }}</h2>
        <div v-if="imageUrl" style="margin-top: 10px;">
@@ -267,6 +277,13 @@ const showConfirm = async () => {
     variant: 'danger'
   })
   console.log('Confirm:', confirm);
+}
+
+const scrollToBottom = () => {
+  window.scrollTo({
+    top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
+    behavior: 'smooth'
+  });
 }
 
 </script>
