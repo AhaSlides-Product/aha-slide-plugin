@@ -22,6 +22,18 @@
         {
           "name": "ECS_LOGLEVEL",
           "value": "error"
+        },
+        {
+          "name": "LANGSMITH_TRACING",
+          "value": "true"
+        },
+        {
+          "name": "LANGSMITH_ENDPOINT",
+          "value": "https://api.smith.langchain.com"
+        },
+        {
+          "name": "LANGSMITH_PROJECT",
+          "value": "Ahaslides"
         }
       ],
       "mountPoints": [],
@@ -30,6 +42,10 @@
         {
           "name": "OPENAI_API_KEY",
           "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-openai_api_key"
+        },
+        {
+          "name": "LANGSMITH_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-langsmith_api_key"
         }
       ],
       "logConfiguration": {
