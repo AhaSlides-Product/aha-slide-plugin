@@ -104,6 +104,14 @@
             🔍 Scroll to Debug Info
           </a-button>
         </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-direction: column; align-items: center;">
+          <a-button @click="handleGetWindowHeight" type="primary" danger ghost>
+            📏 Get Window Height
+          </a-button>
+          <div v-if="parentWindowHeight !== null" style="font-weight: bold; color: #cf1322;">
+            Parent Window Height: {{ parentWindowHeight }}px
+          </div>
+        </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
           <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
         </div>
@@ -144,6 +152,7 @@ const {
   onSubmitButtonHeightChange,
   timeLimit,
   scrollTo,
+  getWindowHeight,
 } = useAudiencePlugin();
 
 const timerWidth = computed(() => {
@@ -158,6 +167,30 @@ const submitButtonRef = ref<any>(null);
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
 const newName = ref('');
+const parentWindowHeight = ref<number | null>(null);
+
+/**
+ * Handles requesting the parent window height.
+ * This method demonstrates how to use the `getWindowHeight` bridge 
+ * to get the `window.innerHeight` of the Audience App.
+ */
+const handleGetWindowHeight = async () => {
+  if (getWindowHeight) {
+    try {
+      console.log('[Plugin] Requesting parent window height...');
+      const height = await getWindowHeight();
+      console.log('[Plugin] Received parent window height:', height);
+      parentWindowHeight.value = height;
+      if (showToastSuccess) {
+        showToastSuccess(`Parent window height: ${height}px`);
+      }
+    } catch (e) {
+      console.error('[Plugin] Failed to get window height:', e);
+    }
+  } else {
+    console.warn('getWindowHeight function not available');
+  }
+};
 
 const handleOpenModal = (path?: string) => {
   if (openPluginModal) {
