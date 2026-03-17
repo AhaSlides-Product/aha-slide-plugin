@@ -46,30 +46,40 @@ runs:
         if ! git diff --cached --quiet; then
           COMMIT_MSG=""
 
+          echo "DEBUG: Inputs repo_name=${{ inputs.repo_name }}, latest_commit_sha=${{ inputs.latest_commit_sha }}"
+
           # Try to get message from dispatch payload if available
           if [ -n "${{ inputs.repo_name }}" ] && [ -n "${{ inputs.latest_commit_sha }}" ]; then
             # Map repo_name to submodule path using .gitmodules
-            # Example: AhaSlides-Product/slide-plugin-ranking-question -> apps/ranking
             SUB_PATH=$(grep -B 2 "${{ inputs.repo_name }}" .gitmodules | grep "path =" | awk '{print $3}' | head -n 1)
+            echo "DEBUG: Attempt 1 SUB_PATH=$SUB_PATH"
             
             # If not found in .gitmodules by full URL, try matching by repo basename
             if [ -z "$SUB_PATH" ]; then
               REPO_BASENAME=$(basename "${{ inputs.repo_name }}")
+              echo "DEBUG: Attempting basename match with $REPO_BASENAME"
               SUB_PATH=$(grep -B 2 "$REPO_BASENAME" .gitmodules | grep "path =" | awk '{print $3}' | head -n 1)
+              echo "DEBUG: Attempt 2 SUB_PATH=$SUB_PATH"
             fi
 
             if [ -n "$SUB_PATH" ] && [ -d "$SUB_PATH" ]; then
+              echo "DEBUG: Found submodule path $SUB_PATH"
               SUB_MSG=$(git -C "$SUB_PATH" log -1 --pretty=%s "${{ inputs.latest_commit_sha }}" 2>/dev/null || git -C "$SUB_PATH" log -1 --pretty=%s 2>/dev/null)
+              echo "DEBUG: Found submodule message: $SUB_MSG"
               if [ -n "$SUB_MSG" ]; then
                 COMMIT_MSG="Update $SUB_PATH: $SUB_MSG"
               fi
+            else
+              echo "DEBUG: Submodule path not found or not a directory"
             fi
           fi
 
           if [ -z "$COMMIT_MSG" ]; then
+            echo "DEBUG: Falling back to generic message"
             COMMIT_MSG="Update submodules to ${{ inputs.plugins_branch }} branch"
           fi
 
+          echo "DEBUG: Final COMMIT_MSG: $COMMIT_MSG"
           git commit -m "$COMMIT_MSG"
           git push origin ${{ inputs.target_branch }}
         else
