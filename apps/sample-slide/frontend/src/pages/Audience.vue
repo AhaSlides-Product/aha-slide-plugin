@@ -16,7 +16,24 @@
       </div>
     </div>
 
-    <div class="debug-section">
+    <!-- Progress Bar Demo -->
+    <div class="progress-section" v-if="timeLimit !== null">
+      <h3>Slide Timer (Sync from Parent)</h3>
+      <div class="timer-container">
+        <div class="timer-value" :class="{ 'timer-low': (timeLimit || 0) <= 5 }">
+          {{ timeLimit }}s
+        </div>
+        <div class="timer-bar-wrapper">
+          <div class="timer-bar" :style="{ width: timerWidth + '%' }"></div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-section" v-else>
+      <h3>Slide Timer</h3>
+      <p>No timer active (null received from parent)</p>
+    </div>
+
+    <div class="debug-section" ref="debugInfoRef">
       <h3>Audience Debug Info</h3>
       <pre class="code-block">{{ JSON.stringify({ audienceId, audienceName, audienceEmoji, audienceEmail, audienceTeam, participantInfo }, null, 2) }}</pre>
     </div>
@@ -79,6 +96,22 @@
             Open Custom Path Modal
           </a-button>
         </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+          <a-button @click="handleScrollTo(0)" type="dashed">
+            📍 Scroll to Iframe Top
+          </a-button>
+          <a-button @click="handleScrollToDebugInfo" type="primary" ghost>
+            🔍 Scroll to Debug Info
+          </a-button>
+        </div>
+        <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-direction: column; align-items: center;">
+          <a-button @click="handleGetWindowHeight" type="primary" danger ghost>
+            📏 Get Window Height
+          </a-button>
+          <div v-if="parentWindowHeight !== null" style="font-weight: bold; color: #cf1322;">
+            Parent Window Height: {{ parentWindowHeight }}px
+          </div>
+        </div>
         <div v-if="uploadedFile" style="margin-top: 10px;">
           <img :src="uploadedFile.url" style="max-width: 200px; border-radius: 4px;" />
         </div>
@@ -93,7 +126,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
-import { SubmissionSenderType } from '@aha/common';
+import { SubmissionSenderType, SubmissionType } from '@aha/common';
 import { getSubmissions, saveSubmission } from '@aha/db';
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -117,13 +150,47 @@ const {
   updateAudienceData,
   openPluginModal,
   onSubmitButtonHeightChange,
+  timeLimit,
+  scrollTo,
+  getWindowHeight,
 } = useAudiencePlugin();
+
+const timerWidth = computed(() => {
+  if (timeLimit.value === null || timeLimit.value === undefined) return 0;
+  // Fallback to timeToAnswer from slideProps if available, otherwise assume 30s for demo bar
+  const total = slideProps.value?.timeToAnswer ? parseInt(slideProps.value.timeToAnswer) : 30;
+  return Math.min(100, (timeLimit.value / total) * 100);
+});
 
 const submitButtonRef = ref<any>(null);
 
 const uploadedFile = ref<any>(null);
 const uploading = ref(false);
 const newName = ref('');
+const parentWindowHeight = ref<number | null>(null);
+
+/**
+ * Handles requesting the parent window height.
+ * This method demonstrates how to use the `getWindowHeight` bridge 
+ * to get the `window.innerHeight` of the Audience App.
+ */
+const handleGetWindowHeight = async () => {
+  if (getWindowHeight) {
+    try {
+      console.log('[Plugin] Requesting parent window height...');
+      const height = await getWindowHeight();
+      console.log('[Plugin] Received parent window height:', height);
+      parentWindowHeight.value = height;
+      if (showToastSuccess) {
+        showToastSuccess(`Parent window height: ${height}px`);
+      }
+    } catch (e) {
+      console.error('[Plugin] Failed to get window height:', e);
+    }
+  } else {
+    console.warn('getWindowHeight function not available');
+  }
+};
 
 const handleOpenModal = (path?: string) => {
   if (openPluginModal) {
@@ -134,6 +201,24 @@ const handleOpenModal = (path?: string) => {
     }
   } else {
     console.warn('openPluginModal function not available');
+  }
+};
+
+const debugInfoRef = ref<HTMLElement | null>(null);
+
+const handleScrollTo = (yOffset: number) => {
+  if (scrollTo) {
+    console.log('[Plugin] Requesting scroll to offset:', yOffset);
+    scrollTo(yOffset);
+  } else {
+    console.warn('scrollTo function not available');
+  }
+};
+
+const handleScrollToDebugInfo = () => {
+  if (debugInfoRef.value) {
+    const offsetTop = debugInfoRef.value.offsetTop;
+    handleScrollTo(offsetTop);
   }
 };
 
@@ -215,7 +300,7 @@ const handleSubmitSubmission = async () => {
   const payload: SubmissionPayload = {
     slideId: slideProps.value?.id || 3,
     slideVersion: slideProps.value?.version || 2,
-    type: "sample-slide",
+    type: SubmissionType.Response,
     presentationId: presentationProps.value?.id || 0,
     senderId: audienceId.value?.toString() ?? "sample-audienceId",
     senderType: SubmissionSenderType.Audience,
@@ -378,5 +463,51 @@ onUnmounted(() => {
   padding: 4px;
   border-bottom: 1px solid #f0f0f0;
   font-family: monospace;
+}
+
+.progress-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 8px;
+}
+
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.timer-low {
+  color: #ff4d4f;
+  animation: pulse 1s infinite;
+}
+
+.timer-bar-wrapper {
+  width: 100%;
+  height: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  background: #1890ff;
+  transition: width 0.3s linear;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 </style>

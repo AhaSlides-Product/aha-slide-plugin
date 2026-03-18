@@ -106,6 +106,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   showConfirmModal?: (payload: ConfirmModalPayload) => Promise<boolean>;
 
   clearSlideData?: (slideId: string) => Promise<void>;
+
+  /**
+   * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
+   */
+  allowPDFRender?: () => void;
 }
 
 /**
@@ -215,6 +220,10 @@ export const PresenterSlidePluginIframe = zoid.create({
     showConfirmModal: {
       type: 'function',
       required: false,
+    },
+    allowPDFRender: {
+      type: 'function',
+      required: false,
     }
   },
 });
@@ -241,13 +250,6 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Close the currently open plugin modal.
    */
   closePluginModal: (() => void) | undefined;
-  /** 
-   * Action to fetch values from a specific bucket and optional key from the parent application.
-   * 
-   * @param params - The parameters containing bucket and optional key.
-   * @returns A promise resolving to an array of objects containing key, path, and value.
-   */
-  getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
 
   /**
    * Access token for the current user.
@@ -265,6 +267,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Clear the slide data in the parent app.
    */
   clearSlideData: ((slideId: string) => Promise<void>) | undefined;
+
+  /**
+   * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
+   */
+  allowPDFRender: (() => void) | undefined;
 }
 
 /**
@@ -313,7 +320,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
-    getValues: xprops.getValues,
+    getValues: baseHook.getValues,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
     uploadImage,
@@ -332,5 +339,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     accessToken: xprops?.token,
     showConfirmModal: xprops?.showConfirmModal,
     clearSlideData: xprops?.clearSlideData,
+    trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
+    allowPDFRender: xprops?.allowPDFRender,
   };
 }

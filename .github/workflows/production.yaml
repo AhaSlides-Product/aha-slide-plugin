@@ -1,4 +1,4 @@
-name: "Production & Canary Deploy"
+name: "Production Deploy"
 
 on:
   workflow_dispatch:
@@ -24,40 +24,10 @@ jobs:
           aws_region: us-east-1
           platform: linux/arm64
 
-  deploy_canary:
-    name: Deploy Canary
-    runs-on: ubuntu-latest
-    needs: build
-    if: false
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy Frontend
-        uses: ./.github/actions/deploy-app
-        with:
-          s3_bucket: ${{ secrets.AWS_S3_BUCKET_CANARY }}
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
-
-      - name: Deploy Backend
-        uses: ./.github/actions/deploy-ecs
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
-          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
-          commit_sha: ${{ github.sha }}
-          ecs_cluster: us01-plugins
-          ecs_service: us01-plugins-canary
-          ecs_task_definition: ecs/tasks/us01-plugins-canary.json
-
   deploy_production:
     name: Deploy Production
     runs-on: ubuntu-latest
     needs: build
-    if: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -65,10 +35,12 @@ jobs:
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
-          s3_bucket: ${{ secrets.AWS_S3_BUCKET_PRODUCTION }}
+          s3_bucket: plugins.ahaslides.com
+          slides_agent_bucket: chatbot.ahaslides.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
+          cloudfront_distribution_id: E280LS9794B888
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs

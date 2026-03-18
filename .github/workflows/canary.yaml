@@ -1,10 +1,7 @@
-name: "Staging Deploy"
+name: "Canary Deploy"
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - staging
 
 jobs:
   build:
@@ -14,21 +11,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PLUGINS_PAT }}
+          token: ${{ secrets.GH_PAT }}
           submodules: recursive
 
       - name: Build
         uses: ./.github/actions/build-app
         with:
-          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
           commit_sha: ${{ github.sha }}
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
           platform: linux/arm64
-          build_storybook: 'true'
 
-  deploy:
+  deploy_canary:
+    name: Deploy Canary
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -38,13 +35,11 @@ jobs:
       - name: Deploy Frontend
         uses: ./.github/actions/deploy-app
         with:
-          s3_bucket: plugins.dev.ahaslide.com
-          slides_agent_bucket: chatbot.ahaslide.com
+          s3_bucket: plugins2.ahaslides.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
-          cloudfront_distribution_id: E24EITRV4LCVOE
-          deploy_storybook: 'true'
+          cloudfront_distribution_id: E1IKEL4KIY7OL5
 
       - name: Deploy Backend
         uses: ./.github/actions/deploy-ecs
@@ -52,8 +47,8 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
-          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
+          repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/us01/plugins
           commit_sha: ${{ github.sha }}
-          ecs_cluster: dev01-plugins
-          ecs_service: dev01-plugins-default
-          ecs_task_definition: ecs/tasks/dev01-plugins-default.json
+          ecs_cluster: us01-plugins
+          ecs_service: us01-plugins-canary
+          ecs_task_definition: ecs/tasks/us01-plugins-canary.json

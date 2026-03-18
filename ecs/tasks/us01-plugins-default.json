@@ -1,5 +1,5 @@
 {
-  "family": "dev01-plugins-default",
+  "family": "us01-plugins-canary",
   "containerDefinitions": [
     {
       "name": "plugins",
@@ -22,18 +22,6 @@
         {
           "name": "ECS_LOGLEVEL",
           "value": "error"
-        },
-        {
-          "name": "LANGSMITH_TRACING",
-          "value": "true"
-        },
-        {
-          "name": "LANGSMITH_ENDPOINT",
-          "value": "https://api.smith.langchain.com"
-        },
-        {
-          "name": "LANGSMITH_PROJECT",
-          "value": "Ahaslides"
         }
       ],
       "mountPoints": [],
@@ -41,17 +29,13 @@
       "secrets": [
         {
           "name": "OPENAI_API_KEY",
-          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-openai_api_key"
-        },
-        {
-          "name": "LANGSMITH_API_KEY",
-          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/dev01-plugins-default-langsmith_api_key"
+          "valueFrom": "arn:aws:ssm:us-east-1:018208337430:parameter/us01-plugins-default-openai_api_key"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/dev01-plugins-default",
+          "awslogs-group": "/ecs/us01-plugins-canary",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -60,7 +44,7 @@
       "stopTimeout": 120
     }
   ],
-  "taskRoleArn": "arn:aws:iam::018208337430:role/dev01-plugins-task-role",
+  "taskRoleArn": "arn:aws:iam::018208337430:role/us01-plugins-task-role",
   "executionRoleArn": "arn:aws:iam::018208337430:role/ecsTaskExecutionRole",
   "networkMode": "awsvpc",
   "volumes": [],

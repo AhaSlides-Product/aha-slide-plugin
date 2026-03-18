@@ -29,3 +29,5 @@ jobs:
         with:
           plugins_branch: staging
           target_branch: staging
+          repo_name: ${{ github.event.client_payload.repo_name }}
+          latest_commit_sha: ${{ github.event.client_payload.latest_commit_sha }}

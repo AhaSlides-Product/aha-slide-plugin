@@ -2,6 +2,16 @@
   <div class="canvas-page">
     <h1>Canvas View</h1>
     <p>Welcome to the Canvas for Slide: {{ slideId }} version {{ slideVersion }}</p>
+    <div style="margin: 15px 0;">
+      <button 
+        @click="scrollToBottom" 
+        class="demo-button"
+        style="background: #52c41a;"
+        data-testid="canvas-scroll-bottom-button"
+      >
+        Scroll to Bottom
+      </button>
+    </div>
     <div class="greeting-display">
       <h2>Greeting: {{ slideGreeting }}</h2>
        <div v-if="imageUrl" style="margin-top: 10px;">
@@ -107,7 +117,7 @@ import { getBucket } from '@aha/common';
 import { ApiClient } from '@aha/api';
 
 const route = useRoute();
-const slideId = route.params.slideId as string;
+const slideId = Number(route.params.slideId);
 const { 
   presentationProps, 
   presentationColorPaletteProps,
@@ -124,6 +134,7 @@ const {
   accessToken,
   openPluginModal,
   showConfirmModal,
+  allowPDFRender,
 } = usePresenterPlugin();
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
@@ -149,6 +160,9 @@ onMounted(async () => {
   })
   initialValues.value = JSON.stringify(result);
   console.log('[Slide Plugin] initialValues', initialValues.value)
+
+  // Allow PDF rendering after initial data is loaded and components are mounted
+  allowPDFRender?.();
   
   // MQTT Integration
   if (subscribeTopic) {
@@ -263,6 +277,13 @@ const showConfirm = async () => {
     variant: 'danger'
   })
   console.log('Confirm:', confirm);
+}
+
+const scrollToBottom = () => {
+  window.scrollTo({
+    top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
+    behavior: 'smooth'
+  });
 }
 
 </script>
