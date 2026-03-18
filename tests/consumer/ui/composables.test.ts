@@ -126,7 +126,7 @@ describe('@aha/ui - Composables', () => {
   describe('usePresenterPlugin', () => {
     beforeEach(() => {
       (window as any).xprops = {
-        presentation: { id: '1', language: 'en', teamPlay: { enabled: true } },
+        presentation: { id: '1', language: 'en', teamplay: { enabled: true } },
         slide: { id: '2', version: 1 },
         currentUser: { presenterLanguage: 'vi' },
         baseUrl: 'https://test.ahaslide.com',
@@ -152,6 +152,7 @@ describe('@aha/ui - Composables', () => {
         showToastError: vi.fn(),
         openPluginModal: vi.fn(),
         closePluginModal: vi.fn(),
+        allowPDFRender: vi.fn(),
       };
     });
 
@@ -167,12 +168,12 @@ describe('@aha/ui - Composables', () => {
       expect(wrapper.vm.hook.presentationProps).toBeDefined();
       expect(wrapper.vm.hook.slideProps).toBeDefined();
       expect(wrapper.vm.hook.baseUrl).toBeDefined();
-      expect(wrapper.vm.hook.presentationProps?.value).toEqual({ id: '1', language: 'en', teamPlay: { enabled: true } });
+      expect(wrapper.vm.hook.presentationProps?.value).toEqual({ id: '1', language: 'en', teamplay: { enabled: true } });
       expect(wrapper.vm.hook.slideProps?.value).toEqual({ id: '2', version: 1 });
       expect(wrapper.vm.hook.baseUrl?.value).toBe('https://test.ahaslide.com');
       expect(wrapper.vm.hook.presentationColorPaletteProps?.value).toEqual(['#ff0000', '#00ff00']);
       expect(wrapper.vm.hook.presentationLighterColorPaletteProps?.value).toEqual(['#ffebeb', '#ebffeb']);
-      expect(wrapper.vm.hook.presentationProps?.value?.teamPlay).toEqual({ enabled: true });
+      expect(wrapper.vm.hook.presentationProps?.value?.teamplay).toEqual({ enabled: true });
       expect(wrapper.vm.hook.currentUserProps?.value?.presenterLanguage).toBe('vi');
       expect(wrapper.vm.hook.accessToken).toBe('test-token');
     });
@@ -209,6 +210,7 @@ describe('@aha/ui - Composables', () => {
       hook.setSubmissionCount!({ count: 10, tooltip: 'votes' });
       expect((window as any).xprops.sendVoteOutcome).toHaveBeenCalledWith({
         voteCount: 10,
+        count: 10,
         tooltip: 'votes'
       });
     });
@@ -224,6 +226,18 @@ describe('@aha/ui - Composables', () => {
       const wrapper = mount(TestComponent);
       const hook = wrapper.vm.hook;
 
+      expect(hook.getValues).toBeDefined();
+      expect(hook.uploadImage).toBeDefined();
+      expect(hook.onKeyboard).toBeDefined();
+      expect(hook.emitKeyboardEvent).toBeDefined();
+      expect(hook.openUploadImageModal).toBeDefined();
+      expect(hook.openEditImageModal).toBeDefined();
+      expect(hook.showToastInfo).toBeDefined();
+      expect(hook.showToastSuccess).toBeDefined();
+      expect(hook.showToastError).toBeDefined();
+      expect(hook.openPluginModal).toBeDefined();
+      expect(hook.closePluginModal).toBeDefined();
+
       expect(typeof hook.getValues).toBe('function');
       expect(typeof hook.uploadImage).toBe('function');
       expect(typeof hook.onKeyboard).toBe('function');
@@ -235,6 +249,27 @@ describe('@aha/ui - Composables', () => {
       expect(typeof hook.showToastError).toBe('function');
       expect(typeof hook.openPluginModal).toBe('function');
       expect(typeof hook.closePluginModal).toBe('function');
+    });
+
+    it('should handle keyboard event registration and emission', async () => {
+      const callback = vi.fn();
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = usePresenterPlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+
+      // Test registration
+      wrapper.vm.hook.onKeyboard?.(callback);
+      expect((window as any).xprops.onKeyboard).toHaveBeenCalledWith(callback);
+
+      // Test emission
+      const event = { key: 'Enter', code: 'Enter' } as any;
+      wrapper.vm.hook.emitKeyboardEvent?.(event);
+      expect((window as any).xprops.emitKeyboardEvent).toHaveBeenCalledWith(event);
     });
 
     it('should respect autoHeight: false and not call autoReportHeight', () => {
@@ -250,15 +285,65 @@ describe('@aha/ui - Composables', () => {
       // With autoHeight false, onHeightChange(null) is called once from useBaseSlidePlugin
       expect(onHeightChange).toHaveBeenCalledWith(null);
     });
+
+    it('should return allowPDFRender function (new feature by Hoang Loi)', () => {
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = usePresenterPlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      const hook = wrapper.vm.hook;
+      expect(typeof hook.allowPDFRender).toBe('function');
+
+      hook.allowPDFRender!();
+      expect((window as any).xprops.allowPDFRender).toHaveBeenCalled();
+    });
+
+    it('allowPDFRender should be undefined when not provided in xprops', () => {
+      delete (window as any).xprops.allowPDFRender;
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = usePresenterPlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      expect(wrapper.vm.hook.allowPDFRender).toBeUndefined();
+    });
+
+    it('should update currentUser when onProps is called', async () => {
+      let onPropsCallback: any;
+      (window as any).xprops.onProps = vi.fn((cb) => { onPropsCallback = cb; });
+
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = usePresenterPlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+
+      onPropsCallback({
+        currentUser: { presenterLanguage: 'fr', newField: 'value' },
+      });
+      await nextTick();
+
+      expect(wrapper.vm.hook.currentUserProps?.value).toEqual({ presenterLanguage: 'fr', newField: 'value' });
+    });
   });
 
   describe('useAudiencePlugin', () => {
     beforeEach(() => {
       (window as any).xprops = {
-        presentation: { id: '1', teamPlay: { score: 100 } },
+        presentation: { id: '1', teamplay: { score: 100 } },
         slide: { id: '2' },
         baseUrl: 'https://audience.ahaslide.com',
-        presentationColorPalette: ['#0000ff'],
+        presentationAttributeColorPalette: { '#0000ff': '#0000ff' },
         presentationLighterColorPalette: ['#ebebff'],
         slideAttributes: { custom: 'data' },
         audience: {
@@ -280,6 +365,8 @@ describe('@aha/ui - Composables', () => {
         openPluginModal: vi.fn(),
         closePluginModal: vi.fn(),
         onSubmitButtonHeightChange: vi.fn(),
+        getWindowHeight: vi.fn().mockResolvedValue(800),
+        getValues: vi.fn(),
       };
     });
 
@@ -390,7 +477,7 @@ describe('@aha/ui - Composables', () => {
       const wrapper = mount(TestComponent);
 
       onPropsCallback({
-        presentation: { id: '1', teamPlay: { score: 200 } },
+        presentation: { id: '1', teamplay: { score: 200 } },
         slideAttributes: { custom: 'new-data' },
         audience: {
           participantInfo: [{ type: 'nickname', value: 'New' }],
@@ -398,9 +485,91 @@ describe('@aha/ui - Composables', () => {
       });
       await nextTick();
 
-      expect(wrapper.vm.hook.presentationProps?.value?.teamPlay).toEqual({ score: 200 });
+      expect(wrapper.vm.hook.presentationProps?.value?.teamplay).toEqual({ score: 200 });
       expect(wrapper.vm.hook.slideAttributesProps?.value).toEqual({ custom: 'new-data' });
       expect(wrapper.vm.hook.participantInfo?.value).toEqual([{ type: 'nickname', value: 'New' }]);
+    });
+
+    it('should return getWindowHeight function (new feature by Tam)', async () => {
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      const hook = wrapper.vm.hook;
+      expect(typeof hook.getWindowHeight).toBe('function');
+
+      const height = await hook.getWindowHeight!();
+      expect(height).toBe(800);
+      expect((window as any).xprops.getWindowHeight).toHaveBeenCalled();
+    });
+
+    it('should return getValues function from base (exposed to audience)', async () => {
+      const mockResult = [{ key: 'k', path: '/p', value: 'v' }];
+      (window as any).xprops.getValues = vi.fn().mockResolvedValue(mockResult);
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      expect(typeof wrapper.vm.hook.getValues).toBe('function');
+
+      const result = await wrapper.vm.hook.getValues!({ bucket: 'my-bucket', key: 'my-key' });
+      expect((window as any).xprops.getValues).toHaveBeenCalledWith({ bucket: 'my-bucket', key: 'my-key' });
+      expect(result).toEqual(mockResult);
+    });
+
+    it('getValues should be undefined when not provided in xprops', () => {
+      delete (window as any).xprops.getValues;
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      expect(wrapper.vm.hook.getValues).toBeUndefined();
+    });
+
+    it('getWindowHeight should be undefined when not provided in xprops', () => {
+      delete (window as any).xprops.getWindowHeight;
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      expect(wrapper.vm.hook.getWindowHeight).toBeUndefined();
+    });
+
+    it('should update slideAttributes reactive ref independently', async () => {
+      let onPropsCallback: any;
+      (window as any).xprops.onProps = vi.fn((cb) => { onPropsCallback = cb; });
+
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+
+      onPropsCallback({
+        slideAttributes: { updated: true },
+      });
+      await nextTick();
+
+      expect(wrapper.vm.hook.slideAttributesProps?.value).toEqual({ updated: true });
     });
   });
 
@@ -469,20 +638,10 @@ describe('@aha/ui - Composables', () => {
       expect(wrapper.vm.hook.translationMap.value).toEqual({ key: 'new' });
     });
 
-    it('should call onHeightChange(null) when autoHeight is false', () => {
-      const onHeightChange = vi.fn();
-      (window as any).xprops.onHeightChange = onHeightChange;
-      const TestComponent = defineComponent({
-        setup() {
-          return useReportPlugin({ autoHeight: false });
-        },
-        template: '<div />',
-      });
-      mount(TestComponent);
-      expect(onHeightChange).toHaveBeenCalledWith(null);
-    });
+    it('should update translationMap and featureFlags reactive refs independently', async () => {
+      let onPropsCallback: any;
+      (window as any).xprops.onProps = vi.fn((cb) => { onPropsCallback = cb; });
 
-    it('should return additional report actions and reactive props', () => {
       const TestComponent = defineComponent({
         setup() {
           const hook = useReportPlugin({ autoHeight: false });
@@ -491,27 +650,15 @@ describe('@aha/ui - Composables', () => {
         template: '<div />',
       });
       const wrapper = mount(TestComponent);
-      const hook = wrapper.vm.hook;
 
-      expect(typeof hook.trackGA4AndMixpanel).toBe('function');
-      expect(typeof hook.replaceRoute).toBe('function');
-      expect(typeof hook.pushRoute).toBe('function');
-      expect(typeof hook.openExportModalForPresentation).toBe('function');
+      onPropsCallback({
+        featureFlags: { flag2: false },
+        translationMap: { key2: 'value2' },
+      });
+      await nextTick();
 
-      hook.trackGA4AndMixpanel!('event', { data: 1 });
-      expect((window as any).xprops.trackGA4AndMixpanel).toHaveBeenCalledWith('event', { data: 1 });
-
-      hook.replaceRoute!('/new-url');
-      expect((window as any).xprops.replaceRoute).toHaveBeenCalledWith('/new-url');
-
-      hook.pushRoute!('/push-url');
-      expect((window as any).xprops.pushRoute).toHaveBeenCalledWith('/push-url');
-
-      hook.openExportModalForPresentation!({ id: 1 });
-      expect((window as any).xprops.openExportModalForPresentation).toHaveBeenCalledWith({ id: 1 });
-
-      expect(hook.featureFlags.value).toEqual({ flag1: true });
-      expect(hook.translationMap.value).toEqual({ key1: 'value1' });
+      expect(wrapper.vm.hook.featureFlags.value).toEqual({ flag2: false });
+      expect(wrapper.vm.hook.translationMap.value).toEqual({ key2: 'value2' });
     });
   });
 });

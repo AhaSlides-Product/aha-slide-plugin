@@ -97,6 +97,56 @@ describe('@aha/ui - Tracking', () => {
         expect.objectContaining({ customProp: 'val' })
       );
     });
+
+    it('should track hover (mouseenter) events', async () => {
+      const TestComponent = defineComponent({
+        directives: { ahaEmitAction: emitActionDirective },
+        template: '<div v-aha-emit-action name="hover-el">Hover me</div>',
+      });
+
+      const wrapper = mount(TestComponent);
+      await wrapper.find('div').trigger('mouseenter');
+
+      expect((window as any).xprops.trackGA4AndMixpanel).toHaveBeenCalledWith(
+        'hover_hover_el',
+        expect.objectContaining({ eventAction: 'hover_hover_el' })
+      );
+    });
+
+    it('should track change events and include user input', async () => {
+      const TestComponent = defineComponent({
+        directives: { ahaEmitAction: emitActionDirective },
+        template: '<input v-aha-emit-action name="search-input" type="text" />',
+      });
+
+      const wrapper = mount(TestComponent);
+      const input = wrapper.find('input');
+      (input.element as HTMLInputElement).value = 'hello world';
+      await input.trigger('change');
+
+      expect((window as any).xprops.trackGA4AndMixpanel).toHaveBeenCalledWith(
+        'change_search_input',
+        expect.objectContaining({
+          eventAction: 'change_search_input',
+          user_input: 'hello world'
+        })
+      );
+    });
+
+    it('should track submit events', async () => {
+      const TestComponent = defineComponent({
+        directives: { ahaEmitAction: emitActionDirective },
+        template: '<form v-aha-emit-action name="my-form"><button type="submit">Submit</button></form>',
+      });
+
+      const wrapper = mount(TestComponent);
+      await wrapper.find('form').trigger('submit');
+
+      expect((window as any).xprops.trackGA4AndMixpanel).toHaveBeenCalledWith(
+        'submit_my_form',
+        expect.objectContaining({ eventAction: 'submit_my_form' })
+      );
+    });
   });
 
   describe('emitActionPlugin', () => {
