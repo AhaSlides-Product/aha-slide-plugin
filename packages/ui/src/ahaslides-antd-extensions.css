@@ -9,3 +9,9 @@
   width: var(--aha-fontSizeXL);
   height: var(--aha-fontSizeXL);
 }
+
+.ant-btn:disabled {
+  background-color: var(--aha-colorBgFillDisabled);
+  border-color: var(--aha-colorBgFillDisabled);
+  color: var(--aha-colorTextDisabled);
+}
