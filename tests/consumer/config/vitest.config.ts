@@ -32,7 +32,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@aha/ui': resolve(__dirname, '../../../packages/ui/src'),
+      '@aha/api': resolve(__dirname, '../../../packages/api/src'),
+      '@aha/db': resolve(__dirname, '../../../packages/db/src'),
       '@aha/backend-utils': resolve(__dirname, '../../../packages/backend-utils/src'),
+      '@aha/common': resolve(__dirname, '../../../packages/common/src'),
     },
   },
 });

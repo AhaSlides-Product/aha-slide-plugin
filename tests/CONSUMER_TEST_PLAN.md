@@ -36,6 +36,7 @@ tests/
 │   │   ├── components.test.ts   # Test Vue components (AhaIcon, etc.)
 │   │   ├── zoid.test.ts         # Test Zoid iframe components
 │   │   ├── theme.test.ts        # Test theme configuration
+│   │   ├── tracking.test.ts     # Test tracking directives and plugin
 │   │   ├── utilities.test.ts    # Test utility functions (execRequest, uploadImage, etc.)
 │   │   └── types.test.ts        # Test TypeScript type definitions
 │   ├── backend-utils/           # Tests for @aha/backend-utils package
@@ -43,6 +44,8 @@ tests/
 │   │   ├── dtos.test.ts         # Test DTO classes (SubmitAnswerDto)
 │   │   ├── types.test.ts        # Test interfaces and type aliases
 │   │   └── validation.test.ts   # Test DTO validation
+│   ├── common/                  # Tests for @aha/common package
+│   │   └── utilities.test.ts    # Test common utilities (getBucket, etc.)
 │   ├── integration/             # Cross-package integration tests
 │   │   ├── frontend-backend.test.ts  # Test frontend-backend data flow
 │   │   └── sample-app.test.ts   # Test using SDK like sample-app does
@@ -89,15 +92,40 @@ tests/
 - ✅ `usePresenterPlugin(options)`: Presenter plugin hook
   - Returns correct reactive refs
   - Props are reactive
-  - Actions are callable
-  - Options are respected (autoHeight, etc.)
+   - Actions are callable
+   - Options are respected (autoHeight, etc.)
+   - `presentation.teamPlay` synchronization
+   - `currentUser.presenterLanguage` accessibility
+   - `accessToken` availability
+   - Actions: `showConfirmModal`, `clearSlideData`, `openUploadImageModal`, `openEditImageModal`
 - ✅ `useAudiencePlugin(options)`: Audience plugin hook
   - Returns correct reactive refs
   - Props are reactive
-  - Options are respected
+   - Options are respected
+   - Color palette props are reactive (`presentationColorPaletteProps`, `presentationLighterColorPaletteProps`)
+   - `participantInfo` synchronization (reactive via `onProps`)
+   - `updateAudienceData` action (including `participantInfo`)
+   - `presentation.teamPlay` synchronization (reactive via `onProps`)
+   - `slideAttributes` synchronization (reactive via `onProps`)
+- ✅ `useReportPlugin`: Hook for report iframes
+  - Reactive props (token, currentLanguage, featureFlags, translationMap, etc.)
+  - `locale`, `iframePath`, `featureFlags`, `translationMap` synchronization (reactive via `onProps`)
+  - Auto-height reporting
+  - Event tracking integration (`trackGA4AndMixpanel`)
+  - Routing actions: `replaceRoute`, `pushRoute`, `openExportModalForPresentation`
+  - Color palette props (inherited from base)
 - ✅ `useColors()`: Color utilities
   - Returns color functions
   - Color transformations work
+- ✅ `tracking`: User tracking features
+  - `vEmitAction`: Simple click tracking directive
+  - `emitActionDirective`: Advanced tracking with modifiers (view, hover, etc.)
+  - `emitActionPlugin`: Vue plugin registration
+  - Reactive props (token, currentLanguage, etc.)
+  - Auto-height reporting
+  - Event tracking integration
+- ✅ `ReportIframe`: Zoid component for reports
+  - Can be instantiated with token and currentLanguage
 
 #### Components
 - ✅ `AhaIcon`: Icon component
@@ -124,6 +152,32 @@ tests/
 - ✅ `autoReportHeight`: Height reporting
   - Reports height changes
   - Cleanup works
+- ✅ `accessToken`: User authentication
+  - Token is available in presenter hook
+- ✅ `updateAudienceData`: Audience management
+  - Can update audience name, email, emoji
+- ✅ `participantInfo`: Extra participant metadata
+  - Support for nickname and other custom fields
+- ✅ `showConfirmModal`: Presenter interactions
+  - Can trigger confirm modals from iframe
+- ✅ `clearSlideData`: Data management
+  - Can clear slide-specific data
+- ✅ `setSubmissionCount`: Progress tracking
+  - Updates submission count UI in parent
+- ✅ `getValues`: Data retrieval
+  - Fetch values from parent app buckets
+- ✅ `uploadImage` & `openUploadImageModal`: Media management
+  - Trigger image upload from plugin
+- ✅ `onKeyboard` & `emitKeyboardEvent`: Keyboard interactions
+  - Sync keyboard events between plugin and parent
+- ✅ `showToast`: Feedback notifications
+  - Show info, success, and error toasts in parent
+- ✅ `openPluginModal` & `closePluginModal`: Modal management
+  - Control plugin modals from iframe
+- ✅ `routing`: Report navigation
+  - `replaceRoute`, `pushRoute`, and `openExportModalForPresentation`
+- ✅ `extraData`: Metadata synchronization
+  - `featureFlags` and `translationMap` in report plugin
 
 #### Theme & Styles
 - ✅ `ahaSlidesDefaultTheme`: Theme object structure
@@ -131,6 +185,10 @@ tests/
 - ✅ Tailwind config is importable
 
 ### 2. @aha/backend-utils Package
+...
+### 3. @aha/common Package
+- ✅ `getBucket`: EMQX/S3 bucket name formatting
+  - Consistent naming across services
 
 #### Exports & Imports
 - ✅ All documented exports are importable
@@ -236,7 +294,7 @@ tests/
    - [x] Document CI/CD integration
 
 2. **Maintenance**
-   - [ ] Add tests for new features
+   - [x] Add tests for new features
    - [ ] Update tests for API changes
    - [ ] Monitor test coverage
 

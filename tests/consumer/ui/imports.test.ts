@@ -31,6 +31,12 @@ describe('@aha/ui - Imports', () => {
       expect(typeof useAudiencePlugin).toBe('function');
     });
 
+    it('should export useReportPlugin', async () => {
+      const { useReportPlugin } = await import('@aha/ui');
+      expect(useReportPlugin).toBeDefined();
+      expect(typeof useReportPlugin).toBe('function');
+    });
+
     it('should export autoReportHeight', async () => {
       const { autoReportHeight } = await import('@aha/ui');
       expect(autoReportHeight).toBeDefined();
@@ -61,6 +67,11 @@ describe('@aha/ui - Imports', () => {
     it('should export AudienceSlidePluginIframe', async () => {
       const { AudienceSlidePluginIframe } = await import('@aha/ui');
       expect(AudienceSlidePluginIframe).toBeDefined();
+    });
+
+    it('should export ReportIframe', async () => {
+      const { ReportIframe } = await import('@aha/ui');
+      expect(ReportIframe).toBeDefined();
     });
   });
 
