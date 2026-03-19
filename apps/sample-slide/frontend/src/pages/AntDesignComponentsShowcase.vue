@@ -6,9 +6,11 @@
       <p class="text-base-70">A comprehensive showcase of all components in ant-design-vue 4.2</p>
       
     </div>
-    <a-button type="primary" class="ant-btn-xl">
-      <IconThumbsUp />
-    </a-button>
+    <div :style="{ width: '500px', height: '500px'}" class="flex justify-center items-center bg-[var(--aha-colorTextBase)]">
+      <a-button type="primary" :disabled="true">
+        Submit
+      </a-button>
+    </div>
 
     <!-- Navigation -->
       <div class="mb-6">
