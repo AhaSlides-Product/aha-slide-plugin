@@ -15,3 +15,11 @@
   border-color: var(--aha-colorBgFillDisabled);
   color: var(--aha-colorTextDisabled);
 }
+
+.ant-card .ant-card-body {
+  padding: var(--aha-baseSpacing);
+}
+
+.ant-card .ant-card-head {
+  padding: 0 var(--aha-baseSpacing);
+}

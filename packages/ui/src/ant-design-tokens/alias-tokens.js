@@ -6,6 +6,7 @@ const AliasTokens = {
   colorBgBaseDark: '#1A1A2E1A',
   colorBgFillDisabled: '#E3E3E3',
   colorTextDisabled: '#B5B5B5',
+  baseSpacing: '16px',
 }
 
 export default AliasTokens;
