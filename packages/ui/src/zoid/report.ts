@@ -26,6 +26,9 @@ export interface ReportProps {
   replaceRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
   pushRoute?: (location: any, onComplete?: Function, onAbort?: Function) => void;
   openExportModalForPresentation?: (presentation: any) => void;
+  showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  showToastSuccess?: (text: string, uniqName?: string, action?: any, options?: any) => void;
+  showToastError?: (text: string, uniqName?: string, action?: any, options?: any) => void;
   locale?: string;
   currentUser?: object;
   featureFlags?: object;
@@ -75,6 +78,18 @@ export const ReportIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    showToastInfo: {
+      type: 'function',
+      required: false,
+    },
+    showToastSuccess: {
+      type: 'function',
+      required: false,
+    },
+    showToastError: {
+      type: 'function',
+      required: false,
+    },
     locale: {
       type: 'string',
       required: false,
@@ -109,6 +124,9 @@ export interface ReportReturn {
   replaceRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
   pushRoute: ((location: any, onComplete?: Function, onAbort?: Function) => void) | undefined;
   openExportModalForPresentation: ((presentation: any) => void) | undefined;
+  showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
+  showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   locale: Ref<string | undefined>;
   translationMap: Ref<Record<string, string> | undefined>;
   iframePath: Ref<string | undefined>;
@@ -130,6 +148,9 @@ export function useReportPlugin(
   const replaceRoute = (window as any).xprops?.replaceRoute;
   const pushRoute = (window as any).xprops?.pushRoute;
   const openExportModalForPresentation = (window as any).xprops?.openExportModalForPresentation;
+  const showToastInfo = (window as any).xprops?.showToastInfo;
+  const showToastSuccess = (window as any).xprops?.showToastSuccess;
+  const showToastError = (window as any).xprops?.showToastError;
   const locale = ref<string | undefined>((window as any).xprops?.locale);
   const translationMap = ref<Record<string, string> | undefined>((window as any).xprops?.translationMap);
   const featureFlags = ref<Record<string, string> | undefined>((window as any).xprops?.featureFlags);
@@ -167,6 +188,9 @@ export function useReportPlugin(
     replaceRoute,
     pushRoute,
     openExportModalForPresentation,
+    showToastInfo,
+    showToastSuccess,
+    showToastError,
     locale,
     translationMap,
     featureFlags,
