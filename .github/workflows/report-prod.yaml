@@ -2,6 +2,11 @@ name: "Report App - Production Deploy"
 
 on:
   workflow_dispatch:
+    inputs:
+      report_branch:
+        description: "Branch of aha-report submodule to deploy (leave empty to use default submodule commit)"
+        required: false
+        default: "staging"
   push:
     branches:
       - reports-production
@@ -16,6 +21,14 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
           submodules: recursive
+
+      - name: Checkout report branch
+        if: ${{ github.event.inputs.report_branch != '' }}
+        shell: bash
+        run: |
+          cd domains/report
+          git fetch origin ${{ github.event.inputs.report_branch }}
+          git checkout ${{ github.event.inputs.report_branch }}
 
       - name: Build
         uses: ./.github/actions/build-report
