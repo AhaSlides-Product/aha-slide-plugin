@@ -111,6 +111,24 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender?: () => void;
+
+  /**
+   * Register a callback to be notified when slide attributes change.
+   * The parent subscribes to the Vuex slideAttributes/updateAttributes mutation
+   * and invokes the callback with the mutation payload.
+   *
+   * @param callback - Called with { presentationId, slideId, attributes } when attributes change.
+   */
+  onSlideAttributesChanged?: (callback: (payload: { presentationId: string | number; slideId: string | number; attributes: Record<string, any> }) => void) => void;
+
+  /**
+   * Filter profane words from text based on the presentation's profanity filter setting.
+   * Returns the original text if filtering is disabled, or the filtered text with profane words replaced by asterisks.
+   *
+   * @param text - The text to filter.
+   * @returns The filtered text.
+   */
+  filterProfaneWords?: (text: string) => string;
 }
 
 /**
@@ -224,7 +242,15 @@ export const PresenterSlidePluginIframe = zoid.create({
     allowPDFRender: {
       type: 'function',
       required: false,
-    }
+    },
+    onSlideAttributesChanged: {
+      type: 'function',
+      required: false,
+    },
+    filterProfaneWords: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -272,6 +298,19 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender: (() => void) | undefined;
+
+  /**
+   * Register a callback to be notified when slide attributes change.
+   * @param callback - Called with { presentationId, slideId, attributes } when attributes change.
+   */
+  onSlideAttributesChanged: ((callback: (payload: { presentationId: string | number; slideId: string | number; attributes: Record<string, any> }) => void) => void) | undefined;
+
+  /**
+   * Filter profane words from text based on the presentation's profanity filter setting.
+   * @param text - The text to filter.
+   * @returns The filtered text.
+   */
+  filterProfaneWords: ((text: string) => string) | undefined;
 }
 
 /**
@@ -341,5 +380,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     clearSlideData: xprops?.clearSlideData,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     allowPDFRender: xprops?.allowPDFRender,
+    onSlideAttributesChanged: xprops?.onSlideAttributesChanged,
+    filterProfaneWords: xprops?.filterProfaneWords,
   };
 }
