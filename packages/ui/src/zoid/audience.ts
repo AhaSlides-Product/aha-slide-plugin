@@ -191,6 +191,10 @@ export const AudienceSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    filterProfaneWords: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -305,5 +309,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     reportHeight: baseHook.reportHeight,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     getValues: baseHook.getValues,
+    filterProfaneWords: baseHook.filterProfaneWords,
   };
 }
