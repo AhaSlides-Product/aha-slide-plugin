@@ -1,5 +1,5 @@
 {
-  "family": "us01-plugins-canary",
+  "family": "us01-plugins-default",
   "containerDefinitions": [
     {
       "name": "plugins",
