@@ -105,12 +105,23 @@ export interface BaseSlidePluginProps {
    * @param topic - The topic to unsubscribe from.
    */
   unsubscribeTopic?: (topic: string) => void;
-  /** 
+  /**
    * Action to track events to GA4 and Mixpanel.
-   * 
+   *
    * @param payload - The event payload to track.
    */
   trackGA4AndMixpanel?: (payload: any) => void;
+
+  /**
+   * Filter profane words from text based on the presentation's profanity filter setting.
+   * Returns the original text if filtering is disabled, or the filtered text with profane words replaced by asterisks.
+   *
+   * Note: Because this function is passed across the zoid iframe boundary, it returns a Promise.
+   *
+   * @param text - The text to filter.
+   * @returns A promise resolving to the filtered text.
+   */
+  filterProfaneWords?: (text: string) => Promise<string>;
 }
 
 /**
@@ -311,6 +322,13 @@ export interface BaseSlidePluginReturn {
    * @returns A promise resolving to an array of objects containing key, path, and value.
    */
   getValues: ((params: { bucket: string, key?: string }) => Promise<{ key: string, path: string, value: string }[]>) | undefined;
+
+  /**
+   * Filter profane words from text based on the presentation's profanity filter setting.
+   * @param text - The text to filter.
+   * @returns A promise resolving to the filtered text.
+   */
+  filterProfaneWords: ((text: string) => Promise<string>) | undefined;
 }
 
 /**
@@ -377,5 +395,6 @@ export function useBaseSlidePlugin(
     xprops,
     trackGA4AndMixpanel,
     getValues: xprops?.getValues,
+    filterProfaneWords: xprops?.filterProfaneWords,
   };
 }
