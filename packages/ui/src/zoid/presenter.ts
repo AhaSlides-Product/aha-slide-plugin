@@ -121,6 +121,18 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   onSlideAttributesChanged?: (callback: (payload: { presentationId: string | number; slideId: string | number; attributes: Record<string, any> }) => void) => void;
 
+  /**
+   * Action to emit a broadcast action from the plugin iframe to the parent application.
+   * @param key - The broadcast key.
+   * @param args - The arguments for the action.
+   */
+  emitBroadcastAction?: (key: string, args: any[]) => void;
+
+  /**
+   * Register a callback in the plugin iframe for broadcast actions from the parent application.
+   * @param callback - The function to call when a broadcast action occurs.
+   */
+  onBroadcastAction?: (callback: (key: string, args: any[]) => void) => void;
 }
 
 /**
@@ -243,6 +255,14 @@ export const PresenterSlidePluginIframe = zoid.create({
       type: 'function',
       required: false,
     },
+    emitBroadcastAction: {
+      type: 'function',
+      required: false,
+    },
+    onBroadcastAction: {
+      type: 'function',
+      required: false,
+    },
   },
 });
 
@@ -296,6 +316,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * @param callback - Called with { presentationId, slideId, attributes } when attributes change.
    */
   onSlideAttributesChanged: ((callback: (payload: { presentationId: string | number; slideId: string | number; attributes: Record<string, any> }) => void) => void) | undefined;
+
+  /**
+   * Action to emit a broadcast action from the plugin iframe to the parent application.
+   */
+  emitBroadcastAction: ((key: string, args: any[]) => void) | undefined;
 }
 
 /**
@@ -312,6 +337,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
   });
   const { xprops } = baseHook;
+
+  ensureBroadcastListenerRegistered();
 
   const originalGetAttributes = xprops?.getSlideAttributesAction;
   const getSlideAttributesAction = async (slideId?: string | number): Promise<any> => {
@@ -366,6 +393,93 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     allowPDFRender: xprops?.allowPDFRender,
     onSlideAttributesChanged: xprops?.onSlideAttributesChanged,
+    emitBroadcastAction: xprops?.emitBroadcastAction,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
+}
+
+const broadcastRegistry: Record<string, Function> = {};
+
+/**
+ * Tracks keys that were emitted by this plugin instance and are waiting for
+ * the host echo. When the host calls `onBroadcastAction` back for a key in
+ * this set, we skip local execution to prevent the function from running twice.
+ */
+const pendingSkip = new Set<string>();
+
+/**
+ * Registers the onBroadcastAction listener exactly once at the module level.
+ * This prevents duplicate registrations when usePresenterPlugin is called
+ * multiple times (e.g., multiple components or component remounts).
+ */
+let broadcastListenerRegistered = false;
+function ensureBroadcastListenerRegistered(): void {
+  if (broadcastListenerRegistered) return;
+  const xprops = (window as any).xprops;
+  if (xprops?.onBroadcastAction) {
+    xprops.onBroadcastAction((key: string, args: any[]) => {
+      // Skip if this plugin was the one that initiated the broadcast —
+      // the local fn was already executed in the wrapper, so we don't
+      // want to run it again when the host echoes the action back.
+      if (pendingSkip.has(key)) {
+        pendingSkip.delete(key);
+        return;
+      }
+      const fn = broadcastRegistry[key];
+      if (fn) {
+        fn(...args);
+      }
+    });
+    broadcastListenerRegistered = true;
+  }
+}
+
+export type BroadcastActionResult<T extends (...args: any[]) => any> = {
+  /** The wrapped function. Call this as you would the original. */
+  fn: T;
+  /**
+   * Removes the handler from the registry.
+   * Call this in `onUnmounted` (or equivalent cleanup) to prevent stale handlers.
+   */
+  unregister: () => void;
+};
+
+/**
+ * Wraps a function so it broadcasts to other screens via MQTT.
+ *
+ * **`key` is required.** Do not rely on `fn.name` — minifiers mangle function
+ * names in production builds, making automatic name detection unreliable.
+ *
+ * @param fn  - The function to wrap.
+ * @param key - A stable, unique identifier for this broadcast action.
+ * @returns An object with the wrapped `fn` and an `unregister` cleanup callback.
+ *
+ * @example
+ * const { fn: scrollToBottom, unregister } = broadcastAction(() => { ... }, 'scrollToBottom');
+ * onUnmounted(unregister);
+ */
+export function broadcastAction<T extends (...args: any[]) => any>(fn: T, key: string): BroadcastActionResult<T> {
+  if (!key) {
+    throw new Error('[broadcastAction] A unique `key` string is required. Do not rely on fn.name — it is mangled by minifiers in production.');
+  }
+
+  broadcastRegistry[key] = fn;
+
+  const wrapper = function (this: any, ...args: any[]) {
+    const result = fn.apply(this, args);
+    const xprops = (window as any).xprops;
+    if (xprops?.emitBroadcastAction) {
+      // Mark this key so the onBroadcastAction echo from the host is ignored,
+      // preventing the function from executing a second time on this screen.
+      pendingSkip.add(key);
+      xprops.emitBroadcastAction(key, args);
+    }
+    return result;
+  };
+
+  const unregister = () => {
+    delete broadcastRegistry[key];
+  };
+
+  return { fn: wrapper as T, unregister };
 }

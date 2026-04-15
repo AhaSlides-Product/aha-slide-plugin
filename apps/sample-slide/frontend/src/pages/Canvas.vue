@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useSync, usePresenterPlugin, type PluginKeyboardEvent } from '@aha/ui';
+import { useSync, usePresenterPlugin, broadcastAction, type PluginKeyboardEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { getBucket } from '@aha/common';
 import { ApiClient } from '@aha/api';
@@ -241,6 +241,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.onkeydown = null;
+  unregisterScrollToBottom();
   if (unsubscribeTopic) {
     unsubscribeTopic(countTopic);
     unsubscribeTopic(submitTestTopic);
@@ -279,12 +280,15 @@ const showConfirm = async () => {
   console.log('Confirm:', confirm);
 }
 
-const scrollToBottom = () => {
-  window.scrollTo({
-    top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
-    behavior: 'smooth'
-  });
-}
+const { fn: scrollToBottom, unregister: unregisterScrollToBottom } = broadcastAction(
+  () => {
+    window.scrollTo({
+      top: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight),
+      behavior: 'smooth'
+    });
+  },
+  'scrollToBottom'
+)
 
 </script>
 
