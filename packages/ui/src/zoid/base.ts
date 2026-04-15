@@ -383,6 +383,40 @@ export function useBaseSlidePlugin(
   const subscribeTopic = xprops?.subscribeTopic;
   const unsubscribeTopic = xprops?.unsubscribeTopic;
 
+  // TODO: Remove this migration wrapper after not having 
+  // any plugin_legacy_bucket_fallback event 
+  const wrappedGetValues: BaseSlidePluginReturn['getValues'] = xprops?.getValues
+    ? async (params: { bucket: string; key?: string }) => {
+        // Matches bucket format from getBucket() in @aha/common/emqx: `s${slideId}-v${slideVersion}/${bucketName}`
+        const match = params.bucket.match(/^s(\d+)-v(\d+)\/(.+)$/);
+        if (!match) {
+          return xprops.getValues(params);
+        }
+
+        const presentationId = presentationProps.value?.id;
+        if (!presentationId) {
+          return xprops.getValues(params);
+        }
+
+        const legacyBucket = `p${presentationId}-${params.bucket}`;
+        const [result, legacyResult] = await Promise.all([
+          xprops.getValues(params),
+          xprops.getValues({ ...params, bucket: legacyBucket }),
+        ]);
+
+        if (result.length === 0 && legacyResult.length > 0) {
+          trackGA4AndMixpanel?.({
+            event: 'plugin_legacy_bucket_fallback',
+            bucket: params.bucket,
+            legacyBucket,
+          });
+          return legacyResult;
+        }
+
+        return result;
+      }
+    : undefined;
+
   return {
     presentationProps,
     presentationColorPaletteProps,
@@ -394,7 +428,7 @@ export function useBaseSlidePlugin(
     reportHeight,
     xprops,
     trackGA4AndMixpanel,
-    getValues: xprops?.getValues,
+    getValues: wrappedGetValues,
     filterProfaneWords: xprops?.filterProfaneWords,
   };
 }
