@@ -3,5 +3,7 @@ export function getBucket(bucketName: string, { presentationId, slideId, slideVe
   slideId: string | number;
   slideVersion: string | number;
 }) {
-  return `p${presentationId}-s${slideId}-v${slideVersion}/${bucketName}`
+  // can't use presentationId as bucket name 
+  // since it changes after a reset 
+  return `s${slideId}-v${slideVersion}/${bucketName}`
 }
