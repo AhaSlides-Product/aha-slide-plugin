@@ -401,6 +401,13 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
 const broadcastRegistry: Record<string, Function> = {};
 
 /**
+ * Tracks keys that were emitted by this plugin instance and are waiting for
+ * the host echo. When the host calls `onBroadcastAction` back for a key in
+ * this set, we skip local execution to prevent the function from running twice.
+ */
+const pendingSkip = new Set<string>();
+
+/**
  * Registers the onBroadcastAction listener exactly once at the module level.
  * This prevents duplicate registrations when usePresenterPlugin is called
  * multiple times (e.g., multiple components or component remounts).
@@ -411,6 +418,13 @@ function ensureBroadcastListenerRegistered(): void {
   const xprops = (window as any).xprops;
   if (xprops?.onBroadcastAction) {
     xprops.onBroadcastAction((key: string, args: any[]) => {
+      // Skip if this plugin was the one that initiated the broadcast —
+      // the local fn was already executed in the wrapper, so we don't
+      // want to run it again when the host echoes the action back.
+      if (pendingSkip.has(key)) {
+        pendingSkip.delete(key);
+        return;
+      }
       const fn = broadcastRegistry[key];
       if (fn) {
         fn(...args);
@@ -455,6 +469,9 @@ export function broadcastAction<T extends (...args: any[]) => any>(fn: T, key: s
     const result = fn.apply(this, args);
     const xprops = (window as any).xprops;
     if (xprops?.emitBroadcastAction) {
+      // Mark this key so the onBroadcastAction echo from the host is ignored,
+      // preventing the function from executing a second time on this screen.
+      pendingSkip.add(key);
       xprops.emitBroadcastAction(key, args);
     }
     return result;
