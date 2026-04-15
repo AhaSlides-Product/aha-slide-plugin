@@ -495,7 +495,6 @@ import {
 } from '@ant-design/icons-vue';
 import ComponentSection from '../components/ComponentSection.vue';
 import ComponentDemo from '../components/ComponentDemo.vue';
-import IconThumbsUp from '~icons/aha/aha-thumbs-up';
 
 // Enable scrolling for this page
 onMounted(() => {
