@@ -405,8 +405,8 @@ export function useBaseSlidePlugin(
         ]);
 
         if (result.length === 0 && legacyResult.length > 0) {
-          trackGA4AndMixpanel?.({
-            event: 'plugin_legacy_bucket_fallback',
+          trackGA4AndMixpanel?.('plugin_legacy_bucket_fallback', {
+            eventAction: 'plugin_legacy_bucket_fallback',
             bucket: params.bucket,
             legacyBucket,
           });
