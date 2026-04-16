@@ -9,7 +9,7 @@ describe('@aha/common - Utilities', () => {
                 slideId: 'slide-2',
                 slideVersion: 'v3',
             });
-            expect(bucket).toBe('ppres-1-sslide-2-vv3/data');
+            expect(bucket).toBe('sslide-2-vv3/data');
         });
 
         it('should handle numeric IDs', () => {
@@ -18,7 +18,7 @@ describe('@aha/common - Utilities', () => {
                 slideId: 200,
                 slideVersion: 1,
             });
-            expect(bucket).toBe('p100-s200-v1/results');
+            expect(bucket).toBe('s200-v1/results');
         });
     });
 });
