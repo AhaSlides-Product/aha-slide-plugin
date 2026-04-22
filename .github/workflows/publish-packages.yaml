@@ -39,12 +39,44 @@ jobs:
           const { execSync } = require('child_process');
 
           const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
-          const workspaces = JSON.parse(execSync('npm query .workspace', { encoding: 'utf8' }));
+
+          // Expand workspace globs from root package.json without requiring npm install
+          function expandWorkspaces(patterns) {
+            const results = [];
+            for (const pat of patterns) {
+              const parts = pat.split('/');
+              let candidates = [''];
+              for (const part of parts) {
+                const next = [];
+                for (const c of candidates) {
+                  if (part === '*') {
+                    const dir = c || '.';
+                    let entries = [];
+                    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch {}
+                    for (const e of entries) {
+                      if (e.isDirectory()) next.push(c ? path.join(c, e.name) : e.name);
+                    }
+                  } else {
+                    next.push(c ? path.join(c, part) : part);
+                  }
+                }
+                candidates = next;
+              }
+              results.push(...candidates);
+            }
+            return results.filter(p => {
+              try { return fs.statSync(path.join(p, 'package.json')).isFile(); } catch { return false; }
+            });
+          }
+
+          const rootPkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const workspaceDirs = expandWorkspaces(rootPkg.workspaces || []);
 
           const infoByLocal = new Map();
-          for (const w of workspaces) {
-            const pkgPath = path.join(w.location, 'package.json');
-            infoByLocal.set(w.name, { path: pkgPath, dir: w.location, pkg: JSON.parse(fs.readFileSync(pkgPath, 'utf8')) });
+          for (const dir of workspaceDirs) {
+            const pkgPath = path.join(dir, 'package.json');
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            infoByLocal.set(pkg.name, { path: pkgPath, dir, pkg });
           }
 
           for (const local of Object.keys(nameMap)) {
