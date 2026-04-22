@@ -142,10 +142,12 @@ export type BroadcastActionResult<T extends (...args: any[]) => any> = {
  * Creates the framework-agnostic zoid component for the Presenter slide plugin iframe.
  * This is the cross-domain bridge that lets host applications mount plugin iframes
  * and pass data/callbacks through `xprops`.
+ *
+ * @param tag - Optional custom tag for the zoid component. Defaults to `'presenter-slide-plugin-iframe'`.
  */
-export function initZoidForPresenter() {
+export function initZoidForPresenter(tag?: string) {
   return zoid.create({
-    tag: 'presenter-slide-plugin-iframe',
+    tag: tag ?? 'presenter-slide-plugin-iframe',
     url: ({ props }: { props: SlidePluginProps }) => props.url,
     props: {
       url: {
