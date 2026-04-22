@@ -1,18 +1,10 @@
-/**
- * Represents the result of an image upload.
- */
-export interface ImageUploadResult {
-  /** The static asset paths. This one should be save on the database, so it can be used to sign the new URL later*/
-  path: string;
-  /** The public URL of the uploaded image. */
-  url: string;
-  /** Any additional metadata returned by the upload service. */
-  [key: string]: any;
-}
+export type { ImageUploadResult } from '@aha/ui-vanilla';
+
+import type { ImageUploadResult } from '@aha/ui-vanilla';
 
 /**
  * Uploads an image file to the hosting service.
- * 
+ *
  * @returns A promise that resolves to the upload result containing URLs and metadata.
  */
 export async function uploadImage(): Promise<ImageUploadResult> {
