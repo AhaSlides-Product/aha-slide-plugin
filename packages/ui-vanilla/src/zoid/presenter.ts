@@ -273,3 +273,11 @@ export function initZoidForPresenter(tag?: string) {
     },
   });
 }
+
+/**
+ * Initializes the embedded app zoid component using the `'embed-app-iframe'` tag.
+ * Convenience wrapper around `initZoidForPresenter('embed-app-iframe')`.
+ */
+export function initializeApp() {
+  return initZoidForPresenter('embed-app-iframe');
+}
