@@ -30,10 +30,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@ahaslides-product'
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Rewrite package.json with published names
+      - name: Apply publish name map
         shell: bash
         run: |
           node <<'SCRIPT'
@@ -47,7 +44,7 @@ jobs:
           const infoByLocal = new Map();
           for (const w of workspaces) {
             const pkgPath = path.join(w.location, 'package.json');
-            infoByLocal.set(w.name, { path: pkgPath, pkg: JSON.parse(fs.readFileSync(pkgPath, 'utf8')) });
+            infoByLocal.set(w.name, { path: pkgPath, dir: w.location, pkg: JSON.parse(fs.readFileSync(pkgPath, 'utf8')) });
           }
 
           for (const local of Object.keys(nameMap)) {
@@ -57,6 +54,7 @@ jobs:
             }
           }
 
+          // 1. Rewrite package.json of each mapped package: name + any cross-mapped dep keys
           for (const local of Object.keys(nameMap)) {
             const info = infoByLocal.get(local);
             info.pkg.name = nameMap[local];
@@ -72,7 +70,47 @@ jobs:
             fs.writeFileSync(info.path, JSON.stringify(info.pkg, null, 2) + '\n');
             console.log('Rewrote ' + info.path + ': ' + local + ' -> ' + nameMap[local]);
           }
+
+          // 2. Rewrite source imports of each mapped package
+          const SOURCE_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.vue']);
+          const EXCLUDE_DIRS = new Set(['node_modules', 'dist', 'build', '.turbo', 'docs', '.git']);
+          const escape = s => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+          const patterns = Object.entries(nameMap).map(([local, published]) => ({
+            regex: new RegExp('([\'"`])' + escape(local) + '\\1', 'g'),
+            replacement: '$1' + published + '$1',
+            local,
+          }));
+
+          function walk(dir) {
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              if (EXCLUDE_DIRS.has(entry.name)) continue;
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                walk(full);
+              } else if (SOURCE_EXTS.has(path.extname(entry.name))) {
+                let content = fs.readFileSync(full, 'utf8');
+                let changed = false;
+                for (const { regex, replacement } of patterns) {
+                  if (regex.test(content)) {
+                    content = content.replace(regex, replacement);
+                    changed = true;
+                  }
+                }
+                if (changed) {
+                  fs.writeFileSync(full, content);
+                  console.log('Rewrote imports in ' + full);
+                }
+              }
+            }
+          }
+
+          for (const local of Object.keys(nameMap)) {
+            walk(infoByLocal.get(local).dir);
+          }
           SCRIPT
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Build mapped packages
         shell: bash
@@ -80,11 +118,8 @@ jobs:
           node <<'SCRIPT'
           const { execSync } = require('child_process');
           const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
-          for (const published of Object.values(nameMap)) {
-            console.log('::group::Building ' + published);
-            execSync('npm run build -w ' + published, { stdio: 'inherit' });
-            console.log('::endgroup::');
-          }
+          const filters = Object.values(nameMap).map(n => '--filter=' + n).join(' ');
+          execSync('npx turbo run build ' + filters, { stdio: 'inherit' });
           SCRIPT
 
       - name: Publish mapped packages
