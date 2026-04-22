@@ -27,8 +27,6 @@ jobs:
           aws_region: us-east-1
           platform: linux/arm64
           build_storybook: 'true'
-          publish_ui_package: 'true'
-          github_token: ${{ secrets.NPM_AUTH_TOKEN }}
 
   deploy:
     runs-on: ubuntu-latest

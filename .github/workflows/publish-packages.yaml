@@ -1,0 +1,107 @@
+name: "Publish Packages"
+
+on:
+  workflow_dispatch:
+
+env:
+  PACKAGE_NAME_MAP: |
+    {
+      "@aha/ui": "@ahaslides-product/plugins-ui",
+      "@aha/ui-vanilla": "@ahaslides-product/plugins-ui-vanilla"
+    }
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PLUGINS_PAT }}
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@ahaslides-product'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rewrite package.json with published names
+        shell: bash
+        run: |
+          node <<'SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+          const { execSync } = require('child_process');
+
+          const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
+          const workspaces = JSON.parse(execSync('npm query .workspace', { encoding: 'utf8' }));
+
+          const infoByLocal = new Map();
+          for (const w of workspaces) {
+            const pkgPath = path.join(w.location, 'package.json');
+            infoByLocal.set(w.name, { path: pkgPath, pkg: JSON.parse(fs.readFileSync(pkgPath, 'utf8')) });
+          }
+
+          for (const local of Object.keys(nameMap)) {
+            if (!infoByLocal.has(local)) {
+              console.error('::error::Mapped package not found in workspaces: ' + local);
+              process.exit(1);
+            }
+          }
+
+          for (const local of Object.keys(nameMap)) {
+            const info = infoByLocal.get(local);
+            info.pkg.name = nameMap[local];
+            for (const field of ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']) {
+              if (!info.pkg[field]) continue;
+              for (const [depName, depVer] of Object.entries(info.pkg[field])) {
+                if (nameMap[depName]) {
+                  delete info.pkg[field][depName];
+                  info.pkg[field][nameMap[depName]] = depVer;
+                }
+              }
+            }
+            fs.writeFileSync(info.path, JSON.stringify(info.pkg, null, 2) + '\n');
+            console.log('Rewrote ' + info.path + ': ' + local + ' -> ' + nameMap[local]);
+          }
+          SCRIPT
+
+      - name: Build mapped packages
+        shell: bash
+        run: |
+          node <<'SCRIPT'
+          const { execSync } = require('child_process');
+          const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
+          for (const published of Object.values(nameMap)) {
+            console.log('::group::Building ' + published);
+            execSync('npm run build -w ' + published, { stdio: 'inherit' });
+            console.log('::endgroup::');
+          }
+          SCRIPT
+
+      - name: Publish mapped packages
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_AUTH_TOKEN secret is empty"
+            exit 1
+          fi
+          node <<'SCRIPT'
+          const { execSync } = require('child_process');
+          const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
+          for (const published of Object.values(nameMap)) {
+            console.log('::group::Publishing ' + published);
+            execSync('npm publish -w ' + published, { stdio: 'inherit' });
+            console.log('::endgroup::');
+          }
+          SCRIPT

@@ -25,14 +25,6 @@ inputs:
     description: 'Whether to build storybook'
     required: false
     default: 'false'
-  publish_ui_package:
-    description: 'Whether to publish packages/ui to GitHub Packages'
-    required: false
-    default: 'false'
-  github_token:
-    description: 'GitHub token used to authenticate against GitHub Packages when publishing'
-    required: false
-    default: ''
 runs:
   using: "composite"
   steps:
@@ -40,8 +32,6 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        registry-url: 'https://npm.pkg.github.com'
-        scope: '@ahaslides-product'
     
     - name: Dynamic add backend modules
       shell: bash
@@ -71,22 +61,6 @@ runs:
         name: storybook-builds
         path: packages/storybook/storybook-static
         if-no-files-found: ignore
-
-    - name: Publish @aha/ui to GitHub Packages
-      if: ${{ inputs.publish_ui_package == 'true' }}
-      shell: bash
-      working-directory: packages/ui
-      env:
-        NODE_AUTH_TOKEN: ${{ inputs.github_token }}
-      run: |
-        if [ -z "$NODE_AUTH_TOKEN" ]; then
-          echo "::error::github_token input is empty — cannot authenticate against GitHub Packages"
-          exit 1
-        fi
-        cp package.json package.json.bak
-        trap 'mv package.json.bak package.json' EXIT
-        node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.name='@ahaslides-product/plugins-ui'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
-        npm publish
 
     - name: Check Backend Build
       id: check-backend
