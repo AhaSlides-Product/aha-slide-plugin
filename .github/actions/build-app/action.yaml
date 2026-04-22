@@ -40,6 +40,8 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@ahaslides-product'
     
     - name: Dynamic add backend modules
       shell: bash
@@ -82,13 +84,8 @@ runs:
           exit 1
         fi
         cp package.json package.json.bak
-        trap 'mv package.json.bak package.json; rm -f .npmrc' EXIT
+        trap 'mv package.json.bak package.json' EXIT
         node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.name='@ahaslides-product/ui'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
-        cat > .npmrc <<EOF
-        @ahaslides-product:registry=https://npm.pkg.github.com/
-        //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-        always-auth=true
-        EOF
         npm publish
 
     - name: Check Backend Build
