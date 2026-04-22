@@ -85,7 +85,7 @@ runs:
         fi
         cp package.json package.json.bak
         trap 'mv package.json.bak package.json' EXIT
-        node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.name='@ahaslides-product/ui'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
+        node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.name='@ahaslides-product/plugins-ui'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
         npm publish
 
     - name: Check Backend Build
