@@ -139,6 +139,134 @@ export type BroadcastActionResult<T extends (...args: any[]) => any> = {
 };
 
 /**
+ * The zoid props schema for the Presenter slide plugin iframe.
+ * Exported so other zoid components (e.g. the embedded app) can extend
+ * this schema instead of duplicating it.
+ */
+export const presenterZoidProps = {
+  url: {
+    type: 'string',
+    required: true,
+    queryParam: false,
+  },
+  presentation: {
+    type: 'object',
+    required: false,
+  },
+  presentationAttributeColorPalette: {
+    type: 'object',
+    required: false,
+  },
+  slide: {
+    type: 'object',
+    required: false,
+  },
+  currentUser: {
+    type: 'object',
+    required: false,
+  },
+  onHeightChange: {
+    type: 'function',
+    required: false,
+  },
+  getSlideAttributesAction: {
+    type: 'function',
+    required: false,
+  },
+  upsertSlideAttributeAction: {
+    type: 'function',
+    required: false,
+  },
+  baseUrl: {
+    type: 'string',
+    required: false,
+  },
+  subscribeTopic: {
+    type: 'function',
+    required: false,
+  },
+  unsubscribeTopic: {
+    type: 'function',
+    required: false,
+  },
+  trackGA4AndMixpanel: {
+    type: 'function',
+    required: false,
+  },
+  uploadImage: {
+    type: 'function',
+    required: false,
+  },
+  onKeyboard: {
+    type: 'function',
+    required: false,
+  },
+  emitKeyboardEvent: {
+    type: 'function',
+    required: false,
+  },
+  showToastInfo: {
+    type: 'function',
+    required: false,
+  },
+  showToastSuccess: {
+    type: 'function',
+    required: false,
+  },
+  showToastError: {
+    type: 'function',
+    required: false,
+  },
+  /**
+   * Action to send a vote outcome (vote count and tooltip) from the plugin iframe to the parent.
+   * @type {function}
+   * @param {object} payload - The vote outcome data.
+   * @param {number} payload.voteCount - The number of votes to display.
+   * @param {string} [payload.tooltip] - Optional tooltip text to display on hover.
+   */
+  sendVoteOutcome: {
+    type: 'function',
+    required: false,
+  },
+  openPluginModal: {
+    type: 'function',
+    required: false,
+  },
+  closePluginModal: {
+    type: 'function',
+    required: false,
+  },
+  token: {
+    type: 'string',
+    required: false,
+  },
+  showConfirmModal: {
+    type: 'function',
+    required: false,
+  },
+  allowPDFRender: {
+    type: 'function',
+    required: false,
+  },
+  onSlideAttributesChanged: {
+    type: 'function',
+    required: false,
+  },
+  filterProfaneWords: {
+    type: 'function',
+    required: false,
+  },
+  emitBroadcastAction: {
+    type: 'function',
+    required: false,
+  },
+  onBroadcastAction: {
+    type: 'function',
+    required: false,
+  },
+} as const;
+
+/**
  * Creates the framework-agnostic zoid component for the Presenter slide plugin iframe.
  * This is the cross-domain bridge that lets host applications mount plugin iframes
  * and pass data/callbacks through `xprops`.
@@ -149,135 +277,6 @@ export function initZoidForPresenter(tag?: string) {
   return zoid.create({
     tag: tag ?? 'presenter-slide-plugin-iframe',
     url: ({ props }: { props: SlidePluginProps }) => props.url,
-    props: {
-      url: {
-        type: 'string',
-        required: true,
-        queryParam: false,
-      },
-      presentation: {
-        type: 'object',
-        required: false,
-      },
-      presentationAttributeColorPalette: {
-        type: 'object',
-        required: false,
-      },
-      slide: {
-        type: 'object',
-        required: false,
-      },
-      currentUser: {
-        type: 'object',
-        required: false,
-      },
-      onHeightChange: {
-        type: 'function',
-        required: false,
-      },
-      getSlideAttributesAction: {
-        type: 'function',
-        required: false,
-      },
-      upsertSlideAttributeAction: {
-        type: 'function',
-        required: false,
-      },
-      baseUrl: {
-        type: 'string',
-        required: false,
-      },
-      subscribeTopic: {
-        type: 'function',
-        required: false,
-      },
-      unsubscribeTopic: {
-        type: 'function',
-        required: false,
-      },
-      trackGA4AndMixpanel: {
-        type: 'function',
-        required: false,
-      },
-      uploadImage: {
-        type: 'function',
-        required: false,
-      },
-      onKeyboard: {
-        type: 'function',
-        required: false,
-      },
-      emitKeyboardEvent: {
-        type: 'function',
-        required: false,
-      },
-      showToastInfo: {
-        type: 'function',
-        required: false,
-      },
-      showToastSuccess: {
-        type: 'function',
-        required: false,
-      },
-      showToastError: {
-        type: 'function',
-        required: false,
-      },
-      /**
-       * Action to send a vote outcome (vote count and tooltip) from the plugin iframe to the parent.
-       * @type {function}
-       * @param {object} payload - The vote outcome data.
-       * @param {number} payload.voteCount - The number of votes to display.
-       * @param {string} [payload.tooltip] - Optional tooltip text to display on hover.
-       */
-      sendVoteOutcome: {
-        type: 'function',
-        required: false,
-      },
-      openPluginModal: {
-        type: 'function',
-        required: false,
-      },
-      closePluginModal: {
-        type: 'function',
-        required: false,
-      },
-      token: {
-        type: 'string',
-        required: false,
-      },
-      showConfirmModal: {
-        type: 'function',
-        required: false,
-      },
-      allowPDFRender: {
-        type: 'function',
-        required: false,
-      },
-      onSlideAttributesChanged: {
-        type: 'function',
-        required: false,
-      },
-      filterProfaneWords: {
-        type: 'function',
-        required: false,
-      },
-      emitBroadcastAction: {
-        type: 'function',
-        required: false,
-      },
-      onBroadcastAction: {
-        type: 'function',
-        required: false,
-      },
-    },
+    props: presenterZoidProps,
   });
-}
-
-/**
- * Initializes the embedded app zoid component using the `'embed-app-iframe'` tag.
- * Convenience wrapper around `initZoidForPresenter('embed-app-iframe')`.
- */
-export function initializeApp() {
-  return initZoidForPresenter('embed-app-iframe');
 }
