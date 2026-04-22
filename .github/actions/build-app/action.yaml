@@ -40,7 +40,6 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        registry-url: 'https://npm.pkg.github.com'
     
     - name: Dynamic add backend modules
       shell: bash
@@ -78,9 +77,18 @@ runs:
       env:
         NODE_AUTH_TOKEN: ${{ inputs.github_token }}
       run: |
+        if [ -z "$NODE_AUTH_TOKEN" ]; then
+          echo "::error::github_token input is empty — cannot authenticate against GitHub Packages"
+          exit 1
+        fi
         cp package.json package.json.bak
-        trap 'mv package.json.bak package.json' EXIT
+        trap 'mv package.json.bak package.json; rm -f .npmrc' EXIT
         node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.name='@ahaslides-product/ui'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
+        cat > .npmrc <<EOF
+        @ahaslides-product:registry=https://npm.pkg.github.com/
+        //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+        always-auth=true
+        EOF
         npm publish
 
     - name: Check Backend Build
