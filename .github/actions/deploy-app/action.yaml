@@ -52,7 +52,7 @@ runs:
       run: |
         # Loop through each app directory and sync frontend/dist to S3
         INVALIDATION_PATHS=""
-        for app_dir in deployment_artifacts/*/; do
+        for app_dir in deployment_artifacts/apps/*/; do
           app_name=$(basename "$app_dir")
           if [ -d "${app_dir}slides_agent" ] && [ -n "${{ inputs.slides_agent_bucket }}" ]; then
             echo "Copying slides agents spec for ${app_name}..."
@@ -75,6 +75,14 @@ runs:
           echo "Deploying Storybook..."
           aws s3 sync "storybook_artifacts" "s3://${{ inputs.s3_bucket }}/storybook"
           INVALIDATION_PATHS="$INVALIDATION_PATHS /storybook/*"
+        fi
+
+        # Deploy Toolkit Schema if present
+        schema_dir="deployment_artifacts/packages/toolkit/dist/schema"
+        if [ -d "$schema_dir" ] && [ -n "$(ls -A "$schema_dir" 2>/dev/null)" ]; then
+          echo "Deploying plugin manifest schema..."
+          aws s3 sync "$schema_dir" "s3://${{ inputs.s3_bucket }}/schema"
+          INVALIDATION_PATHS="$INVALIDATION_PATHS /schema/*"
         fi
 
         if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then

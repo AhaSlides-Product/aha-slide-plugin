@@ -1,0 +1,18 @@
+{
+  "$schema": "https://plugins.ahaslides.com/schema/plugin-manifest.schema.json",
+  "id": "aha-survey",
+  "name": "Survey",
+  "icon": "/icons/system-form.svg",
+  "baseUrl": "https://plugins.ahaslides.com/survey",
+  "staticTabs": [
+    {
+      "contentUrl": "/",
+      "context": "home"
+    },
+    {
+      "contentUrl": "/",
+      "context": "editor",
+      "name": "Survey"
+    }
+  ]
+}

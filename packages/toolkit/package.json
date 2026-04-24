@@ -1,0 +1,22 @@
+{
+  "name": "@aha/toolkit",
+  "version": "1.0.0",
+  "description": "Shared toolkit assets (JSON schemas, etc.) for AhaSlides slide plugins",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./schema/plugin-manifest.schema.json": "./dist/schema/plugin-manifest.schema.json",
+    "./generateSampleManifest": "./dist/generateSampleManifest.js",
+    "./buildManifest": "./dist/buildManifest.js"
+  },
+  "scripts": {
+    "build": "mkdir -p dist/schema && cp schema/*.json dist/schema/ && cp src/*.js dist/",
+    "clean": "rm -rf dist samples",
+    "generate-sample": "node src/generateSampleManifest.js",
+    "build-manifest": "node src/buildManifest.js"
+  },
+  "dependencies": {
+    "ajv": "8.17.1"
+  }
+}

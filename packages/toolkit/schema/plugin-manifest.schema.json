@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plugins.ahaslides.com/schema/plugin-manifest.schema.json",
+  "title": "Plugin Manifest",
+  "description": "Manifest describing an AhaSlides slide plugin.",
+  "type": "object",
+  "required": ["id", "name", "baseUrl", "staticTabs"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URL of this manifest's JSON Schema, used by editors for autocompletion and validation."
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique plugin identifier (kebab-case).",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable plugin name shown in the UI.",
+      "minLength": 1
+    },
+    "icon": {
+      "type": "string",
+      "description": "Absolute or relative path to the plugin icon asset.",
+      "minLength": 1
+    },
+    "baseUrl": {
+      "type": "string",
+      "description": "Base URL where the plugin is hosted. Supports `{{VAR}}` template placeholders resolved at runtime.",
+      "minLength": 1
+    },
+    "staticTabs": {
+      "type": "array",
+      "description": "Tabs registered by the plugin at fixed contexts.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/staticTab" }
+    }
+  },
+  "$defs": {
+    "staticTab": {
+      "type": "object",
+      "required": ["contentUrl", "context"],
+      "additionalProperties": false,
+      "properties": {
+        "contentUrl": {
+          "type": "string",
+          "description": "URL path (relative to `baseUrl`) rendered inside the tab.",
+          "minLength": 1
+        },
+        "context": {
+          "type": "string",
+          "description": "Where this tab is shown inside the host app.",
+          "enum": ["home", "editor", "presenter", "audience", "report"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional display name for the tab.",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

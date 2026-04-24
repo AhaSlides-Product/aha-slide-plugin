@@ -52,6 +52,7 @@ runs:
         path: |
           apps/**/frontend/dist
           apps/**/slides_agent
+          packages/toolkit/dist/schema
         if-no-files-found: warn
 
     - name: Upload Storybook Artifacts
