@@ -8,7 +8,8 @@ env:
     {
       "@aha/ui": "@ahaslides-product/plugins-ui",
       "@aha/ui-vanilla": "@ahaslides-product/plugins-ui-vanilla",
-      "@aha/toolkit": "@ahaslides-product/plugins-toolkit"
+      "@aha/toolkit": "@ahaslides-product/plugins-toolkit",
+      "@aha/design": "@ahaslides-product/plugins-design"
     }
 
 jobs:

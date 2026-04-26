@@ -5,7 +5,8 @@ import AliasTokens from './alias-tokens.js';
 const antDesignTokens = {
   ...SeedTokens,
   ...MapTokens,
-  ...AliasTokens
-}
+  ...AliasTokens,
+};
 
+export { SeedTokens, MapTokens, AliasTokens, antDesignTokens };
 export default antDesignTokens;

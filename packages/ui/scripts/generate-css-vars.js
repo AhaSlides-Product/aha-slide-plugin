@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { theme } from 'ant-design-vue';
-import antDesignTokens from '../src/ant-design-tokens/index.js';
+import antDesignTokens from '@aha/design';
 
 // Get current directory (for ES modules)
 const __filename = fileURLToPath(import.meta.url);

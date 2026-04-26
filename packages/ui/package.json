@@ -1,6 +1,6 @@
 {
   "name": "@aha/ui",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -67,6 +67,7 @@
     "vue-router": "^4.0.0"
   },
   "dependencies": {
+    "@aha/design": "*",
     "@aha/ui-vanilla": "*",
     "zoid": "^9.0.86"
   }

@@ -37,6 +37,7 @@ export default defineConfig({
       '@aha/db': resolve(__dirname, '../../../packages/db/src'),
       '@aha/backend-utils': resolve(__dirname, '../../../packages/backend-utils/src'),
       '@aha/common': resolve(__dirname, '../../../packages/common/src'),
+      '@aha/design': resolve(__dirname, '../../../packages/design/src'),
     },
   },
 });
