@@ -59,6 +59,11 @@
           "type": "string",
           "description": "Optional display name for the tab.",
           "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "How the tab is opened.",
+          "enum": ["popup"]
         }
       }
     }
