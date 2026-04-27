@@ -166,11 +166,39 @@ jobs:
             exit 1
           fi
           node <<'SCRIPT'
-          const { execSync } = require('child_process');
+          const { spawnSync } = require('child_process');
           const nameMap = JSON.parse(process.env.PACKAGE_NAME_MAP);
+          const skipped = [];
+          const failed = [];
           for (const published of Object.values(nameMap)) {
             console.log('::group::Publishing ' + published);
-            execSync('npm publish -w ' + published, { stdio: 'inherit' });
+            const result = spawnSync('npm', ['publish', '-w', published], {
+              encoding: 'utf8',
+              stdio: ['inherit', 'pipe', 'pipe'],
+            });
+            if (result.stdout) process.stdout.write(result.stdout);
+            if (result.stderr) process.stderr.write(result.stderr);
             console.log('::endgroup::');
+
+            if (result.status === 0) continue;
+
+            const combined = (result.stdout || '') + (result.stderr || '');
+            const isConflict = /\b409\b/.test(combined)
+              || /EPUBLISHCONFLICT/i.test(combined)
+              || /cannot publish over the previously published versions/i.test(combined)
+              || /You cannot publish over the previously published version/i.test(combined);
+
+            if (isConflict) {
+              console.log('::warning::' + published + ' already published at this version (409). Skipping.');
+              skipped.push(published);
+            } else {
+              console.log('::error::' + published + ' failed to publish (exit ' + result.status + ')');
+              failed.push(published);
+            }
+          }
+          if (skipped.length) console.log('Skipped (already published): ' + skipped.join(', '));
+          if (failed.length) {
+            console.error('Failed to publish: ' + failed.join(', '));
+            process.exit(1);
           }
           SCRIPT
