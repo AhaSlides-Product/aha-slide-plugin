@@ -45,14 +45,21 @@ function buildManifest(options) {
 module.exports = { substituteEnv, buildManifest };
 
 if (require.main === module) {
-  const pkgDir = path.resolve(__dirname, '..');
-  const templatePath = path.resolve(pkgDir, 'samples/manifest.template.json');
-  const outPath = path.resolve(pkgDir, 'samples/manifest.json');
+  const args = process.argv.slice(2);
+  let templatePath = path.resolve(process.cwd(), 'manifest.template.json');
+  let outPath = path.resolve(process.cwd(), 'manifest.json');
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--template' && i + 1 < args.length) {
+      templatePath = path.resolve(process.cwd(), args[++i]);
+    } else if (args[i] === '--out' && i + 1 < args.length) {
+      outPath = path.resolve(process.cwd(), args[++i]);
+    }
+  }
   try {
     const manifest = buildManifest({ templatePath });
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
-    console.log(`Built ${path.relative(pkgDir, outPath)}`);
+    console.log(`Built ${path.relative(process.cwd(), outPath)}`);
   } catch (err) {
     console.error(err.message);
     process.exit(1);

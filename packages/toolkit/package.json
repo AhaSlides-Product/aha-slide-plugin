@@ -1,6 +1,6 @@
 {
   "name": "@aha/toolkit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Shared toolkit assets (JSON schemas, etc.) for AhaSlides slide plugins",
   "files": [
     "dist"

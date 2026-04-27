@@ -57,13 +57,18 @@ module.exports = {
 };
 
 if (require.main === module) {
-  const outPath = path.resolve(__dirname, '../samples/manifest.template.json');
+  const args = process.argv.slice(2);
+  let outPath = path.resolve(process.cwd(), 'manifest.template.json');
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--out' && i + 1 < args.length) {
+      outPath = path.resolve(process.cwd(), args[++i]);
+    }
+  }
   try {
     const manifest = generateSampleManifest();
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, JSON.stringify(manifest, null, 2) + '\n');
-    const pkgDir = path.resolve(__dirname, '..');
-    console.log(`Generated ${path.relative(pkgDir, outPath)}`);
+    console.log(`Generated ${path.relative(process.cwd(), outPath)}`);
   } catch (err) {
     console.error(err.message);
     process.exit(1);
