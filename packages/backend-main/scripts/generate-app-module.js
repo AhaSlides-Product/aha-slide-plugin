@@ -1,19 +1,24 @@
 const fs = require('fs');
 const path = require('path');
+const { listPlugins } = require('./listPlugins');
 
 const rootDir = path.resolve(__dirname, '../../..');
 const appsDir = path.resolve(rootDir, 'apps');
 const targetFile = path.resolve(__dirname, '../src/app.module.ts');
 const pkgFile = path.resolve(__dirname, '../package.json');
 
+function capitalize(str) {
+  return str
+    .split('-')
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('');
+}
+
 function generate() {
   const backends = [];
 
-  // Scan apps directory
-  const apps = fs.readdirSync(appsDir);
-
-  for (const app of apps) {
-    const backendPath = path.join(appsDir, app, 'backend');
+  for (const plugin of listPlugins(appsDir)) {
+    const backendPath = path.join(plugin.dir, 'backend');
     const packageJsonPath = path.join(backendPath, 'package.json');
     const packageLockJsonPath = path.join(backendPath, 'package-lock.json');
 
@@ -21,9 +26,9 @@ function generate() {
       const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
       if (pkg.name) {
         backends.push({
-          name: app,
+          name: plugin.name,
           packageName: pkg.name,
-          moduleName: 'AppModule'
+          moduleName: 'AppModule',
         });
       }
     }
@@ -31,26 +36,24 @@ function generate() {
     if (fs.existsSync(packageLockJsonPath)) {
       fs.unlinkSync(packageLockJsonPath);
       console.log(`Removed ${packageLockJsonPath}`);
-
     }
   }
 
-  // Generate AppModule
-  const imports = backends.map((b, i) =>
-    `import { AppModule as ${capitalize(b.name)}Module } from '${b.packageName}';`
-  ).join('\n');
+  const imports = backends
+    .map(b => `import { AppModule as ${capitalize(b.name)}Module } from '${b.packageName}';`)
+    .join('\n');
 
-  const routerConfig = backends.map(b =>
-    `      {
+  const routerConfig = backends
+    .map(b => `      {
         path: '${b.name}',
         module: ${capitalize(b.name)}Module,
         // This dynamically pulls AiModule and any others without naming them
         children: getChildModules(${capitalize(b.name)}Module).map(child => ({
-          path: '', // Keeps them directly under /ideaBoard/
+          path: '', // Keeps them directly under /${b.name}/
           module: child
         }))
-      },`
-  ).join('\n');
+      },`)
+    .join('\n');
 
   const moduleImports = backends.map(b => `${capitalize(b.name)}Module`).join(',\n    ');
 
@@ -84,28 +87,21 @@ export class AppModule {}
   fs.writeFileSync(targetFile, content);
   console.log('Successfully generated packages/backend-main/src/app.module.ts');
 
-  // Update package.json dependencies
   const mainPkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'));
   let changed = false;
 
-  backends.forEach(b => {
+  for (const b of backends) {
     if (!mainPkg.dependencies[b.packageName]) {
       mainPkg.dependencies[b.packageName] = '*';
       changed = true;
       console.log(`Added missing dependency: ${b.packageName}`);
     }
-  });
-
-  // Optional: remove stale dependencies that look like @aha/.*-backend (optional, let's keep it simple first)
+  }
 
   if (changed) {
     fs.writeFileSync(pkgFile, JSON.stringify(mainPkg, null, 2) + '\n');
     console.log('Successfully updated packages/backend-main/package.json dependencies');
   }
-}
-
-function capitalize(str) {
-  return str.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
 }
 
 generate();
