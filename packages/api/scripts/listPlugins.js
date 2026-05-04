@@ -9,6 +9,18 @@ function isSkipped(name) {
 
 function listPlugins(appsDir) {
   const result = [];
+  const byName = new Map();
+
+  function add(name, dir) {
+    if (byName.has(name)) {
+      throw new Error(
+        `Slide-type name collision: "${name}" exists in both\n  ${byName.get(name)}\n  ${dir}`
+      );
+    }
+    byName.set(name, dir);
+    result.push({ name, dir });
+  }
+
   for (const entry of fs.readdirSync(appsDir)) {
     if (isSkipped(entry)) continue;
     const full = path.join(appsDir, entry);
@@ -18,10 +30,10 @@ function listPlugins(appsDir) {
         if (isSkipped(child)) continue;
         const childFull = path.join(full, child);
         if (!fs.statSync(childFull).isDirectory()) continue;
-        result.push({ name: child, dir: childFull });
+        add(child, childFull);
       }
     } else {
-      result.push({ name: entry, dir: full });
+      add(entry, full);
     }
   }
   return result;

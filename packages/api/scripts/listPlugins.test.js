@@ -92,3 +92,30 @@ test('folders starting with _ or . inside a group are skipped', () => {
   const plugins = listPlugins(root);
   assert.deepEqual(plugins.map(p => p.name), ['plugin-a']);
 });
+
+test('collision between top-level plugin and grouped plugin throws', () => {
+  const root = makeFixture({
+    'ranking/frontend/package.json': '{}',
+    'community/aha-plugin-group.json': '{}',
+    'community/ranking/frontend/package.json': '{}',
+  });
+  assert.throws(
+    () => listPlugins(root),
+    err => {
+      assert.match(err.message, /name collision/i);
+      assert.match(err.message, /ranking/);
+      assert.match(err.message, /community/);
+      return true;
+    }
+  );
+});
+
+test('collision between two grouped plugins throws', () => {
+  const root = makeFixture({
+    'group-a/aha-plugin-group.json': '{}',
+    'group-a/duplicate/frontend/package.json': '{}',
+    'group-b/aha-plugin-group.json': '{}',
+    'group-b/duplicate/frontend/package.json': '{}',
+  });
+  assert.throws(() => listPlugins(root), /name collision/i);
+});
