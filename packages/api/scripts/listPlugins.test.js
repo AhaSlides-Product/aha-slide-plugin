@@ -119,3 +119,95 @@ test('collision between two grouped plugins throws', () => {
   });
   assert.throws(() => listPlugins(root), /name collision/i);
 });
+
+test('plugin entries include target = "ecs" by default (no group marker)', () => {
+  const root = makeFixture({
+    'sample-slide/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => ({ name: p.name, target: p.target })), [
+    { name: 'sample-slide', target: 'ecs' },
+  ]);
+});
+
+test('group marker without deployment block defaults plugins to target = "ecs"', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{"name":"community"}',
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.target), ['ecs']);
+});
+
+test('group marker with deployment.backend.target = "cloudflare-workers" tags children', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': JSON.stringify({
+      name: 'community',
+      deployment: { backend: { target: 'cloudflare-workers', workersSubdomain: 'my-acct' } }
+    }),
+    'community/plugin-a/frontend/package.json': '{}',
+    'community/plugin-b/backend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => ({ name: p.name, target: p.target })).sort((a, b) => a.name.localeCompare(b.name)), [
+    { name: 'plugin-a', target: 'cloudflare-workers' },
+    { name: 'plugin-b', target: 'cloudflare-workers' },
+  ]);
+});
+
+test('mixed groups: each group tags its own children independently', () => {
+  const root = makeFixture({
+    'group-a/aha-plugin-group.json': JSON.stringify({
+      deployment: { backend: { target: 'cloudflare-workers', workersSubdomain: 'a' } }
+    }),
+    'group-a/plugin-1/frontend/package.json': '{}',
+    'group-b/aha-plugin-group.json': '{}',
+    'group-b/plugin-2/frontend/package.json': '{}',
+    'top-level/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  const byName = Object.fromEntries(plugins.map(p => [p.name, p.target]));
+  assert.deepEqual(byName, {
+    'plugin-1': 'cloudflare-workers',
+    'plugin-2': 'ecs',
+    'top-level': 'ecs',
+  });
+});
+
+test('target = "cloudflare-workers" without workersSubdomain throws', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': JSON.stringify({
+      deployment: { backend: { target: 'cloudflare-workers' } }
+    }),
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  assert.throws(() => listPlugins(root), /workersSubdomain/i);
+});
+
+test('malformed deployment block (target is not a string) throws', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': JSON.stringify({
+      deployment: { backend: { target: 42 } }
+    }),
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  assert.throws(() => listPlugins(root), /target/i);
+});
+
+test('unknown target value throws', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': JSON.stringify({
+      deployment: { backend: { target: 'lambda' } }
+    }),
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  assert.throws(() => listPlugins(root), /unknown.*target.*lambda/i);
+});
+
+test('marker JSON parse error throws with file path in message', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{invalid json',
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  assert.throws(() => listPlugins(root), /aha-plugin-group\.json/);
+});
