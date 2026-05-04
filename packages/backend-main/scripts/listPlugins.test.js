@@ -223,3 +223,32 @@ test('filter pattern (.filter(p => p.target === "ecs")) excludes Worker plugins'
   const ecsOnly = listPlugins(root).filter(p => p.target === 'ecs');
   assert.deepEqual(ecsOnly.map(p => p.name), ['sample']);
 });
+
+test('group child without frontend/ or backend/ is skipped (e.g. scripts/, docs/)', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{}',
+    'community/scripts/some-tool.sh': '#!/bin/bash\n',
+    'community/docs/README.md': '# docs\n',
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.name), ['plugin-a']);
+});
+
+test('top-level folder without frontend/ or backend/ is skipped', () => {
+  const root = makeFixture({
+    'sample-slide/frontend/package.json': '{}',
+    'docs/some-file.md': '# docs\n',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.name), ['sample-slide']);
+});
+
+test('plugin with backend/ only (no frontend/) is recognized', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{}',
+    'community/api-only/backend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.name), ['api-only']);
+});

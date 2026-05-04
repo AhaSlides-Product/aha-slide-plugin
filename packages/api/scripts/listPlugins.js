@@ -8,6 +8,10 @@ function isSkipped(name) {
   return name.startsWith('_') || name.startsWith('.');
 }
 
+function isPluginDir(dir) {
+  return fs.existsSync(path.join(dir, 'frontend')) || fs.existsSync(path.join(dir, 'backend'));
+}
+
 function readGroupTarget(markerPath) {
   let raw;
   try {
@@ -69,9 +73,11 @@ function listPlugins(appsDir) {
         if (isSkipped(child)) continue;
         const childFull = path.join(full, child);
         if (!fs.statSync(childFull).isDirectory()) continue;
+        if (!isPluginDir(childFull)) continue;
         add(child, childFull, target);
       }
     } else {
+      if (!isPluginDir(full)) continue;
       add(entry, full, 'ecs');
     }
   }
