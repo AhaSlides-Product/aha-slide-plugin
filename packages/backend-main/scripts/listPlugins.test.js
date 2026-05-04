@@ -211,3 +211,15 @@ test('marker JSON parse error throws with file path in message', () => {
   });
   assert.throws(() => listPlugins(root), /aha-plugin-group\.json/);
 });
+
+test('filter pattern (.filter(p => p.target === "ecs")) excludes Worker plugins', () => {
+  const root = makeFixture({
+    'sample/frontend/package.json': '{}',
+    'community/aha-plugin-group.json': JSON.stringify({
+      deployment: { backend: { target: 'cloudflare-workers', workersSubdomain: 'x' } }
+    }),
+    'community/worker-plugin/frontend/package.json': '{}',
+  });
+  const ecsOnly = listPlugins(root).filter(p => p.target === 'ecs');
+  assert.deepEqual(ecsOnly.map(p => p.name), ['sample']);
+});

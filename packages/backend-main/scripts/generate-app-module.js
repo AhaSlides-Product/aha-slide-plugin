@@ -17,7 +17,7 @@ function capitalize(str) {
 function generate() {
   const backends = [];
 
-  for (const plugin of listPlugins(appsDir)) {
+  for (const plugin of listPlugins(appsDir).filter(p => p.target === 'ecs')) {
     const backendPath = path.join(plugin.dir, 'backend');
     const packageJsonPath = path.join(backendPath, 'package.json');
     const packageLockJsonPath = path.join(backendPath, 'package-lock.json');
