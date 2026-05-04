@@ -39,3 +39,35 @@ test('non-directory entries are ignored', () => {
   const plugins = listPlugins(root);
   assert.deepEqual(plugins.map(p => p.name), ['sample-slide']);
 });
+
+test('folder with aha-plugin-group.json is treated as a group; children become plugins', () => {
+  const root = makeFixture({
+    'sample-slide/frontend/package.json': '{}',
+    'community/aha-plugin-group.json': '{"name":"community"}',
+    'community/plugin-a/frontend/package.json': '{}',
+    'community/plugin-b/frontend/package.json': '{}',
+    'community/plugin-b/backend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(
+    plugins.map(p => p.name).sort(),
+    ['plugin-a', 'plugin-b', 'sample-slide']
+  );
+  const pluginA = plugins.find(p => p.name === 'plugin-a');
+  assert.ok(
+    pluginA.dir.endsWith(path.join('community', 'plugin-a')),
+    'plugin-a dir is under the group folder'
+  );
+});
+
+test('group folder itself is not registered as a plugin', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{}',
+    'community/plugin-a/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.ok(
+    !plugins.some(p => p.name === 'community'),
+    'group folder name does not appear as a plugin'
+  );
+});
