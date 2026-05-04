@@ -71,3 +71,24 @@ test('group folder itself is not registered as a plugin', () => {
     'group folder name does not appear as a plugin'
   );
 });
+
+test('folders starting with _ or . are skipped at top level', () => {
+  const root = makeFixture({
+    'sample-slide/frontend/package.json': '{}',
+    '_template/frontend/package.json': '{}',
+    '.cache/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.name), ['sample-slide']);
+});
+
+test('folders starting with _ or . inside a group are skipped', () => {
+  const root = makeFixture({
+    'community/aha-plugin-group.json': '{}',
+    'community/_template/frontend/package.json': '{}',
+    'community/plugin-a/frontend/package.json': '{}',
+    'community/.scratch/frontend/package.json': '{}',
+  });
+  const plugins = listPlugins(root);
+  assert.deepEqual(plugins.map(p => p.name), ['plugin-a']);
+});
