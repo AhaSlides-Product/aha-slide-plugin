@@ -233,7 +233,7 @@ export function useBaseSlidePlugin(
   const unsubscribeTopic = xprops?.unsubscribeTopic;
 
   // TODO: Remove this migration wrapper after not having
-  // any plugin_legacy_bucket_fallback event
+  // any plugin_legacy_bucket_fallback event 
   const wrappedGetValues: BaseSlidePluginReturn['getValues'] = xprops?.getValues
     ? async (params: { bucket: string; key?: string }) => {
         // Matches bucket format from getBucket() in @aha/common/emqx: `s${slideId}-v${slideVersion}/${bucketName}`
