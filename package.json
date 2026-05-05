@@ -5,7 +5,7 @@
   "private": true,
   "workspaces": [
     "apps/*/*",
-    "apps/*/*/*",
+    "apps/slide-plugin-by-ahasliders/*/*",
     "packages/*",
     "domains/*",
     "tests"
