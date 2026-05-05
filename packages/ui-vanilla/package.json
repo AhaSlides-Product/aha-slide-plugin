@@ -1,7 +1,7 @@
 {
   "name": "@aha/ui-vanilla",
-  "version": "1.0.8",
-  "description": "Framework-agnostic TypeScript interfaces for AhaSlides slide plugins (zoid contracts).",
+  "version": "1.1.0",
+  "description": "Framework-agnostic TypeScript primitives for AhaSlides slide plugins — zoid contracts, sync stores, image upload, auth.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
