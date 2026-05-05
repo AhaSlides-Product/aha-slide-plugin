@@ -20,7 +20,7 @@
     "zoid": "^9.0.86"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && echo \"@aha/design: just run type check\"",
     "clean": "rm -rf dist *.tsbuildinfo",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
   },
