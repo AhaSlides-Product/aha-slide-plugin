@@ -4,9 +4,10 @@
  */
 export enum SlideType {
   IdeaBoard = 'ideaBoard',
-  Infographic = 'infographic',
   Markdown = 'markdown',
   PinOnImage = 'pinOnImage',
   Ranking = 'ranking',
   SampleSlide = 'sample-slide',
+  Content = 'content',
+  Graph = 'graph',
 }
