@@ -135,6 +135,9 @@ export function createHeightReporter(options: HeightReporterOptions = {}): Heigh
       if (!root || typeof ResizeObserver === 'undefined') return;
       observer = new ResizeObserver(schedule);
       observer.observe(root);
+      // Defensive: ResizeObserver.observe() fires once initially per spec, but
+      // historic Safari quirks and unmount-before-paint races have skipped it.
+      // Schedule explicitly so the parent always gets at least one height ping.
       schedule();
     },
     stop() {
