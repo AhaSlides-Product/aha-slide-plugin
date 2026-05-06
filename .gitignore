@@ -7,3 +7,5 @@ dist
 .npm
 .turbo
 storybook-static
+.superpowers/
+*.tsbuildinfo

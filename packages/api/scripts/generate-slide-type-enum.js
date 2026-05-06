@@ -1,25 +1,29 @@
 const fs = require('fs');
 const path = require('path');
+const { listPlugins } = require('./listPlugins');
 
 const rootDir = path.resolve(__dirname, '../../..');
 const appsDir = path.resolve(rootDir, 'apps');
 const targetFile = path.resolve(__dirname, '../src/slideType.ts');
 
+function capitalize(str) {
+  return str
+    .split(/[-_]/)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('');
+}
+
 function generate() {
-  // Scan apps directory
   if (!fs.existsSync(appsDir)) {
     console.error(`Apps directory not found: ${appsDir}`);
     process.exit(1);
   }
 
-  const apps = fs.readdirSync(appsDir).filter(file => {
-    return fs.statSync(path.join(appsDir, file)).isDirectory();
-  });
+  const plugins = listPlugins(appsDir);
 
-  const enumEntries = apps.map(app => {
-    const key = capitalize(app);
-    return `  ${key} = '${app}',`;
-  }).join('\n');
+  const enumEntries = plugins
+    .map(p => `  ${capitalize(p.name)} = '${p.name}',`)
+    .join('\n');
 
   const content = `/**
  * This file is AUTO-GENERATED. Do not edit it manually.
@@ -32,14 +36,6 @@ ${enumEntries}
 
   fs.writeFileSync(targetFile, content);
   console.log(`Successfully generated ${path.relative(rootDir, targetFile)}`);
-}
-
-function capitalize(str) {
-  // Convert kebab-case or snake_case to PascalCase
-  return str
-    .split(/[-_]/)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
 }
 
 generate();

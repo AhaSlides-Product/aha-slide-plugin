@@ -49,24 +49,49 @@ runs:
 
     - name: Deploy to S3
       shell: bash
+      env:
+        S3_BUCKET: ${{ inputs.s3_bucket }}
+        SLIDES_AGENT_BUCKET: ${{ inputs.slides_agent_bucket }}
       run: |
-        # Loop through each app directory and sync frontend/dist to S3
         INVALIDATION_PATHS=""
-        for app_dir in deployment_artifacts/apps/*/; do
+
+        # Deploy a single plugin's build output. Path is keyed by leaf folder name
+        # so a grouped plugin (apps/<group>/<plugin>/) deploys to s3://bucket/<plugin>/
+        # — same shape as a top-level plugin (apps/<plugin>/).
+        deploy_plugin() {
+          local app_dir="$1"
+          local app_name
           app_name=$(basename "$app_dir")
-          if [ -d "${app_dir}slides_agent" ] && [ -n "${{ inputs.slides_agent_bucket }}" ]; then
+
+          if [ -d "${app_dir}slides_agent" ] && [ -n "$SLIDES_AGENT_BUCKET" ]; then
             echo "Copying slides agents spec for ${app_name}..."
-            # Copy all files inside folders to bucket/slide_types_schemas/
-            aws s3 cp "${app_dir}slides_agent" "s3://${{ inputs.slides_agent_bucket }}/slide_types_schemas/" --recursive
+            aws s3 cp "${app_dir}slides_agent" "s3://${SLIDES_AGENT_BUCKET}/slide_types_schemas/" --recursive
           fi
+
           if [ -d "${app_dir}frontend/dist" ]; then
             echo "Deploying ${app_name}..."
-            # Sync all files except index.html first
-            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}" --exclude "*/index.html" --exclude "index.html"
-            # Then sync index.html files last
-            aws s3 sync "${app_dir}frontend/dist" "s3://${{ inputs.s3_bucket }}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
-            
+            aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}" --exclude "*/index.html" --exclude "index.html"
+            aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
             INVALIDATION_PATHS="$INVALIDATION_PATHS /${app_name}/*"
+          fi
+        }
+
+        # Loop top-level entries. If a folder contains aha-plugin-group.json,
+        # treat it as a group and recurse one level deeper. Skip dot/underscore
+        # prefixed names at every depth (matches the scanner rule).
+        for app_dir in deployment_artifacts/apps/*/; do
+          name=$(basename "$app_dir")
+          case "$name" in _*|.*) continue ;; esac
+
+          if [ -f "${app_dir}aha-plugin-group.json" ]; then
+            for child_dir in "${app_dir}"*/; do
+              [ -d "$child_dir" ] || continue
+              child_name=$(basename "$child_dir")
+              case "$child_name" in _*|.*) continue ;; esac
+              deploy_plugin "$child_dir"
+            done
+          else
+            deploy_plugin "$app_dir"
           fi
         done
 
