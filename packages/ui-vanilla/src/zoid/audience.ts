@@ -9,6 +9,10 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
     /** The teamplay object used in the presentation */
     teamPlay?: Record<string, any>;
   };
+  /** Information about the current logged-in user, if any. */
+  currentUser?: { email?: string; [key: string]: any };
+  /** Whether participant verification is enabled for this presentation. */
+  isParticipantVerificationEnabled?: boolean;
   /** Audience information such as name, email, emoji, ID, and team. */
   audience?: {
     /** The name of the audience participant */
@@ -118,6 +122,14 @@ export function initZoidForAudience() {
       },
       slide: {
         type: 'object',
+        required: false,
+      },
+      currentUser: {
+        type: 'object',
+        required: false,
+      },
+      isParticipantVerificationEnabled: {
+        type: 'boolean',
         required: false,
       },
       audience: {
