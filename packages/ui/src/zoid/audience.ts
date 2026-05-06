@@ -29,6 +29,8 @@ export const AudienceSlidePluginIframe = initZoidForAudience();
  */
 export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight: true }): BaseSlidePluginReturn & {
   slideAttributesProps: Ref<Record<string, any> | undefined>;
+  currentUser: Ref<Record<string, any> | undefined>;
+  isParticipantVerificationEnabled: Ref<boolean>;
   audienceName: Ref<string | undefined>;
   audienceEmoji: Ref<string | undefined>;
   audienceId: Ref<string | number | undefined>;
@@ -54,8 +56,9 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
-  console.log('[useAudiencePlugin] Rendering with xprops:', xprops);
   const slideAttributesProps = ref<Record<string, any> | undefined>(xprops?.slideAttributes);
+  const currentUser = ref<Record<string, any> | undefined>(xprops?.currentUser);
+  const isParticipantVerificationEnabled = ref<boolean>(xprops?.isParticipantVerificationEnabled ?? false);
   const audienceName = ref<string | undefined>(xprops?.audience?.audienceName);
   const audienceEmoji = ref<string | undefined>(xprops?.audience?.audienceEmoji);
   const audienceId = ref<string | number | undefined>(xprops?.audience?.audienceId);
@@ -78,6 +81,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   // Extension callback to handle audience-specific props
   const handleAudienceProps = (newProps: any) => {
 
+    if (newProps.currentUser !== undefined) currentUser.value = newProps.currentUser;
+    if (newProps.isParticipantVerificationEnabled !== undefined) isParticipantVerificationEnabled.value = newProps.isParticipantVerificationEnabled;
     if (newProps.slideAttributes) {
       slideAttributesProps.value = { ...newProps.slideAttributes };
       console.log('[handleAudienceProps] slideAttributesProps:', slideAttributesProps.value);
@@ -106,6 +111,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
     slideAttributesProps,
+    currentUser,
+    isParticipantVerificationEnabled,
     audienceName,
     audienceEmoji,
     audienceId,
