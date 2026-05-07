@@ -29,6 +29,17 @@ function buildSampleManifest() {
       { contentUrl: '/', context: 'home' },
       { contentUrl: '/', context: 'editor', name: 'Survey' },
     ],
+    slideTypes: [
+      {
+        type: 'aha-survey-slide',
+        name: 'Survey',
+        desc: 'Collect structured feedback from participants on a single slide.',
+        icon: '/icons/system-form.svg',
+        canvasUrl: '{{VITE_PUBLIC_BASE_URL}}/slide/canvas',
+        settingUrl: '{{VITE_PUBLIC_BASE_URL}}/slide/settings',
+        audienceUrl: '{{VITE_PUBLIC_BASE_URL}}/slide/audience',
+      },
+    ],
   };
 }
 
