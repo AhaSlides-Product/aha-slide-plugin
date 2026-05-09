@@ -8,6 +8,6 @@ export enum SlideType {
   PinOnImage = 'pinOnImage',
   Ranking = 'ranking',
   SampleSlide = 'sample-slide',
-  Content = 'content',
+  Canvas = 'canvas',
   Graph = 'graph',
 }
