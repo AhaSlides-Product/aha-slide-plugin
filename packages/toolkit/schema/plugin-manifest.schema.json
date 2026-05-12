@@ -37,6 +37,11 @@
       "description": "Tabs registered by the plugin at fixed contexts.",
       "minItems": 1,
       "items": { "$ref": "#/$defs/staticTab" }
+    },
+    "slideTypes": {
+      "type": "array",
+      "description": "Custom slide types registered by the plugin. Each entry appears in the host slide selector and provides the iframe URLs for the editor settings, presenter canvas, and audience views.",
+      "items": { "$ref": "#/$defs/slideType" }
     }
   },
   "$defs": {
@@ -64,6 +69,68 @@
           "type": "string",
           "description": "How the tab is opened.",
           "enum": ["popup"]
+        }
+      }
+    },
+    "slideType": {
+      "type": "object",
+      "required": ["type", "name", "canvasUrl", "settingUrl", "audienceUrl"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Unique slide-type identifier. Stored on the slide as `slide.type`. Should not collide with built-in slide types.",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]*$",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable slide-type name shown in the slide selector.",
+          "minLength": 1
+        },
+        "desc": {
+          "type": "string",
+          "description": "Short description shown in the slide selector."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Absolute or relative path to the slide-type icon asset."
+        },
+        "previewUrl": {
+          "type": "string",
+          "description": "Optional preview image/video URL shown when hovering the slide type."
+        },
+        "canvasUrl": {
+          "type": "string",
+          "description": "Absolute URL of the iframe rendered on the presenter canvas. Supports `{{VAR}}` template placeholders.",
+          "minLength": 1
+        },
+        "settingUrl": {
+          "type": "string",
+          "description": "Absolute URL of the iframe rendered in the editor settings panel. Supports `{{VAR}}` template placeholders.",
+          "minLength": 1
+        },
+        "audienceUrl": {
+          "type": "string",
+          "description": "Absolute URL of the iframe rendered for participants in the audience app. Supports `{{VAR}}` template placeholders.",
+          "minLength": 1
+        },
+        "setting": {
+          "type": "object",
+          "description": "Optional UI capability flags consumed by the host's editor settings panel. Missing keys fall back to host defaults.",
+          "additionalProperties": false,
+          "properties": {
+            "enableQuestionTitle": { "type": "boolean" },
+            "enableQuestionDescription": { "type": "boolean" },
+            "enableTimeLimit": { "type": "boolean" },
+            "enableStopSubmitssionSetting": { "type": "boolean" },
+            "enableHideResultSetting": { "type": "boolean" },
+            "enableQuestionImage": { "type": "boolean" },
+            "enableVoteCount": { "type": "boolean" },
+            "enableLabelOtherSetting": { "type": "boolean" },
+            "enableMultipleSubmission": { "type": "boolean" },
+            "enableFullScreen": { "type": "boolean" }
+          }
         }
       }
     }
