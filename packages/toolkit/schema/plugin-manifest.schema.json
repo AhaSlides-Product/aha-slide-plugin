@@ -114,6 +114,23 @@
           "type": "string",
           "description": "Absolute URL of the iframe rendered for participants in the audience app. Supports `{{VAR}}` template placeholders.",
           "minLength": 1
+        },
+        "setting": {
+          "type": "object",
+          "description": "Optional UI capability flags consumed by the host's editor settings panel. Missing keys fall back to host defaults.",
+          "additionalProperties": false,
+          "properties": {
+            "enableQuestionTitle": { "type": "boolean" },
+            "enableQuestionDescription": { "type": "boolean" },
+            "enableTimeLimit": { "type": "boolean" },
+            "enableStopSubmitssionSetting": { "type": "boolean" },
+            "enableHideResultSetting": { "type": "boolean" },
+            "enableQuestionImage": { "type": "boolean" },
+            "enableVoteCount": { "type": "boolean" },
+            "enableLabelOtherSetting": { "type": "boolean" },
+            "enableMultipleSubmission": { "type": "boolean" },
+            "enableFullScreen": { "type": "boolean" }
+          }
         }
       }
     }
