@@ -9,7 +9,8 @@
     ".": "./src/index.js",
     "./seed-tokens": "./src/seed-tokens.js",
     "./map-tokens": "./src/map-tokens.js",
-    "./alias-tokens": "./src/alias-tokens.js"
+    "./alias-tokens": "./src/alias-tokens.js",
+    "./custom-colors": "./src/custom-colors.js"
   },
   "files": [
     "src"
