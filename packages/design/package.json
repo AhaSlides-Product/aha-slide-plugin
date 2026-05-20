@@ -1,6 +1,6 @@
 {
   "name": "@aha/design",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AhaSlides design tokens (seed/map/alias). Framework-agnostic.",
   "type": "module",
   "main": "./src/index.js",
