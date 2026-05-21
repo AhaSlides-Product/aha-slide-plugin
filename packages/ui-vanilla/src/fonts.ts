@@ -1,26 +1,25 @@
 /**
  * Host-font auto-loader for slide-plugin iframes.
  *
- * Each plugin renders inside a cross-origin iframe, so it does NOT inherit
- * the host's `@font-face` declarations — only the `--aha-fontFamily` CSS
- * variable string. Without a `<link>` to the actual typeface inside the
- * iframe document, the browser silently falls back to a generic family
- * even though DevTools shows the family name set correctly.
- *
- * This module reads `window.xprops.presentation.fontFamily` (populated by
- * zoid once the host bridge is ready), then injects the matching Google
- * Fonts stylesheet into the iframe's `<head>`. Idempotent — repeated calls
- * with the same family are no-ops; family changes update the same link.
- *
- * Adapted from the per-plugin `useHostFont` hook used by the diagram app.
- * Lifted into shared package so every plugin (existing and future) inherits
- * the behaviour by calling `installHostFontAutoLoad()` once at startup.
+ * Cross-origin iframes do NOT inherit `@font-face` declarations from the
+ * host — only the `--aha-fontFamily` CSS variable. So even when DevTools
+ * shows the family name set correctly, the browser silently falls back
+ * to a generic family unless somebody on the iframe side loads the
+ * matching typeface. This module reads
+ * `window.xprops.presentation.fontFamily` and injects the matching Google
+ * Fonts stylesheet into the iframe's `<head>`. Idempotent; updates when
+ * the host swaps font families.
  */
 
 const LINK_ID = 'aha-host-font';
 const DEFAULT_FAMILY = 'Plus Jakarta Sans';
+
+// Generic family names + common system fonts that won't be found on
+// Google Fonts — skip the network call. The list is intentionally
+// non-exhaustive: anything not matched here that also isn't on Google
+// Fonts will just trigger a harmless empty CSS response.
 const SYSTEM_FONT_RE =
-  /^(?:serif|sans-serif|monospace|system-ui|-apple-system|BlinkMacSystemFont|inherit|initial|unset)$/i;
+  /^(?:serif|sans-serif|monospace|system-ui|-apple-system|BlinkMacSystemFont|inherit|initial|unset|Arial|Helvetica|Helvetica Neue|Times New Roman|Times|Courier New|Courier|Verdana|Tahoma|Georgia|Trebuchet MS)$/i;
 
 interface XPropsLike {
   presentation?: { fontFamily?: string };
@@ -52,13 +51,16 @@ function injectFontLink(family: string): void {
   if (typeof document === 'undefined') return;
   if (!family || SYSTEM_FONT_RE.test(family)) return;
 
-  // Axes intentionally mirror `stpancras-presenter-app/public/index.html`'s
-  // Plus Jakarta Sans link so the iframe loads the exact same weight set as
-  // the host UI (400/600 + italic). Add weights here only if the presenter
-  // adds them too — otherwise the iframe diverges from the host typeface.
+  // Weights cover the common roles AhaSlides plugins need: regular (400),
+  // semibold (600), bold (700), and italic for each. This is intentionally
+  // broader than presenter-app/public/index.html's Plus-Jakarta-Sans link
+  // (which omits 700) because the shared loader serves ANY family the
+  // host may send via xprops — and on fonts like Roboto / Lato / Source
+  // Sans, native bold is 700 not 600. Modest extra bandwidth (~30 KB) for
+  // predictable bold rendering across the catalog.
   const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
     family,
-  )}:ital,wght@0,400;0,600;1,400;1,600&display=swap`;
+  )}:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap`;
 
   const existing = document.getElementById(LINK_ID) as HTMLLinkElement | null;
   if (existing && existing.href === href) return;
@@ -93,13 +95,24 @@ export function ensureHostFontLoaded(explicitStack?: string): string {
   return family;
 }
 
-let installed = false;
+// Module-scope watcher state. Encapsulated so the install function can
+// be called repeatedly and so callers (HMR, tests) can tear it down
+// explicitly via the returned cleanup. See _resetHostFontAutoLoadForTesting
+// for the test-only escape hatch.
+let intervalId: number | null = null;
 let lastFamily: string | undefined;
 
 /**
  * Idempotently install a watcher that keeps the iframe's loaded font in
  * sync with `xprops.presentation.fontFamily`. Plugins call this once from
  * their main entry; the host's prop updates are picked up on a short poll.
+ *
+ * Returns a cleanup function that stops the poll and clears module state.
+ * Important for HMR (avoid stacked intervals from re-mounted modules) and
+ * unit tests. The cleanup is safe to call multiple times; subsequent calls
+ * are no-ops. Calling install while already installed returns a no-op
+ * cleanup — first call wins; the original cleanup is what actually tears
+ * the watcher down.
  *
  * @param options.intervalMs polling interval in ms (default `500`)
  * @param options.defaultFamily fallback family when xprops/CSS var are empty
@@ -108,9 +121,14 @@ let lastFamily: string | undefined;
 export function installHostFontAutoLoad(options?: {
   intervalMs?: number;
   defaultFamily?: string;
-}): void {
-  if (typeof window === 'undefined' || installed) return;
-  installed = true;
+}): () => void {
+  if (typeof window === 'undefined') return () => {};
+  if (intervalId !== null) {
+    // Already running — return a no-op cleanup so callers can blindly
+    // chain `.then(cleanup => …)` without accidentally tearing down the
+    // first installer's watcher.
+    return () => {};
+  }
 
   const intervalMs = options?.intervalMs ?? 500;
   const fallback = options?.defaultFamily ?? DEFAULT_FAMILY;
@@ -129,5 +147,32 @@ export function installHostFontAutoLoad(options?: {
   // Seed immediately (covers the case where xprops is already populated
   // OR the host hasn't connected yet — we'll still load the default).
   tick();
-  window.setInterval(tick, intervalMs);
+  const myId = window.setInterval(tick, intervalMs);
+  intervalId = myId;
+
+  // Closure over `myId` ensures the cleanup only clears the interval it
+  // spawned, not whatever interval happens to be active when it's called
+  // (in case the module was reset between install and cleanup).
+  return () => {
+    if (intervalId === myId && typeof window !== 'undefined') {
+      window.clearInterval(myId);
+      intervalId = null;
+      lastFamily = undefined;
+    }
+  };
+}
+
+/**
+ * Test-only reset hook. Unit tests with disabled module isolation can call
+ * this between cases to drop the module-scope watcher + cached family so a
+ * subsequent `installHostFontAutoLoad()` runs as if from scratch. Not part
+ * of the public API for production callers — use the cleanup returned by
+ * `installHostFontAutoLoad` instead.
+ */
+export function _resetHostFontAutoLoadForTesting(): void {
+  if (intervalId !== null && typeof window !== 'undefined') {
+    window.clearInterval(intervalId);
+  }
+  intervalId = null;
+  lastFamily = undefined;
 }
