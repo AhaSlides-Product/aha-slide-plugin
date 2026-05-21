@@ -52,9 +52,13 @@ function injectFontLink(family: string): void {
   if (typeof document === 'undefined') return;
   if (!family || SYSTEM_FONT_RE.test(family)) return;
 
+  // Axes intentionally mirror `stpancras-presenter-app/public/index.html`'s
+  // Plus Jakarta Sans link so the iframe loads the exact same weight set as
+  // the host UI (400/600 + italic). Add weights here only if the presenter
+  // adds them too — otherwise the iframe diverges from the host typeface.
   const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
     family,
-  )}:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap`;
+  )}:ital,wght@0,400;0,600;1,400;1,600&display=swap`;
 
   const existing = document.getElementById(LINK_ID) as HTMLLinkElement | null;
   if (existing && existing.href === href) return;
