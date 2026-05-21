@@ -100,6 +100,10 @@
           "type": "string",
           "description": "Optional preview image/video URL shown when hovering the slide type."
         },
+        "isNew": {
+          "type": "boolean",
+          "description": "Show a 'New' badge next to the slide type in the host slide selector. The badge is auto-cleared per user once they have used the slide type."
+        },
         "canvasUrl": {
           "type": "string",
           "description": "Absolute URL of the iframe rendered on the presenter canvas. Supports `{{VAR}}` template placeholders.",
