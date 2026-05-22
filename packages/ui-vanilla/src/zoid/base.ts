@@ -48,6 +48,26 @@ export interface BaseSlidePluginProps {
     id?: string | number;
     /** The version of the slide */
     version?: number;
+    /**
+     * Resolved primary text colour for the slide as a CSS colour string.
+     * The host merges slide-level override over the deck-level theme
+     * before passing it through here, so plugins can use it directly.
+     */
+    textColour?: string;
+    /**
+     * Resolved deck/slide background colour as a CSS colour string.
+     * Plugins that render a slide-shaped preview tile INSIDE the iframe
+     * (e.g. the canvas templates modal gallery) read this so previews
+     * sit on the real deck bg instead of a hardcoded neutral grey.
+     * Merges slide-level override over the deck-level theme on the host.
+     */
+    baseColour?: string;
+    /**
+     * Resolved deck/slide background image URL. Same usage as
+     * `baseColour` — for in-iframe preview surfaces. When both are set
+     * the image visually wins (deck renderer paints it over the colour).
+     */
+    backgroundImage?: string;
     /** Time allowed to answer the slide in seconds */
     timeToAnswer?: number;
     /** The timestamp when the quiz starts */
