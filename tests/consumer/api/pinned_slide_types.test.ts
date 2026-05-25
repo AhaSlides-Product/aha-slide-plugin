@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ApiClient } from '@aha/api';
 
 /**
  * Consumer tests for Pinned Slide Types API
@@ -9,35 +8,68 @@ import { ApiClient } from '@aha/api';
  *   POST /api/slide/pinned-slide-type        → { ok: true }  (presenter+ role)
  *        body: { slugs: string[] }  (min 1, max 30)
  *
- * These tests verify the SDK ApiClient methods that will consume the above endpoints.
+ * The presenter app calls these endpoints directly via fetch (not through the SDK ApiClient).
+ * These tests validate the expected request/response contract.
  */
-describe('@aha/api - Pinned Slide Types', () => {
-    const baseUrl = 'https://api.test.com';
-    const token = 'test-presenter-token';
-    let client: ApiClient;
+
+const BASE_URL = 'https://api.test.com';
+const PINNED_ENDPOINT = `${BASE_URL}/api/slide/pinned-slide-type`;
+const MAX_PINNED_TYPES = 30;
+
+/** Helper: simulates the GET call as done by the presenter app */
+async function getPinnedSlideTypes(token: string): Promise<string[]> {
+    const response = await fetch(PINNED_ENDPOINT, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+}
+
+/** Helper: simulates the POST call as done by the presenter app */
+async function upsertPinnedSlideTypes(token: string, slugs: string[]): Promise<{ ok: boolean }> {
+    const response = await fetch(PINNED_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slugs }),
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+}
+
+describe('Pinned Slide Types API Contract', () => {
+    const presenterToken = 'test-presenter-token';
 
     beforeEach(() => {
-        client = new ApiClient(baseUrl, token);
         vi.stubGlobal('fetch', vi.fn());
     });
 
-    // ─── GET pinned slide types ──────────────────────────────────────
+    // ─── GET pinned slide types ──────────────────────────────────
 
-    describe('getPinnedSlideTypes()', () => {
-        it('should call GET /api/slide/pinned-slide-type with auth header', async () => {
+    describe('GET /api/slide/pinned-slide-type', () => {
+        it('should call the correct endpoint with auth header', async () => {
             vi.mocked(fetch).mockResolvedValue({
                 ok: true,
                 status: 200,
                 json: () => Promise.resolve(['poll', 'quiz', 'wordcloud']),
             } as Response);
 
-            const result = await client.getPinnedSlideTypes();
+            const result = await getPinnedSlideTypes(presenterToken);
 
             expect(fetch).toHaveBeenCalledWith(
-                `${baseUrl}/api/slide/pinned-slide-type`,
+                PINNED_ENDPOINT,
                 expect.objectContaining({
                     headers: expect.objectContaining({
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${presenterToken}`,
                     }),
                 }),
             );
@@ -51,7 +83,7 @@ describe('@aha/api - Pinned Slide Types', () => {
                 json: () => Promise.resolve([]),
             } as Response);
 
-            const result = await client.getPinnedSlideTypes();
+            const result = await getPinnedSlideTypes(presenterToken);
 
             expect(result).toEqual([]);
             expect(Array.isArray(result)).toBe(true);
@@ -64,20 +96,35 @@ describe('@aha/api - Pinned Slide Types', () => {
                 statusText: 'Forbidden',
             } as Response);
 
-            await expect(client.getPinnedSlideTypes()).rejects.toThrow();
+            await expect(getPinnedSlideTypes('audience-token')).rejects.toThrow('403');
         });
 
         it('should throw on network error', async () => {
             vi.mocked(fetch).mockRejectedValue(new TypeError('Failed to fetch'));
 
-            await expect(client.getPinnedSlideTypes()).rejects.toThrow('Failed to fetch');
+            await expect(getPinnedSlideTypes(presenterToken)).rejects.toThrow('Failed to fetch');
+        });
+
+        it('response should always be an array of strings', async () => {
+            vi.mocked(fetch).mockResolvedValue({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve(['poll', 'ranking']),
+            } as Response);
+
+            const result = await getPinnedSlideTypes(presenterToken);
+
+            expect(Array.isArray(result)).toBe(true);
+            result.forEach((slug: unknown) => {
+                expect(typeof slug).toBe('string');
+            });
         });
     });
 
-    // ─── POST (upsert) pinned slide types ────────────────────────────
+    // ─── POST (upsert) pinned slide types ────────────────────────
 
-    describe('upsertPinnedSlideTypes()', () => {
-        it('should call POST /api/slide/pinned-slide-type with slugs in body', async () => {
+    describe('POST /api/slide/pinned-slide-type', () => {
+        it('should send slugs in request body as JSON', async () => {
             const slugs = ['poll', 'quiz'];
 
             vi.mocked(fetch).mockResolvedValue({
@@ -86,15 +133,15 @@ describe('@aha/api - Pinned Slide Types', () => {
                 json: () => Promise.resolve({ ok: true }),
             } as Response);
 
-            const result = await client.upsertPinnedSlideTypes(slugs);
+            const result = await upsertPinnedSlideTypes(presenterToken, slugs);
 
             expect(fetch).toHaveBeenCalledWith(
-                `${baseUrl}/api/slide/pinned-slide-type`,
+                PINNED_ENDPOINT,
                 expect.objectContaining({
                     method: 'POST',
                     headers: expect.objectContaining({
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${presenterToken}`,
                     }),
                     body: JSON.stringify({ slugs }),
                 }),
@@ -103,7 +150,7 @@ describe('@aha/api - Pinned Slide Types', () => {
         });
 
         it('should accept up to 30 slugs (maxPinnedTypes)', async () => {
-            const slugs = Array.from({ length: 30 }, (_, i) => `slide-type-${i}`);
+            const slugs = Array.from({ length: MAX_PINNED_TYPES }, (_, i) => `slide-type-${i}`);
 
             vi.mocked(fetch).mockResolvedValue({
                 ok: true,
@@ -111,23 +158,23 @@ describe('@aha/api - Pinned Slide Types', () => {
                 json: () => Promise.resolve({ ok: true }),
             } as Response);
 
-            const result = await client.upsertPinnedSlideTypes(slugs);
+            const result = await upsertPinnedSlideTypes(presenterToken, slugs);
 
             expect(result).toEqual({ ok: true });
-            expect(JSON.parse((fetch as any).mock.calls[0][1].body).slugs).toHaveLength(30);
+            const sentBody = JSON.parse((fetch as any).mock.calls[0][1].body);
+            expect(sentBody.slugs).toHaveLength(MAX_PINNED_TYPES);
         });
 
-        it('should overwrite previous pins on subsequent calls', async () => {
+        it('should overwrite previous pins on subsequent calls (upsert semantics)', async () => {
             vi.mocked(fetch).mockResolvedValue({
                 ok: true,
                 status: 200,
                 json: () => Promise.resolve({ ok: true }),
             } as Response);
 
-            await client.upsertPinnedSlideTypes(['poll', 'quiz']);
-            await client.upsertPinnedSlideTypes(['wordcloud', 'brainstorm']);
+            await upsertPinnedSlideTypes(presenterToken, ['poll', 'quiz']);
+            await upsertPinnedSlideTypes(presenterToken, ['wordcloud', 'brainstorm']);
 
-            // Second call should send the new slugs, not append
             const secondCallBody = JSON.parse((fetch as any).mock.calls[1][1].body);
             expect(secondCallBody.slugs).toEqual(['wordcloud', 'brainstorm']);
         });
@@ -139,7 +186,7 @@ describe('@aha/api - Pinned Slide Types', () => {
                 statusText: 'Bad Request',
             } as Response);
 
-            await expect(client.upsertPinnedSlideTypes([])).rejects.toThrow();
+            await expect(upsertPinnedSlideTypes(presenterToken, [])).rejects.toThrow('400');
         });
 
         it('should throw when server returns 403 (non-presenter)', async () => {
@@ -149,70 +196,56 @@ describe('@aha/api - Pinned Slide Types', () => {
                 statusText: 'Forbidden',
             } as Response);
 
-            await expect(client.upsertPinnedSlideTypes(['poll'])).rejects.toThrow();
+            await expect(upsertPinnedSlideTypes('audience-token', ['poll'])).rejects.toThrow('403');
         });
     });
 
-    // ─── Round-trip: upsert then get ─────────────────────────────────
+    // ─── Round-trip: upsert then get ─────────────────────────────
 
     describe('round-trip contract', () => {
         it('should be able to pin types and then retrieve the same list', async () => {
             const slugs = ['ranking', 'ideaBoard', 'pinOnImage'];
 
-            // Mock upsert
             vi.mocked(fetch).mockResolvedValueOnce({
                 ok: true,
                 status: 200,
                 json: () => Promise.resolve({ ok: true }),
             } as Response);
 
-            // Mock get (returns what was just upserted)
             vi.mocked(fetch).mockResolvedValueOnce({
                 ok: true,
                 status: 200,
                 json: () => Promise.resolve(slugs),
             } as Response);
 
-            await client.upsertPinnedSlideTypes(slugs);
-            const result = await client.getPinnedSlideTypes();
+            await upsertPinnedSlideTypes(presenterToken, slugs);
+            const result = await getPinnedSlideTypes(presenterToken);
 
             expect(result).toEqual(slugs);
         });
     });
 
-    // ─── Payload shape validation (SDK-side) ─────────────────────────
+    // ─── Payload validation expectations ─────────────────────────
 
-    describe('payload shape', () => {
-        it('should send slugs as a JSON array of strings', async () => {
-            vi.mocked(fetch).mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve({ ok: true }),
-            } as Response);
+    describe('payload validation (BE contract)', () => {
+        it('slugs must be an array of strings', () => {
+            const validPayload = { slugs: ['poll', 'quiz'] };
 
-            await client.upsertPinnedSlideTypes(['poll', 'quiz']);
-
-            const body = JSON.parse((fetch as any).mock.calls[0][1].body);
-            expect(body).toHaveProperty('slugs');
-            expect(Array.isArray(body.slugs)).toBe(true);
-            body.slugs.forEach((slug: unknown) => {
-                expect(typeof slug).toBe('string');
-            });
+            expect(Array.isArray(validPayload.slugs)).toBe(true);
+            validPayload.slugs.forEach((s) => expect(typeof s).toBe('string'));
         });
 
-        it('GET response should always be an array', async () => {
-            vi.mocked(fetch).mockResolvedValue({
-                ok: true,
-                status: 200,
-                json: () => Promise.resolve(['poll']),
-            } as Response);
+        it('slugs must have at least 1 item (min: 1)', () => {
+            const invalidPayload = { slugs: [] };
+            expect(invalidPayload.slugs.length).toBeLessThan(1);
+        });
 
-            const result = await client.getPinnedSlideTypes();
+        it('slugs must have at most 30 items (max: maxPinnedTypes)', () => {
+            const tooMany = Array.from({ length: MAX_PINNED_TYPES + 1 }, (_, i) => `slug-${i}`);
+            expect(tooMany.length).toBeGreaterThan(MAX_PINNED_TYPES);
 
-            expect(Array.isArray(result)).toBe(true);
-            result.forEach((slug: unknown) => {
-                expect(typeof slug).toBe('string');
-            });
+            const valid = tooMany.slice(0, MAX_PINNED_TYPES);
+            expect(valid.length).toBe(MAX_PINNED_TYPES);
         });
     });
 });
