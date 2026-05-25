@@ -117,4 +117,27 @@ export class ApiClient {
     const result = await this.fetchUrl(url);
     return result || [];
   }
+
+  /**
+   * Get the current user's pinned slide types.
+   * Requires presenter+ role.
+   */
+  async getPinnedSlideTypes(): Promise<string[]> {
+    const url = `${this.baseUrl}/api/slide/pinned-slide-type`;
+    const result = await this.fetchUrl(url);
+    return result || [];
+  }
+
+  /**
+   * Create or replace the current user's pinned slide types.
+   * Requires presenter+ role.
+   * @param slugs Array of slide type slugs (min 1, max 30)
+   */
+  async upsertPinnedSlideTypes(slugs: string[]): Promise<{ ok: boolean }> {
+    const url = `${this.baseUrl}/api/slide/pinned-slide-type`;
+    return this.fetchUrl(url, {
+      method: "POST",
+      body: JSON.stringify({ slugs }),
+    });
+  }
 }
