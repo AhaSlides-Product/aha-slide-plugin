@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ApiClient } from '@aha/api';
+import { ApiClient, SlideType } from '@aha/api';
 
 /**
  * Consumer tests for the Slide Type Marketplace / Registry system
@@ -13,6 +13,13 @@ import { ApiClient } from '@aha/api';
  *
  * Each marketplace slide type is tagged with `source: 'fromMarket'` and `plugin: true`
  * in the presenter app. The SDK should be able to fetch and normalize these types.
+ *
+ * NOTE: Some logic (search filtering, category filtering, pinned ordering, URL resolution)
+ * is inlined in these tests rather than imported from source. This is intentional:
+ * the logic currently lives in the presenter app (stpancras-presenter-app), not in this SDK.
+ * These tests serve as **contract documentation** — they capture the expected behavior so that
+ * when this logic is extracted into the SDK, we already have tests ready to verify correctness.
+ * If the presenter app changes its behavior, these tests should be updated to match.
  */
 
 // ─── Types matching actual implementation ────────────────────────
@@ -55,8 +62,6 @@ interface NormalizedSlideType extends MarketplaceSlideType {
 // ─── Tests ───────────────────────────────────────────────────────
 
 describe('Slide Type Marketplace / Registry', () => {
-    const marketplaceBaseUrl = 'https://aha-slide-types-creator.pages.dev/';
-
     beforeEach(() => {
         vi.stubGlobal('fetch', vi.fn());
     });
@@ -629,9 +634,7 @@ describe('Slide Type Marketplace / Registry', () => {
     // ─── Backward compatibility ──────────────────────────────────
 
     describe('backward compatibility with SlideType enum', () => {
-        it('existing SlideType enum values should still be valid type strings', async () => {
-            const { SlideType } = await import('@aha/api');
-
+        it('existing SlideType enum values should still be valid type strings', () => {
             const enumValues = Object.values(SlideType);
             expect(enumValues.length).toBeGreaterThan(0);
 
@@ -642,7 +645,6 @@ describe('Slide Type Marketplace / Registry', () => {
         });
 
         it('sendLiveSubmission should still accept SlideType enum values', async () => {
-            const { SlideType } = await import('@aha/api');
             const client = new ApiClient('https://api.test.com', 'token');
 
             vi.mocked(fetch).mockResolvedValue({
