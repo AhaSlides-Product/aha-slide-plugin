@@ -197,6 +197,23 @@ export const presenterZoidProps = {
     type: 'function',
     required: false,
   },
+  // Host-side image picker modals. Zoid silently drops any prop not
+  // declared in this schema, so without these entries the canvas iframe
+  // never receives openUploadImageModal / openEditImageModal even when
+  // the host wires them up via `usePresenterPlugin`. Same class of bug
+  // hit previously with `slideAttributes`.
+  openUploadImageModal: {
+    type: 'function',
+    required: false,
+  },
+  openEditImageModal: {
+    type: 'function',
+    required: false,
+  },
+  openAssetPicker: {
+    type: 'function',
+    required: false,
+  },
   onKeyboard: {
     type: 'function',
     required: false,
