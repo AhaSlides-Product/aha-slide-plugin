@@ -27,10 +27,27 @@ Progressive enhancement with a declarative action array. Mirrors the existing
 `setSubmissionCount` (slide→host push) and `onKeyboard` (host→slide callback)
 patterns already in the Zoid presenter contract.
 
-The slide keeps rendering its in-canvas buttons exactly as today. It additionally
-pushes a `PluginAction[]` to the host whenever the set changes, and listens for the
-host to invoke an action by id. Until a host wires the new props, the calls are
-no-ops and behavior is unchanged.
+The slide keeps rendering its in-canvas buttons. It additionally pushes a
+`PluginAction[]` to the host whenever the set changes, and listens for the host to
+invoke an action by id. Until a host wires the new props, the calls are no-ops and
+behavior is unchanged.
+
+**Avoiding duplicate buttons — the child decides.** When the host both supports the
+contract and is presenting, it renders these actions in its own control bar; the
+slide must then hide its in-canvas copy. Rather than add a new host→slide signal,
+the slide makes this decision itself: it already receives `presentation.presenting`
+reactively (via the host's existing `updateProps` flow), and it can detect host
+capability from the mere presence of the `setActionButtons` function in `xprops`. So
+the hide rule is `!!setActionButtons && presentation.presenting`. In the editor (not
+presenting), or against an older host without the contract, the in-canvas buttons
+render as before. No new contract field is needed.
+
+Caveat: the host only actually mounts its control bar when its new-control-bar
+feature flag (`AHA-41850-presenting-control-and-status-panels`) is on. The child
+keys off `presenting`, not that flag, so during the flag's rollout a presenting deck
+with the flag *off* would hide the in-canvas buttons while the host renders nothing.
+Acceptable because the flag is being rolled out to on; revisit only if the slide must
+support presenting with the old control bar.
 
 ## Contract
 
@@ -75,7 +92,10 @@ Two new optional members on `SlidePluginProps` and matching entries in
 - Register `onActionInvoke?.(id => handlers[id]?.())` once on setup.
 - `onUnmounted(() => setActionButtons?.([]))` to clear the host toolbar when the
   slide unmounts.
-- The existing in-canvas `<a-button>`s are **untouched**.
+- Pull `presentationProps` from `usePresenterPlugin()` and add
+  `hostHandlesActions = computed(() => !!setActionButtons && !!presentationProps.value?.presenting)`.
+  Gate the in-canvas button container on `hasAnyActionButton && !hostHandlesActions`
+  so the slide hides its copy once the host renders them while presenting.
 
 ## Error handling / edge cases
 
