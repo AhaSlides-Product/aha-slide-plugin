@@ -2,6 +2,31 @@ import * as zoid from 'zoid/dist/zoid.frameworks';
 import type { ImageUploadResult } from '../image';
 import type { BaseSlidePluginProps, PluginKeyboardEvent } from './base';
 
+/**
+ * A presenter action button that a slide plugin declares to the host.
+ *
+ * Slides push the current set via `setActionButtons` and receive invocations via
+ * `onActionInvoke`. This lets the host render the slide's bottom-of-canvas actions
+ * (e.g. "Next: Vote", "Previous") in its own toolbar instead of, or in addition to,
+ * the iframe rendering them itself.
+ */
+export interface PluginAction {
+  /** Stable, locale-independent identifier the host echoes back on invoke. */
+  id: string;
+  /** Display text, already translated by the slide. */
+  label: string;
+  /** Visual emphasis hint for the host. */
+  variant?: 'primary' | 'default';
+  /** Host-known icon key, if the host renders icons. */
+  icon?: string;
+  /** Whether the action is currently disabled. */
+  disabled?: boolean;
+  /** Whether the action is in a loading state. */
+  loading?: boolean;
+  /** Keyboard hint for the host to render, e.g. "Enter", "Shift+Enter", "M", "V". */
+  shortcut?: string;
+}
+
 export type ConfirmModalPayload = {
   /** The title of the confirm modal */
   title: string;
@@ -126,6 +151,21 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param callback - The function to call when a broadcast action occurs.
    */
   onBroadcastAction?: (callback: (key: string, args: any[]) => void) => void;
+
+  /**
+   * Declare the slide's current presenter action buttons to the host. The slide
+   * calls this whenever its set of available actions changes; the host may render
+   * them in its own toolbar. Pass an empty array to clear.
+   * @param actions - The currently available actions.
+   */
+  setActionButtons?: (actions: PluginAction[]) => void;
+
+  /**
+   * Register a callback to be notified when the host invokes one of the actions
+   * previously declared via `setActionButtons`.
+   * @param callback - Called with the invoked action's `id`.
+   */
+  onActionInvoke?: (callback: (actionId: string) => void) => void;
 }
 
 export type BroadcastActionResult<T extends (...args: any[]) => any> = {
@@ -261,6 +301,14 @@ export const presenterZoidProps = {
     required: false,
   },
   onBroadcastAction: {
+    type: 'function',
+    required: false,
+  },
+  setActionButtons: {
+    type: 'function',
+    required: false,
+  },
+  onActionInvoke: {
     type: 'function',
     required: false,
   },
