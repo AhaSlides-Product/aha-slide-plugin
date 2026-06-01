@@ -1,5 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ApiClient, SlideType } from '@aha/api';
+import {
+    ApiClient,
+    SlideType,
+    searchFilter,
+    filterByCategory,
+    sortWithPinned,
+    normalizeMarketplaceType,
+    stripMarketplacePrefix,
+    parseMarketplaceResponse,
+    resolveSlideSettings,
+    resolveIframeUrl,
+} from '@aha/api';
+import type { MarketplaceSlideType, NormalizedSlideType } from '@aha/api';
 
 /**
  * Consumer tests for the Slide Type Marketplace / Registry system
@@ -10,54 +22,7 @@ import { ApiClient, SlideType } from '@aha/api';
  *
  * The marketplace API lives at: {VUE_APP_AHASLIDES_MARKETPLACE_URL}/api/slide-types
  * Response: array of MarketplaceSlideType[] OR { slideTypes: MarketplaceSlideType[] }
- *
- * Each marketplace slide type is tagged with `source: 'fromMarket'` and `plugin: true`
- * in the presenter app. The SDK should be able to fetch and normalize these types.
- *
- * NOTE: Some logic (search filtering, category filtering, pinned ordering, URL resolution)
- * is inlined in these tests rather than imported from source. This is intentional:
- * the logic currently lives in the presenter app (stpancras-presenter-app), not in this SDK.
- * These tests serve as **contract documentation** — they capture the expected behavior so that
- * when this logic is extracted into the SDK, we already have tests ready to verify correctness.
- * If the presenter app changes its behavior, these tests should be updated to match.
  */
-
-// ─── Types matching actual implementation ────────────────────────
-
-/**
- * Shape of a slide type returned by the marketplace API.
- * Matches the structure consumed by slideMarketplace.module.js
- */
-interface MarketplaceSlideType {
-    type: string;
-    name: string;
-    desc?: string;
-    icon?: string;
-    editorUrl?: string;
-    settingUrl?: string;
-    setting?: {
-        enableQuestionTitle?: boolean;
-        enableQuestionDescription?: boolean;
-        enableTimeLimit?: boolean;
-        enableStopSubmitssionSetting?: boolean;
-        enableHideResultSetting?: boolean;
-        enableQuestionImage?: boolean;
-        enableVoteCount?: boolean;
-        enableLabelOtherSetting?: boolean;
-        enableMultipleSubmission?: boolean;
-        enableFullScreen?: boolean;
-        [key: string]: boolean | undefined;
-    };
-}
-
-/**
- * The normalized slide type after processing by the Vuex store.
- * Adds `source` and `plugin` fields.
- */
-interface NormalizedSlideType extends MarketplaceSlideType {
-    source: 'fromMarket';
-    plugin: true;
-}
 
 // ─── Tests ───────────────────────────────────────────────────────
 
@@ -91,26 +56,23 @@ describe('Slide Type Marketplace / Registry', () => {
         ];
 
         it('should handle response as a plain array', () => {
-            const data = mockApiResponse;
-            const rawTypes = Array.isArray(data) ? data : ((data as any).slideTypes || []);
+            const rawTypes = parseMarketplaceResponse(mockApiResponse);
 
             expect(rawTypes).toHaveLength(2);
             expect(rawTypes[0].type).toBe('marketplace/random-picker');
         });
 
         it('should handle response as { slideTypes: [...] } wrapper', () => {
-            const data = { slideTypes: mockApiResponse };
-            const rawTypes = Array.isArray(data) ? data : (data.slideTypes || []);
+            const rawTypes = parseMarketplaceResponse({ slideTypes: mockApiResponse });
 
             expect(rawTypes).toHaveLength(2);
             expect(rawTypes[0].name).toBe('Random Picker');
         });
 
         it('should strip "marketplace/" prefix from type field', () => {
-            const rawTypes = mockApiResponse;
-            const fetchedTypes = rawTypes.map((slide) => ({
+            const fetchedTypes = mockApiResponse.map((slide) => ({
                 ...slide,
-                type: slide.type.replace('marketplace/', ''),
+                type: stripMarketplacePrefix(slide.type),
             }));
 
             expect(fetchedTypes[0].type).toBe('random-picker');
@@ -123,15 +85,14 @@ describe('Slide Type Marketplace / Registry', () => {
             ];
             const fetchedTypes = rawTypes.map((slide) => ({
                 ...slide,
-                type: slide.type.replace('marketplace/', ''),
+                type: stripMarketplacePrefix(slide.type),
             }));
 
             expect(fetchedTypes[0].type).toBe('candle-timer');
         });
 
         it('should handle empty response gracefully', () => {
-            const data: MarketplaceSlideType[] = [];
-            const rawTypes = Array.isArray(data) ? data : ((data as any).slideTypes || []);
+            const rawTypes = parseMarketplaceResponse([]);
 
             expect(rawTypes).toEqual([]);
         });
@@ -146,11 +107,7 @@ describe('Slide Type Marketplace / Registry', () => {
                 name: 'Random Picker',
             };
 
-            const normalized: NormalizedSlideType = {
-                ...raw,
-                source: 'fromMarket',
-                plugin: true,
-            };
+            const normalized = normalizeMarketplaceType(raw);
 
             expect(normalized.source).toBe('fromMarket');
             expect(normalized.plugin).toBe(true);
@@ -158,7 +115,7 @@ describe('Slide Type Marketplace / Registry', () => {
             expect(normalized.name).toBe('Random Picker');
         });
 
-        it('should apply default setting flags when customSlideTypeByType resolves a marketplace type', () => {
+        it('should apply default setting flags when resolving a marketplace type', () => {
             const marketplaceSlide: MarketplaceSlideType = {
                 type: 'duck-race',
                 name: 'Duck Race Quiz',
@@ -167,64 +124,25 @@ describe('Slide Type Marketplace / Registry', () => {
                 },
             };
 
-            // Matches customSlideTypeByType logic in embed-app.module.js
-            const defaultSettings = {
-                enableQuestionTitle: false,
-                enableQuestionDescription: false,
-                enableTimeLimit: false,
-                enableStopSubmitssionSetting: false,
-                enableHideResultSetting: false,
-                enableQuestionImage: false,
-                enableVoteCount: false,
-                enableLabelOtherSetting: false,
-                enableMultipleSubmission: false,
-                enableFullScreen: false,
-            };
-
-            const resolved = {
-                ...marketplaceSlide,
-                plugin: true,
-                setting: {
-                    ...defaultSettings,
-                    ...(marketplaceSlide.setting || {}),
-                },
-            };
+            const resolved = resolveSlideSettings(marketplaceSlide);
 
             // User-provided setting overrides the default
-            expect(resolved.setting.enableQuestionTitle).toBe(true);
+            expect(resolved.enableQuestionTitle).toBe(true);
             // Defaults applied for unspecified settings
-            expect(resolved.setting.enableTimeLimit).toBe(false);
-            expect(resolved.setting.enableQuestionDescription).toBe(false);
-            expect(resolved.plugin).toBe(true);
+            expect(resolved.enableTimeLimit).toBe(false);
+            expect(resolved.enableQuestionDescription).toBe(false);
         });
 
         it('should use all defaults when marketplace slide has no setting object', () => {
             const marketplaceSlide: MarketplaceSlideType = {
                 type: 'candle-timer',
                 name: 'Candle Timer',
-                // no setting field
             };
 
-            const resolved = {
-                ...marketplaceSlide,
-                plugin: true,
-                setting: {
-                    enableQuestionTitle: false,
-                    enableQuestionDescription: false,
-                    enableTimeLimit: false,
-                    enableStopSubmitssionSetting: false,
-                    enableHideResultSetting: false,
-                    enableQuestionImage: false,
-                    enableVoteCount: false,
-                    enableLabelOtherSetting: false,
-                    enableMultipleSubmission: false,
-                    enableFullScreen: false,
-                    ...(marketplaceSlide.setting || {}),
-                },
-            };
+            const resolved = resolveSlideSettings(marketplaceSlide);
 
             // All false by default
-            Object.values(resolved.setting).forEach((val) => {
+            Object.values(resolved).forEach((val) => {
                 expect(val).toBe(false);
             });
         });
@@ -242,17 +160,8 @@ describe('Slide Type Marketplace / Registry', () => {
                 source: 'fromMarket',
                 plugin: true,
             };
-            const slideId = 42;
 
-            // Matches SlidePluginIframeConfig.vue logic
-            const isFromMarket = slideType.source === 'fromMarket';
-            let iframeUrl: string | null = null;
-
-            if (isFromMarket && slideType.editorUrl) {
-                iframeUrl = `${slideType.editorUrl}/${slideId}`;
-            } else if (slideType.settingUrl) {
-                iframeUrl = `${slideType.settingUrl}/${slideId}`;
-            }
+            const iframeUrl = resolveIframeUrl(slideType, 42);
 
             expect(iframeUrl).toBe('https://plugins.ahaslides.com/random-picker/editor/42');
         });
@@ -265,16 +174,8 @@ describe('Slide Type Marketplace / Registry', () => {
                 source: 'fromMarket',
                 plugin: true,
             };
-            const slideId = 99;
 
-            const isFromMarket = slideType.source === 'fromMarket';
-            let iframeUrl: string | null = null;
-
-            if (isFromMarket && slideType.editorUrl) {
-                iframeUrl = `${slideType.editorUrl}/${slideId}`;
-            } else if (slideType.settingUrl) {
-                iframeUrl = `${slideType.settingUrl}/${slideId}`;
-            }
+            const iframeUrl = resolveIframeUrl(slideType, 99);
 
             expect(iframeUrl).toBe('https://plugins.ahaslides.com/candle-timer/settings/99');
         });
@@ -285,18 +186,9 @@ describe('Slide Type Marketplace / Registry', () => {
                 name: 'Sample Slide',
                 settingUrl: 'https://plugins.ahaslides.com/sample-slide/settings',
                 plugin: true,
-                // No source: 'fromMarket'
             };
-            const slideId = 7;
 
-            const isFromMarket = false;
-            let iframeUrl: string | null = null;
-
-            if (isFromMarket && (slideType as any).editorUrl) {
-                iframeUrl = `${(slideType as any).editorUrl}/${slideId}`;
-            } else if (slideType.settingUrl) {
-                iframeUrl = `${slideType.settingUrl}/${slideId}`;
-            }
+            const iframeUrl = resolveIframeUrl(slideType, 7);
 
             expect(iframeUrl).toBe('https://plugins.ahaslides.com/sample-slide/settings/7');
         });
@@ -308,16 +200,8 @@ describe('Slide Type Marketplace / Registry', () => {
                 source: 'fromMarket',
                 plugin: true,
             };
-            const slideId = 1;
 
-            const isFromMarket = slideType.source === 'fromMarket';
-            let iframeUrl: string | null = null;
-
-            if (isFromMarket && slideType.editorUrl) {
-                iframeUrl = `${slideType.editorUrl}/${slideId}`;
-            } else if (slideType.settingUrl) {
-                iframeUrl = `${slideType.settingUrl}/${slideId}`;
-            }
+            const iframeUrl = resolveIframeUrl(slideType, 1);
 
             expect(iframeUrl).toBeNull();
         });
@@ -333,17 +217,6 @@ describe('Slide Type Marketplace / Registry', () => {
             { type: 'poll-advanced', name: 'Advanced Poll', desc: 'Enhanced polling' },
             { type: 'flip-cards', name: 'Flip Cards', desc: 'Interactive flashcards' },
         ];
-
-        // Matches the filteredSlideTypes computed in SlideMarketplaceList.vue
-        const searchFilter = (types: MarketplaceSlideType[], query: string): MarketplaceSlideType[] => {
-            const q = query.toLowerCase().trim();
-            if (!q) return types;
-            return types.filter(
-                (slide) =>
-                    slide.name.toLowerCase().includes(q) ||
-                    (slide.desc && slide.desc.toLowerCase().includes(q)),
-            );
-        };
 
         it('should return all types when query is empty', () => {
             expect(searchFilter(allTypes, '')).toHaveLength(5);
@@ -368,11 +241,11 @@ describe('Slide Type Marketplace / Registry', () => {
 
         it('should match partial strings across name and desc', () => {
             const result = searchFilter(allTypes, 'random');
-            expect(result).toHaveLength(1); // 'Random Picker' name + 'Pick a random student' desc — same item
+            expect(result).toHaveLength(1);
             expect(result[0].type).toBe('random-picker');
 
             const result2 = searchFilter(allTypes, 'fun');
-            expect(result2).toHaveLength(1); // 'A fun racing game' desc
+            expect(result2).toHaveLength(1);
             expect(result2[0].type).toBe('duck-race-quiz');
         });
     });
@@ -393,47 +266,6 @@ describe('Slide Type Marketplace / Registry', () => {
             { type: 'puzzle-game', name: 'Puzzle Game' },
             { type: 'estimation-quiz', name: 'Estimation Quiz' },
         ];
-
-        // Matches the category filtering logic in SlideMarketplaceList.vue
-        const filterByCategory = (types: MarketplaceSlideType[], category: string): MarketplaceSlideType[] => {
-            if (category === 'All') return types;
-
-            return types.filter((slide) => {
-                const nameLower = slide.name.toLowerCase();
-                const typeLower = slide.type.toLowerCase();
-
-                if (category === 'Quiz') {
-                    return typeLower.includes('quiz') || nameLower.includes('quiz');
-                }
-                if (category === 'Poll') {
-                    return typeLower.includes('poll') || nameLower.includes('poll') ||
-                        typeLower === 'ranking' || typeLower === 'budget-allocation' || typeLower === 'take-a-stand';
-                }
-                if (category === 'Timer') {
-                    return typeLower.includes('timer') || nameLower.includes('timer');
-                }
-                if (category === 'Random picker') {
-                    return typeLower.includes('random') || nameLower.includes('random') ||
-                        typeLower.includes('picker') || nameLower.includes('picker') ||
-                        nameLower.includes('assignment') || nameLower.includes('rotation') ||
-                        nameLower.includes('race') || nameLower.includes('box');
-                }
-                if (category === 'Fun & Trivia') {
-                    return typeLower.includes('flip') || typeLower.includes('interactive') ||
-                        typeLower.includes('matchmories') || typeLower.includes('puzzle') ||
-                        typeLower.includes('chain') || typeLower.includes('battle') ||
-                        typeLower.includes('splash');
-                }
-                if (category === 'Scored') {
-                    return typeLower.includes('quiz') || typeLower.includes('battle') ||
-                        typeLower.includes('puzzle') || typeLower.includes('matchmories') ||
-                        typeLower.includes('estimation') || typeLower.includes('swipe') ||
-                        typeLower.includes('blank') || typeLower.includes('label');
-                }
-
-                return true;
-            });
-        };
 
         it('"All" category should return all types', () => {
             expect(filterByCategory(allTypes, 'All')).toHaveLength(allTypes.length);
@@ -488,7 +320,6 @@ describe('Slide Type Marketplace / Registry', () => {
         it('should not re-fetch if slideTypes are already loaded', async () => {
             const state = { slideTypes: [{ type: 'quiz', name: 'Quiz' }], fetchPromise: null };
 
-            // Simulates the guard in fetchMarketplaceSlideTypes action
             const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
 
             expect(shouldFetch).toBe(false);
@@ -496,7 +327,7 @@ describe('Slide Type Marketplace / Registry', () => {
 
         it('should reuse in-flight promise if fetch is already in progress', () => {
             const existingPromise = Promise.resolve();
-            const state = { slideTypes: [], fetchPromise: existingPromise };
+            const state = { slideTypes: [] as MarketplaceSlideType[], fetchPromise: existingPromise };
 
             const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
             const shouldReusePromise = state.slideTypes.length === 0 && state.fetchPromise !== null;
@@ -506,7 +337,7 @@ describe('Slide Type Marketplace / Registry', () => {
         });
 
         it('should fetch when slideTypes is empty and no in-flight promise', () => {
-            const state = { slideTypes: [], fetchPromise: null };
+            const state = { slideTypes: [] as MarketplaceSlideType[], fetchPromise: null };
 
             const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
 
@@ -524,31 +355,30 @@ describe('Slide Type Marketplace / Registry', () => {
             ];
 
             const slides = [
-                { type: 'random-picker', typeObj: null },
+                { type: 'random-picker', typeObj: null as any },
                 { type: 'regular-poll', typeObj: { name: 'Poll', type: 'regular-poll' } },
-                { type: 'duck-race', typeObj: undefined },
+                { type: 'duck-race', typeObj: undefined as any },
             ];
 
-            // Simulates mapSlidesTypeObj logic
             slides.forEach((slide) => {
                 if (slide.type && (!slide.typeObj || Object.keys(slide.typeObj).length === 0)) {
                     const marketplaceSlide = marketplaceTypes.find((s) => s.type === slide.type);
                     if (marketplaceSlide) {
-                        slide.typeObj = { ...marketplaceSlide, source: 'fromMarket', plugin: true } as any;
+                        slide.typeObj = normalizeMarketplaceType(marketplaceSlide);
                     }
                 }
             });
 
-            expect((slides[0].typeObj as any).source).toBe('fromMarket');
-            expect((slides[0].typeObj as any).plugin).toBe(true);
-            expect((slides[0].typeObj as any).name).toBe('Random Picker');
+            expect(slides[0].typeObj.source).toBe('fromMarket');
+            expect(slides[0].typeObj.plugin).toBe(true);
+            expect(slides[0].typeObj.name).toBe('Random Picker');
 
             // Existing typeObj should not be overwritten
-            expect((slides[1].typeObj as any).name).toBe('Poll');
-            expect((slides[1].typeObj as any)).not.toHaveProperty('source');
+            expect(slides[1].typeObj.name).toBe('Poll');
+            expect(slides[1].typeObj).not.toHaveProperty('source');
 
-            expect((slides[2].typeObj as any).source).toBe('fromMarket');
-            expect((slides[2].typeObj as any).name).toBe('Duck Race Quiz');
+            expect(slides[2].typeObj.source).toBe('fromMarket');
+            expect(slides[2].typeObj.name).toBe('Duck Race Quiz');
         });
 
         it('should not overwrite typeObj if it already has content', () => {
@@ -561,11 +391,10 @@ describe('Slide Type Marketplace / Registry', () => {
             if (slide.type && (!slide.typeObj || Object.keys(slide.typeObj).length === 0)) {
                 const marketplaceSlide = marketplaceTypes.find((s) => s.type === slide.type);
                 if (marketplaceSlide) {
-                    slide.typeObj = { ...marketplaceSlide, source: 'fromMarket', plugin: true } as any;
+                    slide.typeObj = { ...normalizeMarketplaceType(marketplaceSlide) } as any;
                 }
             }
 
-            // Should keep the existing built-in type
             expect(slide.typeObj.name).toBe('Built-in Quiz');
         });
     });
@@ -580,18 +409,6 @@ describe('Slide Type Marketplace / Registry', () => {
             { type: 'ranking', name: 'Ranking' },
             { type: 'open-ended', name: 'Open-Ended' },
         ];
-
-        const sortWithPinned = (
-            types: MarketplaceSlideType[],
-            pinnedSlugs: string[],
-        ): MarketplaceSlideType[] => {
-            const pinSet = new Set(pinnedSlugs);
-            const pinned = pinnedSlugs
-                .map((slug) => types.find((t) => t.type === slug))
-                .filter((t): t is MarketplaceSlideType => t !== undefined);
-            const unpinned = types.filter((t) => !pinSet.has(t.type));
-            return [...pinned, ...unpinned];
-        };
 
         it('should place pinned types at the beginning', () => {
             const result = sortWithPinned(allTypes, ['ranking', 'wordcloud']);
@@ -682,7 +499,6 @@ describe('Slide Type Marketplace / Registry', () => {
                 editorUrl: 'https://plugins.ahaslides.com/random-picker/editor',
             };
 
-            // Matches handleSelectMarketplaceSlideType in SlideTypeListV4.vue
             const slideItem = {
                 name: marketplaceItem.name,
                 type: marketplaceItem.type,
