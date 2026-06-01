@@ -32,22 +32,21 @@ The slide keeps rendering its in-canvas buttons. It additionally pushes a
 invoke an action by id. Until a host wires the new props, the calls are no-ops and
 behavior is unchanged.
 
-**Avoiding duplicate buttons — the child decides.** When the host both supports the
-contract and is presenting, it renders these actions in its own control bar; the
-slide must then hide its in-canvas copy. Rather than add a new host→slide signal,
-the slide makes this decision itself: it already receives `presentation.presenting`
-reactively (via the host's existing `updateProps` flow), and it can detect host
-capability from the mere presence of the `setActionButtons` function in `xprops`. So
-the hide rule is `!!setActionButtons && presentation.presenting`. In the editor (not
-presenting), or against an older host without the contract, the in-canvas buttons
-render as before. No new contract field is needed.
+**Avoiding duplicate buttons — the child decides, by capability alone.** When the
+host supports the contract it renders these actions in its own bar (center while
+presenting, a dedicated editor bar otherwise), so the slide must hide its in-canvas
+copy. Rather than add a new host→slide signal, the slide keys off the mere presence
+of the `setActionButtons` function in `xprops`: the hide rule is simply
+`!!setActionButtons`. Against an older host without the contract the prop is absent
+and the in-canvas buttons render as before.
 
-Caveat: the host only actually mounts its control bar when its new-control-bar
-feature flag (`AHA-41850-presenting-control-and-status-panels`) is on. The child
-keys off `presenting`, not that flag, so during the flag's rollout a presenting deck
-with the flag *off* would hide the in-canvas buttons while the host renders nothing.
-Acceptable because the flag is being rolled out to on; revisit only if the slide must
-support presenting with the old control bar.
+For this to be correct, the host must only *provide* `setActionButtons` when it can
+actually render the actions — i.e. when its new-control-bar feature flag
+(`AHA-41850-presenting-control-and-status-panels`) is on. The host gates the prop's
+provision on that flag, so its presence in `xprops` means exactly "the host will
+render these." A flag-off (or older) host omits the prop, and the slide falls back to
+its in-canvas buttons instead of hiding them with nowhere to go. No new contract
+field is needed, and the rule holds in both editor and presenting modes.
 
 ## Contract
 
@@ -92,10 +91,9 @@ Two new optional members on `SlidePluginProps` and matching entries in
 - Register `onActionInvoke?.(id => handlers[id]?.())` once on setup.
 - `onUnmounted(() => setActionButtons?.([]))` to clear the host toolbar when the
   slide unmounts.
-- Pull `presentationProps` from `usePresenterPlugin()` and add
-  `hostHandlesActions = computed(() => !!setActionButtons && !!presentationProps.value?.presenting)`.
-  Gate the in-canvas button container on `hasAnyActionButton && !hostHandlesActions`
-  so the slide hides its copy once the host renders them while presenting.
+- Add `hostHandlesActions = computed(() => !!setActionButtons)` and gate the
+  in-canvas button container on `hasAnyActionButton && !hostHandlesActions`, so the
+  slide hides its copy whenever the host supports (and therefore renders) the actions.
 
 ## Error handling / edge cases
 
