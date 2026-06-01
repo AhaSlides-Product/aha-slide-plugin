@@ -19,6 +19,12 @@ export interface PluginAction {
   variant?: 'primary' | 'default';
   /** Host-known icon key, if the host renders icons. */
   icon?: string;
+  /**
+   * Explicit SVG viewBox for the icon, e.g. "0 0 16 16". Lets the slide correct
+   * glyphs whose native viewBox is non-square (which the host would otherwise
+   * letterbox, pushing the ink off-centre). Ignored when `icon` is unset.
+   */
+  iconViewBox?: string;
   /** Whether the action is currently disabled. */
   disabled?: boolean;
   /** Whether the action is in a loading state. */
