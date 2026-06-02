@@ -169,9 +169,12 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   /**
    * Register a callback to be notified when the host invokes one of the actions
    * previously declared via `setActionButtons`.
-   * @param callback - Called with the invoked action's `id`.
+   * @param callback - Called with the invoked action's `id`. May be async; the
+   *   host does not await it (loading is driven declaratively via the action's
+   *   `loading` field), but allowing `Promise<void>` lets slides pass an async
+   *   handler without a type-only wrapper.
    */
-  onActionInvoke?: (callback: (actionId: string) => void) => void;
+  onActionInvoke?: (callback: (actionId: string) => void | Promise<void>) => void;
 }
 
 export type BroadcastActionResult<T extends (...args: any[]) => any> = {

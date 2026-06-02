@@ -91,9 +91,10 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
 
   /**
    * Register a callback invoked when the host triggers an action declared via
-   * `setActionButtons`. The callback receives the invoked action's `id`.
+   * `setActionButtons`. The callback receives the invoked action's `id` and may
+   * be async (the host does not await it).
    */
-  onActionInvoke: ((callback: (actionId: string) => void) => void) | undefined;
+  onActionInvoke: ((callback: (actionId: string) => void | Promise<void>) => void) | undefined;
 }
 
 /**
