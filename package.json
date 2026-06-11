@@ -8,7 +8,8 @@
     "apps/slide-plugin-by-ahasliders/*/*",
     "packages/*",
     "domains/*",
-    "tests"
+    "tests",
+    "!apps/ideaBoard/tests"
   ],
   "scripts": {
     "dev": "turbo run dev",
