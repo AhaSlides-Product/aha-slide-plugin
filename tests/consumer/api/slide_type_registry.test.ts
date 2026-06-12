@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
     ApiClient,
     SlideType,
@@ -10,6 +10,8 @@ import {
     parseMarketplaceResponse,
     resolveSlideSettings,
     resolveIframeUrl,
+    backfillTypeObj,
+    createSlideSelectionPayload,
 } from '@aha/api';
 import type { MarketplaceSlideType, NormalizedSlideType } from '@aha/api';
 
@@ -29,6 +31,10 @@ import type { MarketplaceSlideType, NormalizedSlideType } from '@aha/api';
 describe('Slide Type Marketplace / Registry', () => {
     beforeEach(() => {
         vi.stubGlobal('fetch', vi.fn());
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
     });
 
     // ─── Marketplace API response parsing ────────────────────────
@@ -314,37 +320,6 @@ describe('Slide Type Marketplace / Registry', () => {
         });
     });
 
-    // ─── Marketplace fetch with deduplication ────────────────────
-
-    describe('fetch deduplication', () => {
-        it('should not re-fetch if slideTypes are already loaded', async () => {
-            const state = { slideTypes: [{ type: 'quiz', name: 'Quiz' }], fetchPromise: null };
-
-            const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
-
-            expect(shouldFetch).toBe(false);
-        });
-
-        it('should reuse in-flight promise if fetch is already in progress', () => {
-            const existingPromise = Promise.resolve();
-            const state = { slideTypes: [] as MarketplaceSlideType[], fetchPromise: existingPromise };
-
-            const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
-            const shouldReusePromise = state.slideTypes.length === 0 && state.fetchPromise !== null;
-
-            expect(shouldFetch).toBe(false);
-            expect(shouldReusePromise).toBe(true);
-        });
-
-        it('should fetch when slideTypes is empty and no in-flight promise', () => {
-            const state = { slideTypes: [] as MarketplaceSlideType[], fetchPromise: null };
-
-            const shouldFetch = state.slideTypes.length === 0 && !state.fetchPromise;
-
-            expect(shouldFetch).toBe(true);
-        });
-    });
-
     // ─── typeObj backfilling on presentation slides ──────────────
 
     describe('typeObj backfilling', () => {
@@ -360,14 +335,7 @@ describe('Slide Type Marketplace / Registry', () => {
                 { type: 'duck-race', typeObj: undefined as any },
             ];
 
-            slides.forEach((slide) => {
-                if (slide.type && (!slide.typeObj || Object.keys(slide.typeObj).length === 0)) {
-                    const marketplaceSlide = marketplaceTypes.find((s) => s.type === slide.type);
-                    if (marketplaceSlide) {
-                        slide.typeObj = normalizeMarketplaceType(marketplaceSlide);
-                    }
-                }
-            });
+            backfillTypeObj(slides, marketplaceTypes);
 
             expect(slides[0].typeObj.source).toBe('fromMarket');
             expect(slides[0].typeObj.plugin).toBe(true);
@@ -386,16 +354,11 @@ describe('Slide Type Marketplace / Registry', () => {
                 { type: 'quiz', name: 'Marketplace Quiz' },
             ];
 
-            const slide = { type: 'quiz', typeObj: { name: 'Built-in Quiz', type: 'quiz' } };
+            const slides = [{ type: 'quiz', typeObj: { name: 'Built-in Quiz', type: 'quiz' } }];
 
-            if (slide.type && (!slide.typeObj || Object.keys(slide.typeObj).length === 0)) {
-                const marketplaceSlide = marketplaceTypes.find((s) => s.type === slide.type);
-                if (marketplaceSlide) {
-                    slide.typeObj = { ...normalizeMarketplaceType(marketplaceSlide) } as any;
-                }
-            }
+            backfillTypeObj(slides, marketplaceTypes);
 
-            expect(slide.typeObj.name).toBe('Built-in Quiz');
+            expect(slides[0].typeObj.name).toBe('Built-in Quiz');
         });
     });
 
@@ -499,11 +462,7 @@ describe('Slide Type Marketplace / Registry', () => {
                 editorUrl: 'https://plugins.ahaslides.com/random-picker/editor',
             };
 
-            const slideItem = {
-                name: marketplaceItem.name,
-                type: marketplaceItem.type,
-                plugin: true,
-            };
+            const slideItem = createSlideSelectionPayload(marketplaceItem);
 
             expect(slideItem.plugin).toBe(true);
             expect(slideItem.type).toBe('random-picker');
@@ -518,11 +477,7 @@ describe('Slide Type Marketplace / Registry', () => {
                 settingUrl: 'https://example.com/settings',
             };
 
-            const slideItem = {
-                name: marketplaceItem.name,
-                type: marketplaceItem.type,
-                plugin: true,
-            };
+            const slideItem = createSlideSelectionPayload(marketplaceItem);
 
             expect(slideItem).not.toHaveProperty('editorUrl');
             expect(slideItem).not.toHaveProperty('settingUrl');

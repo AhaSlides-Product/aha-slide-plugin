@@ -39,7 +39,7 @@ export interface NormalizedSlideType extends MarketplaceSlideType {
 
 // ─── Constants ───────────────────────────────────────────────────
 
-export const DEFAULT_SLIDE_SETTINGS: Required<Omit<MarketplaceSlideSettings, string> & Record<string, boolean>> = {
+export const DEFAULT_SLIDE_SETTINGS = {
     enableQuestionTitle: false,
     enableQuestionDescription: false,
     enableTimeLimit: false,
@@ -50,7 +50,18 @@ export const DEFAULT_SLIDE_SETTINGS: Required<Omit<MarketplaceSlideSettings, str
     enableLabelOtherSetting: false,
     enableMultipleSubmission: false,
     enableFullScreen: false,
-};
+} satisfies Required<Pick<MarketplaceSlideSettings,
+    | 'enableQuestionTitle'
+    | 'enableQuestionDescription'
+    | 'enableTimeLimit'
+    | 'enableStopSubmitssionSetting'
+    | 'enableHideResultSetting'
+    | 'enableQuestionImage'
+    | 'enableVoteCount'
+    | 'enableLabelOtherSetting'
+    | 'enableMultipleSubmission'
+    | 'enableFullScreen'
+>>;
 
 // ─── Normalization ───────────────────────────────────────────────
 
@@ -69,7 +80,7 @@ export function normalizeMarketplaceType(raw: MarketplaceSlideType): NormalizedS
  * Strips the "marketplace/" prefix from a slide type string.
  */
 export function stripMarketplacePrefix(type: string): string {
-    return type.replace('marketplace/', '');
+    return type.replace(/^marketplace\//, '');
 }
 
 /**
@@ -129,6 +140,8 @@ export function searchFilter(types: MarketplaceSlideType[], query: string): Mark
 
 /**
  * Filters slide types by category.
+ * NOTE: Unrecognized categories fall through to `return true` (returns all types).
+ * This matches the presenter app behavior where unknown categories are a no-op.
  */
 export function filterByCategory(types: MarketplaceSlideType[], category: string): MarketplaceSlideType[] {
     if (category === 'All') return types;
@@ -168,6 +181,44 @@ export function filterByCategory(types: MarketplaceSlideType[], category: string
 
         return true;
     });
+}
+
+// ─── Backfilling & payload helpers ────────────────────────────────
+
+export interface SlideWithTypeObj {
+    type: string;
+    typeObj: any;
+}
+
+/**
+ * Backfills typeObj on slides that have no typeObj (null/undefined/empty)
+ * by matching against marketplace slide types.
+ * Mutates slides in place.
+ */
+export function backfillTypeObj(
+    slides: SlideWithTypeObj[],
+    marketplaceTypes: MarketplaceSlideType[],
+): void {
+    slides.forEach((slide) => {
+        if (slide.type && (!slide.typeObj || Object.keys(slide.typeObj).length === 0)) {
+            const marketplaceSlide = marketplaceTypes.find((s) => s.type === slide.type);
+            if (marketplaceSlide) {
+                slide.typeObj = normalizeMarketplaceType(marketplaceSlide);
+            }
+        }
+    });
+}
+
+/**
+ * Creates a slide creation payload from a marketplace item.
+ * Only includes name, type, and plugin flag — excludes URLs and other metadata.
+ */
+export function createSlideSelectionPayload(item: MarketplaceSlideType): { name: string; type: string; plugin: true } {
+    return {
+        name: item.name,
+        type: item.type,
+        plugin: true,
+    };
 }
 
 // ─── Pinned ordering ─────────────────────────────────────────────

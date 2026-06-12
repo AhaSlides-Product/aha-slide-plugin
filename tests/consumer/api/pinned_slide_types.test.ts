@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 /**
  * Consumer tests for Pinned Slide Types API
@@ -51,6 +51,10 @@ describe('Pinned Slide Types API Contract', () => {
 
     beforeEach(() => {
         vi.stubGlobal('fetch', vi.fn());
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
     });
 
     // ─── GET pinned slide types ──────────────────────────────────
@@ -225,27 +229,4 @@ describe('Pinned Slide Types API Contract', () => {
         });
     });
 
-    // ─── Payload validation expectations ─────────────────────────
-
-    describe('payload validation (BE contract)', () => {
-        it('slugs must be an array of strings', () => {
-            const validPayload = { slugs: ['poll', 'quiz'] };
-
-            expect(Array.isArray(validPayload.slugs)).toBe(true);
-            validPayload.slugs.forEach((s) => expect(typeof s).toBe('string'));
-        });
-
-        it('slugs must have at least 1 item (min: 1)', () => {
-            const invalidPayload = { slugs: [] };
-            expect(invalidPayload.slugs.length).toBeLessThan(1);
-        });
-
-        it('slugs must have at most 30 items (max: maxPinnedTypes)', () => {
-            const tooMany = Array.from({ length: MAX_PINNED_TYPES + 1 }, (_, i) => `slug-${i}`);
-            expect(tooMany.length).toBeGreaterThan(MAX_PINNED_TYPES);
-
-            const valid = tooMany.slice(0, MAX_PINNED_TYPES);
-            expect(valid.length).toBe(MAX_PINNED_TYPES);
-        });
-    });
 });
