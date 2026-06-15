@@ -36,6 +36,10 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
   openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
   currentUserProps: Ref<Record<string, any> | undefined>;
+  /**
+   * List of audiences joined in the presentation.
+   */
+  audiences: Ref<Record<string, any> | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -106,9 +110,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
  */
 export function usePresenterPlugin(options: UseSlidePluginOptions = {}): PresenterPluginReturn {
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
+  const audiences = ref<Record<string, any> | undefined>((window as any).xprops?.audiences);
 
   const baseHook = useBaseSlidePlugin(options, (newProps) => {
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
+    if (newProps.audiences) audiences.value = { ...newProps.audiences };
   });
   const { xprops } = baseHook;
 
@@ -142,6 +148,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     presentationLighterColorPaletteProps: baseHook.presentationLighterColorPaletteProps,
     slideProps: baseHook.slideProps,
     currentUserProps,
+    audiences,
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,

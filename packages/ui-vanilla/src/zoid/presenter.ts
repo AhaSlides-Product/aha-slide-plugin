@@ -63,6 +63,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
     [key: string]: any;
   };
   /**
+   * List of audiences joined in the presentation.
+   * Maps participant/audience ID to audience details (e.g. name, emoji, team, online status, answers).
+   */
+  audiences?: Record<string, any>;
+  /**
    * Action to fetch all custom attributes for the current slide from the parent application.
    *
    * @param slideId - Optional override for the slide identifier.
@@ -211,6 +216,10 @@ export const presenterZoidProps = {
     required: false,
   },
   currentUser: {
+    type: 'object',
+    required: false,
+  },
+  audiences: {
     type: 'object',
     required: false,
   },

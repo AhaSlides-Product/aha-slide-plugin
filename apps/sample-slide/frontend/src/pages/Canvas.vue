@@ -41,6 +41,11 @@
       <pre class="code-block">{{ JSON.stringify(slideProps, null, 2) }}</pre>
     </div>
 
+    <div v-if="audiences" class="debug-section" data-testid="canvas-audiences">
+      <h3>Joined Audiences (this.$store.state.audiences)</h3>
+      <pre class="code-block">{{ JSON.stringify(audiences, null, 2) }}</pre>
+    </div>
+
     <div v-if="slideAttributes" class="debug-section" data-testid="canvas-slide-attributes">
       <h3>Slide Attributes</h3>
       <pre class="code-block">{{ JSON.stringify(slideAttributes, null, 2) }}</pre>
@@ -135,6 +140,7 @@ const {
   openPluginModal,
   showConfirmModal,
   allowPDFRender,
+  audiences,
 } = usePresenterPlugin();
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
