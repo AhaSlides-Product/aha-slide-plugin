@@ -130,6 +130,7 @@
             "enableLabelOtherSetting": { "type": "boolean" },
             "enableMultipleSubmission": { "type": "boolean" },
             "enableFullScreen": { "type": "boolean" },
+            "enableFullScreenFrame": { "type": "boolean" },
             "enableIframePreload": { "type": "boolean" }
           }
         }
