@@ -16,7 +16,10 @@ export type {
   SlidePluginProps,
   ConfirmModalPayload,
   BroadcastActionResult,
+  PluginAction,
 } from '@aha/ui-vanilla';
+
+import type { PluginAction } from '@aha/ui-vanilla';
 
 /**
  * PresenterSlidePluginIframe is a cross-domain component (zoid) that allows
@@ -79,6 +82,19 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Action to emit a broadcast action from the plugin iframe to the parent application.
    */
   emitBroadcastAction: ((key: string, args: any[]) => void) | undefined;
+
+  /**
+   * Declare the slide's current presenter action buttons to the host. Call whenever
+   * the available action set changes; pass an empty array to clear.
+   */
+  setActionButtons: ((actions: PluginAction[]) => void) | undefined;
+
+  /**
+   * Register a callback invoked when the host triggers an action declared via
+   * `setActionButtons`. The callback receives the invoked action's `id` and may
+   * be async (the host does not await it).
+   */
+  onActionInvoke: ((callback: (actionId: string) => void | Promise<void>) => void) | undefined;
 }
 
 /**
@@ -152,6 +168,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     allowPDFRender: xprops?.allowPDFRender,
     onSlideAttributesChanged: xprops?.onSlideAttributesChanged,
     emitBroadcastAction: xprops?.emitBroadcastAction,
+    setActionButtons: xprops?.setActionButtons,
+    onActionInvoke: xprops?.onActionInvoke,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
 }

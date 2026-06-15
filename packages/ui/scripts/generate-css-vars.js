@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { theme } from 'ant-design-vue';
-import antDesignTokens from '@aha/design';
+import antDesignTokens, { CustomColors } from '@aha/design';
+
+// Ant Design preset palette names — dropped from output (including shades like blue1..blue10)
+const PRESET_COLOR_RE = /^(blue|purple|cyan|green|magenta|pink|red|orange|yellow|volcano|geekblue|gold|lime)(-?\d+)?$/;
 
 // Get current directory (for ES modules)
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +22,10 @@ const { defaultAlgorithm, defaultSeed } = theme;
 const mapToken = defaultAlgorithm({ ...defaultSeed, ...ahaSlidesDefaultTheme.token });
 
 // 3. Convert them to CSS Variable format
-const cssVariables = Object.entries(mapToken)
+const cssVariables = [
+  ...Object.entries(mapToken).filter(([key]) => !PRESET_COLOR_RE.test(key)),
+  ...Object.entries(CustomColors),
+]
   .map(([key, value]) => {
     const name = `--aha-${key}`;
     const unit = typeof value === 'number' && !['zIndex', 'opacity', 'weight'].some(k => key.toLowerCase().includes(k)) ? 'px' : '';
