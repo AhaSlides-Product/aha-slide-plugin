@@ -1,8 +1,8 @@
-import type { AppPluginProps } from './app'
+import type { SlidePluginProps } from './presenter'
 
-function xprops(): AppPluginProps {
-  if (typeof window === 'undefined') return {} as AppPluginProps
-  return ((window as { xprops?: AppPluginProps }).xprops ?? {}) as AppPluginProps
+function xprops(): SlidePluginProps {
+  if (typeof window === 'undefined') return {} as SlidePluginProps
+  return ((window as { xprops?: SlidePluginProps }).xprops ?? {}) as SlidePluginProps
 }
 
 /**

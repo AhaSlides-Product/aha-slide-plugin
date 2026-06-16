@@ -5,7 +5,7 @@ import { sendThumbnail, registerThumbnailCaptureRequest } from '@aha/ui-vanilla'
 export interface ThumbnailCaptureOptions {
   /** Longest-edge pixel budget for the captured image. Default 320. */
   maxWidth?: number
-  /** Capture quality 0..1 (applies to lossy encodes). Default 0.9. */
+  /** Reserved for a future lossy (JPEG/WebP) encode path; currently unused by the PNG capture. */
   quality?: number
 }
 
@@ -21,7 +21,7 @@ export function useThumbnailCapture(
   node: Ref<HTMLElement | null>,
   options: ThumbnailCaptureOptions = {},
 ) {
-  const { maxWidth = 320, quality = 0.9 } = options
+  const { maxWidth = 320 } = options
 
   async function capture(): Promise<void> {
     const el = node.value
@@ -29,7 +29,7 @@ export function useThumbnailCapture(
     try {
       const rect = el.getBoundingClientRect()
       const pixelRatio = rect.width > 0 ? Math.min(1, maxWidth / rect.width) : 1
-      const dataUrl = await toPng(el, { pixelRatio, quality, cacheBust: true })
+      const dataUrl = await toPng(el, { pixelRatio, cacheBust: true })
       sendThumbnail(dataUrl)
     } catch {
       // Capture is best-effort; failures fall back to the icon. Never throw.

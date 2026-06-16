@@ -44,4 +44,24 @@ describe('useThumbnailCapture', () => {
     await expect(capture()).resolves.toBeUndefined()
     expect(sendThumbnail).not.toHaveBeenCalled()
   })
+
+  it('passes pixelRatio based on element width relative to maxWidth', async () => {
+    const el = document.createElement('div')
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
+      width: 640, height: 360,
+      top: 0, left: 0, right: 640, bottom: 360,
+      x: 0, y: 0,
+      toJSON: () => ({}),
+    })
+    const target = ref<HTMLElement | null>(el)
+    const { capture } = useThumbnailCapture(target, { maxWidth: 320 })
+    await capture()
+    expect(toPng).toHaveBeenCalledWith(el, expect.objectContaining({ pixelRatio: 0.5 }))
+  })
+
+  it('calls registerThumbnailCaptureRequest exactly once per useThumbnailCapture call', () => {
+    const target = ref<HTMLElement | null>(document.createElement('div'))
+    useThumbnailCapture(target)
+    expect(registerThumbnailCaptureRequest).toHaveBeenCalledTimes(1)
+  })
 })

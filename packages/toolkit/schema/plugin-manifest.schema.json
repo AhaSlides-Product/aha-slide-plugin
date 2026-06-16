@@ -146,7 +146,8 @@
             },
             "thumbnailUrl": {
               "type": "string",
-              "description": "Image shown in static mode. Required when mode = static."
+              "description": "Image shown in static mode. Required when mode = static.",
+              "minLength": 1
             }
           },
           "required": ["mode"],

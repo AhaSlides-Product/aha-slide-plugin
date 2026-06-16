@@ -235,6 +235,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    *   handler without a type-only wrapper.
    */
   onActionInvoke?: (callback: (actionId: string) => void | Promise<void>) => void;
+
+  /** Plugin → host: send a captured thumbnail data URL for this slide. */
+  setSlideThumbnail?: (dataUrl: string) => void;
+  /** Host → plugin: register a callback the host invokes before unmount to request a capture. */
+  onRequestThumbnailCapture?: (callback: () => void) => void;
 }
 
 export type BroadcastActionResult<T extends (...args: any[]) => any> = {
@@ -431,6 +436,14 @@ export const presenterZoidProps = {
    * @returns {Promise<void>} Resolves once the leaderboard slide has been created.
    */
   createLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  setSlideThumbnail: {
+    type: 'function',
+    required: false,
+  },
+  onRequestThumbnailCapture: {
     type: 'function',
     required: false,
   },
