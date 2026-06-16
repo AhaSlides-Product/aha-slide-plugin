@@ -22,7 +22,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && echo \"@aha/ui-vanilla: just run type check\"",
     "clean": "rm -rf dist *.tsbuildinfo",
-    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts"
+    "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
+    "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
