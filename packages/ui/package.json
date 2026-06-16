@@ -41,7 +41,7 @@
     "build:css": "postcss src/ahaslides-antd-extensions.css -o dist/assets/ahaslides-antd-extensions.css",
     "build:antd-css-vars": "node scripts/generate-css-vars.js",
     "docs": "typedoc --skipErrorChecking --plugin typedoc-plugin-markdown --out docs src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@ant-design/icons-vue": "^7.0.0",
@@ -69,6 +69,7 @@
   "dependencies": {
     "@aha/design": "*",
     "@aha/ui-vanilla": "*",
+    "html-to-image": "^1.11.13",
     "zoid": "^9.0.86"
   }
 }
