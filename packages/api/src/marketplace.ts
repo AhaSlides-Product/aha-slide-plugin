@@ -8,6 +8,14 @@
 
 // ─── Types ───────────────────────────────────────────────────────
 
+export type ThumbnailMode = 'icon' | 'static' | 'snapshot'
+
+export interface SlideTypeThumbnail {
+    mode: ThumbnailMode
+    /** Required when mode === 'static'. */
+    thumbnailUrl?: string
+}
+
 export interface MarketplaceSlideType {
     type: string;
     name: string;
@@ -16,6 +24,8 @@ export interface MarketplaceSlideType {
     editorUrl?: string;
     settingUrl?: string;
     setting?: MarketplaceSlideSettings;
+    /** Left-panel thumbnail configuration. Omitting defaults to icon mode. */
+    thumbnail?: SlideTypeThumbnail;
 }
 
 export interface MarketplaceSlideSettings {
