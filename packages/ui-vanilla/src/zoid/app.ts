@@ -24,10 +24,6 @@ export interface AppPluginProps extends SlidePluginProps {
     navType: 'push' | 'pop' | 'replace';
     fullScreen: boolean;
   }) => void;
-  /** Plugin → host: send a captured thumbnail data URL for this slide. */
-  setSlideThumbnail?: (dataUrl: string) => void;
-  /** Host → plugin: register a callback the host invokes before unmount to request a capture. */
-  onRequestThumbnailCapture?: (callback: () => void) => void;
 }
 
 /**

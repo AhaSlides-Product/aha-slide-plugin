@@ -59,3 +59,10 @@ test('thumbnail rejects unknown mode values', () => {
   m.slideTypes[0].thumbnail = { mode: 'unknown' };
   assert.equal(validate(m), false, 'unknown mode should fail');
 });
+
+test('thumbnail mode static rejects empty thumbnailUrl', () => {
+  const validate = ajv.compile(schema);
+  const m = structuredClone(base);
+  m.slideTypes[0].thumbnail = { mode: 'static', thumbnailUrl: '' };
+  assert.equal(validate(m), false, 'static with empty thumbnailUrl should fail');
+});
