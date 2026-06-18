@@ -137,6 +137,19 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   clearSlideData?: (slideId: string) => Promise<void>;
 
   /**
+   * Create a leaderboard slide immediately after the currently selected plugin slide.
+   *
+   * Behaves identically to the built-in pickAnswer leaderboard toggle: a new
+   * slide of type `'leaderboard'` is inserted right after the active slide,
+   * inheriting the presentation's current theme. If a leaderboard slide already
+   * follows the active slide, the host may choose to skip creation.
+   *
+   * @returns A promise that resolves once the leaderboard slide has been created
+   *   and inserted into the slide list.
+   */
+  createLeaderboardSlide?: () => Promise<void>;
+
+  /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender?: () => void;
@@ -344,6 +357,16 @@ export const presenterZoidProps = {
     required: false,
   },
   onActionInvoke: {
+    type: 'function',
+    required: false,
+  },
+  /**
+   * Create a leaderboard slide immediately after the currently selected plugin slide.
+   * Mirrors the pickAnswer leaderboard toggle behaviour.
+   * @type {function}
+   * @returns {Promise<void>} Resolves once the leaderboard slide has been created.
+   */
+  createLeaderboardSlide: {
     type: 'function',
     required: false,
   },
