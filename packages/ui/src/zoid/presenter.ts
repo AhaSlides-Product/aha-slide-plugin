@@ -72,6 +72,18 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   clearSlideData: ((slideId: string) => Promise<void>) | undefined;
 
   /**
+   * Create a leaderboard slide immediately after the currently selected plugin slide.
+   *
+   * Behaves identically to the built-in pickAnswer leaderboard toggle: a new
+   * slide of type `'leaderboard'` is inserted right after the active slide,
+   * inheriting the presentation's current theme.
+   *
+   * @returns A promise that resolves once the leaderboard slide has been created
+   *   and inserted into the slide list.
+   */
+  createLeaderboardSlide: (() => Promise<void>) | undefined;
+
+  /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender: (() => void) | undefined;
@@ -177,6 +189,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     emitBroadcastAction: xprops?.emitBroadcastAction,
     setActionButtons: xprops?.setActionButtons,
     onActionInvoke: xprops?.onActionInvoke,
+    createLeaderboardSlide: xprops?.createLeaderboardSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
 }

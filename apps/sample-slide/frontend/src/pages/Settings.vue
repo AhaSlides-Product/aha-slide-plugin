@@ -115,6 +115,10 @@
       <div style="margin-top: 10px;">
         <a-button type="danger" @click="onClearSlideData">Clear Slide Data</a-button>
       </div>
+
+      <div style="margin-top: 10px;">
+        <a-button type="primary" data-testid="settings-create-leaderboard-btn" @click="handleCreateLeaderboard">Create Leaderboard Slide</a-button>
+      </div>
     </div>
   </div>
 </template>
@@ -135,6 +139,7 @@ const {
   showConfirmModal, 
   clearSlideData,
   trackGA4AndMixpanel,
+  createLeaderboardSlide,
  } = usePresenterPlugin({ autoHeight: true });
 const slideId = computed(() => slideProps.value?.id);
 const slideGreeting = useSync(computed(() => `greeting-${slideId.value}`), '');
@@ -252,6 +257,15 @@ watch(showSlideAttributes, async () => {
   await nextTick();
   reportHeight();
 });
+
+const handleCreateLeaderboard = async () => {
+  try {
+    await createLeaderboardSlide?.();
+    showToastSuccess?.('Leaderboard slide created', 'leaderboard-created');
+  } catch (error) {
+    showToastError?.('Failed to create leaderboard slide', 'leaderboard-error');
+  }
+};
 
 const onClearSlideData = async () => {
   const confirm = await showConfirmModal?.({
