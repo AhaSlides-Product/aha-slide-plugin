@@ -1,5 +1,6 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
 import type { ImageUploadResult } from '../image';
+import type { AudioUploadResult } from '../audio';
 import type { BaseSlidePluginProps, PluginKeyboardEvent } from './base';
 
 /**
@@ -81,6 +82,13 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @returns A promise resolving when the update is complete.
    */
   uploadImage: () => Promise<ImageUploadResult>;
+  /**
+   * Action to open the host's audio upload modal and return the chosen audio.
+   * Lets a plugin reuse the presenter's audio uploader for audio slide content.
+   *
+   * @returns A promise resolving to the uploaded audio's URL and file name.
+   */
+  openUploadAudioModal?: () => Promise<AudioUploadResult>;
   /**
    * Callback function to subscribe to keyboard events from the parent application.
    *
@@ -278,6 +286,12 @@ export const presenterZoidProps = {
     required: false,
   },
   openEditImageModal: {
+    type: 'function',
+    required: false,
+  },
+  // Host-side audio picker modal. Declared here so Zoid forwards it to the
+  // plugin iframe (Zoid silently drops any prop missing from this schema).
+  openUploadAudioModal: {
     type: 'function',
     required: false,
   },
