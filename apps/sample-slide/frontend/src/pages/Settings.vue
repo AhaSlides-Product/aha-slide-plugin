@@ -117,7 +117,7 @@
       </div>
 
       <div style="margin-top: 10px;">
-        <a-button type="primary" @click="handleCreateLeaderboard">Create Leaderboard Slide</a-button>
+        <a-button type="primary" data-testid="settings-create-leaderboard-btn" @click="handleCreateLeaderboard">Create Leaderboard Slide</a-button>
       </div>
     </div>
   </div>
