@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue';
 import { ImageUploadResult } from '../image';
+import { AudioUploadResult } from '../audio';
 import {
   useBaseSlidePlugin,
   type BaseSlidePluginReturn,
@@ -35,6 +36,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   uploadImage: ((file: File) => Promise<ImageUploadResult>) | undefined;
   openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
   openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
+  /**
+   * Open the host's audio upload modal and resolve with the chosen audio.
+   * Mirrors openUploadImageModal for audio slide content.
+   */
+  openUploadAudioModal: (() => Promise<AudioUploadResult>) | undefined;
   currentUserProps: Ref<Record<string, any> | undefined>;
   /**
    * List of audiences joined in the presentation.
@@ -153,6 +159,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
   const emitKeyboardEvent = xprops?.emitKeyboardEvent;
   const openUploadImageModal = xprops?.openUploadImageModal;
   const openEditImageModal = xprops?.openEditImageModal;
+  const openUploadAudioModal = xprops?.openUploadAudioModal;
 
   return {
     presentationProps: baseHook.presentationProps,
@@ -172,6 +179,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     emitKeyboardEvent,
     openUploadImageModal,
     openEditImageModal,
+    openUploadAudioModal,
     showToastInfo: xprops?.showToastInfo,
     showToastSuccess: xprops?.showToastSuccess,
     showToastError: xprops?.showToastError,
