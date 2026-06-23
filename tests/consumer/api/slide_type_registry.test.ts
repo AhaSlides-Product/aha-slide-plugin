@@ -430,7 +430,7 @@ describe('Slide Type Marketplace / Registry', () => {
             vi.mocked(fetch).mockResolvedValue({
                 ok: true,
                 status: 200,
-                json: () => Promise.resolve({ id: 'sub-1' }),
+                text: () => Promise.resolve(JSON.stringify({ id: 'sub-1' })),
             } as Response);
 
             const payload = {

@@ -15,7 +15,7 @@ describe('@aha/api - ApiClient', () => {
         vi.mocked(fetch).mockResolvedValue({
             ok: true,
             status: 200,
-            json: () => Promise.resolve({ success: true }),
+            text: () => Promise.resolve(JSON.stringify({ success: true })),
         } as Response);
 
         await client.fetchUrl(`${baseUrl}/test`);
@@ -41,7 +41,7 @@ describe('@aha/api - ApiClient', () => {
         vi.mocked(fetch).mockResolvedValue({
             ok: true,
             status: 200,
-            json: () => Promise.resolve({ id: 'sub-1' }),
+            text: () => Promise.resolve(JSON.stringify({ id: 'sub-1' })),
         } as Response);
 
         const result = await client.sendLiveSubmission(SlideType.SampleSlide, payload);
@@ -76,7 +76,7 @@ describe('@aha/api - ApiClient', () => {
         vi.mocked(fetch).mockResolvedValue({
             ok: true,
             status: 200,
-            json: () => Promise.resolve([{ id: '1' }, { id: '2' }]),
+            text: () => Promise.resolve(JSON.stringify([{ id: '1' }, { id: '2' }])),
         } as Response);
 
         const results = await client.getSubmissions({ slideId: 10, slideVersion: 2, type: 'test' }, { limit: 10, offset: 5 });
@@ -90,7 +90,7 @@ describe('@aha/api - ApiClient', () => {
         vi.mocked(fetch).mockResolvedValue({
             ok: true,
             status: 200,
-            json: () => Promise.resolve([]),
+            text: () => Promise.resolve(JSON.stringify([])),
         } as Response);
 
         await client.getParticipantSubmissions({ audienceId: 'aud-1', slideId: 101 }, { limit: 5 });
