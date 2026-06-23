@@ -31,7 +31,8 @@ export type StreakAction = "COUNT" | "NOT_COUNT" | "BREAK";
 
 /** A single scored answer result. */
 export interface AnswerResultPayload extends BaseAnswerScope {
-  /** Must be UUID. Defaults to `null` on the backend when omitted, e.g. bonus score doens't need to reference an answer. */
+  resultId: string;
+  /** Defaults to `""` on the backend when omitted, e.g. bonus score doens't need to reference an answer. */
   answerId?: string;
   /** Defaults to `0` on the backend when omitted. */
   points?: number;
@@ -48,7 +49,6 @@ export interface AnswerResultPayload extends BaseAnswerScope {
 }
 
 export interface AnswerResponse {
-  /** Must be UUID. */
   answerId: string;
   results: AnswerResultPayload[];
 }
