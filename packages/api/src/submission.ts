@@ -1,5 +1,10 @@
 import { SlideType } from "./slideType";
 import { SubmissionPayload } from "@aha/common";
+import {
+  AnswerRequest,
+  AnswerResultRequest,
+  ResetResultRequest,
+} from "./answer";
 export { SubmissionPayload } from "@aha/common";
 export class ApiClient {
   private baseUrl: string;
@@ -24,7 +29,15 @@ export class ApiClient {
       throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
     }
 
-    return [202, 204].includes(response.status) ? undefined : response.json();
+    if ([202, 204].includes(response.status)) {
+      return undefined;
+    }
+
+    // Some endpoints (e.g. liveproxy answer results) reply 200 with an empty
+    // body, which would make response.json() throw. Parse only when there is
+    // a body to parse.
+    const text = await response.text();
+    return text ? JSON.parse(text) : undefined;
   }
 
   /**
@@ -116,5 +129,49 @@ export class ApiClient {
     const url = `${this.baseUrl}/api/audiences/${audienceId}/submissions?${params.toString()}`;
     const result = await this.fetchUrl(url);
     return result || [];
+  }
+
+  /**
+   * Submit a scored answer to liveproxy (CreateAnswerV3). The proxy forwards
+   * the answer upstream and returns the resulting scored answer payloads.
+   * @param payload answer scope plus the slide-type-specific `data`
+   * @returns the scored answer results
+   */
+  async createAnswer<T>(payload: AnswerRequest<T>): Promise<AnswerResultRequest> {
+    const url = `${this.baseUrl}/api/live/answers`;
+
+    return this.fetchUrl(url, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /**
+   * Persist scored answer results in liveproxy (CreateAnswerResult).
+   * Requires an authenticated (JWT) client.
+   * @param payload the answer results to persist
+   */
+  async createAnswerResults(payload: AnswerResultRequest): Promise<void> {
+    const url = `${this.baseUrl}/api/live/answers/results`;
+
+    return this.fetchUrl(url, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /**
+   * Reset (delete) previously persisted answer results in liveproxy
+   * (ResetResult). Requires an authenticated (JWT) client. Narrow the scope
+   * with the optional `activityId` / `subActivityId` / `answerId` fields.
+   * @param payload the scope of the results to reset
+   */
+  async resetAnswerResult(payload: ResetResultRequest): Promise<void> {
+    const url = `${this.baseUrl}/api/live/answers/results`;
+
+    return this.fetchUrl(url, {
+      method: "DELETE",
+      body: JSON.stringify(payload),
+    });
   }
 }
