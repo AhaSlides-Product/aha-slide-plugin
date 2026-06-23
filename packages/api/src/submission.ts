@@ -151,7 +151,7 @@ export class ApiClient {
    * Requires an authenticated (JWT) client.
    * @param payload the answer results to persist
    */
-  async createAnswerResult(payload: AnswerResultRequest): Promise<void> {
+  async createAnswerResults(payload: AnswerResultRequest): Promise<void> {
     const url = `${this.baseUrl}/api/live/answers/results`;
 
     return this.fetchUrl(url, {
