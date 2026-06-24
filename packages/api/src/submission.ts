@@ -151,18 +151,13 @@ export class ApiClient {
   /**
    * Submit a scored answer to liveproxy (CreateAnswerV3). The proxy forwards
    * the answer upstream and returns the resulting scored answer payloads.
+   * @param slideType slide type, sent as the `slide_type` query param
    * @param payload answer scope plus the slide-type-specific `data`
    * @returns the scored answer results
    */
-  async createAnswer<T>(payload: AnswerRequest<T>): Promise<AnswerResultRequest> {
-    const url = `${this.baseUrl}/api/live/answers`;
-    let body = this.withTimestamp(payload);
-
-    // Tag the slide-type-specific payload with a client-generated id so the
-    // backend can dedupe / correlate this submission.
-    if (body.data && typeof body.data === "object") {
-      body = { ...body, data: { clientId: crypto.randomUUID(), ...body.data } };
-    }
+  async createAnswer<T>(slideType: string, payload: AnswerRequest<T>): Promise<AnswerResultRequest> {
+    const url = `${this.baseUrl}/api/live/answers?slide_type=${slideType}`;
+    const body = this.withTimestamp(payload);
 
     this.logFn?.(`createAnswer: ${JSON.stringify(body)}`);
 
