@@ -1,13 +1,19 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { SubmissionPayload } from '@aha/common';
+import { AnswerRequest } from '@aha/api';
 
 type SubmissionUpsert = SubmissionPayload & { slideType: string }
 type Submission = SubmissionUpsert & { id: number }
 
+type AnswerUpsert = AnswerRequest & { slideType: string }
+type Answer = AnswerUpsert & { id: number }
+
 const DB_NAME = 'AhaSlides';
 const STORE_NAME = 'submissions';
-const DB_VERSION = 1;
+const ANSWER_STORE_NAME = 'answers';
+const DB_VERSION = 2;
 const slideIdSlideVersionAudienceIdIndex = 'slideId-slideVersion-audienceId';
+const slideIdSlideVersionParticipantIdIndex = 'slideId-slideVersion-participantId';
 
 interface AhaDB extends DBSchema {
   [STORE_NAME]: {
@@ -15,6 +21,13 @@ interface AhaDB extends DBSchema {
     value: Submission;
     indexes: {
       [slideIdSlideVersionAudienceIdIndex]: [number, number, string];
+    };
+  };
+  [ANSWER_STORE_NAME]: {
+    key: number;
+    value: Answer;
+    indexes: {
+      [slideIdSlideVersionParticipantIdIndex]: [string, number, string];
     };
   };
 }
@@ -32,6 +45,13 @@ function getDB() {
           autoIncrement: true,
         });
         store.createIndex(slideIdSlideVersionAudienceIdIndex, ['slideId', 'slideVersion', 'senderId']);
+      }
+      if (oldVersion < 2) {
+        const store = db.createObjectStore(ANSWER_STORE_NAME, {
+          keyPath: 'id',
+          autoIncrement: true,
+        });
+        store.createIndex(slideIdSlideVersionParticipantIdIndex, ['slideId', 'slideVersion', 'participantId']);
       }
     },
     blocked() {
@@ -72,5 +92,20 @@ export async function getSubmissions({ slideId, slideVersion, senderId }: { slid
 export async function deleteSubmission(id: number): Promise<void> {
   const db = await getDB();
   await db.delete(STORE_NAME, id);
+}
+
+export async function saveAnswer(answer: AnswerUpsert): Promise<number> {
+  const db = await getDB();
+  return db.put(ANSWER_STORE_NAME, answer as any);
+}
+
+export async function getAnswers({ slideId, slideVersion, participantId }: { slideId: string, slideVersion: number, participantId: string }): Promise<Answer[]> {
+  const db = await getDB();
+  return db.getAllFromIndex(ANSWER_STORE_NAME, slideIdSlideVersionParticipantIdIndex, [slideId, slideVersion, participantId]);
+}
+
+export async function deleteAnswer(id: number): Promise<void> {
+  const db = await getDB();
+  await db.delete(ANSWER_STORE_NAME, id);
 }
 

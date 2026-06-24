@@ -8,7 +8,8 @@
 
 /** Scope fields shared by every answer request and result. */
 export interface BaseAnswerScope {
-  timestamp: number;
+  /** Auto-filled with `Date.now()` before sending when omitted. */
+  timestamp?: number;
   presentationId: string;
   presentationVersion: number;
   teamId?: string;
@@ -60,6 +61,47 @@ export interface AnswerResponse {
  */
 export interface AnswerResultRequest {
   results: AnswerResultPayload[];
+}
+
+/** Supported leaderboard aggregation functions. */
+export type LeaderboardAgg = "total_score";
+
+/**
+ * Query params shared by the leaderboard endpoints
+ * (`GET /api/aha-sync/answers/leaderboards/*`). Adds `scoreChannel` and `agg`
+ * on top of the common answer scope.
+ */
+export interface LeaderboardQuery extends BaseAnswerScope {
+  /** Which score bucket to read, e.g. in-game vs final leaderboard. */
+  scoreChannel?: string;
+  /** Aggregation function. Defaults to `total_score`. */
+  agg?: LeaderboardAgg;
+}
+
+/** Query params for `GET /api/aha-sync/answers/leaderboards/topn`. */
+export interface GetLeaderboardTopNRequest extends LeaderboardQuery {
+  /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
+  n?: number;
+}
+
+/** Query params for `GET /api/aha-sync/answers/leaderboards/around`. */
+export interface GetLeaderboardAroundRequest extends LeaderboardQuery {
+  /** Entries to include above/below the participant. Defaults to `10`, range `[0, 100]`. */
+  k?: number;
+}
+
+/** A single leaderboard entry. */
+export interface LeaderboardItem {
+  id: string;
+  score: number;
+  rank: number;
+  name: string;
+  emoji: string;
+}
+
+/** Response body for the leaderboard endpoints. */
+export interface LeaderboardResponse {
+  items: LeaderboardItem[];
 }
 
 /** Request body for `DELETE /api/live/answers/results` (ResetResult). */

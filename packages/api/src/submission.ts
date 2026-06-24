@@ -3,6 +3,10 @@ import { SubmissionPayload } from "@aha/common";
 import {
   AnswerRequest,
   AnswerResultRequest,
+  GetLeaderboardAroundRequest,
+  GetLeaderboardTopNRequest,
+  LeaderboardQuery,
+  LeaderboardResponse,
   ResetResultRequest,
 } from "./answer";
 export { SubmissionPayload } from "@aha/common";
@@ -11,12 +15,23 @@ export class ApiClient {
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
+  private logFn?: (message: string) => void;
 
-  constructor(baseUrl: string, accessToken?: string) {
+  constructor(
+    baseUrl: string,
+    accessToken?: string,
+    options: { logFn?: (message: string) => void } = {},
+  ) {
     this.baseUrl = baseUrl;
     if (accessToken) {
       this.headers["Authorization"] = `Bearer ${accessToken}`;
     }
+    this.logFn = options.logFn;
+  }
+
+  /** Fill in `timestamp` with the current time when the caller omitted it. */
+  private withTimestamp<T extends { timestamp?: number }>(scope: T): T {
+    return scope.timestamp == null ? { ...scope, timestamp: Date.now() } : scope;
   }
 
   async fetchUrl(url: string, options?: RequestInit): Promise<any> {
@@ -48,6 +63,8 @@ export class ApiClient {
    */
   async sendLiveSubmission<T>(slideType: SlideType, payload: SubmissionPayload<T>): Promise<Response> {
     const url = `${this.baseUrl}/api/live/submissions?slide_type=${slideType}`;
+
+    this.logFn?.(`sendLiveSubmission ${slideType}: ${JSON.stringify(payload)}`);
 
     return this.fetchUrl(url, {
       method: "POST",
@@ -139,10 +156,19 @@ export class ApiClient {
    */
   async createAnswer<T>(payload: AnswerRequest<T>): Promise<AnswerResultRequest> {
     const url = `${this.baseUrl}/api/live/answers`;
+    let body = this.withTimestamp(payload);
+
+    // Tag the slide-type-specific payload with a client-generated id so the
+    // backend can dedupe / correlate this submission.
+    if (body.data && typeof body.data === "object") {
+      body = { ...body, data: { clientId: crypto.randomUUID(), ...body.data } };
+    }
+
+    this.logFn?.(`createAnswer: ${JSON.stringify(body)}`);
 
     return this.fetchUrl(url, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     });
   }
 
@@ -156,8 +182,55 @@ export class ApiClient {
 
     return this.fetchUrl(url, {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        results: payload.results.map((result) => this.withTimestamp(result)),
+      }),
     });
+  }
+
+  /** Build the shared leaderboard query string from an answer scope. */
+  private toLeaderboardParams(scope: LeaderboardQuery): URLSearchParams {
+    const params = new URLSearchParams();
+    params.append("presentationId", scope.presentationId);
+    params.append("presentationVersion", scope.presentationVersion.toString());
+    if (scope.teamId) params.append("teamId", scope.teamId);
+    if (scope.participantId) params.append("participantId", scope.participantId);
+    if (scope.slideId) params.append("slideId", scope.slideId);
+    if (scope.slideVersion !== undefined) params.append("slideVersion", scope.slideVersion.toString());
+    if (scope.questionId) params.append("questionId", scope.questionId);
+    if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
+    if (scope.agg) params.append("agg", scope.agg);
+    return params;
+  }
+
+  /**
+   * Fetch the top-N leaderboard from aha-sync
+   * (`GET /api/aha-sync/answers/leaderboards/topn`).
+   * @param request answer scope plus optional `agg` and `n`
+   * @returns the ranked leaderboard entries
+   */
+  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
+    const { n, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    if (n !== undefined) params.append("n", n.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/topn?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch the leaderboard slice around a participant from aha-sync
+   * (`GET /api/aha-sync/answers/leaderboards/around`).
+   * @param request answer scope plus optional `agg` and `k`
+   * @returns the ranked leaderboard entries around the participant
+   */
+  async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
+    const { k, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    if (k !== undefined) params.append("k", k.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/around?${params.toString()}`;
+    return this.fetchUrl(url);
   }
 
   /**
