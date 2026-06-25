@@ -66,14 +66,24 @@ export interface AnswerResultRequest {
 /** Supported leaderboard aggregation functions. */
 export type LeaderboardAgg = "total_score";
 
+/** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
+export type LeaderboardSubject = "participant" | "team";
+
 /**
  * Query params shared by the leaderboard endpoints
- * (`GET /api/aha-sync/answers/leaderboards/*`). Adds `scoreChannel` and `agg`
- * on top of the common answer scope.
+ * (`GET /api/aha-sync/answers/leaderboards/*`). Mirrors aha-sync's
+ * `BaseAnswerScope` plus `agg`; note this scope is intentionally narrower than
+ * the liveproxy {@link BaseAnswerScope} (no `teamId`/`participantId`/`questionId`).
  */
-export interface LeaderboardQuery extends BaseAnswerScope {
+export interface LeaderboardQuery {
+  presentationId: string;
+  presentationVersion: number;
+  slideId?: string;
+  slideVersion?: number;
   /** Which score bucket to read, e.g. in-game vs final leaderboard. */
   scoreChannel?: string;
+  /** Whether the leaderboard ranks participants or teams. Defaults to `participant`. */
+  subject?: LeaderboardSubject;
   /** Aggregation function. Defaults to `total_score`. */
   agg?: LeaderboardAgg;
 }
@@ -86,7 +96,9 @@ export interface GetLeaderboardTopNRequest extends LeaderboardQuery {
 
 /** Query params for `GET /api/aha-sync/answers/leaderboards/around`. */
 export interface GetLeaderboardAroundRequest extends LeaderboardQuery {
-  /** Entries to include above/below the participant. Defaults to `10`, range `[0, 100]`. */
+  /** Id of the subject (participant or team) to center the slice on. Required. */
+  subjectId: string;
+  /** Entries to include above/below the subject. Defaults to `10`, range `[0, 100]`. */
   k?: number;
 }
 

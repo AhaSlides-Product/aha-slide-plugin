@@ -188,12 +188,10 @@ export class ApiClient {
     const params = new URLSearchParams();
     params.append("presentationId", scope.presentationId);
     params.append("presentationVersion", scope.presentationVersion.toString());
-    if (scope.teamId) params.append("teamId", scope.teamId);
-    if (scope.participantId) params.append("participantId", scope.participantId);
     if (scope.slideId) params.append("slideId", scope.slideId);
     if (scope.slideVersion !== undefined) params.append("slideVersion", scope.slideVersion.toString());
-    if (scope.questionId) params.append("questionId", scope.questionId);
     if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
+    if (scope.subject) params.append("subject", scope.subject);
     if (scope.agg) params.append("agg", scope.agg);
     return params;
   }
@@ -214,14 +212,15 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the leaderboard slice around a participant from aha-sync
+   * Fetch the leaderboard slice around a subject from aha-sync
    * (`GET /api/aha-sync/answers/leaderboards/around`).
-   * @param request answer scope plus optional `agg` and `k`
-   * @returns the ranked leaderboard entries around the participant
+   * @param request answer scope plus the required `subjectId` and optional `agg` and `k`
+   * @returns the ranked leaderboard entries around the subject
    */
   async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
-    const { k, ...scope } = request;
+    const { k, subjectId, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
+    params.append("subjectId", subjectId);
     if (k !== undefined) params.append("k", k.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/around?${params.toString()}`;

@@ -1,6 +1,6 @@
 {
   "name": "@aha/db",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Indexeddb wrapper for slide plugin",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

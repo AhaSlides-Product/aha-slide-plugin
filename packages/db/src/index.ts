@@ -32,6 +32,20 @@ interface AhaDB extends DBSchema {
   };
 }
 
+/**
+ * Returns a structured-clone-safe plain copy of a value.
+ *
+ * Slides build their payloads from Vue reactive state, and reactive Proxies
+ * (arrays especially) cannot be handled by IndexedDB's structured-clone-based
+ * `put`, which throws `DataCloneError: [object Array] could not be cloned`.
+ * These payloads are plain JSON DTOs (the same shape sent to the API), so a
+ * JSON round-trip both detaches the value and strips any reactivity Proxy,
+ * without coupling this package to any UI framework.
+ */
+function toStorable<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value));
+}
+
 let dbPromise: Promise<IDBPDatabase<AhaDB>> | null = null;
 
 function getDB() {
@@ -81,7 +95,7 @@ function getDB() {
 
 export async function saveSubmission(submission: SubmissionUpsert): Promise<number> {
   const db = await getDB();
-  return db.put(STORE_NAME, submission as any);
+  return db.put(STORE_NAME, toStorable(submission) as any);
 }
 
 export async function getSubmissions({ slideId, slideVersion, senderId }: { slideId: number, slideVersion: number, senderId: string }): Promise<Submission[]> {
@@ -96,7 +110,7 @@ export async function deleteSubmission(id: number): Promise<void> {
 
 export async function saveAnswer(answer: AnswerUpsert): Promise<number> {
   const db = await getDB();
-  return db.put(ANSWER_STORE_NAME, answer as any);
+  return db.put(ANSWER_STORE_NAME, toStorable(answer) as any);
 }
 
 export async function getAnswers({ slideId, slideVersion, participantId }: { slideId: string, slideVersion: number, participantId: string }): Promise<Answer[]> {

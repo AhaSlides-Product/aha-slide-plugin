@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { saveSubmission, getSubmissions, deleteSubmission } from '@aha/db';
+import { saveSubmission, getSubmissions, deleteSubmission, saveAnswer } from '@aha/db';
 import { openDB } from 'idb';
+import { reactive } from 'vue';
 
 // Mock idb
 vi.mock('idb', () => ({
@@ -69,6 +70,55 @@ describe('@aha/db - Database Utilities', () => {
         await deleteSubmission(999);
 
         expect(mockDb.delete).toHaveBeenCalledWith('submissions', 999);
+    });
+
+    it('should store a structured-clone-safe (non-reactive) copy of an answer', async () => {
+        // Reproduces the audience "DataCloneError: [object Array] could not be cloned"
+        // bug: slides build answer payloads from Vue reactive state, and reactive
+        // Proxies (especially arrays) cannot be structured-cloned by IndexedDB's put().
+        const answer = reactive({
+            slideId: 'slide-1',
+            slideVersion: 1,
+            participantId: 'p-1',
+            slideType: 'fill-in-the-blanks',
+            scope: { answers: ['cat', 'dog'] },
+        });
+
+        mockDb.put.mockResolvedValue(7);
+        const id = await saveAnswer(answer as any);
+
+        expect(id).toBe(7);
+        expect(mockDb.put).toHaveBeenCalledTimes(1);
+        const stored = mockDb.put.mock.calls[0][1];
+        // The value handed to IndexedDB must survive structured cloning.
+        expect(() => structuredClone(stored)).not.toThrow();
+        // And it must be a detached copy, not the live reactive object.
+        expect(stored).toEqual({
+            slideId: 'slide-1',
+            slideVersion: 1,
+            participantId: 'p-1',
+            slideType: 'fill-in-the-blanks',
+            scope: { answers: ['cat', 'dog'] },
+        });
+    });
+
+    it('should store a structured-clone-safe copy of a submission', async () => {
+        const submission = reactive({
+            presentationId: 1,
+            slideId: 2,
+            slideVersion: 1,
+            slideType: 'multiple-choice',
+            senderId: 'user-1',
+            senderType: 'audience' as any,
+            type: 'test',
+            attributes: { choices: ['a', 'b'] },
+        });
+
+        mockDb.put.mockResolvedValue(8);
+        await saveSubmission(submission as any);
+
+        const stored = mockDb.put.mock.calls[0][1];
+        expect(() => structuredClone(stored)).not.toThrow();
     });
 
     it('should reuse the database connection', async () => {
