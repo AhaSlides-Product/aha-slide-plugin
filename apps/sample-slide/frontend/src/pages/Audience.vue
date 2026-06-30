@@ -16,6 +16,45 @@
       </div>
     </div>
 
+    <!-- Join Game Demo — uses the host-provided `teams` list + `joinGame` action -->
+    <div class="join-section" v-if="joinGame">
+      <h3>Join Game</h3>
+      <div class="join-controls">
+        <a-input
+          v-model:value="joinName"
+          placeholder="Your name"
+          style="width: 240px"
+          data-testid="audience-join-name-input"
+        />
+        <a-input
+          v-model:value="joinEmoji"
+          placeholder="Emoji (optional)"
+          style="width: 120px"
+          data-testid="audience-join-emoji-input"
+        />
+        <a-select
+          v-if="teams && teams.length"
+          v-model:value="selectedTeamId"
+          placeholder="Pick your team"
+          style="width: 240px"
+          data-testid="audience-join-team-select"
+        >
+          <a-select-option v-for="team in teams" :key="team.id" :value="team.id">
+            {{ team.name }}
+          </a-select-option>
+        </a-select>
+        <a-button
+          type="primary"
+          :loading="joining"
+          @click="handleJoinGame"
+          data-testid="audience-join-game-button"
+        >
+          Join Game
+        </a-button>
+        <p v-if="audienceTeam"><b>Joined team:</b> {{ audienceTeam }}</p>
+      </div>
+    </div>
+
     <!-- Progress Bar Demo -->
     <div class="progress-section" v-if="timeLimit !== null">
       <h3>Slide Timer (Sync from Parent)</h3>
@@ -147,12 +186,15 @@ const {
   baseUrl,
   uploadImage,
   showToastSuccess,
+  showToastError,
   updateAudienceData,
   openPluginModal,
   onSubmitButtonHeightChange,
   timeLimit,
   scrollTo,
   getWindowHeight,
+  teams,
+  joinGame,
 } = useAudiencePlugin();
 
 const timerWidth = computed(() => {
@@ -262,6 +304,40 @@ const handleShowToast = () => {
     showToastSuccess('This is a test toast from sample plugin!', 'test-toast');
   } else {
     console.warn('showToastSuccess function not available');
+  }
+};
+
+const joinName = ref('');
+const joinEmoji = ref('');
+const selectedTeamId = ref<string | number | undefined>(undefined);
+const joining = ref(false);
+
+/**
+ * Demonstrates the host-provided `joinGame` capability: collect a name/emoji
+ * and (when team play is on) a team picked from the host `teams` list, then
+ * join. The host validates and resolves with the outcome.
+ */
+const handleJoinGame = async () => {
+  if (!joinGame) {
+    console.warn('joinGame function not available');
+    return;
+  }
+  joining.value = true;
+  try {
+    const result = await joinGame({
+      audienceName: joinName.value,
+      audienceEmoji: joinEmoji.value || undefined,
+      teamId: selectedTeamId.value,
+    });
+    if (result.success) {
+      showToastSuccess?.('Joined the game!');
+    } else {
+      showToastError?.(`Could not join: ${result.error}`);
+    }
+  } catch (e) {
+    console.error('[Plugin] joinGame failed', e);
+  } finally {
+    joining.value = false;
   }
 };
 
@@ -439,6 +515,20 @@ onUnmounted(() => {
   border: 2px dashed #eb2f96;
   border-radius: 12px;
   text-align: center;
+}
+.join-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f9f0ff;
+  border: 1px solid #d3adf7;
+  border-radius: 8px;
+}
+.join-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 .vote-controls {
   display: flex;

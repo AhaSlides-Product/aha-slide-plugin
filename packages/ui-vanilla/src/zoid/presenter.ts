@@ -69,6 +69,14 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   audiences?: Record<string, any>;
   /**
+   * True while the host is auto-advancing through already-started quizzes in
+   * the deck — i.e. a previous quiz/game was started and the presenter moved
+   * forward to the next one. When `true`, the plugin should start the game
+   * immediately and skip its game-lobby / join screen (mirrors the native
+   * quiz behaviour). `false`/undefined means show the lobby as usual.
+   */
+  autoStartGame?: boolean;
+  /**
    * Action to fetch all custom attributes for the current slide from the parent application.
    *
    * @param slideId - Optional override for the slide identifier.
@@ -242,6 +250,10 @@ export const presenterZoidProps = {
   },
   audiences: {
     type: 'object',
+    required: false,
+  },
+  autoStartGame: {
+    type: 'boolean',
     required: false,
   },
   onHeightChange: {

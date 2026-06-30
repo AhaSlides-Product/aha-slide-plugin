@@ -46,6 +46,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * List of audiences joined in the presentation.
    */
   audiences: Ref<Record<string, any> | undefined>;
+  /**
+   * True while the host auto-advances through already-started quizzes — start
+   * immediately and skip the game-lobby / join screen when set.
+   */
+  autoStartGame: Ref<boolean | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -129,10 +134,12 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
 export function usePresenterPlugin(options: UseSlidePluginOptions = {}): PresenterPluginReturn {
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
   const audiences = ref<Record<string, any> | undefined>((window as any).xprops?.audiences);
+  const autoStartGame = ref<boolean | undefined>((window as any).xprops?.autoStartGame);
 
   const baseHook = useBaseSlidePlugin(options, (newProps) => {
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
     if (newProps.audiences) audiences.value = { ...newProps.audiences };
+    if (newProps.autoStartGame !== undefined) autoStartGame.value = newProps.autoStartGame;
   });
   const { xprops } = baseHook;
 
@@ -168,6 +175,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     slideProps: baseHook.slideProps,
     currentUserProps,
     audiences,
+    autoStartGame,
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
