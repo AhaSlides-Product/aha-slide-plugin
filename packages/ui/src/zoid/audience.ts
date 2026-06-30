@@ -111,7 +111,9 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       timeLimit.value = newProps.timeLimit;
     }
     if (newProps.teams !== undefined) {
-      teams.value = newProps.teams ? [...newProps.teams] : newProps.teams;
+      // Guard against a non-array value arriving over the cross-domain bridge —
+      // spreading a non-iterable would throw.
+      teams.value = Array.isArray(newProps.teams) ? [...newProps.teams] : newProps.teams;
     }
   };
 

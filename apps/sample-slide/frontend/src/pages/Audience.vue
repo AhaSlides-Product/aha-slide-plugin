@@ -325,17 +325,20 @@ const handleJoinGame = async () => {
   joining.value = true;
   try {
     const result = await joinGame({
-      audienceName: joinName.value,
+      audienceName: joinName.value.trim() || undefined,
       audienceEmoji: joinEmoji.value || undefined,
       teamId: selectedTeamId.value,
     });
-    if (result.success) {
+    // `result` may be null/undefined over the Zoid bridge if the host returns
+    // nothing; `result.error` is optional even on failure.
+    if (result?.success) {
       showToastSuccess?.('Joined the game!');
     } else {
-      showToastError?.(`Could not join: ${result.error}`);
+      showToastError?.(`Could not join: ${result?.error ?? 'please try again'}`);
     }
   } catch (e) {
     console.error('[Plugin] joinGame failed', e);
+    showToastError?.('Something went wrong — please try again.');
   } finally {
     joining.value = false;
   }
