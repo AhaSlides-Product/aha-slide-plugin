@@ -60,9 +60,9 @@ export class ApiClient {
 
   /**
    * Send submission to liveproxy. This API is used by audience to submit their response.
-   * @param slideType 
-   * @param payload 
-   * @returns 
+   * @param slideType
+   * @param payload
+   * @returns
    */
   async sendLiveSubmission<T>(slideType: SlideType, payload: SubmissionPayload<T>): Promise<Response> {
     const url = `${this.baseUrl}/api/live/submissions?slide_type=${slideType}`;
@@ -77,8 +77,8 @@ export class ApiClient {
 
   /**
    * This API is used by presenter to delete a submission.
-   * @param submissionId 
-   * @returns 
+   * @param submissionId
+   * @returns
    */
   async deleteSubmission(submissionId: string): Promise<Response> {
     const url = `${this.baseUrl}/api/submissions/${submissionId}`;
@@ -99,12 +99,12 @@ export class ApiClient {
 
   /**
    * List by slideId with optional slideVersion and type (query params)
-   * @param slideId 
-   * @param slideVersion 
-   * @param type 
+   * @param slideId
+   * @param slideVersion
+   * @param type
    * @param limit
    * @param offset
-   * @returns 
+   * @returns
    */
   async getSubmissions<T>({ slideId, slideVersion, type }: {
     slideId: number,
@@ -125,13 +125,13 @@ export class ApiClient {
 
   /**
    * List submissions of an audience
-   * @param audienceId 
-   * @param slideId 
-   * @param slideVersion 
-   * @param type 
+   * @param audienceId
+   * @param slideId
+   * @param slideVersion
+   * @param type
    * @param limit
    * @param offset
-   * @returns 
+   * @returns
    */
   async getParticipantSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
     audienceId: string,
@@ -152,8 +152,8 @@ export class ApiClient {
   }
 
   /**
-   * Submit a scored answer to liveproxy (CreateAnswerV3). The proxy forwards
-   * the answer upstream and returns the resulting scored answer payloads.
+   * Submit an answer to liveproxy. This API is used by audience to submit their answers.
+   * The proxy forwards the answer upstream and returns the resulting scored answer payloads.
    * @param slideType slide type, sent as the `slide_type` query param
    * @param payload answer scope plus the slide-type-specific `data`
    * @returns the scored answer results
@@ -171,9 +171,9 @@ export class ApiClient {
   }
 
   /**
-   * Persist scored answer results in liveproxy (CreateAnswerResult).
+   * Persist manual results without going through the answer flow. This API is used by presenter.
    * Requires an authenticated (JWT) client.
-   * @param payload the answer results to persist
+   * @param payload the results to persist
    */
   async createAnswerResults(payload: AnswerResultRequest): Promise<void> {
     const url = `${this.baseUrl}/api/live/answers/results`;
@@ -197,8 +197,7 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the top-N leaderboard from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/topn`).
+   * Fetch the top-N leaderboard.
    * @param request base scope plus optional `slideId`, `aggregations` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
@@ -215,8 +214,7 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the leaderboard slice around a subject from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/around`).
+   * Fetch the leaderboard slice around a subject.
    * @param request base scope plus the required `subjectId` and optional `slideId`, `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
@@ -234,9 +232,8 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the top-N leaderboard over a slide window from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/slide/topn`). Carries a real
-   * `oldScore` (total excluding the last slide), unlike the whole-session topn.
+   * Fetch the top-N leaderboard over a slide window.
+   * Carries a real `oldScore` (total excluding the last slide), unlike {@link getLeaderboardTopN}.
    * @param request base scope plus the required `slideIds` and optional `aggregations` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
@@ -252,8 +249,7 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the leaderboard slice around a subject over a slide window from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/slide/around`).
+   * Fetch the leaderboard slice around a subject over a slide window.
    * @param request base scope plus the required `slideIds`/`subjectId` and optional `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
@@ -270,9 +266,9 @@ export class ApiClient {
   }
 
   /**
-   * Reset (delete) previously persisted answer results in liveproxy
-   * (ResetResult). Requires an authenticated (JWT) client. Narrow the scope
-   * with the optional `activityId` / `subActivityId` / `answerId` fields.
+   * Reset (delete) previously persisted results.
+   * Narrow the scope with the optional `activityId` / `subActivityId` / `answerId` fields.
+   * Requires an authenticated (JWT) client.
    * @param payload the scope of the results to reset
    */
   async resetAnswerResult(payload: ResetResultRequest): Promise<void> {
