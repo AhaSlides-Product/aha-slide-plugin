@@ -6,12 +6,18 @@ import {
 import {
   initZoidForAudience,
   type ParticipantInfo,
+  type Team,
+  type JoinGamePayload,
+  type JoinGameResult,
   type UseSlidePluginOptions,
 } from '@aha/ui-vanilla';
 
 export type {
   AudienceSlidePluginProps,
   ParticipantInfo,
+  Team,
+  JoinGamePayload,
+  JoinGameResult,
 } from '@aha/ui-vanilla';
 
 /**
@@ -53,6 +59,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   timeLimit: Ref<number | null | undefined>;
   scrollTo: ((yOffset: number) => void) | undefined;
   getWindowHeight: (() => Promise<number>) | undefined;
+  /** Teams the audience can join (when team play is enabled on the host). */
+  teams: Ref<Team[] | undefined>;
+  /** Join the game/presentation as a participant; see {@link Team}. */
+  joinGame: ((payload: JoinGamePayload) => Promise<JoinGameResult>) | undefined;
 } {
   // Audience-specific reactive refs
   const xprops = (window as any).xprops;
@@ -65,6 +75,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const audienceEmail = ref<string | undefined>(xprops?.audience?.audienceEmail);
   const audienceTeam = ref<string | undefined>(xprops?.audience?.audienceTeam);
   const participantInfo = ref<ParticipantInfo[] | undefined>(xprops?.audience?.participantInfo);
+  const teams = ref<Team[] | undefined>(xprops?.teams);
+  const joinGame = xprops?.joinGame;
 
   const uploadImage = xprops?.uploadImage;
   const showToastInfo = xprops?.showToastInfo;
@@ -98,6 +110,11 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     if (newProps.timeLimit !== undefined) {
       timeLimit.value = newProps.timeLimit;
     }
+    if (newProps.teams !== undefined) {
+      // Guard against a non-array value arriving over the cross-domain bridge —
+      // spreading a non-iterable would throw.
+      teams.value = Array.isArray(newProps.teams) ? [...newProps.teams] : newProps.teams;
+    }
   };
 
   const baseHook = useBaseSlidePlugin(options, handleAudienceProps);
@@ -130,6 +147,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     scrollTo,
     getWindowHeight,
     participantInfo,
+    teams,
+    joinGame,
     reportHeight: baseHook.reportHeight,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     getValues: baseHook.getValues,

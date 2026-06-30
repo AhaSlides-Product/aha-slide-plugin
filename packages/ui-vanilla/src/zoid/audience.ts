@@ -86,11 +86,69 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * @returns A promise that resolves to the window inner height.
    */
   getWindowHeight?: () => Promise<number>;
+  /**
+   * The list of teams the audience can join, provided by the host when the
+   * presentation has team play enabled. Empty/undefined when team play is off.
+   * Use this to render a team picker inside the plugin's own join UI.
+   */
+  teams?: Team[];
+  /**
+   * Join the current game/presentation as a participant (optionally into a team).
+   *
+   * The host owns validation (e.g. required name, team-full checks) and the
+   * underlying join request, then resolves with the outcome so the plugin can
+   * react (e.g. show a toast). Only available when the presentation allows
+   * audiences to join.
+   *
+   * @param payload - The participant's name, emoji and selected team.
+   * @returns A promise resolving to the join result. `error` is set when
+   *          `success` is `false`.
+   * @example
+   * ```typescript
+   * const res = await joinGame({ audienceName: 'Lina', audienceEmoji: '😎', teamId });
+   * if (!res.success) showToastError(res.error ?? 'Could not join');
+   * ```
+   */
+  joinGame?: (payload: JoinGamePayload) => Promise<JoinGameResult>;
 }
 
 export type ParticipantInfo = {
   type: string;
   value: string;
+};
+
+/**
+ * A team the audience can join when the presentation has team play enabled.
+ */
+export type Team = {
+  /** Unique team identifier. */
+  id: string | number;
+  /** Display name of the team. */
+  name: string;
+  /** Optional team colour (hex). */
+  color?: string;
+};
+
+/**
+ * Payload for {@link AudienceSlidePluginProps.joinGame}.
+ */
+export type JoinGamePayload = {
+  /** The participant's display name. */
+  audienceName?: string;
+  /** The participant's chosen emoji. */
+  audienceEmoji?: string;
+  /** The id of the team to join (required when team play is enabled). */
+  teamId?: string | number;
+};
+
+/**
+ * Result returned by {@link AudienceSlidePluginProps.joinGame}.
+ */
+export type JoinGameResult = {
+  /** Whether the join succeeded. */
+  success: boolean;
+  /** The failure reason when `success` is `false`. */
+  error?: 'invalid-name' | 'invalid-team' | 'team-full' | 'network';
 };
 
 /**
@@ -205,6 +263,14 @@ export function initZoidForAudience() {
         required: false,
       },
       filterProfaneWords: {
+        type: 'function',
+        required: false,
+      },
+      teams: {
+        type: 'array',
+        required: false,
+      },
+      joinGame: {
         type: 'function',
         required: false,
       },
