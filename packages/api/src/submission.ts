@@ -3,9 +3,12 @@ import { SubmissionPayload } from "@aha/common";
 import {
   AnswerRequest,
   AnswerResultRequest,
+  BaseLeaderboardScope,
   GetLeaderboardAroundRequest,
+  GetLeaderboardSlideAroundRequest,
+  GetLeaderboardSlideTopNRequest,
   GetLeaderboardTopNRequest,
-  LeaderboardQuery,
+  LeaderboardAroundResponse,
   LeaderboardResponse,
   ResetResultRequest,
 } from "./answer";
@@ -183,28 +186,28 @@ export class ApiClient {
     });
   }
 
-  /** Build the shared leaderboard query string from an answer scope. */
-  private toLeaderboardParams(scope: LeaderboardQuery): URLSearchParams {
+  /** Build the shared leaderboard query string from the base scope. */
+  private toLeaderboardParams(scope: BaseLeaderboardScope): URLSearchParams {
     const params = new URLSearchParams();
     params.append("presentationId", scope.presentationId);
     params.append("presentationVersion", scope.presentationVersion.toString());
-    if (scope.slideId) params.append("slideId", scope.slideId);
-    if (scope.slideVersion !== undefined) params.append("slideVersion", scope.slideVersion.toString());
     if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
     if (scope.subject) params.append("subject", scope.subject);
-    if (scope.agg) params.append("agg", scope.agg);
     return params;
   }
 
   /**
    * Fetch the top-N leaderboard from aha-sync
    * (`GET /api/aha-sync/answers/leaderboards/topn`).
-   * @param request answer scope plus optional `agg` and `n`
-   * @returns the ranked leaderboard entries
+   * @param request base scope plus optional `slideId`, `aggregations` and `n`
+   * @returns the ranked entries keyed by aggregation name
    */
   async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
-    const { n, ...scope } = request;
+    const { n, aggregations, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
+    if (slideId) params.append("slideId", slideId);
+    if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
+    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
     if (n !== undefined) params.append("n", n.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/topn?${params.toString()}`;
@@ -214,16 +217,55 @@ export class ApiClient {
   /**
    * Fetch the leaderboard slice around a subject from aha-sync
    * (`GET /api/aha-sync/answers/leaderboards/around`).
-   * @param request answer scope plus the required `subjectId` and optional `agg` and `k`
+   * @param request base scope plus the required `subjectId` and optional `slideId`, `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
-  async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
-    const { k, subjectId, ...scope } = request;
+  async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardAroundResponse> {
+    const { k, subjectId, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
+    if (slideId) params.append("slideId", slideId);
+    if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
     params.append("subjectId", subjectId);
+    if (aggregation) params.append("aggregation", aggregation);
     if (k !== undefined) params.append("k", k.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/around?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch the top-N leaderboard over a slide window from aha-sync
+   * (`GET /api/aha-sync/answers/leaderboards/slide/topn`). Carries a real
+   * `oldScore` (total excluding the last slide), unlike the whole-session topn.
+   * @param request base scope plus the required `slideIds` and optional `aggregations` and `n`
+   * @returns the ranked entries keyed by aggregation name
+   */
+  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardResponse> {
+    const { n, aggregations, slideIds, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
+    if (n !== undefined) params.append("n", n.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/topn?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch the leaderboard slice around a subject over a slide window from aha-sync
+   * (`GET /api/aha-sync/answers/leaderboards/slide/around`).
+   * @param request base scope plus the required `slideIds`/`subjectId` and optional `aggregation` and `k`
+   * @returns the ranked leaderboard entries around the subject
+   */
+  async getLeaderboardSlideAround(request: GetLeaderboardSlideAroundRequest): Promise<LeaderboardAroundResponse> {
+    const { k, subjectId, aggregation, slideIds, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    params.append("subjectId", subjectId);
+    if (aggregation) params.append("aggregation", aggregation);
+    if (k !== undefined) params.append("k", k.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/around?${params.toString()}`;
     return this.fetchUrl(url);
   }
 
