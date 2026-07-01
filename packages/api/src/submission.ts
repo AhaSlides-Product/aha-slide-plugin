@@ -8,7 +8,7 @@ import {
   GetLeaderboardSlideAroundRequest,
   GetLeaderboardSlideTopNRequest,
   GetLeaderboardTopNRequest,
-  LeaderboardAroundResponse,
+  LeaderboardMultiResponse,
   LeaderboardResponse,
   ResetResultRequest,
 } from "./answer";
@@ -201,7 +201,7 @@ export class ApiClient {
    * @param request base scope plus optional `slideId`, `aggregations` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
-  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
+  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardMultiResponse> {
     const { n, aggregations, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     if (slideId) params.append("slideId", slideId);
@@ -218,7 +218,7 @@ export class ApiClient {
    * @param request base scope plus the required `subjectId` and optional `slideId`, `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
-  async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardAroundResponse> {
+  async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
     const { k, subjectId, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     if (slideId) params.append("slideId", slideId);
@@ -233,11 +233,11 @@ export class ApiClient {
 
   /**
    * Fetch the top-N leaderboard over a slide window.
-   * Carries a real `oldScore` (total excluding the last slide), unlike {@link getLeaderboardTopN}.
+   * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings before the last slide.
    * @param request base scope plus the required `slideIds` and optional `aggregations` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
-  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardResponse> {
+  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardMultiResponse> {
     const { n, aggregations, slideIds, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     params.append("slideIds", JSON.stringify(slideIds));
@@ -253,7 +253,7 @@ export class ApiClient {
    * @param request base scope plus the required `slideIds`/`subjectId` and optional `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
-  async getLeaderboardSlideAround(request: GetLeaderboardSlideAroundRequest): Promise<LeaderboardAroundResponse> {
+  async getLeaderboardSlideAround(request: GetLeaderboardSlideAroundRequest): Promise<LeaderboardResponse> {
     const { k, subjectId, aggregation, slideIds, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     params.append("slideIds", JSON.stringify(slideIds));

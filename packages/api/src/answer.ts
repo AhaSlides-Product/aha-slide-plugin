@@ -63,7 +63,7 @@ export interface AnswerResultRequest {
   results: AnswerResultPayload[];
 }
 
-/** Supported leaderboard aggregation functions. `around` excludes the streak aggregations. */
+/** Supported leaderboard aggregation. Streaks apply to top-N only, not around-slices. */
 export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak" | "longest_streak";
 
 /** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
@@ -73,13 +73,13 @@ export type LeaderboardSubject = "participant" | "team";
 export interface BaseLeaderboardScope {
   presentationId: string;
   presentationVersion: number;
-  /** Which score bucket to read, e.g. in-game vs final leaderboard. */
+  /** Which score bucket to read, e.g. in-game vs final. */
   scoreChannel?: string;
   /** Whether the leaderboard ranks participants or teams. Defaults to `participant`. */
   subject?: LeaderboardSubject;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/topn`. */
+/** Parameters for a top-N leaderboard query. */
 export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
   slideId?: string;
   slideVersion?: number;
@@ -89,9 +89,9 @@ export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
   n?: number;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/slide/topn`. */
+/** Parameters for a top-N leaderboard query over a slide window. */
 export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
-  /** Ordered quiz slide ids to aggregate; the last is the `oldScore` count-up baseline. */
+  /** Ordered quiz slide ids to rank over; `oldScore` excludes the last one. */
   slideIds: string[];
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
@@ -99,7 +99,7 @@ export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
   n?: number;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/around`. */
+/** Parameters for a leaderboard slice centered on one subject. */
 export interface GetLeaderboardAroundRequest extends BaseLeaderboardScope {
   slideId?: string;
   slideVersion?: number;
@@ -111,7 +111,7 @@ export interface GetLeaderboardAroundRequest extends BaseLeaderboardScope {
   k?: number;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/slide/around`. */
+/** Parameters for a subject-centered slice over a slide window. */
 export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
   slideIds: string[];
   /** Id of the subject (participant or team) to center the slice on. Required. */
@@ -132,14 +132,14 @@ export interface LeaderboardItem {
   emoji: string;
 }
 
-/** Response body for `GET .../leaderboards/topn`: entries keyed by aggregation name. */
+/** A single ranked list of leaderboard entries. */
 export interface LeaderboardResponse {
-  aggregations: Record<string, LeaderboardItem[]>;
+  items: LeaderboardItem[];
 }
 
-/** Response body for `GET .../leaderboards/around`: a flat ranked slice. */
-export interface LeaderboardAroundResponse {
-  items: LeaderboardItem[];
+/** A ranked list per requested aggregation, keyed by aggregation name. */
+export interface LeaderboardMultiResponse {
+  aggregations: Record<string, LeaderboardResponse>;
 }
 
 /** Request body for `DELETE /api/live/answers/results` (ResetResult). */
