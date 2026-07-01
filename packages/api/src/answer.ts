@@ -63,41 +63,61 @@ export interface AnswerResultRequest {
   results: AnswerResultPayload[];
 }
 
-/** Supported leaderboard aggregation functions. */
-export type LeaderboardAgg = "total_score";
+/** Supported leaderboard aggregation. Streaks apply to top-N only, not around-slices. */
+export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak" | "longest_streak";
 
 /** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
 export type LeaderboardSubject = "participant" | "team";
 
-/**
- * Query params shared by the leaderboard endpoints
- * (`GET /api/aha-sync/answers/leaderboards/*`). Mirrors aha-sync's
- * `BaseAnswerScope` plus `agg`; note this scope is intentionally narrower than
- * the liveproxy {@link BaseAnswerScope} (no `teamId`/`participantId`/`questionId`).
- */
-export interface LeaderboardQuery {
+/** Scope shared by every leaderboard request. */
+export interface BaseLeaderboardScope {
   presentationId: string;
   presentationVersion: number;
-  slideId?: string;
-  slideVersion?: number;
-  /** Which score bucket to read, e.g. in-game vs final leaderboard. */
+  /** Which score bucket to read, e.g. in-game vs final. */
   scoreChannel?: string;
   /** Whether the leaderboard ranks participants or teams. Defaults to `participant`. */
   subject?: LeaderboardSubject;
-  /** Aggregation function. Defaults to `total_score`. */
-  agg?: LeaderboardAgg;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/topn`. */
-export interface GetLeaderboardTopNRequest extends LeaderboardQuery {
+/** Parameters for a top-N leaderboard query. */
+export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
+  slideId?: string;
+  slideVersion?: number;
+  /** Aggregations to rank by. Defaults to `["total_score"]`. */
+  aggregations?: LeaderboardAggregation[];
   /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
   n?: number;
 }
 
-/** Query params for `GET /api/aha-sync/answers/leaderboards/around`. */
-export interface GetLeaderboardAroundRequest extends LeaderboardQuery {
+/** Parameters for a top-N leaderboard query over a slide window. */
+export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
+  /** Ordered quiz slide ids to rank over; `oldScore` excludes the last one. */
+  slideIds: string[];
+  /** Aggregations to rank by. Defaults to `["total_score"]`. */
+  aggregations?: LeaderboardAggregation[];
+  /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
+  n?: number;
+}
+
+/** Parameters for a leaderboard slice centered on one subject. */
+export interface GetLeaderboardAroundRequest extends BaseLeaderboardScope {
+  slideId?: string;
+  slideVersion?: number;
   /** Id of the subject (participant or team) to center the slice on. Required. */
   subjectId: string;
+  /** Aggregation to rank by. Defaults to `total_score`. */
+  aggregation?: LeaderboardAggregation;
+  /** Entries to include above/below the subject. Defaults to `10`, range `[0, 100]`. */
+  k?: number;
+}
+
+/** Parameters for a subject-centered slice over a slide window. */
+export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
+  slideIds: string[];
+  /** Id of the subject (participant or team) to center the slice on. Required. */
+  subjectId: string;
+  /** Aggregation to rank by. Defaults to `total_score`. */
+  aggregation?: LeaderboardAggregation;
   /** Entries to include above/below the subject. Defaults to `10`, range `[0, 100]`. */
   k?: number;
 }
@@ -106,14 +126,20 @@ export interface GetLeaderboardAroundRequest extends LeaderboardQuery {
 export interface LeaderboardItem {
   id: string;
   score: number;
+  oldScore: number;
   rank: number;
   name: string;
   emoji: string;
 }
 
-/** Response body for the leaderboard endpoints. */
+/** A single ranked list of leaderboard entries. */
 export interface LeaderboardResponse {
   items: LeaderboardItem[];
+}
+
+/** A ranked list per requested aggregation, keyed by aggregation name. */
+export interface LeaderboardMultiResponse {
+  aggregations: Record<string, LeaderboardResponse>;
 }
 
 /** Request body for `DELETE /api/live/answers/results` (ResetResult). */

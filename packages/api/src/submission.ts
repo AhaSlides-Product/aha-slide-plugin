@@ -3,9 +3,12 @@ import { SubmissionPayload } from "@aha/common";
 import {
   AnswerRequest,
   AnswerResultRequest,
+  BaseLeaderboardScope,
   GetLeaderboardAroundRequest,
+  GetLeaderboardSlideAroundRequest,
+  GetLeaderboardSlideTopNRequest,
   GetLeaderboardTopNRequest,
-  LeaderboardQuery,
+  LeaderboardMultiResponse,
   LeaderboardResponse,
   ResetResultRequest,
 } from "./answer";
@@ -57,9 +60,9 @@ export class ApiClient {
 
   /**
    * Send submission to liveproxy. This API is used by audience to submit their response.
-   * @param slideType 
-   * @param payload 
-   * @returns 
+   * @param slideType
+   * @param payload
+   * @returns
    */
   async sendLiveSubmission<T>(slideType: SlideType, payload: SubmissionPayload<T>): Promise<Response> {
     const url = `${this.baseUrl}/api/live/submissions?slide_type=${slideType}`;
@@ -74,8 +77,8 @@ export class ApiClient {
 
   /**
    * This API is used by presenter to delete a submission.
-   * @param submissionId 
-   * @returns 
+   * @param submissionId
+   * @returns
    */
   async deleteSubmission(submissionId: string): Promise<Response> {
     const url = `${this.baseUrl}/api/submissions/${submissionId}`;
@@ -96,12 +99,12 @@ export class ApiClient {
 
   /**
    * List by slideId with optional slideVersion and type (query params)
-   * @param slideId 
-   * @param slideVersion 
-   * @param type 
+   * @param slideId
+   * @param slideVersion
+   * @param type
    * @param limit
    * @param offset
-   * @returns 
+   * @returns
    */
   async getSubmissions<T>({ slideId, slideVersion, type }: {
     slideId: number,
@@ -122,13 +125,13 @@ export class ApiClient {
 
   /**
    * List submissions of an audience
-   * @param audienceId 
-   * @param slideId 
-   * @param slideVersion 
-   * @param type 
+   * @param audienceId
+   * @param slideId
+   * @param slideVersion
+   * @param type
    * @param limit
    * @param offset
-   * @returns 
+   * @returns
    */
   async getParticipantSubmissions<T>({ audienceId, slideId, slideVersion, type }: {
     audienceId: string,
@@ -149,8 +152,8 @@ export class ApiClient {
   }
 
   /**
-   * Submit a scored answer to liveproxy (CreateAnswerV3). The proxy forwards
-   * the answer upstream and returns the resulting scored answer payloads.
+   * Submit an answer to liveproxy. This API is used by audience to submit their answers.
+   * The proxy forwards the answer upstream and returns the resulting scored answer payloads.
    * @param slideType slide type, sent as the `slide_type` query param
    * @param payload answer scope plus the slide-type-specific `data`
    * @returns the scored answer results
@@ -168,9 +171,9 @@ export class ApiClient {
   }
 
   /**
-   * Persist scored answer results in liveproxy (CreateAnswerResult).
+   * Persist manual results without going through the answer flow. This API is used by presenter.
    * Requires an authenticated (JWT) client.
-   * @param payload the answer results to persist
+   * @param payload the results to persist
    */
   async createAnswerResults(payload: AnswerResultRequest): Promise<void> {
     const url = `${this.baseUrl}/api/live/answers/results`;
@@ -183,28 +186,27 @@ export class ApiClient {
     });
   }
 
-  /** Build the shared leaderboard query string from an answer scope. */
-  private toLeaderboardParams(scope: LeaderboardQuery): URLSearchParams {
+  /** Build the shared leaderboard query string from the base scope. */
+  private toLeaderboardParams(scope: BaseLeaderboardScope): URLSearchParams {
     const params = new URLSearchParams();
     params.append("presentationId", scope.presentationId);
     params.append("presentationVersion", scope.presentationVersion.toString());
-    if (scope.slideId) params.append("slideId", scope.slideId);
-    if (scope.slideVersion !== undefined) params.append("slideVersion", scope.slideVersion.toString());
     if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
     if (scope.subject) params.append("subject", scope.subject);
-    if (scope.agg) params.append("agg", scope.agg);
     return params;
   }
 
   /**
-   * Fetch the top-N leaderboard from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/topn`).
-   * @param request answer scope plus optional `agg` and `n`
-   * @returns the ranked leaderboard entries
+   * Fetch the top-N leaderboard.
+   * @param request base scope plus optional `slideId`, `aggregations` and `n`
+   * @returns the ranked entries keyed by aggregation name
    */
-  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
-    const { n, ...scope } = request;
+  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardMultiResponse> {
+    const { n, aggregations, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
+    if (slideId) params.append("slideId", slideId);
+    if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
+    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
     if (n !== undefined) params.append("n", n.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/topn?${params.toString()}`;
@@ -212,15 +214,17 @@ export class ApiClient {
   }
 
   /**
-   * Fetch the leaderboard slice around a subject from aha-sync
-   * (`GET /api/aha-sync/answers/leaderboards/around`).
-   * @param request answer scope plus the required `subjectId` and optional `agg` and `k`
+   * Fetch the leaderboard slice around a subject.
+   * @param request base scope plus the required `subjectId` and optional `slideId`, `aggregation` and `k`
    * @returns the ranked leaderboard entries around the subject
    */
   async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
-    const { k, subjectId, ...scope } = request;
+    const { k, subjectId, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
+    if (slideId) params.append("slideId", slideId);
+    if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
     params.append("subjectId", subjectId);
+    if (aggregation) params.append("aggregation", aggregation);
     if (k !== undefined) params.append("k", k.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/around?${params.toString()}`;
@@ -228,9 +232,43 @@ export class ApiClient {
   }
 
   /**
-   * Reset (delete) previously persisted answer results in liveproxy
-   * (ResetResult). Requires an authenticated (JWT) client. Narrow the scope
-   * with the optional `activityId` / `subActivityId` / `answerId` fields.
+   * Fetch the top-N leaderboard over a slide window.
+   * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings before the last slide.
+   * @param request base scope plus the required `slideIds` and optional `aggregations` and `n`
+   * @returns the ranked entries keyed by aggregation name
+   */
+  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardMultiResponse> {
+    const { n, aggregations, slideIds, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
+    if (n !== undefined) params.append("n", n.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/topn?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch the leaderboard slice around a subject over a slide window.
+   * @param request base scope plus the required `slideIds`/`subjectId` and optional `aggregation` and `k`
+   * @returns the ranked leaderboard entries around the subject
+   */
+  async getLeaderboardSlideAround(request: GetLeaderboardSlideAroundRequest): Promise<LeaderboardResponse> {
+    const { k, subjectId, aggregation, slideIds, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    params.append("subjectId", subjectId);
+    if (aggregation) params.append("aggregation", aggregation);
+    if (k !== undefined) params.append("k", k.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/around?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Reset (delete) previously persisted results.
+   * Narrow the scope with the optional `activityId` / `subActivityId` / `answerId` fields.
+   * Requires an authenticated (JWT) client.
    * @param payload the scope of the results to reset
    */
   async resetAnswerResult(payload: ResetResultRequest): Promise<void> {
