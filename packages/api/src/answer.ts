@@ -63,8 +63,8 @@ export interface AnswerResultRequest {
   results: AnswerResultPayload[];
 }
 
-/** Supported leaderboard aggregation functions. `around` excludes `current_streak`. */
-export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak";
+/** Supported leaderboard aggregation functions. `around` excludes the streak aggregations. */
+export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak" | "longest_streak";
 
 /** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
 export type LeaderboardSubject = "participant" | "team";
