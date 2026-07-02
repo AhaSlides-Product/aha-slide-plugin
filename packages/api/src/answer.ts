@@ -10,11 +10,11 @@
 export interface BaseAnswerScope {
   /** Auto-filled with `Date.now()` before sending when omitted. */
   timestamp?: number;
-  presentationId: string;
+  presentationId: number;
   presentationVersion: number;
   teamId?: string;
   participantId?: string;
-  slideId?: string;
+  slideId?: number;
   slideVersion?: number;
   questionId?: string;
 }
@@ -71,7 +71,7 @@ export type LeaderboardSubject = "participant" | "team";
 
 /** Scope shared by every leaderboard request. */
 export interface BaseLeaderboardScope {
-  presentationId: string;
+  presentationId: number;
   presentationVersion: number;
   /** Which score bucket to read, e.g. in-game vs final. */
   scoreChannel?: string;
@@ -81,7 +81,7 @@ export interface BaseLeaderboardScope {
 
 /** Parameters for a top-N leaderboard query. */
 export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
-  slideId?: string;
+  slideId?: number;
   slideVersion?: number;
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
@@ -92,7 +92,7 @@ export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
 /** Parameters for a top-N leaderboard query over a slide window. */
 export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
   /** Ordered quiz slide ids to rank over; `oldScore` excludes the last one. */
-  slideIds: string[];
+  slideIds: number[];
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
   /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
@@ -101,7 +101,7 @@ export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
 
 /** Parameters for a leaderboard slice centered on one subject. */
 export interface GetLeaderboardAroundRequest extends BaseLeaderboardScope {
-  slideId?: string;
+  slideId?: number;
   slideVersion?: number;
   /** Id of the subject (participant or team) to center the slice on. Required. */
   subjectId: string;
@@ -113,7 +113,7 @@ export interface GetLeaderboardAroundRequest extends BaseLeaderboardScope {
 
 /** Parameters for a subject-centered slice over a slide window. */
 export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
-  slideIds: string[];
+  slideIds: number[];
   /** Id of the subject (participant or team) to center the slice on. Required. */
   subjectId: string;
   /** Aggregation to rank by. Defaults to `total_score`. */
@@ -145,9 +145,9 @@ export interface LeaderboardMultiResponse {
 /** Request body for `DELETE /api/live/answers/results` (ResetResult). */
 export interface ResetResultRequest {
   timestamp: number;
-  presentationId: string;
+  presentationId: number;
   presentationVersion: number;
-  slideId?: string;
+  slideId?: number;
   questionId?: string;
   answerId?: string;
 }

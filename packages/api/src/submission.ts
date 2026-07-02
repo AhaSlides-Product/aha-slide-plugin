@@ -189,7 +189,7 @@ export class ApiClient {
   /** Build the shared leaderboard query string from the base scope. */
   private toLeaderboardParams(scope: BaseLeaderboardScope): URLSearchParams {
     const params = new URLSearchParams();
-    params.append("presentationId", scope.presentationId);
+    params.append("presentationId", scope.presentationId.toString());
     params.append("presentationVersion", scope.presentationVersion.toString());
     if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
     if (scope.subject) params.append("subject", scope.subject);
@@ -204,7 +204,7 @@ export class ApiClient {
   async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardMultiResponse> {
     const { n, aggregations, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
-    if (slideId) params.append("slideId", slideId);
+    if (slideId) params.append("slideId", slideId.toString());
     if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
     if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
     if (n !== undefined) params.append("n", n.toString());
@@ -221,7 +221,7 @@ export class ApiClient {
   async getLeaderboardAround(request: GetLeaderboardAroundRequest): Promise<LeaderboardResponse> {
     const { k, subjectId, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
-    if (slideId) params.append("slideId", slideId);
+    if (slideId) params.append("slideId", slideId.toString());
     if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
     params.append("subjectId", subjectId);
     if (aggregation) params.append("aggregation", aggregation);
