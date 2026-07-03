@@ -122,14 +122,20 @@ export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
   k?: number;
 }
 
+export interface AudienceInfo {
+  name: string;
+  emoji: string;
+  teamId?: string;
+  teamName?: string;
+}
+
 /** A single leaderboard entry. */
-export interface LeaderboardItem {
+export interface LeaderboardItem extends AudienceInfo {
   id: string;
   score: number;
   oldScore: number;
   rank: number;
-  name: string;
-  emoji: string;
+  members?: AudienceInfo[];
 }
 
 /** A single ranked list of leaderboard entries. */
