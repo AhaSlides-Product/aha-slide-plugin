@@ -27,8 +27,17 @@ export interface AnswerRequest<T = unknown> extends BaseAnswerScope {
   data: T;
 }
 
-/** How an answer affects the participant's streak. Defaults to `COUNT`. */
+/** How an answer affects the participant's streak. */
 export type StreakAction = "COUNT" | "NOT_COUNT" | "BREAK";
+
+/** Correctness of an answer. */
+export type Verdict = "CORRECT" | "WRONG" | "PARTIALLY_CORRECT";
+
+/**
+ * How repeated answers at the same checkpoint are kept: `FIRST` and `LAST`
+ * collapse to one, `ALL` keeps every answer.
+ */
+export type Retention = "FIRST" | "LAST" | "ALL";
 
 /** A single scored answer result. */
 export interface AnswerResultPayload extends BaseAnswerScope {
@@ -39,11 +48,13 @@ export interface AnswerResultPayload extends BaseAnswerScope {
   points?: number;
   /** Defaults to `""` on the backend when omitted, used to distinguish where score is counted to, e.g. in-game vs final leaderboard. */
   scoreChannel?: string;
-  /** Defaults to `true` on the backend when omitted. */
-  correct?: boolean;
-  /** Defaults to `COUNT` on the backend when omitted. */
+  /** Correctness of the answer. Left unspecified on the backend when omitted. */
+  verdict?: Verdict;
+  /** How the answer affects the streak. Left unspecified on the backend when omitted. */
   streakAction?: StreakAction;
-  /** Defaults to `false` on the backend when omitted. */
+  /** Dedup policy for repeated answers at the same checkpoint. Defaults to `ALL` on the backend when omitted. */
+  retention?: Retention;
+  /** Fully replaces an earlier result carrying the same labels. Defaults to `false`. */
   override?: boolean;
   /** Defaults to `0` on the backend when omitted. */
   count?: number;
