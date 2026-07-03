@@ -85,7 +85,7 @@ export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
   slideVersion?: number;
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
-  /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
+  /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;
 }
 
@@ -93,11 +93,11 @@ export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
 export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
   /** Ordered quiz slide ids to rank over. */
   slideIds: number[];
-  /** Slide where the leaderboard was last shown; `oldScore` covers slides up to and including it. */
+  /** Slide up to which the last leaderboard was calculated. `oldScore` covers slides up to and including it. */
   lastSlideId?: number;
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
-  /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
+  /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;
 }
 
