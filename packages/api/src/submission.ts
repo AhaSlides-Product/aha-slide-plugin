@@ -233,14 +233,15 @@ export class ApiClient {
 
   /**
    * Fetch the top-N leaderboard over a slide window.
-   * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings before the last slide.
-   * @param request base scope plus the required `slideIds` and optional `aggregations` and `n`
+   * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings as of `lastSlideId`.
+   * @param request base scope plus the required `slideIds` and optional `lastSlideId`, `aggregations` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
   async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardMultiResponse> {
-    const { n, aggregations, slideIds, ...scope } = request;
+    const { n, aggregations, slideIds, lastSlideId, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     params.append("slideIds", JSON.stringify(slideIds));
+    if (lastSlideId !== undefined) params.append("lastSlideId", lastSlideId.toString());
     if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
     if (n !== undefined) params.append("n", n.toString());
 

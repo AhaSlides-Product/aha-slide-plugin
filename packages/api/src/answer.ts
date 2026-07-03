@@ -91,8 +91,10 @@ export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
 
 /** Parameters for a top-N leaderboard query over a slide window. */
 export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
-  /** Ordered quiz slide ids to rank over; `oldScore` excludes the last one. */
+  /** Ordered quiz slide ids to rank over. */
   slideIds: number[];
+  /** Slide where the leaderboard was last shown; `oldScore` covers slides up to and including it. */
+  lastSlideId?: number;
   /** Aggregations to rank by. Defaults to `["total_score"]`. */
   aggregations?: LeaderboardAggregation[];
   /** Number of top entries to return. Defaults to `20`, range `[1, 100]`. */
