@@ -74,7 +74,7 @@ export interface AnswerResultRequest {
   results: AnswerResultPayload[];
 }
 
-/** Supported leaderboard aggregation. Streaks apply to top-N only, not around-slices. */
+/** Supported leaderboard aggregation. Streaks apply to participants top-N only, not teams or around queries. */
 export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak" | "longest_streak";
 
 /** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
@@ -94,7 +94,7 @@ export interface BaseLeaderboardScope {
 export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
   slideId?: number;
   slideVersion?: number;
-  /** Aggregations to rank by. Defaults to `["total_score"]`. */
+  /** Aggregations to rank by. Defaults to `[total_score]`. */
   aggregations?: LeaderboardAggregation[];
   /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;
@@ -106,7 +106,7 @@ export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
   slideIds: number[];
   /** Slide up to which the last leaderboard was calculated. `oldScore` covers slides up to and including it. */
   lastSlideId?: number;
-  /** Aggregations to rank by. Defaults to `["total_score"]`. */
+  /** Aggregations to rank by. Defaults to `[total_score]`. */
   aggregations?: LeaderboardAggregation[];
   /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;

@@ -37,6 +37,35 @@ export interface NormalizedSlideType extends MarketplaceSlideType {
     plugin: true;
 }
 
+// ─── Scored slide types ──────────────────────────────────────────
+
+/**
+ * A slide type is "scored" (quiz-style, feeds the leaderboard) via a signal
+ * that differs by source:
+ *   - Local constant entries hard-code `label: 'Quiz'`.
+ *   - Marketplace-catalogue entries have no `label`; their scored marker is the
+ *     `Scored` tag. `category` is unreliable (mixes Quiz/quiz/Vote/Game/Media),
+ *     so the tag is the one signal consistent across every scored entry.
+ * Tags arrive as string[] or, defensively, object[] of { label }.
+ */
+export interface ScoredSlideTypeInput {
+    label?: string;
+    tags?: Array<string | { label?: string }>;
+}
+
+export const QUIZ_LABEL = 'Quiz';
+export const SCORED_TAG = 'Scored';
+
+const tagLabel = (tag: string | { label?: string }): string =>
+    typeof tag === 'string' ? tag : (tag && tag.label) || '';
+
+export function isScoredSlideType(item?: ScoredSlideTypeInput | null): boolean {
+    if (!item) return false;
+    if (item.label === QUIZ_LABEL) return true;
+    const tags = Array.isArray(item.tags) ? item.tags : [];
+    return tags.some((tag) => tagLabel(tag) === SCORED_TAG);
+}
+
 // ─── Constants ───────────────────────────────────────────────────
 
 export const DEFAULT_SLIDE_SETTINGS = {
