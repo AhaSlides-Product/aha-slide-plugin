@@ -12,6 +12,7 @@ import {
     resolveIframeUrl,
     backfillTypeObj,
     createSlideSelectionPayload,
+    isScoredSlideType,
 } from '@aha/api';
 import type { MarketplaceSlideType, NormalizedSlideType } from '@aha/api';
 
@@ -481,6 +482,31 @@ describe('Slide Type Marketplace / Registry', () => {
 
             expect(slideItem).not.toHaveProperty('editorUrl');
             expect(slideItem).not.toHaveProperty('settingUrl');
+        });
+    });
+
+    describe('isScoredSlideType', () => {
+        it('should return false for null/undefined', () => {
+            expect(isScoredSlideType(null)).toBe(false);
+            expect(isScoredSlideType(undefined)).toBe(false);
+        });
+
+        it('should be scored when a local constant entry has label "Quiz"', () => {
+            expect(isScoredSlideType({ label: 'Quiz' })).toBe(true);
+        });
+
+        it('should be scored when a marketplace entry carries the "Scored" tag (no label)', () => {
+            expect(isScoredSlideType({ tags: ['Scored', 'Quizzes', 'Icebreaker'] })).toBe(true);
+        });
+
+        it('should support the defensive object[] tag shape ({ label })', () => {
+            expect(isScoredSlideType({ tags: [{ label: 'Scored' }, { label: 'Quizzes' }] })).toBe(true);
+        });
+
+        it('should not be scored without a Quiz label or Scored tag', () => {
+            expect(isScoredSlideType({ tags: ['Brainstorm'] })).toBe(false);
+            expect(isScoredSlideType({ tags: [] })).toBe(false);
+            expect(isScoredSlideType({})).toBe(false);
         });
     });
 });

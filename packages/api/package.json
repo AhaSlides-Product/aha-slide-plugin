@@ -1,6 +1,6 @@
 {
   "name": "@aha/api",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Shared utilities for both backend and frontend",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
