@@ -36,9 +36,9 @@ export interface CountTotalItem {
 export interface CountUniqueItem {
   /** The bucket name for aggregation (e.g., slide-specific path). */
   bucket: string;
-  /** The key within the bucket (e.g., the answer option). */
+  /** The counter name (e.g., `submission_count`). */
   key: string;
-  /** item identifier. */
+  /** The distinct value to de-dupe on (e.g., a sender/participant id). */
   item: string;
 }
 
@@ -46,6 +46,6 @@ export interface CountUniqueItem {
 export interface SyncItem {
   /** EMQX topic that clients subscribe to for updates. */
   path: string;
-  /** The value to be sent to the topic. */
+  /** JSON-encoded value published to the topic (consumers `JSON.parse` it). */
   value: string;
 }
