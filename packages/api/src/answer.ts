@@ -132,6 +132,26 @@ export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
   k?: number;
 }
 
+/** Parameters for reading a participant's past answers (AnswersV3). */
+export interface GetAnswersRequest {
+  presentationId: number;
+  presentationVersion: number;
+  slideId: number;
+  slideVersion: number;
+  participantId: string;
+  /** Restrict to one question; omit to match every question on the slide. */
+  questionId?: string;
+}
+
+/** One raw answer row from AnswersV3. */
+export interface AnswerRecord<T = unknown> {
+  /** Scope labels stored with the answer (snake_case, string-valued). */
+  labels: Record<string, string>;
+  /** The slide-type-specific answer payload. */
+  data: T;
+  timestamp: number;
+}
+
 export interface AudienceInfo {
   name: string;
   emoji: string;

@@ -1,9 +1,11 @@
 import { SubmissionPayload } from "@aha/common";
 import {
+  AnswerRecord,
   AnswerRequest,
   AnswerResponse,
   AnswerResultRequest,
   BaseLeaderboardScope,
+  GetAnswersRequest,
   GetLeaderboardAroundRequest,
   GetLeaderboardSlideAroundRequest,
   GetLeaderboardSlideTopNRequest,
@@ -187,6 +189,28 @@ export class ApiClient {
         results: payload.results.map((result) => this.withTimestamp(result)),
       }),
     });
+  }
+
+  /**
+   * Read a participant's past answers for a slide (AnswersV3). Omit `questionId`
+   * to match every question. Returns the raw answer rows.
+   */
+  async getAnswers<T = unknown>(request: GetAnswersRequest): Promise<AnswerRecord<T>[]> {
+    const url = `${this.baseUrl}/api/answer/v3/answers/?${this.toAnswersV3Params(request)}`;
+    const body = await this.fetchUrl(url);
+    return body?.answers ?? [];
+  }
+
+  /** Build the AnswersV3 read query string. */
+  private toAnswersV3Params(request: GetAnswersRequest): URLSearchParams {
+    const params = new URLSearchParams();
+    params.append("presentationId", request.presentationId.toString());
+    params.append("presentationVersion", request.presentationVersion.toString());
+    params.append("slideId", request.slideId.toString());
+    params.append("slideVersion", request.slideVersion.toString());
+    params.append("participantId", request.participantId);
+    if (request.questionId) params.append("questionId", request.questionId);
+    return params;
   }
 
   /** Build the shared leaderboard query string from the base scope. */
