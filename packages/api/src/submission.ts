@@ -1,7 +1,7 @@
-import { SlideType } from "./slideType";
 import { SubmissionPayload } from "@aha/common";
 import {
   AnswerRequest,
+  AnswerResponse,
   AnswerResultRequest,
   BaseLeaderboardScope,
   GetLeaderboardAroundRequest,
@@ -12,7 +12,10 @@ import {
   LeaderboardResponse,
   ResetResultRequest,
 } from "./answer";
+import { SlideType } from "./slideType";
+
 export { SubmissionPayload } from "@aha/common";
+
 export class ApiClient {
   private baseUrl: string;
   private headers: Record<string, string> = {
@@ -158,7 +161,7 @@ export class ApiClient {
    * @param payload answer scope plus the slide-type-specific `data`
    * @returns the scored answer results
    */
-  async createAnswer<T>(slideType: string, payload: AnswerRequest<T>): Promise<AnswerResultRequest> {
+  async createAnswer<T>(slideType: string, payload: AnswerRequest<T>): Promise<AnswerResponse> {
     const url = `${this.baseUrl}/api/live/answers?slide_type=${slideType}`;
     const body = this.withTimestamp(payload);
 
