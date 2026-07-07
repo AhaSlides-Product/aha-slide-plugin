@@ -107,4 +107,41 @@ describe('@aha/api - ApiClient', () => {
 
         await expect(client.fetchUrl(`${baseUrl}/fail`)).rejects.toThrow('Failed to fetch https://api.test.com/fail: Not Found');
     });
+
+    it('should request top-N leaderboard with a single aggregation param', async () => {
+        vi.mocked(fetch).mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: () => Promise.resolve(JSON.stringify({ aggregations: {} })),
+        } as Response);
+
+        await client.getLeaderboardTopN({
+            presentationId: 1,
+            presentationVersion: 2,
+            slideId: 10,
+            aggregation: 'average_score',
+            n: 5,
+        });
+
+        const expectedUrl = `${baseUrl}/api/aha-sync/answers/leaderboards/topn?presentationId=1&presentationVersion=2&slideId=10&aggregation=average_score&n=5`;
+        expect(fetch).toHaveBeenCalledWith(expectedUrl, expect.anything());
+    });
+
+    it('should request slide top-N leaderboard with a single aggregation param', async () => {
+        vi.mocked(fetch).mockResolvedValue({
+            ok: true,
+            status: 200,
+            text: () => Promise.resolve(JSON.stringify({ aggregations: {} })),
+        } as Response);
+
+        await client.getLeaderboardSlideTopN({
+            presentationId: 1,
+            presentationVersion: 2,
+            slideIds: [10, 11],
+            aggregation: 'total_score',
+        });
+
+        const expectedUrl = `${baseUrl}/api/aha-sync/answers/leaderboards/slide/topn?presentationId=1&presentationVersion=2&slideIds=${encodeURIComponent(JSON.stringify([10, 11]))}&aggregation=total_score`;
+        expect(fetch).toHaveBeenCalledWith(expectedUrl, expect.anything());
+    });
 });
