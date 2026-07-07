@@ -1,6 +1,6 @@
 {
   "name": "@aha/backend-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared backend utilities and DTOs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

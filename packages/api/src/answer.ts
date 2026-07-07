@@ -1,6 +1,4 @@
-/**
- * Types for the answer and leaderboard endpoints.
- */
+import { CountTotalItem, CountUniqueItem, SyncItem } from "@aha/common";
 
 /** Scope fields shared by every answer request and result. */
 export interface BaseAnswerScope {
@@ -59,6 +57,9 @@ export interface AnswerResultPayload extends BaseAnswerScope {
 export interface AnswerResponse {
   answerId: string;
   results: AnswerResultPayload[];
+  countTotal?: CountTotalItem[];
+  countUnique?: CountUniqueItem[];
+  sync?: SyncItem[];
 }
 
 /**
