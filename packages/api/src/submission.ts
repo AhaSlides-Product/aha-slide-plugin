@@ -198,15 +198,15 @@ export class ApiClient {
 
   /**
    * Fetch the top-N leaderboard.
-   * @param request base scope plus optional `slideId`, `aggregations` and `n`
+   * @param request base scope plus optional `slideId`, `aggregation` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
   async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardMultiResponse> {
-    const { n, aggregations, slideId, slideVersion, ...scope } = request;
+    const { n, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     if (slideId) params.append("slideId", slideId.toString());
     if (slideVersion !== undefined) params.append("slideVersion", slideVersion.toString());
-    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
+    if (aggregation) params.append("aggregation", aggregation);
     if (n !== undefined) params.append("n", n.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/topn?${params.toString()}`;
@@ -234,15 +234,15 @@ export class ApiClient {
   /**
    * Fetch the top-N leaderboard over a slide window.
    * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings as of `lastSlideId`.
-   * @param request base scope plus the required `slideIds` and optional `lastSlideId`, `aggregations` and `n`
+   * @param request base scope plus the required `slideIds` and optional `lastSlideId`, `aggregation` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
   async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardMultiResponse> {
-    const { n, aggregations, slideIds, lastSlideId, ...scope } = request;
+    const { n, aggregation, slideIds, lastSlideId, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     params.append("slideIds", JSON.stringify(slideIds));
     if (lastSlideId !== undefined) params.append("lastSlideId", lastSlideId.toString());
-    if (aggregations) params.append("aggregations", JSON.stringify(aggregations));
+    if (aggregation) params.append("aggregation", aggregation);
     if (n !== undefined) params.append("n", n.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/topn?${params.toString()}`;

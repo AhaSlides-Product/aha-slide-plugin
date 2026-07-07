@@ -1,9 +1,5 @@
 /**
- * Types for the liveproxy answer endpoints.
- *
- * Mirrors the goctl `.api` definitions in
- * backend-live-session/liveproxy/api/main.api so the FE/BE share one source
- * of truth for the request/response shapes.
+ * Types for the answer and leaderboard endpoints.
  */
 
 /** Scope fields shared by every answer request and result. */
@@ -52,7 +48,7 @@ export interface AnswerResultPayload extends BaseAnswerScope {
   verdict?: Verdict;
   /** How the answer affects the streak. Left unspecified on the backend when omitted. */
   streakAction?: StreakAction;
-  /** Dedup policy for repeated answers at the same checkpoint. Defaults to `ALL` on the backend when omitted. */
+  /** Dedup policy for repeated answers at the same checkpoint. Defaults to `FIRST` on the backend when omitted. */
   retention?: Retention;
   /** Fully replaces an earlier result carrying the same labels. Defaults to `false`. */
   override?: boolean;
@@ -74,8 +70,8 @@ export interface AnswerResultRequest {
   results: AnswerResultPayload[];
 }
 
-/** Supported leaderboard aggregation. Streaks apply to participants top-N only, not teams or around queries. */
-export type LeaderboardAggregation = "total_score" | "average_score" | "first_score" | "current_streak" | "longest_streak";
+/** Aggregation a leaderboard request ranks by. */
+export type LeaderboardAggregation = "total_score" | "average_score" | "first_score";
 
 /** Which kind of entity the leaderboard ranks. Defaults to `participant`. */
 export type LeaderboardSubject = "participant" | "team";
@@ -94,8 +90,8 @@ export interface BaseLeaderboardScope {
 export interface GetLeaderboardTopNRequest extends BaseLeaderboardScope {
   slideId?: number;
   slideVersion?: number;
-  /** Aggregations to rank by. Defaults to `[total_score]`. */
-  aggregations?: LeaderboardAggregation[];
+  /** Aggregation to rank by. Defaults to `total_score`. */
+  aggregation?: LeaderboardAggregation;
   /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;
 }
@@ -106,8 +102,8 @@ export interface GetLeaderboardSlideTopNRequest extends BaseLeaderboardScope {
   slideIds: number[];
   /** Slide up to which the last leaderboard was calculated. `oldScore` covers slides up to and including it. */
   lastSlideId?: number;
-  /** Aggregations to rank by. Defaults to `[total_score]`. */
-  aggregations?: LeaderboardAggregation[];
+  /** Aggregation to rank by. Defaults to `total_score`. */
+  aggregation?: LeaderboardAggregation;
   /** Number of top entries to return. Defaults to `20`, range `[1, 1000]`. */
   n?: number;
 }
@@ -142,12 +138,20 @@ export interface AudienceInfo {
   teamName?: string;
 }
 
-/** A single leaderboard entry. */
+/**
+ * A single leaderboard entry.
+ * The `around`/`slide-around` endpoints enrich only the pivot row (`id === subjectId`)
+ * with `answerCount`/`correctAnswerCount`/`currentStreak`/`longestStreak`.
+ */
 export interface LeaderboardItem extends AudienceInfo {
   id: string;
   score: number;
   oldScore: number;
   rank: number;
+  currentStreak?: number;
+  longestStreak?: number;
+  answerCount?: number;
+  correctAnswerCount?: number;
   members?: AudienceInfo[];
 }
 
@@ -156,7 +160,12 @@ export interface LeaderboardResponse {
   items: LeaderboardItem[];
 }
 
-/** A ranked list per requested aggregation, keyed by aggregation name. */
+/**
+ * A ranked list per requested aggregation, keyed by aggregation name.
+ * For `subject=participant` the response also carries `current_streak` and
+ * `longest_streak` buckets (each a single top-1 leader).
+ * For `subject=team` only the ranking bucket is present.
+ */
 export interface LeaderboardMultiResponse {
   aggregations: Record<string, LeaderboardResponse>;
 }
