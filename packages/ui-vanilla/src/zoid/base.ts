@@ -167,6 +167,21 @@ export interface PluginKeyboardEvent {
 }
 
 /**
+ * A cross-domain "audience is typing" event, forwarded from the host to the
+ * presenter plugin iframe via {@link SlidePluginProps.onTyping}.
+ *
+ * The presenter app already tracks who is typing (its `user-is-typing` socket
+ * event); this is the serializable subset it relays so a plugin canvas can
+ * render its own "… is typing" indicator.
+ */
+export interface PluginTypingEvent {
+  /** Socket id of the audience participant, as assigned by the host. */
+  socketId?: string;
+  /** Whether that participant is currently typing (`false` when they stop). */
+  isTyping: boolean;
+}
+
+/**
  * Options for the composition hooks.
  */
 export interface UseSlidePluginOptions {

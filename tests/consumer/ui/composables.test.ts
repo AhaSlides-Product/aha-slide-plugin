@@ -145,6 +145,7 @@ describe('@aha/ui - Composables', () => {
         getValues: vi.fn(),
         onKeyboard: vi.fn(),
         emitKeyboardEvent: vi.fn(),
+        onTyping: vi.fn(),
         openUploadImageModal: vi.fn(),
         openEditImageModal: vi.fn(),
         showToastInfo: vi.fn(),
@@ -272,6 +273,22 @@ describe('@aha/ui - Composables', () => {
       expect((window as any).xprops.emitKeyboardEvent).toHaveBeenCalledWith(event);
     });
 
+    it('should register an audience typing callback via onTyping', () => {
+      const callback = vi.fn();
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = usePresenterPlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+
+      expect(typeof wrapper.vm.hook.onTyping).toBe('function');
+      wrapper.vm.hook.onTyping?.(callback);
+      expect((window as any).xprops.onTyping).toHaveBeenCalledWith(callback);
+    });
+
     it('should respect autoHeight: false and not call autoReportHeight', () => {
       const onHeightChange = vi.fn();
       (window as any).xprops.onHeightChange = onHeightChange;
@@ -359,6 +376,7 @@ describe('@aha/ui - Composables', () => {
         unsubscribeTopic: vi.fn(),
         updateAudienceData: vi.fn(),
         uploadImage: vi.fn(),
+        emitTyping: vi.fn(),
         showToastInfo: vi.fn(),
         showToastSuccess: vi.fn(),
         showToastError: vi.fn(),
@@ -461,6 +479,24 @@ describe('@aha/ui - Composables', () => {
       expect(typeof hook.openPluginModal).toBe('function');
       expect(typeof hook.closePluginModal).toBe('function');
       expect(typeof hook.onSubmitButtonHeightChange).toBe('function');
+    });
+
+    it('should forward audience typing intent via emitTyping', () => {
+      const TestComponent = defineComponent({
+        setup() {
+          const hook = useAudiencePlugin({ autoHeight: false });
+          return { hook };
+        },
+        template: '<div />',
+      });
+      const wrapper = mount(TestComponent);
+      const hook = wrapper.vm.hook;
+
+      expect(typeof hook.emitTyping).toBe('function');
+      hook.emitTyping!(true);
+      expect((window as any).xprops.emitTyping).toHaveBeenCalledWith(true);
+      hook.emitTyping!(false);
+      expect((window as any).xprops.emitTyping).toHaveBeenCalledWith(false);
     });
 
     it('should update values when onProps is called', async () => {

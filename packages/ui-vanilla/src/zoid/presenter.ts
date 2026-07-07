@@ -1,7 +1,7 @@
 import * as zoid from 'zoid/dist/zoid.frameworks';
 import type { ImageUploadResult } from '../image';
 import type { AudioUploadResult } from '../audio';
-import type { BaseSlidePluginProps, PluginKeyboardEvent } from './base';
+import type { BaseSlidePluginProps, PluginKeyboardEvent, PluginTypingEvent } from './base';
 
 /**
  * A presenter action button that a slide plugin declares to the host.
@@ -109,6 +109,17 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * @param event - The keyboard event data to emit.
    */
   emitKeyboardEvent?: (event: PluginKeyboardEvent) => void;
+  /**
+   * Register a callback to be notified when an audience participant is typing.
+   *
+   * The presenter app already knows who is typing (via its `user-is-typing`
+   * socket event); this forwards those events to the plugin canvas so it can
+   * render its own "… is typing" indicator. The callback fires with
+   * `isTyping: true` when a participant starts and `false` when they stop.
+   *
+   * @param callback - The function to call when a typing event occurs.
+   */
+  onTyping?: (callback: (event: PluginTypingEvent) => void) => void;
   /**
    * Show an info toast message in the parent app.
    * @param text - The message to display.
@@ -316,6 +327,10 @@ export const presenterZoidProps = {
     required: false,
   },
   emitKeyboardEvent: {
+    type: 'function',
+    required: false,
+  },
+  onTyping: {
     type: 'function',
     required: false,
   },

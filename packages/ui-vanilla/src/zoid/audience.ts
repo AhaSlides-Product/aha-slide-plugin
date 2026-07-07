@@ -35,6 +35,18 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    */
   uploadImage?: () => Promise<any>;
   /**
+   * Notify the host that this audience participant is (or has stopped) typing,
+   * so the presenter can show its "… is typing" indicator. Reuses the audience
+   * app's existing typing signal (the `uit` socket event); the host throttles
+   * and attaches participant identity, so the plugin only reports intent.
+   *
+   * Call with `true` on input/keypress and `false` when the field is cleared,
+   * blurred, or the answer is submitted.
+   *
+   * @param isTyping - `true` while typing, `false` when typing stops.
+   */
+  emitTyping?: (isTyping: boolean) => void;
+  /**
    * Show an info toast message in the parent app.
    */
   showToastInfo?: (text: string, uniqName?: string, action?: any, options?: any) => void;
@@ -219,6 +231,10 @@ export function initZoidForAudience() {
         required: false,
       },
       uploadImage: {
+        type: 'function',
+        required: false,
+      },
+      emitTyping: {
         type: 'function',
         required: false,
       },
