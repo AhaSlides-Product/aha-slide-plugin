@@ -12,6 +12,16 @@
         Scroll to Bottom
       </button>
     </div>
+    <!-- Typing indicator demo: shown while the host forwards audience typing (AHA-41641) -->
+    <div
+      v-if="isAudienceTyping"
+      class="typing-indicator"
+      data-testid="canvas-audience-typing"
+    >
+      <span class="typing-dots"><span></span><span></span><span></span></span>
+      Audience is typing…
+    </div>
+
     <div class="greeting-display">
       <h2>Greeting: {{ slideGreeting }}</h2>
        <div v-if="imageUrl" style="margin-top: 10px;">
@@ -126,7 +136,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useSync, usePresenterPlugin, broadcastAction, type PluginKeyboardEvent } from '@aha/ui';
+import { useSync, usePresenterPlugin, broadcastAction, type PluginKeyboardEvent, type PluginTypingEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
 import { getBucket } from '@aha/common';
 import { ApiClient } from '@aha/api';
@@ -143,6 +153,7 @@ const {
   unsubscribeTopic,
   onKeyboard,
   emitKeyboardEvent,
+  onTyping,
   setSubmissionCount,
   getValues,
   baseUrl,
@@ -158,6 +169,9 @@ const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);
 const slideAttributes = ref<any>(null);
 const lastKeyboardEvent = ref<string>('');
+// "Audience is typing" demo — driven by the host `onTyping` bridge (AHA-41641).
+const isAudienceTyping = ref(false);
+let typingResetTimer: ReturnType<typeof setTimeout> | null = null;
 const mqttMessages = ref<string[]>([]);
 const initialValues = ref<string>("");
 const submitTestMessages = ref<string[]>([]);
@@ -217,6 +231,24 @@ onMounted(async () => {
     });
   }
 
+  // Typing Indicator Integration (AHA-41641)
+  // The host forwards audience typing events (from its `user-is-typing` signal)
+  // so the plugin can render its own "… is typing" UI. Auto-clear after 3.5s in
+  // case a "stop typing" event never arrives, mirroring the host indicator.
+  if (onTyping) {
+    onTyping((event: PluginTypingEvent) => {
+      console.log('Received typing event:', event);
+      if (typingResetTimer) {
+        clearTimeout(typingResetTimer);
+        typingResetTimer = null;
+      }
+      isAudienceTyping.value = Boolean(event?.isTyping);
+      if (isAudienceTyping.value) {
+        typingResetTimer = setTimeout(() => { isAudienceTyping.value = false; }, 3500);
+      }
+    });
+  }
+
   // Guest-to-Host Communication
   // Listen for keyboard events in the iframe and emit them to the parent application
   document.onkeydown = (e: KeyboardEvent) => {
@@ -258,6 +290,10 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.onkeydown = null;
+  if (typingResetTimer) {
+    clearTimeout(typingResetTimer);
+    typingResetTimer = null;
+  }
   unregisterScrollToBottom();
   if (unsubscribeTopic) {
     unsubscribeTopic(countTopic);
@@ -388,5 +424,34 @@ const { fn: scrollToBottom, unregister: unregisterScrollToBottom } = broadcastAc
 .no-messages {
   color: #999;
   font-style: italic;
+}
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  border-radius: 20px;
+  font-size: 14px;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  animation: typing-bounce 0.8s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.13s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.26s; }
+@keyframes typing-bounce {
+  0% { transform: translateY(0); opacity: 0.7; }
+  30% { transform: translateY(-5px); opacity: 0.4; }
+  60% { transform: translateY(0); opacity: 0.2; }
 }
 </style>

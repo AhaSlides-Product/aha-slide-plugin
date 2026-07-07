@@ -5,6 +5,7 @@ import type { UseSlidePluginOptions } from '@aha/ui-vanilla';
 export type {
   BaseSlidePluginProps,
   PluginKeyboardEvent,
+  PluginTypingEvent,
   UseSlidePluginOptions,
 } from '@aha/ui-vanilla';
 
