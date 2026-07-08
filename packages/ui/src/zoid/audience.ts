@@ -44,6 +44,12 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceTeam: Ref<string | undefined>;
   participantInfo: Ref<ParticipantInfo[] | undefined>;
   uploadImage: (() => Promise<any>) | undefined;
+  /**
+   * Notify the host that this participant is (or has stopped) typing, so the
+   * presenter shows its "… is typing" indicator. Call with `true` while typing
+   * and `false` when the field is cleared/blurred or the answer is submitted.
+   */
+  emitTyping: ((isTyping: boolean) => void) | undefined;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -79,6 +85,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const joinGame = xprops?.joinGame;
 
   const uploadImage = xprops?.uploadImage;
+  const emitTyping = xprops?.emitTyping;
   const showToastInfo = xprops?.showToastInfo;
   const showToastSuccess = xprops?.showToastSuccess;
   const showToastError = xprops?.showToastError;
@@ -136,6 +143,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceEmail,
     audienceTeam,
     uploadImage,
+    emitTyping,
     showToastInfo,
     showToastSuccess,
     showToastError,

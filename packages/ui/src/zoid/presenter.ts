@@ -8,6 +8,7 @@ import {
 import {
   initZoidForPresenter,
   type PluginKeyboardEvent,
+  type PluginTypingEvent,
   type UseSlidePluginOptions,
   type ConfirmModalPayload,
   type BroadcastActionResult,
@@ -33,6 +34,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
   onKeyboard: ((callback: (event: PluginKeyboardEvent) => void) => void) | undefined;
   emitKeyboardEvent: ((event: PluginKeyboardEvent) => void) | undefined;
+  /**
+   * Register a callback invoked when an audience participant starts or stops
+   * typing, so the plugin canvas can render its own "… is typing" indicator.
+   */
+  onTyping: ((callback: (event: PluginTypingEvent) => void) => void) | undefined;
   uploadImage: ((file: File) => Promise<ImageUploadResult>) | undefined;
   openUploadImageModal: (() => Promise<ImageUploadResult>) | undefined;
   openEditImageModal: ((currentImageUrl: string) => Promise<ImageUploadResult>) | undefined;
@@ -164,6 +170,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
   const uploadImage = xprops?.uploadImage;
   const onKeyboard = xprops?.onKeyboard;
   const emitKeyboardEvent = xprops?.emitKeyboardEvent;
+  const onTyping = xprops?.onTyping;
   const openUploadImageModal = xprops?.openUploadImageModal;
   const openEditImageModal = xprops?.openEditImageModal;
   const openUploadAudioModal = xprops?.openUploadAudioModal;
@@ -185,6 +192,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     uploadImage,
     onKeyboard,
     emitKeyboardEvent,
+    onTyping,
     openUploadImageModal,
     openEditImageModal,
     openUploadAudioModal,

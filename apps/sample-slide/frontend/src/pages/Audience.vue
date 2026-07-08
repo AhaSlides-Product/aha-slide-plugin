@@ -55,6 +55,20 @@
       </div>
     </div>
 
+    <!-- Typing Demo — reports "audience is typing" to the presenter (AHA-41641) -->
+    <div class="typing-section" v-if="emitTyping">
+      <h3>Typing Demo</h3>
+      <p>Type below — the presenter canvas shows "audience is typing…".</p>
+      <a-textarea
+        v-model:value="typingText"
+        placeholder="Start typing your answer…"
+        :rows="3"
+        @input="handleTypingInput"
+        @blur="handleTypingBlur"
+        data-testid="audience-typing-input"
+      />
+    </div>
+
     <!-- Progress Bar Demo -->
     <div class="progress-section" v-if="timeLimit !== null">
       <h3>Slide Timer (Sync from Parent)</h3>
@@ -195,6 +209,7 @@ const {
   getWindowHeight,
   teams,
   joinGame,
+  emitTyping,
 } = useAudiencePlugin();
 
 const timerWidth = computed(() => {
@@ -305,6 +320,20 @@ const handleShowToast = () => {
   } else {
     console.warn('showToastSuccess function not available');
   }
+};
+
+/**
+ * Typing-indicator demo (AHA-41641): report typing to the host while the
+ * participant edits the field so the presenter canvas can show "audience is
+ * typing…". Emit `true` on input and `false` when the field loses focus.
+ * The host already throttles, so a raw per-keystroke call is fine.
+ */
+const typingText = ref('');
+const handleTypingInput = () => {
+  emitTyping?.(true);
+};
+const handleTypingBlur = () => {
+  emitTyping?.(false);
 };
 
 const joinName = ref('');
@@ -524,6 +553,13 @@ onUnmounted(() => {
   padding: 20px;
   background: #f9f0ff;
   border: 1px solid #d3adf7;
+  border-radius: 8px;
+}
+.typing-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #fffbe6;
+  border: 1px solid #ffe58f;
   border-radius: 8px;
 }
 .join-controls {
