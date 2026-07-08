@@ -1,9 +1,12 @@
 import { SubmissionPayload } from "@aha/common";
 import {
+  AnswerRecord,
   AnswerRequest,
   AnswerResponse,
   AnswerResultRequest,
   BaseLeaderboardScope,
+  GetParticipantSlideAnswersRequest,
+  GetSlideAnswersRequest,
   GetLeaderboardAroundRequest,
   GetLeaderboardSlideAroundRequest,
   GetLeaderboardSlideTopNRequest,
@@ -36,8 +39,8 @@ export class ApiClient {
   }
 
   /** Fill in `timestamp` with the current time when the caller omitted it. */
-  private withTimestamp<T extends { timestamp?: number }>(scope: T): T {
-    return scope.timestamp == null ? { ...scope, timestamp: Date.now() } : scope;
+  private withTimestamp<T extends { timestamp?: number }>(request: T): T {
+    return request.timestamp == null ? { ...request, timestamp: Date.now() } : request;
   }
 
   async fetchUrl(url: string, options?: RequestInit): Promise<any> {
@@ -187,6 +190,40 @@ export class ApiClient {
         results: payload.results.map((result) => this.withTimestamp(result)),
       }),
     });
+  }
+
+  /**
+   * Read one participant's answers for a slide (AnswersV3) — audience-facing, no
+   * auth. Omit `questionId` to match every question. Returns the raw answer rows.
+   */
+  async getParticipantSlideAnswers<T = unknown>(request: GetParticipantSlideAnswersRequest): Promise<AnswerRecord<T>[]> {
+    const url = `${this.baseUrl}/api/answers/v3/slide/participant?${this.toAnswersV3Params(request)}`;
+    const body = await this.fetchUrl(url);
+    return body?.answers ?? [];
+  }
+
+  /**
+   * Read a slide's answers (AnswersV3) — presenter-facing, requires an access
+   * token. Omit `participantId` to read every participant; page with `limit`/`offset`.
+   */
+  async getSlideAnswers<T = unknown>(request: GetSlideAnswersRequest): Promise<AnswerRecord<T>[]> {
+    const url = `${this.baseUrl}/api/answers/v3/slide?${this.toAnswersV3Params(request)}`;
+    const body = await this.fetchUrl(url);
+    return body?.answers ?? [];
+  }
+
+  /** Build the AnswersV3 read query string (participantId optional). */
+  private toAnswersV3Params(request: GetSlideAnswersRequest): URLSearchParams {
+    const params = new URLSearchParams();
+    params.append("presentationId", request.presentationId.toString());
+    params.append("presentationVersion", request.presentationVersion.toString());
+    params.append("slideId", request.slideId.toString());
+    params.append("slideVersion", request.slideVersion.toString());
+    if (request.participantId) params.append("participantId", request.participantId);
+    if (request.questionId) params.append("questionId", request.questionId);
+    if (request.limit != null) params.append("limit", request.limit.toString());
+    if (request.offset != null) params.append("offset", request.offset.toString());
+    return params;
   }
 
   /** Build the shared leaderboard query string from the base scope. */
