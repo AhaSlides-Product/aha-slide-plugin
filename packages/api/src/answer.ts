@@ -7,9 +7,9 @@ export interface BaseAnswerScope {
   presentationId: number;
   presentationVersion: number;
   teamId?: string;
-  participantId?: string;
-  slideId?: number;
-  slideVersion?: number;
+  participantId: string;
+  slideId: number;
+  slideVersion: number;
   questionId?: string;
 }
 
@@ -132,15 +132,27 @@ export interface GetLeaderboardSlideAroundRequest extends BaseLeaderboardScope {
   k?: number;
 }
 
-/** Parameters for reading a participant's past answers (AnswersV3). */
-export interface GetAnswersRequest {
+export interface BaseSlideAnswersRequest {
   presentationId: number;
   presentationVersion: number;
   slideId: number;
   slideVersion: number;
-  participantId: string;
   /** Restrict to one question; omit to match every question on the slide. */
   questionId?: string;
+  /** Page size (server default 100). */
+  limit?: number;
+  /** Rows to skip (server default 0). */
+  offset?: number;
+}
+
+/** Read one participant's answers for a slide. Audience-facing, participantId required. */
+export interface GetParticipantSlideAnswersRequest extends BaseSlideAnswersRequest {
+  participantId: string;
+}
+
+/** Read a slide's answers. Presenter-facing, participantId is not required. */
+export interface GetSlideAnswersRequest extends BaseSlideAnswersRequest {
+  participantId?: string;
 }
 
 /** One raw answer row from AnswersV3. */
