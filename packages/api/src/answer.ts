@@ -56,9 +56,9 @@ export interface AnswerResultPayload<T = unknown> extends BaseAnswerScope {
   data?: T;
 }
 
-export interface AnswerResponse {
+export interface AnswerResponse<T = unknown> {
   answerId: string;
-  results: AnswerResultPayload[];
+  results: AnswerResultPayload<T>[];
   countTotal?: CountTotalItem[];
   countUnique?: CountUniqueItem[];
   sync?: SyncItem[];
@@ -69,8 +69,8 @@ export interface AnswerResponse {
  * `POST /api/live/answers` and the request body of
  * `POST /api/live/answers/results`.
  */
-export interface AnswerResultRequest {
-  results: AnswerResultPayload[];
+export interface AnswerResultRequest<T = unknown> {
+  results: AnswerResultPayload<T>[];
 }
 
 /** Aggregation a leaderboard request ranks by. */
