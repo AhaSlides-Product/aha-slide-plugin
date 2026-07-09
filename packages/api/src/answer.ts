@@ -52,6 +52,8 @@ export interface AnswerResultPayload extends BaseAnswerScope {
   override?: boolean;
   /** Defaults to `0` on the backend when omitted. */
   count?: number;
+  /** Slide-type result payload for the audience to read back; round-tripped by liveproxy, not aggregated. */
+  data?: unknown;
 }
 
 export interface AnswerResponse {
