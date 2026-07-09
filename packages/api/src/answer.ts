@@ -34,7 +34,7 @@ export type Verdict = "CORRECT" | "WRONG" | "PARTIALLY_CORRECT";
 export type Retention = "FIRST" | "LAST" | "ALL";
 
 /** A single scored answer result. */
-export interface AnswerResultPayload extends BaseAnswerScope {
+export interface AnswerResultPayload<T = unknown> extends BaseAnswerScope {
   resultId: string;
   /** Defaults to `""` on the backend when omitted, e.g. bonus score doens't need to reference an answer. */
   answerId?: string;
@@ -52,8 +52,8 @@ export interface AnswerResultPayload extends BaseAnswerScope {
   override?: boolean;
   /** Defaults to `0` on the backend when omitted. */
   count?: number;
-  /** Slide-type result payload for the audience to read back; round-tripped by liveproxy, not aggregated. */
-  data?: unknown;
+  /** Slide-type result payload for the audience to read back. */
+  data?: T;
 }
 
 export interface AnswerResponse {
