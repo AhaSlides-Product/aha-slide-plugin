@@ -34,7 +34,7 @@ export type Verdict = "CORRECT" | "WRONG" | "PARTIALLY_CORRECT";
 export type Retention = "FIRST" | "LAST" | "ALL";
 
 /** A single scored answer result. */
-export interface AnswerResultPayload extends BaseAnswerScope {
+export interface AnswerResultPayload<T = unknown> extends BaseAnswerScope {
   resultId: string;
   /** Defaults to `""` on the backend when omitted, e.g. bonus score doens't need to reference an answer. */
   answerId?: string;
@@ -52,11 +52,13 @@ export interface AnswerResultPayload extends BaseAnswerScope {
   override?: boolean;
   /** Defaults to `0` on the backend when omitted. */
   count?: number;
+  /** Slide-type result payload for the audience to read back. */
+  data?: T;
 }
 
-export interface AnswerResponse {
+export interface AnswerResponse<T = unknown> {
   answerId: string;
-  results: AnswerResultPayload[];
+  results: AnswerResultPayload<T>[];
   countTotal?: CountTotalItem[];
   countUnique?: CountUniqueItem[];
   sync?: SyncItem[];
@@ -67,8 +69,8 @@ export interface AnswerResponse {
  * `POST /api/live/answers` and the request body of
  * `POST /api/live/answers/results`.
  */
-export interface AnswerResultRequest {
-  results: AnswerResultPayload[];
+export interface AnswerResultRequest<T = unknown> {
+  results: AnswerResultPayload<T>[];
 }
 
 /** Aggregation a leaderboard request ranks by. */
