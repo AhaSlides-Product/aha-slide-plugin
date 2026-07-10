@@ -69,11 +69,11 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   audiences?: Record<string, any>;
   /**
-   * True while the host is auto-advancing through already-started quizzes in
-   * the deck — i.e. a previous quiz/game was started and the presenter moved
-   * forward to the next one. When `true`, the plugin should start the game
-   * immediately and skip its game-lobby / join screen (mirrors the native
-   * quiz behaviour). `false`/undefined means show the lobby as usual.
+   * False while the host holds a game-lobby quiz in the lobby (waiting for
+   * Start); true once the game has started or when the slide has no lobby. When
+   * `true`, the plugin should skip its game-lobby / join screen and start
+   * straight away. Derived from the synced quizStatus — the audience surface
+   * exposes the identical value.
    */
   autoStartGame?: boolean;
   /**

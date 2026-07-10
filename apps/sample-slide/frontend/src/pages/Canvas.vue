@@ -56,13 +56,13 @@
       <pre class="code-block">{{ JSON.stringify(audiences, null, 2) }}</pre>
     </div>
 
-    <!-- autoStartGame demo: when the host auto-advances through already-started
-         quizzes, a game plugin should start immediately and skip its lobby. -->
+    <!-- autoStartGame demo: false while the host holds a game-lobby quiz in the
+         lobby, true once the game has started — start now and skip the lobby. -->
     <div class="debug-section" data-testid="canvas-auto-start-game">
       <h3>Auto-start game (skip lobby)</h3>
       <p><b>autoStartGame:</b> {{ autoStartGame ? 'true' : 'false' }}</p>
       <p>{{ autoStartGame
-        ? 'Host is auto-advancing — start the game now and skip the lobby.'
+        ? 'Game has started — start now and skip the lobby.'
         : 'Show the game lobby / join screen as usual.' }}</p>
     </div>
 
