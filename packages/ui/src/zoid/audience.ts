@@ -64,8 +64,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
   timeLimit: Ref<number | null | undefined>;
-  /** False while the host holds the quiz in the game lobby (wait for Start); true/undefined once started. */
-  autoStartGame: Ref<boolean | undefined>;
+  /** False while the host holds the quiz in the game lobby (wait for Start); true once started or when there's no lobby. Defaults to true (fail-open). */
+  autoStartGame: Ref<boolean>;
   scrollTo: ((yOffset: number) => void) | undefined;
   getWindowHeight: (() => Promise<number>) | undefined;
   /** Teams the audience can join (when team play is enabled on the host). */
@@ -98,7 +98,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const closePluginModal = xprops?.closePluginModal;
   const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
   const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
-  const autoStartGame = ref<boolean | undefined>(xprops?.autoStartGame);
+  const autoStartGame = ref<boolean>(xprops?.autoStartGame ?? true);
   const scrollTo = xprops?.scrollTo;
   const getWindowHeight = xprops?.getWindowHeight;
 
@@ -122,6 +122,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     }
     if (newProps.autoStartGame !== undefined) {
       autoStartGame.value = newProps.autoStartGame;
+    } else if ('autoStartGame' in newProps) {
+      autoStartGame.value = true;
     }
     if (newProps.timeLimit !== undefined) {
       timeLimit.value = newProps.timeLimit;
