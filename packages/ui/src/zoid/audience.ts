@@ -42,6 +42,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   audienceId: Ref<string | number | undefined>;
   audienceEmail: Ref<string | undefined>;
   audienceTeam: Ref<string | undefined>;
+  audienceQuizTeam: Ref<string | number | undefined>;
   participantInfo: Ref<ParticipantInfo[] | undefined>;
   uploadImage: (() => Promise<any>) | undefined;
   /**
@@ -80,6 +81,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const audienceId = ref<string | number | undefined>(xprops?.audience?.audienceId);
   const audienceEmail = ref<string | undefined>(xprops?.audience?.audienceEmail);
   const audienceTeam = ref<string | undefined>(xprops?.audience?.audienceTeam);
+  const audienceQuizTeam = ref<string | number | undefined>(xprops?.audience?.audienceQuizTeam);
   const participantInfo = ref<ParticipantInfo[] | undefined>(xprops?.audience?.participantInfo);
   const teams = ref<Team[] | undefined>(xprops?.teams);
   const joinGame = xprops?.joinGame;
@@ -112,6 +114,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       if (newProps.audience.audienceId !== undefined) audienceId.value = newProps.audience.audienceId;
       if (newProps.audience.audienceEmail !== undefined) audienceEmail.value = newProps.audience.audienceEmail;
       if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
+      if (newProps.audience.audienceQuizTeam !== undefined) audienceQuizTeam.value = newProps.audience.audienceQuizTeam;
       if (newProps.audience.participantInfo !== undefined) participantInfo.value = newProps.audience.participantInfo;
     }
     if (newProps.timeLimit !== undefined) {
@@ -142,6 +145,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceId,
     audienceEmail,
     audienceTeam,
+    audienceQuizTeam,
     uploadImage,
     emitTyping,
     showToastInfo,
