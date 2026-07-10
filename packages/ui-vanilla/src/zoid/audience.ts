@@ -23,8 +23,10 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
     audienceId?: string | number;
     /** The email of the audience participant */
     audienceEmail?: string;
-    /** The team name of the audience participant */
+    /** Free-text admission "organisation/team" field — NOT the team-play team. */
     audienceTeam?: string;
+    /** Team-play team id the participant joined; resolve its name via the `teams` list. */
+    audienceQuizTeam?: string | number;
   };
   /**
    * Custom attributes associated with the current slide.
