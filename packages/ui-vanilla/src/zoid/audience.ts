@@ -90,6 +90,8 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * @type {number|null}
    */
   timeLimit?: number | null;
+  /** False while a game-lobby quiz waits for Start; true/undefined once started or when there's no lobby. */
+  autoStartGame?: boolean;
   /**
    * Scroll the parent app to a specific offset relative to the iframe top.
    * @param yOffset - The vertical offset relative to the iframe top.
@@ -270,6 +272,10 @@ export function initZoidForAudience() {
       },
       timeLimit: {
         type: 'number',
+        required: false,
+      },
+      autoStartGame: {
+        type: 'boolean',
         required: false,
       },
       scrollTo: {
