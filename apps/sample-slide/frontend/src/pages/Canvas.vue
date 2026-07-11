@@ -56,13 +56,13 @@
       <pre class="code-block">{{ JSON.stringify(audiences, null, 2) }}</pre>
     </div>
 
-    <!-- autoStartGame demo: false while the host holds a game-lobby quiz in the
-         lobby, true once the game has started — start now and skip the lobby. -->
+    <!-- quizStatus demo: a game plugin starts immediately and skips its lobby
+         once the host quiz phase leaves the lobby. -->
     <div class="debug-section" data-testid="canvas-auto-start-game">
       <h3>Auto-start game (skip lobby)</h3>
-      <p><b>autoStartGame:</b> {{ autoStartGame ? 'true' : 'false' }}</p>
-      <p>{{ autoStartGame
-        ? 'Game has started — start now and skip the lobby.'
+      <p><b>quizStatus:</b> {{ quizStatus ?? 'n/a' }}</p>
+      <p>{{ shouldSkipLobby
+        ? 'Host has left the lobby — start the game now and skip the lobby.'
         : 'Show the game lobby / join screen as usual.' }}</p>
     </div>
 
@@ -134,11 +134,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useSync, usePresenterPlugin, broadcastAction, type PluginKeyboardEvent, type PluginTypingEvent } from '@aha/ui';
 import { useSlideImage } from '../composables/useSlideImage';
-import { getBucket } from '@aha/common';
+import { getBucket, QuizStatus } from '@aha/common';
 import { ApiClient } from '@aha/api';
 
 const route = useRoute();
@@ -162,8 +162,10 @@ const {
   showConfirmModal,
   allowPDFRender,
   audiences,
-  autoStartGame,
+  quizStatus,
 } = usePresenterPlugin();
+// A game plugin skips its lobby once the host leaves the lobby phase.
+const shouldSkipLobby = computed(() => quizStatus.value !== QuizStatus.Lobby);
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);

@@ -90,7 +90,10 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    * @type {number|null}
    */
   timeLimit?: number | null;
-  /** False while a game-lobby quiz waits for Start; true/undefined once started or when there's no lobby. */
+  /**
+   * @deprecated Superseded by `quizStatus`. No host sends it and no hook reads
+   * it; kept on the wire contract only, to be removed once fully retired.
+   */
   autoStartGame?: boolean;
   /**
    * Host quiz lifecycle phase (see `QuizStatus` in `@aha/common`: 1=Lobby,

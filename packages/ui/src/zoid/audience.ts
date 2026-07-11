@@ -64,8 +64,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   closePluginModal: (() => void) | undefined;
   onSubmitButtonHeightChange: ((height: number) => void) | undefined;
   timeLimit: Ref<number | null | undefined>;
-  /** False while the host holds the quiz in the game lobby (wait for Start); true once started or when there's no lobby. Defaults to true (fail-open). */
-  autoStartGame: Ref<boolean>;
   /** Host quiz lifecycle phase (QuizStatus from @aha/common); undefined for non-quiz slides. */
   quizStatus: Ref<number | undefined>;
   scrollTo: ((yOffset: number) => void) | undefined;
@@ -100,7 +98,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const closePluginModal = xprops?.closePluginModal;
   const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
   const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
-  const autoStartGame = ref<boolean>(xprops?.autoStartGame ?? true);
   const quizStatus = ref<number | undefined>(xprops?.quizStatus);
   const scrollTo = xprops?.scrollTo;
   const getWindowHeight = xprops?.getWindowHeight;
@@ -122,11 +119,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       if (newProps.audience.audienceTeam !== undefined) audienceTeam.value = newProps.audience.audienceTeam;
       if (newProps.audience.audienceQuizTeam !== undefined) audienceQuizTeam.value = newProps.audience.audienceQuizTeam;
       if (newProps.audience.participantInfo !== undefined) participantInfo.value = newProps.audience.participantInfo;
-    }
-    if (newProps.autoStartGame !== undefined) {
-      autoStartGame.value = newProps.autoStartGame;
-    } else if ('autoStartGame' in newProps) {
-      autoStartGame.value = true;
     }
     if (newProps.quizStatus !== undefined) {
       quizStatus.value = newProps.quizStatus;
@@ -172,7 +164,6 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     closePluginModal,
     onSubmitButtonHeightChange,
     timeLimit,
-    autoStartGame,
     quizStatus,
     scrollTo,
     getWindowHeight,

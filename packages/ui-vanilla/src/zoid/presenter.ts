@@ -74,6 +74,9 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * `true`, the plugin should skip its game-lobby / join screen and start
    * straight away. Derived from the synced quizStatus — the audience surface
    * exposes the identical value.
+   *
+   * @deprecated Superseded by `quizStatus`. No host sends it and no hook reads
+   * it; kept on the wire contract only, to be removed once fully retired.
    */
   autoStartGame?: boolean;
   /**
