@@ -74,6 +74,9 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    * forward to the next one. When `true`, the plugin should start the game
    * immediately and skip its game-lobby / join screen (mirrors the native
    * quiz behaviour). `false`/undefined means show the lobby as usual.
+   *
+   * @deprecated Superseded by `quizStatus`. No host sends it and no hook reads
+   * it; kept on the wire contract only, to be removed once fully retired.
    */
   autoStartGame?: boolean;
   /**
