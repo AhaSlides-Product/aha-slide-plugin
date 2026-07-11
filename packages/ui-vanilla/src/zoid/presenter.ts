@@ -77,11 +77,9 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   autoStartGame?: boolean;
   /**
-   * Host-driven quiz lifecycle phase (see `QuizStatus` in `@aha/common`:
-   * 1=Lobby, 2=Rule, 3=Countdown, 4=Question, 5=Result). The general successor
-   * to `autoStartGame` — prefer this to drive the plugin's inner quiz flow.
-   * `autoStartGame === (quizStatus !== QuizStatus.Lobby)`. May be `undefined`
-   * for non-quiz slides or an older host that predates this prop.
+   * Host quiz lifecycle phase (see `QuizStatus` in `@aha/common`: 1=Lobby,
+   * 2=Rule, 3=Countdown, 4=Question, 5=Result). Drives the plugin's inner quiz
+   * flow. `undefined` for non-quiz slides.
    */
   quizStatus?: number;
   /**

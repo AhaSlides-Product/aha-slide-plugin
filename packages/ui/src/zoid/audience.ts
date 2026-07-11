@@ -66,7 +66,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   timeLimit: Ref<number | null | undefined>;
   /** False while the host holds the quiz in the game lobby (wait for Start); true once started or when there's no lobby. Defaults to true (fail-open). */
   autoStartGame: Ref<boolean>;
-  /** Host-driven quiz lifecycle phase (QuizStatus from @aha/common). Successor to autoStartGame; undefined for non-quiz slides / older host. */
+  /** Host quiz lifecycle phase (QuizStatus from @aha/common); undefined for non-quiz slides. */
   quizStatus: Ref<number | undefined>;
   scrollTo: ((yOffset: number) => void) | undefined;
   getWindowHeight: (() => Promise<number>) | undefined;

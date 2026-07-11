@@ -57,7 +57,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * immediately and skip the game-lobby / join screen when set.
    */
   autoStartGame: Ref<boolean | undefined>;
-  /** Host-driven quiz lifecycle phase (QuizStatus from @aha/common). Successor to autoStartGame. */
+  /** Host quiz lifecycle phase (QuizStatus from @aha/common). */
   quizStatus: Ref<number | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;

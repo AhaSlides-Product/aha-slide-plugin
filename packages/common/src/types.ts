@@ -4,14 +4,8 @@ export enum SubmissionSenderType {
 }
 
 /**
- * Host-driven quiz lifecycle phase, broadcast to plugin quiz iframes via the
- * `quizStatus` xprop. Values mirror the presenter/audience host `QuizStatuses`
- * enum so the same integer means the same thing on both sides of the iframe.
- *
- * Prefer this over the legacy `autoStartGame` boolean, which is a projection of
- * it: `autoStartGame === (quizStatus !== QuizStatus.Lobby)`. `autoStartGame`
- * stays on the contract for backward-compat with plugins that predate
- * `quizStatus`; it will be retired once every deployed plugin reads `quizStatus`.
+ * Host quiz lifecycle phase, sent to plugin quiz iframes via the `quizStatus`
+ * xprop. Values mirror the host `QuizStatuses` enum.
  */
 export enum QuizStatus {
   Lobby = 1,
