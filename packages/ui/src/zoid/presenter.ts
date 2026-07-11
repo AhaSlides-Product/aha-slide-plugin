@@ -57,6 +57,8 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * immediately and skip the game-lobby / join screen when set.
    */
   autoStartGame: Ref<boolean | undefined>;
+  /** Host-driven quiz lifecycle phase (QuizStatus from @aha/common). Successor to autoStartGame. */
+  quizStatus: Ref<number | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -141,11 +143,13 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
   const audiences = ref<Record<string, any> | undefined>((window as any).xprops?.audiences);
   const autoStartGame = ref<boolean | undefined>((window as any).xprops?.autoStartGame);
+  const quizStatus = ref<number | undefined>((window as any).xprops?.quizStatus);
 
   const baseHook = useBaseSlidePlugin(options, (newProps) => {
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
     if (newProps.audiences) audiences.value = { ...newProps.audiences };
     if (newProps.autoStartGame !== undefined) autoStartGame.value = newProps.autoStartGame;
+    if (newProps.quizStatus !== undefined) quizStatus.value = newProps.quizStatus;
   });
   const { xprops } = baseHook;
 
@@ -183,6 +187,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     currentUserProps,
     audiences,
     autoStartGame,
+    quizStatus,
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,
