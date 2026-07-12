@@ -91,7 +91,9 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    */
   timeLimit?: number | null;
   /**
-   * @deprecated Superseded by `quizStatus`; kept on the wire contract only.
+   * Legacy game-lobby flag: false while the host holds the quiz in the lobby,
+   * true once started or when there's no lobby (defaults to true / fail-open).
+   * Superseded by `quizStatus` (prefer it), but still wired for back-compat.
    */
   autoStartGame?: boolean;
   /**
