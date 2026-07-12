@@ -56,8 +56,7 @@
       <pre class="code-block">{{ JSON.stringify(audiences, null, 2) }}</pre>
     </div>
 
-    <!-- quizStatus demo: a game plugin starts immediately and skips its lobby
-         once the host quiz phase leaves the lobby. -->
+    <!-- quizStatus demo: skip the lobby once the host leaves the lobby phase. -->
     <div class="debug-section" data-testid="canvas-auto-start-game">
       <h3>Auto-start game (skip lobby)</h3>
       <p><b>quizStatus:</b> {{ quizStatus ?? 'n/a' }}</p>

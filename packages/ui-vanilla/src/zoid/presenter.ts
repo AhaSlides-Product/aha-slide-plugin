@@ -69,20 +69,12 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   audiences?: Record<string, any>;
   /**
-   * False while the host holds a game-lobby quiz in the lobby (waiting for
-   * Start); true once the game has started or when the slide has no lobby. When
-   * `true`, the plugin should skip its game-lobby / join screen and start
-   * straight away. Derived from the synced quizStatus — the audience surface
-   * exposes the identical value.
-   *
-   * @deprecated Superseded by `quizStatus`. No host sends it and no hook reads
-   * it; kept on the wire contract only, to be removed once fully retired.
+   * @deprecated Superseded by `quizStatus`; kept on the wire contract only.
    */
   autoStartGame?: boolean;
   /**
-   * Host quiz lifecycle phase (see `QuizStatus` in `@aha/common`: 1=Lobby,
-   * 2=Rule, 3=Countdown, 4=Question, 5=Result). Drives the plugin's inner quiz
-   * flow. `undefined` for non-quiz slides.
+   * Host quiz lifecycle phase (`QuizStatus` in `@aha/common`: 1=Lobby, 2=Rule,
+   * 3=Countdown, 4=Question, 5=Result). `undefined` for non-quiz slides.
    */
   quizStatus?: number;
   /**

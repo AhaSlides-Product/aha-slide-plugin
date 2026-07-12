@@ -91,14 +91,12 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    */
   timeLimit?: number | null;
   /**
-   * @deprecated Superseded by `quizStatus`. No host sends it and no hook reads
-   * it; kept on the wire contract only, to be removed once fully retired.
+   * @deprecated Superseded by `quizStatus`; kept on the wire contract only.
    */
   autoStartGame?: boolean;
   /**
-   * Host quiz lifecycle phase (see `QuizStatus` in `@aha/common`: 1=Lobby,
-   * 2=Rule, 3=Countdown, 4=Question, 5=Result). Drives the plugin's inner quiz
-   * flow. `undefined` for non-quiz slides.
+   * Host quiz lifecycle phase (`QuizStatus` in `@aha/common`: 1=Lobby, 2=Rule,
+   * 3=Countdown, 4=Question, 5=Result). `undefined` for non-quiz slides.
    */
   quizStatus?: number;
   /**
