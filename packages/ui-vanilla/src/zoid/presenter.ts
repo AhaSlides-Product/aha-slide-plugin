@@ -69,13 +69,16 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   audiences?: Record<string, any>;
   /**
-   * True while the host is auto-advancing through already-started quizzes in
-   * the deck — i.e. a previous quiz/game was started and the presenter moved
-   * forward to the next one. When `true`, the plugin should start the game
-   * immediately and skip its game-lobby / join screen (mirrors the native
-   * quiz behaviour). `false`/undefined means show the lobby as usual.
+   * Legacy game-lobby flag: false while a game-lobby quiz waits in the lobby,
+   * true once started or when there's no lobby. Superseded by `quizStatus`
+   * (prefer it), but still wired for back-compat.
    */
   autoStartGame?: boolean;
+  /**
+   * Host quiz lifecycle phase (`QuizStatus` in `@aha/common`: 1=Lobby, 2=Rule,
+   * 3=Countdown, 4=Question, 5=Result). `undefined` for non-quiz slides.
+   */
+  quizStatus?: number;
   /**
    * Action to fetch all custom attributes for the current slide from the parent application.
    *
@@ -265,6 +268,10 @@ export const presenterZoidProps = {
   },
   autoStartGame: {
     type: 'boolean',
+    required: false,
+  },
+  quizStatus: {
+    type: 'number',
     required: false,
   },
   onHeightChange: {

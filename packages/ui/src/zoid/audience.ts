@@ -66,6 +66,8 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   timeLimit: Ref<number | null | undefined>;
   /** False while the host holds the quiz in the game lobby (wait for Start); true once started or when there's no lobby. Defaults to true (fail-open). */
   autoStartGame: Ref<boolean>;
+  /** Host quiz lifecycle phase (QuizStatus from @aha/common); undefined for non-quiz slides. */
+  quizStatus: Ref<number | undefined>;
   scrollTo: ((yOffset: number) => void) | undefined;
   getWindowHeight: (() => Promise<number>) | undefined;
   /** Teams the audience can join (when team play is enabled on the host). */
@@ -99,6 +101,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const onSubmitButtonHeightChange = xprops?.onSubmitButtonHeightChange;
   const timeLimit = ref<number | null | undefined>(xprops?.timeLimit);
   const autoStartGame = ref<boolean>(xprops?.autoStartGame ?? true);
+  const quizStatus = ref<number | undefined>(xprops?.quizStatus);
   const scrollTo = xprops?.scrollTo;
   const getWindowHeight = xprops?.getWindowHeight;
 
@@ -124,6 +127,11 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
       autoStartGame.value = newProps.autoStartGame;
     } else if ('autoStartGame' in newProps) {
       autoStartGame.value = true;
+    }
+    if (newProps.quizStatus !== undefined) {
+      quizStatus.value = newProps.quizStatus;
+    } else if ('quizStatus' in newProps) {
+      quizStatus.value = undefined;
     }
     if (newProps.timeLimit !== undefined) {
       timeLimit.value = newProps.timeLimit;
@@ -165,6 +173,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     onSubmitButtonHeightChange,
     timeLimit,
     autoStartGame,
+    quizStatus,
     scrollTo,
     getWindowHeight,
     participantInfo,
