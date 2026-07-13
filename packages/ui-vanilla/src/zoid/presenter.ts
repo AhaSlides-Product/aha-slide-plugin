@@ -70,7 +70,7 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   audiences?: Record<string, any>;
   /**
    * Legacy game-lobby flag: false while a game-lobby quiz waits in the lobby,
-   * true once started or when there's no lobby. Superseded by `quizStatus`
+   * true once started or when there's no lobby. Superseded by `slide.quizStatus`
    * (prefer it), but still wired for back-compat.
    */
   autoStartGame?: boolean;

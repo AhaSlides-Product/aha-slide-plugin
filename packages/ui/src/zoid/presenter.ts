@@ -55,7 +55,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   /**
    * False while the host holds a game-lobby quiz in the lobby (wait for Start);
    * true once started or when the slide has no lobby. Derived from the synced
-   * quizStatus — the audience surface exposes the identical value.
+   * `slide.quizStatus` — the audience surface exposes the identical value.
    */
   autoStartGame: Ref<boolean | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
