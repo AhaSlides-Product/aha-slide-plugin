@@ -1,6 +1,6 @@
 {
   "name": "@aha/common",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Shared utilities for both backend and frontend",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
