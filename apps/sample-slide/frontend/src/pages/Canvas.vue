@@ -161,9 +161,9 @@ const {
   showConfirmModal,
   allowPDFRender,
   audiences,
-  quizStatus,
 } = usePresenterPlugin();
 // A game plugin skips its lobby once the host leaves the lobby phase.
+const quizStatus = computed(() => slideProps.value?.quizStatus);
 const shouldSkipLobby = computed(() => quizStatus.value !== QuizStatus.Lobby);
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');

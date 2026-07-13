@@ -55,11 +55,9 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   /**
    * False while the host holds a game-lobby quiz in the lobby (wait for Start);
    * true once started or when the slide has no lobby. Derived from the synced
-   * quizStatus — the audience surface exposes the identical value.
+   * `slide.quizStatus` — the audience surface exposes the identical value.
    */
   autoStartGame: Ref<boolean | undefined>;
-  /** Host quiz lifecycle phase (QuizStatus from @aha/common). */
-  quizStatus: Ref<number | undefined>;
   showToastInfo: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastSuccess: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
   showToastError: ((text: string, uniqName?: string, action?: any, options?: any) => void) | undefined;
@@ -144,13 +142,11 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
   const currentUserProps = ref<Record<string, any> | undefined>((window as any).xprops?.currentUser);
   const audiences = ref<Record<string, any> | undefined>((window as any).xprops?.audiences);
   const autoStartGame = ref<boolean | undefined>((window as any).xprops?.autoStartGame);
-  const quizStatus = ref<number | undefined>((window as any).xprops?.quizStatus);
 
   const baseHook = useBaseSlidePlugin(options, (newProps) => {
     if (newProps.currentUser) currentUserProps.value = { ...newProps.currentUser };
     if (newProps.audiences) audiences.value = { ...newProps.audiences };
     if (newProps.autoStartGame !== undefined) autoStartGame.value = newProps.autoStartGame;
-    if (newProps.quizStatus !== undefined) quizStatus.value = newProps.quizStatus;
   });
   const { xprops } = baseHook;
 
@@ -188,7 +184,6 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     currentUserProps,
     audiences,
     autoStartGame,
-    quizStatus,
     baseUrl: baseHook.baseUrl,
     subscribeTopic: baseHook.subscribeTopic,
     unsubscribeTopic: baseHook.unsubscribeTopic,

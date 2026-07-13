@@ -99,6 +99,8 @@ export interface BaseSlidePluginProps {
 
     /** slide title */
     title?: string;
+    /** Host quiz lifecycle phase (`QuizStatus` in `@aha/common`); undefined for non-quiz slides. */
+    quizStatus?: number;
     [key: string]: any;
   };
   /**

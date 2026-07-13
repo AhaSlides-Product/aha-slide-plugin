@@ -4,8 +4,8 @@ export enum SubmissionSenderType {
 }
 
 /**
- * Host quiz lifecycle phase, sent to plugin quiz iframes via the `quizStatus`
- * xprop. Values mirror the host `QuizStatuses` enum.
+ * Host quiz lifecycle phase, carried on the `slide` prop (`slide.quizStatus`).
+ * Values mirror the host `QuizStatuses` enum.
  */
 export enum QuizStatus {
   Lobby = 1,
