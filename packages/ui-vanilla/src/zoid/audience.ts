@@ -97,11 +97,6 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    */
   autoStartGame?: boolean;
   /**
-   * Host quiz lifecycle phase (`QuizStatus` in `@aha/common`: 1=Lobby, 2=Rule,
-   * 3=Countdown, 4=Question, 5=Result). `undefined` for non-quiz slides.
-   */
-  quizStatus?: number;
-  /**
    * Scroll the parent app to a specific offset relative to the iframe top.
    * @param yOffset - The vertical offset relative to the iframe top.
    */
@@ -285,10 +280,6 @@ export function initZoidForAudience() {
       },
       autoStartGame: {
         type: 'boolean',
-        required: false,
-      },
-      quizStatus: {
-        type: 'number',
         required: false,
       },
       scrollTo: {
