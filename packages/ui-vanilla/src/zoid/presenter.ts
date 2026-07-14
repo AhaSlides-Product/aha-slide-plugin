@@ -51,6 +51,23 @@ export type ConfirmModalPayload = {
  * Interface for the properties expected by the PresenterSlidePluginIframe component.
  */
 export interface SlidePluginProps extends BaseSlidePluginProps {
+  /**
+   * Host-driven keep-alive preload gate (host setting `enablePreloadIframe`).
+   *
+   * When the host preloads the NEXT slide's plugin iframe ahead of time (while a
+   * previous slide is still on screen), it renders the iframe with `active:
+   * false`. The iframe fully boots — all JS/CSS/HTML bundles download, parse and
+   * execute, and zoid connects — but the plugin should render only a blank/hidden
+   * shell and must NOT consume real slide data yet. When the slide becomes the
+   * active slide, the host flips this to `true` via `updateProps({ active: true,
+   * ...data })` — WITHOUT recreating the iframe — and only then does the plugin
+   * render its actual component with full data. Because the bundles are already
+   * loaded, that first real paint is near-instant.
+   *
+   * `undefined` (prop omitted) is treated as active, for backward compatibility:
+   * hosts that don't preload keep the current immediate-render behaviour.
+   */
+  active?: boolean;
   presentation?: BaseSlidePluginProps['presentation'] & {
     /** The teamplay object used in the presentation */
     teamplay?: Record<string, any>;
@@ -245,6 +262,14 @@ export const presenterZoidProps = {
     type: 'string',
     required: true,
     queryParam: false,
+  },
+  // Host-driven keep-alive preload gate (host setting `enablePreloadIframe`).
+  // `false` while the host preloads this iframe ahead of time (bundles boot but
+  // the plugin stays blank / consumes no data); flipped to `true` via updateProps
+  // when the slide becomes active. Omitted => treated as active (back-compat).
+  active: {
+    type: 'boolean',
+    required: false,
   },
   presentation: {
     type: 'object',
