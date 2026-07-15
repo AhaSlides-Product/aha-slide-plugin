@@ -56,6 +56,32 @@ runs:
           packages/toolkit/dist/schema
         if-no-files-found: warn
 
+    # A plugin's frontend build (`vue-tsc -b && vite build`) can fail while the
+    # top-level `npm run build -- --continue || true` above still exits 0, leaving
+    # no `frontend/dist`. The deploy step then silently skips that plugin, so a
+    # broken build ships nothing while the pipeline stays green (this hid the
+    # AHA-46130 idea-board change for ~2 weeks). Fail here instead: every frontend
+    # that declares a `build` script must have produced a non-empty dist.
+    - name: Verify frontend builds produced output
+      shell: bash
+      run: |
+        missing=()
+        while IFS= read -r pkg; do
+          dir=$(dirname "$pkg")
+          if node -e "const s=require('./$pkg').scripts||{}; process.exit(s.build?0:1)" 2>/dev/null; then
+            if [ ! -d "$dir/dist" ] || [ -z "$(ls -A "$dir/dist" 2>/dev/null)" ]; then
+              missing+=("$dir")
+            fi
+          fi
+        done < <(find apps -type d -name node_modules -prune -o -type f -path '*/frontend/package.json' -print)
+
+        if [ "${#missing[@]}" -gt 0 ]; then
+          echo "::error::Frontend build produced no dist for ${#missing[@]} plugin(s) — their build failed:"
+          printf '::error::  - %s\n' "${missing[@]}"
+          exit 1
+        fi
+        echo "✓ All frontend plugins produced a dist."
+
     - name: Upload Storybook Artifacts
       if: ${{ inputs.build_storybook == 'true' }}
       uses: actions/upload-artifact@v4
