@@ -7,6 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { LANGUAGES } from './languages';
+import { type AppId, CONTENT_DIVERGENCES, NON_COMPLIANCE } from './non-compliance';
 import { resolveLanguage } from './registry';
 
 describe('registry data — required fields', () => {
@@ -30,6 +31,28 @@ describe('registry data — required fields', () => {
       for (const banned of ['apps', 'aliases', 'files']) {
         expect(lang, `${lang.code} must not carry "${banned}"`).not.toHaveProperty(banned);
       }
+    }
+  });
+
+  it('carries no free-text field — this file is data, not a place to explain', () => {
+    // `notes` existed and was removed. It was added for a good reason (stop a
+    // reader "helpfully fixing" a deliberate value) and became the path of
+    // least resistance for every finding anyone made: 13 of 33 entries, ~26% of
+    // the file, a 20-line essay on the pt dialect — every word a second copy of
+    // NON_COMPLIANCE/CONTENT_DIVERGENCES/README, already drifting from them.
+    // This is the ratchet. Prose has typed homes; see the README's "Where prose
+    // goes". If this fails, the copy you are about to add belongs in one of them.
+    for (const lang of LANGUAGES) {
+      for (const banned of ['notes', 'note', 'comment', 'description']) {
+        expect(lang, `${lang.code} must not carry "${banned}" — see README "Where prose goes"`)
+          .not.toHaveProperty(banned);
+      }
+      expect(Object.keys(lang).sort(), `${lang.code} has exactly four fields`).toEqual([
+        'antd',
+        'code',
+        'dayjs',
+        'name',
+      ]);
     }
   });
 });
@@ -69,13 +92,57 @@ describe('registry data — the codes are the standard, not the apps’ habits',
 });
 
 describe('registry data — unsourced values are documented, not guessed', () => {
-  it('requires a note wherever dayjs or antd is null', () => {
+  // This used to assert that a null carried an explanatory `notes` string. The
+  // prose field is gone (see the README's "Where prose goes"), and the check is
+  // stronger without it: a null is not an opinion needing a comment, it is a
+  // FACT about the apps — the registry sources `dayjs` from aha-survey and
+  // `antd` from aha-report/aha-survey, so a value is unsourced exactly when
+  // those apps lack the language. That is already recorded, per app, as a
+  // `missing-language` deviation. Tying the two together means the explanation
+  // cannot go missing, cannot drift from the checklist, and names the concrete
+  // work that fills the hole — none of which a free-text note gave us.
+  const DAYJS_SOURCES: readonly AppId[] = ['survey'];
+  const ANTD_SOURCES: readonly AppId[] = ['report', 'survey'];
+
+  const missingIn = (app: AppId, code: string) =>
+    NON_COMPLIANCE.some(
+      (d) => d.app === app && d.kind === 'missing-language' && d.language === code,
+    );
+
+  it('explains every null with the missing-language entry that causes it', () => {
     for (const lang of LANGUAGES) {
-      if (lang.dayjs === null || lang.antd === null) {
-        expect(
-          lang.notes,
-          `${lang.code} has a null dayjs/antd but no note explaining why`,
-        ).toBeTruthy();
+      for (const [field, sources] of [
+        ['dayjs', DAYJS_SOURCES],
+        ['antd', ANTD_SOURCES],
+      ] as const) {
+        if (lang[field] !== null) continue;
+        for (const app of sources) {
+          expect(
+            missingIn(app, lang.code),
+            `${lang.code}.${field} is null, so the registry's source for it (${app}) must ` +
+              `have a missing-language entry saying why nobody has chosen one`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('has no null left unexplained once its source app has the language', () => {
+    // The mirror: if every source app HAS the language, someone chose a value,
+    // so a null would be an unrecorded guess-in-waiting rather than a fact.
+    for (const lang of LANGUAGES) {
+      for (const [field, sources] of [
+        ['dayjs', DAYJS_SOURCES],
+        ['antd', ANTD_SOURCES],
+      ] as const) {
+        const unsourceable = sources.some((app) => missingIn(app, lang.code));
+        if (!unsourceable) {
+          expect(
+            lang[field],
+            `${lang.code}.${field}: every source app has this language, so a value was ` +
+              `chosen — null cannot be right`,
+          ).not.toBeNull();
+        }
       }
     }
   });
@@ -91,22 +158,50 @@ describe('registry data — unsourced values are documented, not guessed', () =>
 });
 
 describe('registry data — known divergences stay recorded', () => {
-  it('keeps the zh and pt content questions visible in the data', () => {
-    // The registry records these rather than resolving them; the detail lives
-    // in CONTENT_DIVERGENCES, but the language entry must point at it so a
-    // reader of LANGUAGES alone cannot miss it.
-    expect(resolveLanguage('zh')?.notes).toMatch(/DO NOT "FIX"/i);
-    // pt is half-resolved: product settled the CODE as `pt` (2026-07); WHICH
-    // Portuguese the content is stays open. The note must carry both halves —
-    // recording only the decision would let someone "finish the job" by picking
-    // a dialect, and recording only the open question would let someone
-    // re-litigate the code.
-    const pt = resolveLanguage('pt')?.notes ?? '';
-    expect(pt, 'must record that the code is settled as `pt`').toMatch(/CODE SETTLED/i);
-    expect(pt, 'must keep the dialect question open').toMatch(/DIALECT OPEN/i);
-    // ...and must not re-assert the dialect claim the measurements disproved:
-    // the presenter is a blend, not European.
-    expect(pt, 'must not call the presenter European').not.toMatch(/presenter[^.]*European/i);
+  // These assertions used to read the `notes` prose on the language entries.
+  // The questions themselves have not moved and must not be lost — only the
+  // duplicate copy of them did. They live in CONTENT_DIVERGENCES, which is
+  // where they were always documented; these now guard that record directly
+  // rather than a restatement of it in LANGUAGES.
+  const divergence = (code: string) => CONTENT_DIVERGENCES.find((c) => c.language === code);
+
+  it('keeps the zh content question recorded, not resolved by a registry edit', () => {
+    const zh = divergence('zh');
+    expect(zh, 'zh divergence must exist — the code serves two languages').toBeDefined();
+    // The audience app has no Simplified file, so no code reassignment fixes it.
+    expect(zh?.detail).toMatch(/audience app has NO Simplified file/i);
+    expect(zh?.decision, 'must stay a question for a human').toMatch(/\?$/);
+  });
+
+  it('keeps pt half-resolved: the CODE settled, the DIALECT open', () => {
+    // Recording only the decision would let someone "finish the job" by picking
+    // a dialect; recording only the open question would let someone re-litigate
+    // the code. Both halves must survive, and they must stay distinguishable.
+    const pt = divergence('pt');
+    expect(pt, 'pt divergence must exist').toBeDefined();
+    expect(pt?.decision, 'the code half is settled').toMatch(/CODE half is settled/i);
+    expect(pt?.decision, 'the dialect half is not').toMatch(/which Portuguese|European or Brazilian/i);
+    expect(pt?.detail).toMatch(/THE CODE HALF IS DECIDED, THE DIALECT IS NOT/i);
+    // The `pt` code decision is settled in the checklist as an actionable
+    // rename — the two records must not disagree about that.
+    const survey = NON_COMPLIANCE.find(
+      (d) => d.app === 'survey' && d.kind === 'wrong-code' && d.actual === 'pt-BR',
+    );
+    expect(survey?.required, 'the settled code').toBe('pt');
+    expect(survey?.blockedBy, 'the code question no longer blocks it').toBeUndefined();
+  });
+
+  it('never re-asserts that the presenter serves European Portuguese', () => {
+    // The claim an earlier round got wrong and the measurements disproved: the
+    // presenter's file is a BLEND (ficheiro x34 AND arquivo x19). It points
+    // European by LABEL only, which is exactly why "just follow the presenter"
+    // cannot settle the dialect. Guard the classification, not the word:
+    // `serves.presenter` legitimately mentions the European *label*.
+    const pt = divergence('pt');
+    expect(pt?.serves.presenter, 'the presenter file is a blend').toMatch(/BLEND/i);
+    expect(pt?.detail, 'the tiebreak must stay refuted').toMatch(
+      /presenter has no single dialect to follow/i,
+    );
   });
 
   it('preserves the deliberate antd gaps rather than "fixing" them', () => {

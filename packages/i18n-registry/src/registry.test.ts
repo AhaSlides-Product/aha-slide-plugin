@@ -112,7 +112,10 @@ describe('resolveLanguage', () => {
     for (const banned of ['apps', 'aliases', 'files']) {
       expect(ko).not.toHaveProperty(banned);
     }
-    expect(Object.keys(ko).sort()).toEqual(['antd', 'code', 'dayjs', 'name', 'notes'].sort());
+    // Four fields, no fifth. `notes` was removed deliberately — an open prose
+    // field on a data type accumulates everything and duplicates the records
+    // that should own it. See the README's "Where prose goes".
+    expect(Object.keys(ko).sort()).toEqual(['antd', 'code', 'dayjs', 'name'].sort());
   });
 });
 

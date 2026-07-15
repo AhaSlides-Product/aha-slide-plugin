@@ -43,6 +43,22 @@ A hand-mirrored list drifts, and it already has. As of 2026-07-15:
 Nothing catches any of this, because there is no shared declaration to check
 against. This package is that declaration.
 
+## Where the 33 languages come from
+
+The set is the presenter's **`messages` map** (`src/utils/language/index.js`) —
+the languages it can actually load — **not** its switcher list. The two are not
+the same, and the difference is deliberate:
+
+- The `messages` map has **34 keys for 33 languages**: `sl` and `si` both load
+  `AhaSlides_Slovenia.json`. `si` is not a 34th language, it is a defect
+  (recorded as a `legacy-alias`).
+- **Indonesian (`id`), Turkish (`tr`) and Danish (`da`)** are *not* offered in
+  the presenter's switcher (`languageOptions` in `src/constant/index.js`), but
+  they load fine via `messages` and are allowlisted in `src/constant/locale.js`.
+  They are real languages, reachable by a host locale — just not user-selectable
+  in that one UI. Deriving the set from the switcher would silently drop all
+  three.
+
 ## The rule
 
 > **The registry declares ONE standard. The API speaks canonical codes only.**
@@ -253,12 +269,22 @@ resolve when the content question does.
 
 ### Deliberate gaps — leave them alone
 
-- **Albanian** has no antd pack; both consumers fall back to `en_US` built-ins on
-  purpose. `antd: 'en_US'` records that intent.
-- **Serbian Cyrillic** borrows the Latin-script `sr_RS` pack — the only Serbian
-  pack antd has.
-- **Norwegian** stays on the `no` macrolanguage code (a valid ISO 639-1 code)
-  with Bokmål `nb`/`nb_NO` tooling, because dayjs and antd have no bare `no`.
+Three entries carry a `dayjs`/`antd` value that looks like a bug and is not. They
+are the values the apps actually chose; "fixing" them changes real behaviour.
+Each is pinned by a test, so a helpful correction fails the suite rather than
+shipping.
+
+- **Albanian (`sq`)** — `antd: 'en_US'`. antd ships **no Albanian pack**, so both
+  `aha-report` and `aha-survey` fall back to `en_US` for built-ins (pagination,
+  pickers, empty states); strings and dates are still Albanian. The value records
+  that intentional fallback — it is not a stray copy-paste.
+- **Serbian Cyrillic (`sr-Cyrl`)** — `antd: 'sr_RS'`, the same pack as `sr-Latn`.
+  antd has no Cyrillic Serbian pack, so both consumers borrow the **Latin-script**
+  one: built-ins render in Latin script while strings and dates are Cyrillic. That
+  is the existing, intentional behaviour.
+- **Norwegian (`no`)** — `dayjs: 'nb'`, `antd: 'nb_NO'`. `no` is a valid ISO 639-1
+  **macrolanguage** code so it stays canonical, but dayjs and antd have no bare
+  `no` — both use Bokmål, the standard written form. The pairing is correct.
 
 ## `null` means "nobody has chosen one", not "none exists"
 
@@ -271,7 +297,16 @@ resolve when the content question does.
 
 These were **not guessed**. A wrong locale code here propagates to five apps, so
 an unsourced value stays `null` until someone picks it deliberately and records
-it. A test enforces that every `null` carries an explanatory `notes`.
+it.
+
+`null` is never unexplained, and the explanation is **derivable, not prose**: a
+value is unsourced exactly when the app the registry sources it *from* does not
+have the language — so every `null` is accounted for by a `missing-language`
+entry in the checklist naming that app. `aha-survey` is the sole source of
+`dayjs` codes; `aha-report` and `aha-survey` are the sources of `antd` packs.
+A test enforces that link in both directions, so a `null` can never appear
+without the checklist entry that explains it, and adding the language to the app
+is what unblocks the value.
 
 ## Adding a language
 
@@ -280,17 +315,53 @@ it. A test enforces that every `null` carries an explanatory `notes`.
    package was written). Do not infer a language from a filename either; read the
    mapping code. `zh` is the cautionary tale.
 2. Add the entry to `src/languages.ts` with every field sourced from real app
-   code. If a value cannot be sourced, use `null` and add a `notes` explaining —
-   do not invent it.
+   code. If a value cannot be sourced, use `null` — do not invent it.
+   `src/languages.ts` is **data only**: it takes a code, a name, and two pack
+   values, and it has no field to write prose in. That is deliberate (see below).
 3. If any app is behind on it, add the `missing-language` entries to
    `src/non-compliance.ts` in the same PR. A language nobody has recorded as
-   missing is a language nobody will add.
+   missing is a language nobody will add. This is also what explains any `null`
+   you just added — the tests require the two to agree.
 4. Run `npm test -w @aha/i18n-registry`. The suite checks duplicate codes, that
    no canonical code collides with another language's ISO code, that every
    checklist entry is complete and points at a real language and a real file,
    and that no `null` is undocumented.
 5. **Bump `version` in `package.json`.** CI enforces this — see below.
 6. Publish via the **Publish Packages** workflow (`workflow_dispatch`).
+
+## Where prose goes — and why `languages.ts` has none
+
+`LanguageEntry` is `code`, `name`, `dayjs`, `antd`. **There is no `notes` field,
+and adding one back is a regression.**
+
+There used to be. It was introduced for a good reason — to stop a reader
+"helpfully fixing" a deliberate value — and it did what an open-ended prose field
+on a data type always does: it became the path of least resistance for every
+finding anyone made. It grew to cover 13 of 33 entries and roughly a quarter of
+the file, including a ~20-line essay on the Portuguese dialect question. Every
+word of it was a **second or third copy** of something this README or the
+checklist already said, and the copies had begun to drift apart. `languages.ts`
+is the file every consumer imports; it should read as the data it is.
+
+So each kind of knowledge has exactly one home:
+
+| Knowledge | Home |
+| --------- | ---- |
+| Which languages exist, and their canonical codes and packs | `src/languages.ts` — data, no prose |
+| An app deviates from the standard and must change | `NON_COMPLIANCE` — typed, findable by `app`/`kind`/`language` |
+| The same code serves different content in different apps | `CONTENT_DIVERGENCES` — typed, one entry per language |
+| Narrative that belongs to no single entry | this README |
+| "Do not "fix" this value" | **a test that fails**, plus this README's *Deliberate gaps* |
+
+That last row is the important one, and the reason the field is not needed. A
+comment never stopped anybody: a note saying `DO NOT "FIX"` is invisible to the
+person who edits the value and runs the suite. A **failing test with the reason
+in it** is not. Every deliberate value and every `null` is pinned by an assertion
+in `languages.test.ts`, so a helpful correction fails loudly with an explanation
+instead of shipping to five apps.
+
+If you have something to say about a language and none of the rows above fit, the
+thing you are describing is probably a defect — write it in the checklist.
 
 ## The version gate
 

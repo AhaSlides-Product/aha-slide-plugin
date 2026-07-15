@@ -297,8 +297,16 @@ export const NON_COMPLIANCE: readonly Deviation[] = [
     source: SURVEY_MAPPING,
     detail:
       'ACTIONABLE — unblocked by the product decision (2026-07) that AhaSlides ships ONE ' +
-      'Portuguese under the code `pt`. The presenter language picker offers a single ' +
-      'Portuguese entry, so there is no second language for `pt-BR` to name. Migrate: ' +
+      'Portuguese under the code `pt`. BOTH of the presenter\'s language pickers agree, ' +
+      'and they are independent hardcoded lists, which is what makes the grounds solid ' +
+      'rather than one list\'s habit:\n' +
+      "  - UI language:           { name: 'Português', language: 'pt', country: 'Portugal' } " +
+      '— src/constant/index.js\n' +
+      "  - presentation language: { id: 'pt', title: 'Português' } " +
+      '— src/components-v2/presentation-editor/settings-modal/' +
+      'SettingsPresentationLanguageTab.vue\n' +
+      'Neither offers a Brazilian option, so there is no second language for `pt-BR` to ' +
+      'name. Migrate: ' +
       "rename the `SurveyLocale` member 'pt-BR' -> 'pt', the resource directory " +
       'frontend/src/i18n/pt-BR/ -> pt/, and collapse the SUPPORTED entries ' +
       "`br: 'pt-BR'` / `pt: 'pt-BR'` onto `pt` (the `br` shim itself is a separate, " +
@@ -562,7 +570,10 @@ export const NON_COMPLIANCE: readonly Deviation[] = [
       '`sv` to SUPPORTED and the SurveyLocale union, plus its resource bundle. ' +
       'Adding it also unblocks `sv.dayjs`, which is null in the registry only because ' +
       'aha-survey — the sole source of dayjs codes — has no Swedish entry to read one ' +
-      'from. Note the host will send `se` until the presenter migrates.',
+      'from. That is the whole reason for the asymmetry in the `sv` entry: `antd` is ' +
+      'sv_SE because aha-report HAS Swedish and chose a pack, while `dayjs` has no ' +
+      'source at all — it was not guessed. Note the host will send `se` until the ' +
+      'presenter migrates.',
   },
 
   // ---------------------------------------------------------------- unregistered
@@ -649,9 +660,9 @@ export const CONTENT_DIVERGENCES: readonly ContentDivergence[] = [
   {
     language: 'zh',
     serves: {
-      presenter: 'Simplified (AhaSlides_Simplified_Chinese.json)',
+      presenter: 'Simplified (AhaSlides_Simplified_Chinese.json; switcher entry 中文/China)',
       audience: 'Traditional (AhaSlides_Traditional_Chinese.json)',
-      report: 'Simplified (zh.json) — plus Traditional under a separate `zh-tw`',
+      report: 'Simplified (zh.json, antd zh_CN) — plus Traditional under a separate `zh-tw`',
     },
     decision:
       'Does AhaSlides ship Traditional Chinese as a distinct language (`zh-TW`), or is ' +
@@ -713,8 +724,10 @@ export const CONTENT_DIVERGENCES: readonly ContentDivergence[] = [
       'where the users are, not a decision about who we serve — which is why this is a ' +
       'product call and not a patch.\n\n' +
       'Until it is answered, the `pt` entry\'s antd pt_PT / dayjs pt-br stay mismatched ' +
-      'on purpose: they are the only values any app has chosen, and harmonising them ' +
-      'would silently decide the dialect.',
+      'on purpose — that mismatch IS this open question showing through in the data. ' +
+      'They are the only values any app has chosen (antd pt_PT from aha-report, dayjs ' +
+      'pt-br from aha-survey, each the registry\'s sole source for that field), and ' +
+      'harmonising them would silently decide the dialect. They resolve when this does.',
   },
 ];
 

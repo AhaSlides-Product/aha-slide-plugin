@@ -17,6 +17,18 @@
  * Every field is the standard's answer, not any app's answer. If an app
  * disagrees with a field here, the app is wrong, and the disagreement belongs
  * in the non-compliance record rather than in this type.
+ *
+ * These four fields are the whole type, and there is deliberately no fifth for
+ * free text. A `notes?: string` existed and had to be removed: an open-ended
+ * prose field on a data type is the path of least resistance for every finding
+ * anyone makes, so it accumulated app deviations, open product questions and
+ * measurement evidence — all of it duplicating `./non-compliance.js` and the
+ * README, and starting to drift from them. Explanations live where they are
+ * findable and typed: {@link LanguageEntry.dayjs}/{@link LanguageEntry.antd}
+ * carry the `null` semantics, NON_COMPLIANCE carries per-app defects,
+ * CONTENT_DIVERGENCES carries the content questions, and a value nobody should
+ * "helpfully fix" is pinned by a test that fails with the reason — see the
+ * README's "Where prose goes".
  */
 export interface LanguageEntry {
   /**
@@ -42,6 +54,12 @@ export interface LanguageEntry {
    * locale". Consumers needing it must pick one deliberately and record it
    * here. A guess would propagate silently to every consumer, so the registry
    * refuses to make one.
+   *
+   * Every `null` is therefore explained by a `missing-language` entry in
+   * `./non-compliance.js` naming the app that lacks the language — `aha-survey`
+   * is the sole source of dayjs codes, so a null here means the survey has no
+   * entry to read one from. A test enforces that link, so the reason is never
+   * missing and adding the language to the app is what unblocks the value.
    */
   readonly dayjs: string | null;
 
@@ -51,11 +69,4 @@ export interface LanguageEntry {
    * {@link LanguageEntry.dayjs}.
    */
   readonly antd: string | null;
-
-  /**
-   * Free text recording a known trap, deliberate gap, or unresolved question
-   * for this language. Present only where there is something a reader must not
-   * "helpfully" fix.
-   */
-  readonly notes?: string;
 }
