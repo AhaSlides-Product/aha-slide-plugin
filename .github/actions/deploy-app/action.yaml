@@ -54,18 +54,22 @@ runs:
         SLIDES_AGENT_BUCKET: ${{ inputs.slides_agent_bucket }}
       run: |
         INVALIDATION_PATHS=""
+        MISSING_DIST=0
 
         # Deploy a single plugin's build output. Path is keyed by leaf folder name
         # so a grouped plugin (apps/<group>/<plugin>/) deploys to s3://bucket/<plugin>/
         # — same shape as a top-level plugin (apps/<plugin>/).
         deploy_plugin() {
           local app_dir="$1"
-          local app_name
+          local app_name has_agent=0
           app_name=$(basename "$app_dir")
 
-          if [ -d "${app_dir}slides_agent" ] && [ -n "$SLIDES_AGENT_BUCKET" ]; then
-            echo "Copying slides agents spec for ${app_name}..."
-            aws s3 cp "${app_dir}slides_agent" "s3://${SLIDES_AGENT_BUCKET}/slide_types_schemas/" --recursive
+          if [ -d "${app_dir}slides_agent" ]; then
+            has_agent=1
+            if [ -n "$SLIDES_AGENT_BUCKET" ]; then
+              echo "Copying slides agents spec for ${app_name}..."
+              aws s3 cp "${app_dir}slides_agent" "s3://${SLIDES_AGENT_BUCKET}/slide_types_schemas/" --recursive
+            fi
           fi
 
           if [ -d "${app_dir}frontend/dist" ]; then
@@ -73,6 +77,13 @@ runs:
             aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}" --exclude "*/index.html" --exclude "index.html"
             aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
             INVALIDATION_PATHS="$INVALIDATION_PATHS /${app_name}/*"
+          elif [ "$has_agent" = 1 ]; then
+            # A slide-type plugin ships a slides_agent spec, so it must also have a
+            # frontend build. Missing dist here means its build silently failed —
+            # fail loudly instead of skipping (this is how AHA-46130 shipped nothing
+            # for ~2 weeks while every deploy still reported success).
+            echo "::error::No frontend/dist for slide plugin '${app_name}' — its build likely failed; refusing to silently skip it."
+            MISSING_DIST=1
           fi
         }
 
@@ -113,4 +124,11 @@ runs:
         if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then
           echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
           aws cloudfront create-invalidation --distribution-id "${{ inputs.cloudfront_distribution_id }}" --paths $INVALIDATION_PATHS
+        fi
+
+        # Deploy the plugins that DID build (above), then fail the job so a broken
+        # plugin can't ship nothing under a green check.
+        if [ "$MISSING_DIST" = 1 ]; then
+          echo "::error::One or more slide plugins had no frontend build to deploy — failing the deploy."
+          exit 1
         fi
