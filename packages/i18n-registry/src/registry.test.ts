@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import {
-  canonicalCodes,
-  codeForApp,
-  getLanguage,
-  isKnownCode,
-  languagesForApp,
-  resolveCode,
-  resolveLanguage,
-} from './registry';
+import { canonicalCodes, isKnownCode, resolveCode, resolveLanguage } from './registry';
+
+/**
+ * Every app-specific code in use today. The registry must reject all of them:
+ * that rejection IS the migration signal. If a future change makes any of
+ * these resolve, the registry has stopped being a standard and become a
+ * compatibility shim — which is the exact failure these tests exist to catch.
+ */
+const APP_SPECIFIC_CODES = [
+  'kr', // presenter/audience/report/team Korean — really Kanuri
+  'se', // presenter/audience/report/team Swedish — really Northern Sami
+  'si', // presenter/audience/team Slovenian — really Sinhala
+  'br', // presenter/team Portuguese — really Breton
+  'pt-BR', // survey Portuguese
+];
 
 describe('canonicalCodes', () => {
   it('lists every language exactly once', () => {
@@ -16,15 +22,14 @@ describe('canonicalCodes', () => {
     expect(new Set(codes).size).toBe(codes.length);
   });
 
-  it('includes the ISO-corrected canonicals, not the apps’ legacy codes', () => {
+  it('is the ISO-corrected set, never an app’s legacy code', () => {
     const codes = canonicalCodes();
     expect(codes).toContain('ko');
     expect(codes).toContain('sv');
     expect(codes).toContain('sl');
     expect(codes).toContain('pt');
     expect(codes).toContain('sr-Latn');
-    // The legacy/wrong codes are aliases, never canonical.
-    for (const wrong of ['kr', 'se', 'si', 'br', 'sr-latn', 'pt-BR']) {
+    for (const wrong of APP_SPECIFIC_CODES) {
       expect(codes).not.toContain(wrong);
     }
   });
@@ -36,13 +41,13 @@ describe('canonicalCodes', () => {
   });
 });
 
-describe('resolveCode', () => {
-  it('maps each app’s legacy code to the canonical one', () => {
-    expect(resolveCode('kr')).toBe('ko'); // presenter/audience/report/team Korean
-    expect(resolveCode('se')).toBe('sv'); // "Swedish" (se is really Northern Sami)
-    expect(resolveCode('si')).toBe('sl'); // legacy Slovenian alias
-    expect(resolveCode('br')).toBe('pt'); // legacy Portuguese alias
-    expect(resolveCode('pt-BR')).toBe('pt'); // survey Portuguese
+describe('resolveCode — canonical only', () => {
+  it('REJECTS every app-specific code', () => {
+    // The load-bearing assertion of the whole package. `resolveCode('kr')`
+    // returning 'ko' would be a convenience that entrenches `kr` forever.
+    for (const code of APP_SPECIFIC_CODES) {
+      expect(resolveCode(code)).toBeUndefined();
+    }
   });
 
   it('is an identity on canonical codes', () => {
@@ -51,17 +56,23 @@ describe('resolveCode', () => {
     }
   });
 
-  it('is case-insensitive, reconciling sr-latn / sr-Latn', () => {
+  it('normalizes CASE only, because RFC 5646 tags are case-insensitive', () => {
+    // `sr-latn` is not an app dialect — it is the same tag, spelled without
+    // the recommended script casing. Rejecting it would be wrong, not strict.
     expect(resolveCode('sr-latn')).toBe('sr-Latn');
     expect(resolveCode('sr-Latn')).toBe('sr-Latn');
     expect(resolveCode('SR-LATN')).toBe('sr-Latn');
     expect(resolveCode('sr-cyrl')).toBe('sr-Cyrl');
-    expect(resolveCode('sr-Cyrl')).toBe('sr-Cyrl');
-    expect(resolveCode('KR')).toBe('ko');
+    expect(resolveCode('KO')).toBe('ko');
+  });
+
+  it('does not let case-insensitivity smuggle a wrong code back in', () => {
+    expect(resolveCode('KR')).toBeUndefined();
+    expect(resolveCode('SE')).toBeUndefined();
   });
 
   it('tolerates surrounding whitespace', () => {
-    expect(resolveCode('  kr  ')).toBe('ko');
+    expect(resolveCode('  ko  ')).toBe('ko');
   });
 
   it('returns undefined for unknown codes rather than silently falling back to en', () => {
@@ -81,86 +92,44 @@ describe('resolveCode', () => {
 });
 
 describe('resolveLanguage', () => {
-  it('returns the full entry for an alias', () => {
-    const ko = resolveLanguage('kr');
+  it('returns the full entry for a canonical code', () => {
+    const ko = resolveLanguage('ko');
     expect(ko?.code).toBe('ko');
     expect(ko?.name).toBe('Korean');
-    expect(ko?.apps.presenter).toBe('kr');
-    expect(ko?.apps.survey).toBe('ko');
+    expect(ko?.antd).toBe('ko_KR');
   });
 
-  it('records the zh divergence rather than resolving it', () => {
-    const zh = resolveLanguage('zh');
-    expect(zh?.files.presenter).toBe('AhaSlides_Simplified_Chinese.json');
-    expect(zh?.files.audience).toBe('AhaSlides_Traditional_Chinese.json');
-    expect(zh?.notes).toMatch(/DO NOT "FIX"/i);
-  });
-});
-
-describe('getLanguage', () => {
-  it('accepts canonical codes only', () => {
-    expect(getLanguage('ko')?.name).toBe('Korean');
-    expect(getLanguage('kr')).toBeUndefined(); // alias — use resolveLanguage
-    expect(getLanguage('sr-Latn')?.name).toBe('Serbian (Latin)');
-  });
-});
-
-describe('codeForApp', () => {
-  it('round-trips a canonical code into each app’s own vocabulary', () => {
-    expect(codeForApp('ko', 'presenter')).toBe('kr');
-    expect(codeForApp('ko', 'survey')).toBe('ko');
-    expect(codeForApp('sv', 'report')).toBe('se');
-    expect(codeForApp('pt', 'survey')).toBe('pt-BR');
-    expect(codeForApp('sr-Latn', 'team')).toBe('sr-latn');
+  it('rejects app-specific codes exactly as resolveCode does', () => {
+    expect(resolveLanguage('kr')).toBeUndefined();
+    expect(resolveLanguage('pt-BR')).toBeUndefined();
   });
 
-  it('translates directly between two apps’ codes', () => {
-    // The presenter says 'kr'; what does the survey call it?
-    expect(codeForApp('kr', 'survey')).toBe('ko');
-    // The survey says 'pt-BR'; what does the presenter call it?
-    expect(codeForApp('pt-BR', 'presenter')).toBe('pt');
-  });
-
-  it('returns null — not a guess — where an app lacks the language', () => {
-    expect(codeForApp('az', 'report')).toBeNull();
-    expect(codeForApp('az', 'survey')).toBeNull();
-    expect(codeForApp('az', 'team')).toBeNull();
-    expect(codeForApp('sv', 'survey')).toBeNull();
-  });
-
-  it('distinguishes "unsupported" (null) from "unknown" (undefined)', () => {
-    expect(codeForApp('az', 'survey')).toBeNull();
-    expect(codeForApp('xx', 'survey')).toBeUndefined();
-  });
-});
-
-describe('languagesForApp', () => {
-  it('reports the per-app language counts, drift included', () => {
-    // Presenter + audience are the authority: all 33.
-    expect(languagesForApp('presenter')).toHaveLength(33);
-    expect(languagesForApp('audience')).toHaveLength(33);
-    // The mirrors have fallen behind — this is the drift L0 exists to expose.
-    expect(languagesForApp('report')).toHaveLength(32); // no az
-    expect(languagesForApp('survey')).toHaveLength(31); // no az, no sv
-    expect(languagesForApp('team')).toHaveLength(32); // no az
-  });
-
-  it('excludes exactly the languages an app is missing', () => {
-    const missing = (app: 'report' | 'survey' | 'team') => {
-      const have = new Set(languagesForApp(app).map((l) => l.code));
-      return canonicalCodes().filter((c) => !have.has(c));
-    };
-    expect(missing('report')).toEqual(['az']);
-    expect(missing('team')).toEqual(['az']);
-    expect(missing('survey')).toEqual(['sv', 'az']);
+  it('exposes no app-shaped field — the standard does not model apps', () => {
+    const ko = resolveLanguage('ko') as unknown as Record<string, unknown>;
+    expect(ko).toBeDefined();
+    // Guards the review decision behind this package: an `apps`/`aliases`/
+    // `files` field is how "one standard" quietly becomes "five dialects".
+    for (const banned of ['apps', 'aliases', 'files']) {
+      expect(ko).not.toHaveProperty(banned);
+    }
+    expect(Object.keys(ko).sort()).toEqual(['antd', 'code', 'dayjs', 'name', 'notes'].sort());
   });
 });
 
 describe('isKnownCode', () => {
-  it('accepts canonical codes and aliases, rejects everything else', () => {
+  it('accepts canonical codes, in any casing', () => {
     expect(isKnownCode('en')).toBe(true);
-    expect(isKnownCode('kr')).toBe(true);
+    expect(isKnownCode('ko')).toBe(true);
     expect(isKnownCode('SR-LATN')).toBe(true);
+  });
+
+  it('is FALSE for app-specific codes — this is how an app learns to migrate', () => {
+    for (const code of APP_SPECIFIC_CODES) {
+      expect(isKnownCode(code)).toBe(false);
+    }
+  });
+
+  it('rejects junk', () => {
     expect(isKnownCode('xx')).toBe(false);
     expect(isKnownCode(null)).toBe(false);
   });

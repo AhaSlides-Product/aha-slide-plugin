@@ -1,56 +1,34 @@
 /**
  * Types for the canonical AhaSlides language registry.
  *
- * This package is DATA. It declares *which languages exist* and *what each
- * locale code means* across the AhaSlides apps. It deliberately contains no
- * i18n library, no runtime dependency, and no translated strings.
+ * This package is DATA. It declares *which languages AhaSlides has* and *what
+ * the one correct code for each is*. It deliberately contains no i18n library,
+ * no runtime dependency, and no translated strings.
+ *
+ * It also deliberately contains no notion of an *app*. The registry declares a
+ * single standard; it does not model, translate to, or otherwise speak any
+ * individual app's dialect. Where an app deviates from the standard today,
+ * that is recorded as a defect to be fixed — see `./non-compliance.js`.
  */
 
 /**
- * The apps that ship a language list today. Each mirrors the presenter's set
- * by hand, which is precisely why they have drifted — see the README.
- */
-export type AppId = 'presenter' | 'audience' | 'report' | 'survey' | 'team';
-
-/** Every {@link AppId}, in a stable order. Useful for iterating/validating. */
-export const APP_IDS: readonly AppId[] = ['presenter', 'audience', 'report', 'survey', 'team'];
-
-/**
- * The PRIMARY locale code each app uses for a language, or `null` when that app
- * does not support the language at all.
+ * One language in the canonical registry.
  *
- * "Primary" matters: a few apps also accept a legacy code for the same language
- * (presenter/audience/team accept `si` as well as `sl`; the presenter rewrites
- * `br` to `pt` at load time). Those extra codes live in
- * {@link LanguageEntry.aliases} and still resolve — this field records the one
- * code the app actually keys its bundle on.
- *
- * `null` is a real, load-bearing value here: it is how the registry records
- * that an app has fallen behind the presenter's language set. It must never be
- * "helpfully" filled in with a guess.
+ * Every field is the standard's answer, not any app's answer. If an app
+ * disagrees with a field here, the app is wrong, and the disagreement belongs
+ * in the non-compliance record rather than in this type.
  */
-export type AppCodes = Readonly<Record<AppId, string | null>>;
-
-/**
- * The translation-bundle filename each app serves for a language, or `null`
- * when the app has no file.
- *
- * Per-app rather than a single field on purpose: the presenter and the audience
- * app genuinely disagree for some languages (`zh`, `pt`, `sk`). Recording both
- * makes the divergence visible data instead of a silent render bug.
- */
-export interface LanguageFiles {
-  readonly presenter: string | null;
-  readonly audience: string | null;
-}
-
-/** One language in the canonical registry. */
 export interface LanguageEntry {
   /**
-   * The canonical code for this language: ISO 639-1, with a BCP-47 script
-   * subtag where a script distinction exists. This is the code new code should
-   * use. It is NOT necessarily the code any given app uses today — see
-   * {@link LanguageEntry.apps} and {@link LanguageEntry.aliases}.
+   * The canonical code: ISO 639-1, with a BCP-47 script subtag where a script
+   * distinction exists (`sr-Latn`). This is the ONLY code the registry accepts
+   * or returns for this language.
+   *
+   * Codes compare case-insensitively, because RFC 5646 §2.1.1 makes tag case
+   * insignificant — `sr-latn` and `sr-Latn` are the same tag, so treating them
+   * as different codes would be a bug, not strictness. That is the only
+   * latitude the API grants: a *different string* (`kr` for `ko`) is a
+   * different tag, and is rejected.
    */
   readonly code: string;
 
@@ -58,28 +36,12 @@ export interface LanguageEntry {
   readonly name: string;
 
   /**
-   * Every DISTINCT non-canonical code that any app uses for this language
-   * today. Guaranteed to round-trip: each one resolves back to
-   * {@link LanguageEntry.code}.
-   *
-   * Case variants are NOT aliases — resolution is case-insensitive, so the
-   * presenter's `sr-latn` and the survey's `sr-Latn` are one code, not two.
-   * Only genuinely different strings appear here (`kr` for `ko`, `se` for `sv`,
-   * `si` for `sl`, `br`/`pt-BR` for `pt`).
-   */
-  readonly aliases: readonly string[];
-
-  /** The code each app uses today, or `null` where the app lacks the language. */
-  readonly apps: AppCodes;
-
-  /** The bundle filename each of the two CDN-served apps uses. */
-  readonly files: LanguageFiles;
-
-  /**
    * The dayjs locale code, or `null` when no AhaSlides app has chosen one yet.
    *
    * `null` means "not sourceable from any app today" — NOT "dayjs has no such
-   * locale". Consumers needing it must pick one deliberately and record it here.
+   * locale". Consumers needing it must pick one deliberately and record it
+   * here. A guess would propagate silently to every consumer, so the registry
+   * refuses to make one.
    */
   readonly dayjs: string | null;
 
@@ -91,8 +53,8 @@ export interface LanguageEntry {
   readonly antd: string | null;
 
   /**
-   * Free text recording a known divergence, deliberate gap, or trap for this
-   * language. Present only where there is something a reader must not
+   * Free text recording a known trap, deliberate gap, or unresolved question
+   * for this language. Present only where there is something a reader must not
    * "helpfully" fix.
    */
   readonly notes?: string;

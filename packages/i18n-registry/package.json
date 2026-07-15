@@ -1,6 +1,6 @@
 {
   "name": "@aha/i18n-registry",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Canonical registry of AhaSlides languages and locale codes — data only, no i18n runtime",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

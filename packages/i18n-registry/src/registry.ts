@@ -1,20 +1,18 @@
 import { LANGUAGES } from './languages.js';
-import type { AppId, LanguageEntry } from './types.js';
+import type { LanguageEntry } from './types.js';
 
 /**
- * Lookup index: every canonical code AND every alias, lowercased, -> entry.
+ * Lookup index: canonical codes ONLY, lowercased.
  *
- * Lowercased on purpose. The apps disagree on casing for the script-subtagged
- * codes (`sr-latn` in presenter/audience/report/team vs `sr-Latn` in survey),
- * so a case-sensitive lookup would fail to round-trip exactly the codes this
- * registry exists to reconcile.
+ * Lowercased because RFC 5646 §2.1.1 makes language-tag case insignificant:
+ * `sr-latn` and `sr-Latn` are the same tag, so a case-sensitive index would
+ * reject a spelling that is objectively correct. That is the ONLY latitude
+ * here — no alias, legacy, or app-specific code is in this map. `kr` is not a
+ * misspelling of `ko`; it is a different tag (Kanuri), and it does not resolve.
  */
 const INDEX: ReadonlyMap<string, LanguageEntry> = (() => {
   const map = new Map<string, LanguageEntry>();
-  for (const lang of LANGUAGES) {
-    map.set(lang.code.toLowerCase(), lang);
-    for (const alias of lang.aliases) map.set(alias.toLowerCase(), lang);
-  }
+  for (const lang of LANGUAGES) map.set(lang.code.toLowerCase(), lang);
   return map;
 })();
 
@@ -22,21 +20,28 @@ const INDEX: ReadonlyMap<string, LanguageEntry> = (() => {
  * Every canonical language code, in registry order.
  *
  * @example
- * canonicalCodes(); // ['en', 'vi', 'es', 'pt', ...]
+ * canonicalCodes(); // ['en', 'vi', 'es', 'pt', ...]  (33 codes)
  */
 export function canonicalCodes(): string[] {
   return LANGUAGES.map((lang) => lang.code);
 }
 
 /**
- * Resolve any code an AhaSlides app uses — canonical or alias, any casing —
- * to its full registry entry.
+ * Resolve a CANONICAL code to its registry entry.
  *
- * @returns the entry, or `undefined` if the code is not an AhaSlides language.
+ * Canonical only, by design. An app-specific code does not resolve — see the
+ * README's "Why the API is canonical-only" for the reasoning, and
+ * `./non-compliance.js` for how to build a boundary shim from the deviation
+ * record if you must adapt untrusted host input.
+ *
+ * @returns the entry, or `undefined` if the code is not a canonical AhaSlides
+ *   language code. `undefined` is also what a *legacy* code gets — that is the
+ *   point: it is how an integrating app discovers it must migrate.
  *
  * @example
- * resolveLanguage('kr')?.code;      // 'ko'   (presenter's non-ISO Korean)
- * resolveLanguage('sr-latn')?.code; // 'sr-Latn'
+ * resolveLanguage('ko')?.name;      // 'Korean'
+ * resolveLanguage('sr-latn')?.code; // 'sr-Latn'  (same tag, RFC 5646 casing)
+ * resolveLanguage('kr');            // undefined  ('kr' is Kanuri, not Korean)
  * resolveLanguage('xx');            // undefined
  */
 export function resolveLanguage(code: string | null | undefined): LanguageEntry | undefined {
@@ -45,61 +50,38 @@ export function resolveLanguage(code: string | null | undefined): LanguageEntry 
 }
 
 /**
- * Resolve any app-specific code to its canonical code.
+ * Normalize a canonical code to its exact registry spelling.
+ *
+ * This handles CASING only (`sr-latn` -> `sr-Latn`). It is not a translation
+ * layer and will never turn `kr` into `ko`.
  *
  * @returns the canonical code, or `undefined` if unknown. Callers that need a
- *   fallback should apply their own (`resolveCode(x) ?? 'en'`) — this function
+ *   fallback must apply their own (`resolveCode(x) ?? 'en'`) — this function
  *   never silently invents `en`, so "unknown language" stays distinguishable
  *   from "actually English".
  *
  * @example
- * resolveCode('kr'); // 'ko'
- * resolveCode('si'); // 'sl'  (legacy Slovenian alias)
- * resolveCode('br'); // 'pt'
+ * resolveCode('ko');       // 'ko'
+ * resolveCode('sr-latn');  // 'sr-Latn'
+ * resolveCode('kr');       // undefined
+ * resolveCode('si');       // undefined  ('si' is Sinhala, not Slovenian)
  */
 export function resolveCode(code: string | null | undefined): string | undefined {
   return resolveLanguage(code)?.code;
 }
 
 /**
- * Look up a language by its canonical code only. Aliases are NOT accepted —
- * use {@link resolveLanguage} for those.
- */
-export function getLanguage(canonicalCode: string): LanguageEntry | undefined {
-  const entry = resolveLanguage(canonicalCode);
-  return entry && entry.code.toLowerCase() === canonicalCode.trim().toLowerCase()
-    ? entry
-    : undefined;
-}
-
-/**
- * Translate any code into the code a given app uses for that language.
+ * Whether a code is a canonical AhaSlides language code.
  *
- * @returns the app's code, or `null` when the app does not support the
- *   language, or `undefined` when the input is not an AhaSlides language.
+ * Deliberately FALSE for every app-specific code in use today
+ * (`isKnownCode('kr') === false`). A validator that green-lit `kr` would let
+ * an integrating app keep shipping `kr` forever — which is exactly the drift
+ * this package exists to end.
  *
  * @example
- * codeForApp('ko', 'presenter'); // 'kr'
- * codeForApp('kr', 'survey');    // 'ko'
- * codeForApp('az', 'survey');    // null      (survey has no Azerbaijani)
- * codeForApp('xx', 'survey');    // undefined
- */
-export function codeForApp(
-  code: string | null | undefined,
-  app: AppId,
-): string | null | undefined {
-  const entry = resolveLanguage(code);
-  return entry ? entry.apps[app] : undefined;
-}
-
-/** Every registry language that the given app supports today. */
-export function languagesForApp(app: AppId): LanguageEntry[] {
-  return LANGUAGES.filter((lang) => lang.apps[app] !== null);
-}
-
-/**
- * Whether a code — canonical or alias, any casing — is a known AhaSlides
- * language.
+ * isKnownCode('ko');      // true
+ * isKnownCode('sr-Latn'); // true
+ * isKnownCode('kr');      // false — migrate to 'ko'
  */
 export function isKnownCode(code: string | null | undefined): boolean {
   return resolveLanguage(code) !== undefined;
