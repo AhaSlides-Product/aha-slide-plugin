@@ -1,7 +1,7 @@
 {
   "name": "aha-slide-plugin",
   "version": "1.0.0",
-  "packageManager": "npm@10.9.3",
+  "packageManager": "npm@10.9.4",
   "private": true,
   "workspaces": [
     "apps/*/*",
