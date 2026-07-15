@@ -207,11 +207,17 @@ declares 33 rather than quietly picking one.
 Two separate questions hide behind "the Portuguese problem". Keep them apart.
 
 **The code: decided (2026-07).** AhaSlides ships **one** Portuguese, and its code
-is **`pt`**. The presenter's language picker — what every session is configured
-from — offers exactly one Portuguese entry (`{ name: 'Português', language:
-'pt', country: 'Portugal' }`, `src/constant/index.js`). There is no Brazilian
-option to pick, so `pt-BR` never named a second language. `aha-survey` must
-rename `pt-BR` → `pt`; that entry is **actionable now**, not `blockedBy`.
+is **`pt`**. Both of the presenter's language pickers agree, and they are
+independent hardcoded lists:
+
+| Picker | Entry | File |
+|---|---|---|
+| UI language | `{ name: 'Português', language: 'pt', country: 'Portugal' }` | `src/constant/index.js` |
+| Presentation language | `{ id: 'pt', title: 'Português' }` | `src/components-v2/presentation-editor/settings-modal/SettingsPresentationLanguageTab.vue` |
+
+Neither offers a Brazilian option, so `pt-BR` never named a second language.
+`aha-survey` must rename `pt-BR` → `pt`; that entry is **actionable now**, not
+`blockedBy`.
 
 **The dialect: still open.** *Which* Portuguese the content should be is a
 product call, and it is a real user-visible bug today — a Portuguese session

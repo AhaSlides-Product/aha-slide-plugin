@@ -54,12 +54,15 @@ export const LANGUAGES: readonly LanguageEntry[] = [
       'CODE SETTLED, DIALECT OPEN — the two halves of the Portuguese question have ' +
       'different answers, and conflating them is the trap this note exists to prevent.\n\n' +
       'THE CODE IS `pt`, by product decision (2026-07). AhaSlides ships ONE Portuguese, ' +
-      'so it gets ONE code, and the presenter — the language picker every session is ' +
-      'configured from — offers exactly one Portuguese entry: ' +
-      "{ name: 'Português', language: 'pt', country: 'Portugal' } in src/constant/index.js. " +
-      'There is no Brazilian option to pick. `pt-BR` is therefore not a second language, ' +
-      'it is aha-survey coding the same one differently, and it must migrate to `pt`. ' +
-      'That entry is actionable now — see NON_COMPLIANCE, app "survey", kind "wrong-code".\n\n' +
+      'so it gets ONE code. Both of the presenter\'s language pickers agree, and they ' +
+      'are independent hardcoded lists:\n' +
+      "  - UI language:           { name: 'Português', language: 'pt', country: 'Portugal' } " +
+      '(src/constant/index.js)\n' +
+      "  - presentation language: { id: 'pt', title: 'Português' } " +
+      '(src/components-v2/presentation-editor/settings-modal/SettingsPresentationLanguageTab.vue)\n' +
+      'Neither offers a Brazilian option. `pt-BR` is therefore not a second language, it ' +
+      'is aha-survey coding the same one differently, and it must migrate to `pt`. That ' +
+      'entry is actionable now — see NON_COMPLIANCE, app "survey", kind "wrong-code".\n\n' +
       'WHICH Portuguese the CONTENT is remains open, and the registry will not settle it ' +
       'by fiat. It is not the 2–2 app split it looks like. Measured against origin/staging ' +
       'by counting BR/PT lexical markers in the JSON VALUES (the presenter\'s keys are ' +
