@@ -12,8 +12,7 @@ env:
       "@aha/design": "@ahaslides-product/plugins-design",
       "@aha/api": "@ahaslides-product/plugins-api",
       "@aha/db": "@ahaslides-product/plugins-db",
-      "@aha/common": "@ahaslides-product/plugins-common",
-      "@aha/i18n-registry": "@ahaslides-product/i18n-registry"
+      "@aha/common": "@ahaslides-product/plugins-common"
     }
 
 jobs:
