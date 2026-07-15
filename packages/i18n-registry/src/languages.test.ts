@@ -96,7 +96,17 @@ describe('registry data — known divergences stay recorded', () => {
     // in CONTENT_DIVERGENCES, but the language entry must point at it so a
     // reader of LANGUAGES alone cannot miss it.
     expect(resolveLanguage('zh')?.notes).toMatch(/DO NOT "FIX"/i);
-    expect(resolveLanguage('pt')?.notes).toMatch(/UNRESOLVED/i);
+    // pt is half-resolved: product settled the CODE as `pt` (2026-07); WHICH
+    // Portuguese the content is stays open. The note must carry both halves —
+    // recording only the decision would let someone "finish the job" by picking
+    // a dialect, and recording only the open question would let someone
+    // re-litigate the code.
+    const pt = resolveLanguage('pt')?.notes ?? '';
+    expect(pt, 'must record that the code is settled as `pt`').toMatch(/CODE SETTLED/i);
+    expect(pt, 'must keep the dialect question open').toMatch(/DIALECT OPEN/i);
+    // ...and must not re-assert the dialect claim the measurements disproved:
+    // the presenter is a blend, not European.
+    expect(pt, 'must not call the presenter European').not.toMatch(/presenter[^.]*European/i);
   });
 
   it('preserves the deliberate antd gaps rather than "fixing" them', () => {

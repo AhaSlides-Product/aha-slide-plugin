@@ -165,7 +165,7 @@ order:
 
 | Kind | Meaning |
 | ---- | ------- |
-| `wrong-code` | The app's code is a different language's valid ISO code. Silently mis-renders today. |
+| `wrong-code` | The app codes a registry language non-canonically and must migrate. Usually a *different* language's valid ISO code (`kr`, `se`) — silently mis-renders today. Sometimes just a code we don't use (`pt-BR`). |
 | `legacy-alias` | The app *additionally* accepts a non-canonical code. Drop it. |
 | `compat-shim` | Code that exists only to absorb another app's non-compliance. Delete once `blockedBy` clears. |
 | `casing` | Right tag, non-canonical BCP-47 casing. Cosmetic. |
@@ -202,18 +202,48 @@ a canonical code **zero** times. Adopting `zh-TW` as a 34th language would give
 all three a home — but that is a product call, and it is why the registry
 declares 33 rather than quietly picking one.
 
-### `pt` is European in two apps and Brazilian in two others
+### `pt` — the code is settled, the dialect is not
 
-Presenter and `aha-report` serve European (`AhaSlides_Portuguese.json`, antd
-`pt_PT`); audience and `aha-survey` serve Brazilian (`AhaSlides_Portuguese_BR.json`,
-antd `pt_BR`, dayjs `pt-br`). Same class of bug as `zh`, split 2–2.
+Two separate questions hide behind "the Portuguese problem". Keep them apart.
+
+**The code: decided (2026-07).** AhaSlides ships **one** Portuguese, and its code
+is **`pt`**. The presenter's language picker — what every session is configured
+from — offers exactly one Portuguese entry (`{ name: 'Português', language:
+'pt', country: 'Portugal' }`, `src/constant/index.js`). There is no Brazilian
+option to pick, so `pt-BR` never named a second language. `aha-survey` must
+rename `pt-BR` → `pt`; that entry is **actionable now**, not `blockedBy`.
+
+**The dialect: still open.** *Which* Portuguese the content should be is a
+product call, and it is a real user-visible bug today — a Portuguese session
+renders one thing on the slide and another in the audience view.
+
+The tempting tiebreak, "follow the presenter, it's the source of truth", **does
+not work**: the presenter has no single dialect to follow. Measured on
+`origin/staging` by counting BR/PT lexical markers in the JSON *values*:
+
+| App | Dialect |
+|---|---|
+| presenter `AhaSlides_Portuguese.json` | **blend** — `ficheiro` ×34 *and* `arquivo` ×19 (the same word, "file", both ways in one file); `ecrã` ×32 beside `tela` ×10 |
+| audience `AhaSlides_Portuguese_BR.json` | Brazilian (zero European markers) |
+| `aha-survey` `pt-BR` | Brazilian (zero European markers) |
+| `aha-report` `pt.json` | **unclassifiable** — 169 keys, zero markers either way |
+
+So the presenter points European by *label* and both ways by *content*. The two
+highest-volume participant-facing surfaces are unambiguously Brazilian — but
+that is an inference about where the users are, not a decision about who we
+serve.
+
+> **Measuring this yourself:** parse the JSON and scan **values only** — the
+> presenter's *keys* are English sentences, so scanning raw file text counts
+> English and gives a wrong answer. Never use a marker that is also an English
+> word (`time`, Brazilian for "team", collides and poisons the count). `você` is
+> weak — European Portuguese uses it too. Reliable pairs: `arquivo`/`ficheiro`,
+> `tela`/`ecrã`, `usuário`/`utilizador`, `gerenciar`/`gerir`.
 
 This is also why the `pt` entry carries an apparently inconsistent antd `pt_PT`
-with dayjs `pt-br`: those are the only values any app has actually chosen, and
-inventing the missing halves would be a guess. If the answer is "both", `pt-BR`
-becomes a 34th registry language and `aha-survey` is retroactively compliant —
-which is why its `pt-BR` entry in the checklist is marked `blockedBy` rather than
-"fix now".
+with dayjs `pt-br`: those are the only values any app has actually chosen.
+**Do not harmonise them** — picking one would silently decide the dialect. They
+resolve when the content question does.
 
 ### Deliberate gaps — leave them alone
 

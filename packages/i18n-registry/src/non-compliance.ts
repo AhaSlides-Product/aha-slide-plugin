@@ -63,9 +63,15 @@ export const APP_IDS: readonly AppId[] = ['presenter', 'audience', 'report', 'su
  */
 export type DeviationKind =
   /**
-   * The app's code for a language is a DIFFERENT language's valid ISO 639-1
-   * code. The worst kind: nothing errors, and `Intl`/i18next silently apply
-   * the wrong language's plural and date rules.
+   * The app codes a registry language as something other than its canonical
+   * code, and must migrate. Usually the worst kind — `kr`/`se` are a DIFFERENT
+   * language's valid ISO 639-1 code, so nothing errors and `Intl`/i18next
+   * silently apply the wrong language's plural and date rules.
+   *
+   * Not always an ISO collision, though: aha-survey's `pt-BR` is a perfectly
+   * valid tag naming the dialect it really ships. It is wrong here only because
+   * AhaSlides ships ONE Portuguese and its code is `pt`. That entry renames a
+   * code; it does not touch content.
    */
   | 'wrong-code'
   /**
@@ -290,13 +296,19 @@ export const NON_COMPLIANCE: readonly Deviation[] = [
     required: 'pt',
     source: SURVEY_MAPPING,
     detail:
-      'DO NOT ACTION YET. The survey codes Portuguese as `pt-BR` while the registry ' +
-      'canon is `pt`. Unlike the `kr`/`se` entries this may not be a defect at all: the ' +
-      'survey ships genuinely Brazilian content, so `pt-BR` accurately describes what it ' +
-      'serves. If the product decision is "AhaSlides ships both", `pt-BR` becomes a 34th ' +
-      'registry language and this entry disappears with no code change. Listed so the ' +
-      'discrepancy is not mistaken for an oversight.',
-    blockedBy: 'CONTENT_DIVERGENCES: pt — which Portuguese does AhaSlides ship?',
+      'ACTIONABLE — unblocked by the product decision (2026-07) that AhaSlides ships ONE ' +
+      'Portuguese under the code `pt`. The presenter language picker offers a single ' +
+      'Portuguese entry, so there is no second language for `pt-BR` to name. Migrate: ' +
+      "rename the `SurveyLocale` member 'pt-BR' -> 'pt', the resource directory " +
+      'frontend/src/i18n/pt-BR/ -> pt/, and collapse the SUPPORTED entries ' +
+      "`br: 'pt-BR'` / `pt: 'pt-BR'` onto `pt` (the `br` shim itself is a separate, " +
+      'still-blocked entry — see kind "compat-shim").\n\n' +
+      'This is a code fix ONLY. The survey\'s content really is Brazilian (measured: ' +
+      'zero European markers across all six pt-BR bundles), and this migration does not ' +
+      'change a single translated string — it stops the survey calling AhaSlides\' one ' +
+      'Portuguese by a code no other app uses. Whether that content SHOULD be Brazilian ' +
+      'is the open dialect question and is tracked separately in CONTENT_DIVERGENCES: pt. ' +
+      'Do not let this rename be read as answering it.',
   },
 
   // ---------------------------------------------------------------- sl / si
@@ -399,9 +411,13 @@ export const NON_COMPLIANCE: readonly Deviation[] = [
     required: null,
     source: SURVEY_MAPPING,
     detail:
-      'Absorbs the presenter/team `br` alias. Delete once they drop it. The `pt` -> ' +
-      "`pt-BR` entry beside it is NOT a shim — it is the survey's own coding of " +
-      'Portuguese, and it lives or dies with the `pt` content decision.',
+      'Absorbs the presenter/team `br` alias. Delete once they drop it. STILL BLOCKED, ' +
+      'and note what does NOT unblock it: the `pt` code decision settled that the ' +
+      "canonical code is `pt`, which makes the sibling `pt: 'pt-BR'` entry an actionable " +
+      'rename (see kind "wrong-code") — but this shim is blocked on presenter and team ' +
+      'actually dropping `br` from their own allowlists, which has not happened. After ' +
+      "the survey migrates, this shim simply becomes `br: 'pt'`; it disappears only when " +
+      'the two upstream aliases do. `br` is Breton.',
     blockedBy: 'presenter, team: pt legacy-alias',
   },
 
@@ -618,10 +634,16 @@ export const NON_COMPLIANCE: readonly Deviation[] = [
 
 /**
  * The two languages whose CONTENT disagrees across apps. Each needs a product
- * decision before any code changes — no registry edit can resolve either.
+ * decision — no registry edit can resolve either.
  *
  * These are the expensive findings. Everything in {@link NON_COMPLIANCE} is a
  * mechanical rename; these two are real user-visible bugs.
+ *
+ * A content divergence does not necessarily block the matching code work, and
+ * `pt` is the worked example: product settled the CODE (`pt`), which unblocked
+ * aha-survey's `pt-BR` rename, while WHICH Portuguese the content is stays open
+ * here. Read each entry's `decision` for what is actually still being asked —
+ * do not assume the whole language is frozen.
  */
 export const CONTENT_DIVERGENCES: readonly ContentDivergence[] = [
   {
@@ -655,26 +677,44 @@ export const CONTENT_DIVERGENCES: readonly ContentDivergence[] = [
   {
     language: 'pt',
     serves: {
-      presenter: 'European (AhaSlides_Portuguese.json; switcher reads "Português"/Portugal)',
-      audience: 'Brazilian (AhaSlides_Portuguese_BR.json)',
-      report: 'European (pt.json, antd pt_PT)',
-      survey: 'Brazilian (pt-BR, antd pt_BR, dayjs pt-br)',
+      presenter:
+        'BLEND — labelled European (switcher reads "Português"/Portugal) but the content ' +
+        'is both: ficheiro x34 AND arquivo x19, ecrã x32 AND tela x10',
+      audience: 'Brazilian (AhaSlides_Portuguese_BR.json; zero European markers)',
+      report: 'UNCLASSIFIABLE (pt.json, 169 keys, zero markers either way; antd pt_PT)',
+      survey: 'Brazilian (pt-BR, antd pt_BR, dayjs pt-br; zero European markers)',
     },
     decision:
-      'Does AhaSlides ship European Portuguese, Brazilian Portuguese, or both as ' +
-      'distinct languages?',
+      'The CODE half is settled — one Portuguese, coded `pt`. Only the content is still ' +
+      'in question: which Portuguese should that one Portuguese BE, European or Brazilian?',
     detail:
-      'Same class of bug as `zh`, found while building the registry: one code, two ' +
-      'languages, split 2–2 across the apps. A presenter session in Portuguese shows ' +
-      'European Portuguese on the slide and Brazilian Portuguese in the audience view.\n\n' +
-      'Notably the two apps that migrated their codes most recently (audience, survey) ' +
-      'both chose Brazilian, which hints at where the real audience is — but that is an ' +
-      'inference, not evidence, and it is why this is a decision rather than a patch.\n\n' +
-      'This divergence is also why the registry\'s `pt` entry carries an apparently ' +
-      'inconsistent antd pt_PT with dayjs pt-br: those are the only values any app has ' +
-      'actually chosen, and inventing the missing halves would be a guess. If the answer ' +
-      'is "both", `pt-BR` becomes a 34th registry language and aha-survey is ' +
-      'retroactively compliant.',
+      'THE CODE HALF IS DECIDED, THE DIALECT IS NOT. Product decided (2026-07) that ' +
+      'AhaSlides ships one Portuguese under `pt` — the presenter picker offers exactly ' +
+      'one Portuguese entry. That resolved aha-survey\'s `pt-BR` into an actionable ' +
+      'rename. It did NOT resolve which dialect the content is, which is what remains ' +
+      'here and is a real user-visible bug: a presenter session in Portuguese renders ' +
+      'a blend on the slide and Brazilian in the audience view.\n\n' +
+      'The obvious tiebreak — "follow the presenter, it is the source of truth" — DOES ' +
+      'NOT WORK, and this is the finding that matters. The presenter has no single ' +
+      'dialect to follow. Measured on origin/staging by counting BR/PT lexical markers ' +
+      'in the JSON values, AhaSlides_Portuguese.json contains `ficheiro` x34 (European) ' +
+      'AND `arquivo` x19 (Brazilian) — the same word, "file", translated both ways in ' +
+      'one file — plus `ecrã` x32 beside `tela` x10. It points European by LABEL and ' +
+      'both ways by CONTENT.\n\n' +
+      'Method note, because an earlier pass got this wrong: parse the JSON and scan ' +
+      'VALUES only (the presenter\'s keys are English sentences, so raw-text scanning ' +
+      'counts English), and never use a marker that is also an English word — `time` ' +
+      '(BR "team") collides and poisons the count. `você` alone is weak; European ' +
+      'Portuguese uses it too. Reliable pairs: arquivo/ficheiro, tela/ecrã, ' +
+      'usuário/utilizador, gerenciar/gerir.\n\n' +
+      'Where the evidence does point: the two highest-volume participant-facing ' +
+      'surfaces (audience, survey) are unambiguously Brazilian with zero European ' +
+      'markers, and aha-report is too small to classify. But that is an inference about ' +
+      'where the users are, not a decision about who we serve — which is why this is a ' +
+      'product call and not a patch.\n\n' +
+      'Until it is answered, the `pt` entry\'s antd pt_PT / dayjs pt-br stay mismatched ' +
+      'on purpose: they are the only values any app has chosen, and harmonising them ' +
+      'would silently decide the dialect.',
   },
 ];
 

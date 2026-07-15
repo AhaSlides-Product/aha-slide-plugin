@@ -51,17 +51,34 @@ export const LANGUAGES: readonly LanguageEntry[] = [
     dayjs: 'pt-br',
     antd: 'pt_PT',
     notes:
-      'UNRESOLVED — WHICH Portuguese AhaSlides ships is an open product question, and ' +
-      'the registry will not settle it by fiat. The apps genuinely disagree: presenter ' +
-      'and aha-report serve European (AhaSlides_Portuguese.json, antd pt_PT); audience ' +
-      'and aha-survey serve Brazilian (AhaSlides_Portuguese_BR.json, antd pt_BR, dayjs ' +
-      'pt-br). The mixed `antd`/`dayjs` above is that disagreement showing through, not ' +
-      "a typo: antd pt_PT is aha-report's (it matches the canonical `pt`), while dayjs " +
-      'pt-br is aha-survey\'s — the only app that has chosen a dayjs code at all, and ' +
-      'inventing `pt` would be a guess. Until the product question is answered, `pt` ' +
-      'stays the single canonical code. If AhaSlides decides it ships BOTH, `pt-BR` ' +
-      'becomes a 34th registry language and aha-survey retroactively becomes compliant. ' +
-      'See the non-compliance record: kind "content", language "pt".',
+      'CODE SETTLED, DIALECT OPEN — the two halves of the Portuguese question have ' +
+      'different answers, and conflating them is the trap this note exists to prevent.\n\n' +
+      'THE CODE IS `pt`, by product decision (2026-07). AhaSlides ships ONE Portuguese, ' +
+      'so it gets ONE code, and the presenter — the language picker every session is ' +
+      'configured from — offers exactly one Portuguese entry: ' +
+      "{ name: 'Português', language: 'pt', country: 'Portugal' } in src/constant/index.js. " +
+      'There is no Brazilian option to pick. `pt-BR` is therefore not a second language, ' +
+      'it is aha-survey coding the same one differently, and it must migrate to `pt`. ' +
+      'That entry is actionable now — see NON_COMPLIANCE, app "survey", kind "wrong-code".\n\n' +
+      'WHICH Portuguese the CONTENT is remains open, and the registry will not settle it ' +
+      'by fiat. It is not the 2–2 app split it looks like. Measured against origin/staging ' +
+      'by counting BR/PT lexical markers in the JSON VALUES (the presenter\'s keys are ' +
+      'English sentences, so scanning raw file text counts English and gives a wrong ' +
+      'answer):\n' +
+      '  - presenter AhaSlides_Portuguese.json is a BLEND, not European. It carries both ' +
+      '`ficheiro` x34 AND `arquivo` x19 — the same word, "file", translated to both ' +
+      'dialects in one file — plus `ecrã` x32 beside `tela` x10. Translated by different ' +
+      'hands against different targets.\n' +
+      '  - aha-report pt.json is UNCLASSIFIABLE: 169 keys, zero markers either way.\n' +
+      '  - audience AhaSlides_Portuguese_BR.json and aha-survey pt-BR are both ' +
+      'unambiguously Brazilian (zero European markers between them).\n' +
+      'So the presenter points one way by LABEL (country: Portugal) and another by ' +
+      'CONTENT (a blend), which is exactly why "just follow the presenter" cannot decide ' +
+      'the dialect. See CONTENT_DIVERGENCES: pt.\n\n' +
+      'The mismatched `antd`/`dayjs` above is that open dialect showing through, not a ' +
+      "typo: antd pt_PT is aha-report's, dayjs pt-br is aha-survey's — the only values " +
+      'any app has actually chosen. Do NOT harmonise them; picking one would silently ' +
+      'decide the dialect. They resolve when the content question does.',
   },
   {
     code: 'fr',

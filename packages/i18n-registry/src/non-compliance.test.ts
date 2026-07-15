@@ -114,19 +114,31 @@ describe('the record — every entry is actionable', () => {
 describe('the record — it matches what the apps actually do', () => {
   it('names the four ISO-collision codes and no others as wrong-code', () => {
     const actuals = new Set(deviationsByKind('wrong-code').map((d) => d.actual));
-    // pt-BR is the survey's, and is blocked on the pt content decision rather
-    // than being a plain mistake — see CONTENT_DIVERGENCES.
+    // pt-BR is the survey's. Unlike kr/se it is not an ISO collision — it is a
+    // real code for a real dialect — but it is still wrong HERE, because the
+    // product ships one Portuguese and it is coded `pt`.
     expect([...actuals].sort()).toEqual(['kr', 'pt-BR', 'se'].sort());
   });
 
-  it('holds aha-survey up as the migrated app', () => {
-    // survey is the only app with no wrong-code entry other than the blocked
-    // pt-BR one — it already moved to ko/sr-Latn. If that stops being true,
-    // either an app migrated (delete this) or survey regressed (fix it).
-    const unblocked = deviationsForApp('survey').filter(
-      (d) => d.kind === 'wrong-code' && d.blockedBy === undefined,
+  it('leaves no wrong-code entry blocked on the settled pt code question', () => {
+    // The pt CODE decision landed (2026-07): one Portuguese, coded `pt`. Every
+    // wrong-code entry is now actionable, survey's pt-BR included. Nothing may
+    // sit behind the pt question any more — only the DIALECT is still open, and
+    // no wrong-code entry depends on it (a rename does not touch content).
+    const blocked = deviationsByKind('wrong-code').filter((d) => d.blockedBy !== undefined);
+    expect(blocked).toEqual([]);
+  });
+
+  it("records the survey's pt-BR as a rename it must now do", () => {
+    const [pt] = deviationsForApp('survey').filter(
+      (d) => d.kind === 'wrong-code' && d.actual === 'pt-BR',
     );
-    expect(unblocked).toEqual([]);
+    expect(pt, 'survey pt-BR wrong-code entry must exist').toBeDefined();
+    expect(pt.required, 'must migrate to the canonical code').toBe('pt');
+    expect(pt.blockedBy, 'the pt code decision unblocked this').toBeUndefined();
+    // Guard the distinction this entry exists to hold: it is a code fix, and
+    // must not be read as deciding which dialect the survey ships.
+    expect(pt.detail).toMatch(/code fix ONLY/i);
   });
 
   it('records the drift that renders English today', () => {
