@@ -1,0 +1,91 @@
+name: "i18n Registry Version Gate"
+
+# Why this exists
+# ---------------
+# `@aha/i18n-registry` is the single source of truth for the AhaSlides language
+# set, consumed by five apps. "Publish Packages" is workflow_dispatch-only with
+# hand-bumped versions, and it deliberately swallows a 409 as
+#   ::warning:: already published at this version. Skipping.
+# which is CORRECT for the 7-package batch publish (most are unchanged on any
+# given run) — do not change that behaviour.
+#
+# But it means: change the registry, forget the version bump, hit publish ->
+# NOTHING is published while the run reports success. Five repos' CI would then
+# pass against a stale language set. This gate closes exactly that hole, for
+# exactly this package: touch packages/i18n-registry/** in a PR and you must
+# bump packages/i18n-registry/package.json `version`.
+#
+# It runs on every PR (rather than using a `paths:` filter) so the check always
+# reports a conclusion and can be made a required status check — a
+# paths-filtered workflow simply doesn't run on unrelated PRs, which leaves a
+# required check pending forever. The no-op path exits in seconds.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  version-gate:
+    name: "i18n-registry version bumped"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Full history: we diff against the merge base with the PR's base branch.
+          fetch-depth: 0
+
+      - name: Require a version bump when the registry changes
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+
+          PKG_DIR="packages/i18n-registry"
+          PKG_JSON="$PKG_DIR/package.json"
+
+          # Three-dot: compare HEAD against the merge base with the base branch,
+          # so unrelated commits landing on the base branch never trip the gate.
+          CHANGED=$(git diff --name-only "$BASE_SHA...HEAD" -- "$PKG_DIR" || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "No changes under $PKG_DIR/ — nothing to gate."
+            exit 0
+          fi
+
+          echo "Changed files under $PKG_DIR/:"
+          echo "$CHANGED" | sed 's/^/  /'
+          echo ""
+
+          HEAD_VERSION=$(node -p "require('./$PKG_JSON').version")
+
+          # The package may not exist on the base branch (the PR that introduces
+          # it). There is nothing to bump from, so the gate passes.
+          if ! git cat-file -e "$BASE_SHA:$PKG_JSON" 2>/dev/null; then
+            echo "::notice::$PKG_JSON does not exist on the base branch — new package at v$HEAD_VERSION. OK."
+            exit 0
+          fi
+
+          BASE_VERSION=$(git show "$BASE_SHA:$PKG_JSON" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version")
+
+          echo "base version: $BASE_VERSION"
+          echo "head version: $HEAD_VERSION"
+          echo ""
+
+          if [ "$BASE_VERSION" = "$HEAD_VERSION" ]; then
+            echo "::error file=$PKG_JSON::$PKG_DIR changed but \"version\" is still $HEAD_VERSION. Bump it, or Publish Packages will silently skip this package on a 409 and every consumer keeps the stale language set."
+            exit 1
+          fi
+
+          # A decrease would also fail to publish (409 against the higher
+          # already-published version) — and fail just as silently.
+          LOWEST=$(printf '%s\n%s\n' "$BASE_VERSION" "$HEAD_VERSION" | sort -V | head -n1)
+          if [ "$LOWEST" != "$BASE_VERSION" ]; then
+            echo "::error file=$PKG_JSON::version went BACKWARDS ($BASE_VERSION -> $HEAD_VERSION). Publish would 409 and skip silently."
+            exit 1
+          fi
+
+          echo "Version bumped $BASE_VERSION -> $HEAD_VERSION. OK."
