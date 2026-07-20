@@ -357,6 +357,49 @@ describe('@aha/ui - Composables', () => {
         input.remove();
       });
 
+      it('does not hijack arrow keys on a <select>', () => {
+        (window as any).xprops.presentation.presenting = true;
+        mountPlugin();
+        const select = document.createElement('select');
+        document.body.appendChild(select);
+        press('ArrowDown', select);
+        expect((window as any).xprops.emitKeyboardEvent).not.toHaveBeenCalled();
+        select.remove();
+      });
+
+      it('does not hijack typing into an input inside an open shadow root', () => {
+        (window as any).xprops.presentation.presenting = true;
+        mountPlugin();
+        // `e.target` retargets to the host, so only composedPath()[0] sees the INPUT.
+        const host = document.createElement('div');
+        document.body.appendChild(host);
+        const root = host.attachShadow({ mode: 'open' });
+        const input = document.createElement('input');
+        root.appendChild(input);
+
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', code: 'KeyA', bubbles: true, composed: true }));
+
+        expect((window as any).xprops.emitKeyboardEvent).not.toHaveBeenCalled();
+        host.remove();
+      });
+
+      it('still forwards from a non-input element inside an open shadow root', () => {
+        (window as any).xprops.presentation.presenting = true;
+        mountPlugin();
+        const host = document.createElement('div');
+        document.body.appendChild(host);
+        const root = host.attachShadow({ mode: 'open' });
+        const div = document.createElement('div');
+        root.appendChild(div);
+
+        div.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight', bubbles: true, composed: true }));
+
+        expect((window as any).xprops.emitKeyboardEvent).toHaveBeenCalledWith(
+          expect.objectContaining({ key: 'ArrowRight', type: 'keydown' }),
+        );
+        host.remove();
+      });
+
       it('is inert when the host provides no emitKeyboardEvent (settings iframe)', () => {
         (window as any).xprops.presentation.presenting = true;
         delete (window as any).xprops.emitKeyboardEvent;

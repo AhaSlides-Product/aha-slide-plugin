@@ -266,9 +266,20 @@ function ensureKeyboardPassthroughRegistered(): void {
     if (xprops?.active === false) return;
 
     // Never hijack typing — a plugin's own text field must keep its keystrokes.
-    const target = e.target as HTMLElement | null;
+    //
+    // Prefer `composedPath()[0]` over `e.target`: for an event originating inside an
+    // open shadow root, `e.target` is RETARGETED to the shadow host, so a plugin that
+    // wraps its input in a custom element would report the host's tagName (not INPUT)
+    // and we would forward the user's typing to the deck. `composedPath()[0]` is the
+    // real innermost target. (Closed shadow roots still retarget — unavoidable, and no
+    // worse than before.) `?.()` short-circuits the whole chain if the method is
+    // missing, and `|| e.target` covers composedPath() returning [] off-dispatch.
+    //
+    // SELECT is guarded alongside INPUT/TEXTAREA because arrow keys move between
+    // dropdown options — forwarding those would change slide while the user picks.
+    const target = (e.composedPath?.()[0] || e.target) as HTMLElement | null;
     const tag = target?.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) return;
 
     // Only serialisable fields: zoid cannot post DOM nodes (target/view) across origins.
     emit({
