@@ -303,6 +303,68 @@ describe('@aha/ui - Composables', () => {
       expect(onHeightChange).toHaveBeenCalledWith(null);
     });
 
+    /**
+     * AHA-46661 — keystrokes inside the cross-origin plugin iframe never reach the
+     * host document, so the SDK forwards them over the `emitKeyboardEvent` xprop.
+     */
+    describe('keyboard passthrough (AHA-46661)', () => {
+      const mountPlugin = () => {
+        const TestComponent = defineComponent({
+          setup() {
+            return usePresenterPlugin({ autoHeight: false });
+          },
+          template: '<div />',
+        });
+        return mount(TestComponent);
+      };
+
+      const press = (key = 'ArrowRight', target?: HTMLElement) => {
+        const event = new KeyboardEvent('keydown', { key, code: key, bubbles: true });
+        (target ?? document.body).dispatchEvent(event);
+      };
+
+      it('forwards a keydown to the host while presenting', () => {
+        (window as any).xprops.presentation.presenting = true;
+        mountPlugin();
+        press('ArrowRight');
+        expect((window as any).xprops.emitKeyboardEvent).toHaveBeenCalledWith(
+          expect.objectContaining({ key: 'ArrowRight', code: 'ArrowRight', type: 'keydown' }),
+        );
+      });
+
+      it('does not forward while in the editor (not presenting)', () => {
+        (window as any).xprops.presentation.presenting = false;
+        mountPlugin();
+        press('ArrowRight');
+        expect((window as any).xprops.emitKeyboardEvent).not.toHaveBeenCalled();
+      });
+
+      it('does not forward from an inactive (preloaded) instance', () => {
+        (window as any).xprops.presentation.presenting = true;
+        (window as any).xprops.active = false;
+        mountPlugin();
+        press('ArrowRight');
+        expect((window as any).xprops.emitKeyboardEvent).not.toHaveBeenCalled();
+      });
+
+      it('does not hijack typing into a plugin input', () => {
+        (window as any).xprops.presentation.presenting = true;
+        mountPlugin();
+        const input = document.createElement('input');
+        document.body.appendChild(input);
+        press('a', input);
+        expect((window as any).xprops.emitKeyboardEvent).not.toHaveBeenCalled();
+        input.remove();
+      });
+
+      it('is inert when the host provides no emitKeyboardEvent (settings iframe)', () => {
+        (window as any).xprops.presentation.presenting = true;
+        delete (window as any).xprops.emitKeyboardEvent;
+        mountPlugin();
+        expect(() => press('ArrowRight')).not.toThrow();
+      });
+    });
+
     it('should return allowPDFRender function (new feature by Hoang Loi)', () => {
       const TestComponent = defineComponent({
         setup() {

@@ -151,6 +151,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
   const { xprops } = baseHook;
 
   ensureBroadcastListenerRegistered();
+  ensureKeyboardPassthroughRegistered();
 
   const originalGetAttributes = xprops?.getSlideAttributesAction;
   const getSlideAttributesAction = async (slideId?: string | number): Promise<any> => {
@@ -217,6 +218,72 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     createLeaderboardSlide: xprops?.createLeaderboardSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
+}
+
+/**
+ * AHA-46661 — forward keystrokes out of the (focused) plugin iframe to the host.
+ *
+ * The plugin iframe is cross-origin (presenter on `app.ahaslides.com`, plugins on
+ * `plugins.ahaslides.com`), so once the user clicks inside it the browser routes
+ * every `keydown` to the iframe's own document. The presenter's shortcut handlers
+ * are bound to the PARENT document (`document.onkeydown` in PresentationEditor.vue),
+ * so they stop firing entirely and the deck can no longer be driven — arrows don't
+ * change slide, Esc doesn't exit. Nothing is "disabled": the events simply never
+ * cross the origin boundary.
+ *
+ * The host already ships the remedy — the `emitKeyboardEvent` xprop, which re-emits
+ * the event on the host's own `onKeyboard` bus. It was purely opt-in, so each plugin
+ * had to hand-roll its own passthrough (ideaBoard's `useKeyboardShortcut`, survey's
+ * and diagram's `usePresenterKeyboardPassthrough`, content-v2's `useAnimationPlayback`)
+ * and any plugin that hadn't swallowed all shortcuts. Registering it here means every
+ * plugin calling `usePresenterPlugin()` gets it for free, with no per-plugin change.
+ *
+ * Registered once at module level (same reasoning as `ensureBroadcastListenerRegistered`)
+ * so repeated `usePresenterPlugin()` calls / remounts don't stack listeners.
+ */
+let keyboardPassthroughRegistered = false;
+function ensureKeyboardPassthroughRegistered(): void {
+  if (keyboardPassthroughRegistered) return;
+  if (typeof document === 'undefined') return;
+  keyboardPassthroughRegistered = true;
+
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    // Read `xprops` live on every keystroke — zoid swaps the object on host
+    // re-renders, so anything captured at registration time would go stale.
+    const xprops = (window as any).xprops;
+
+    // Settings/config iframes are rendered without the callback; nothing to do.
+    const emit = xprops?.emitKeyboardEvent;
+    if (typeof emit !== 'function') return;
+
+    // Only while presenting. In the editor the host's arrow/Enter handling belongs
+    // to the canvas, and forwarding would move the deck while the user is authoring.
+    if (!xprops?.presentation?.presenting) return;
+
+    // AHA-46422 keep-alive: an off-screen preloaded instance boots with `active:
+    // false`. It must never drive the live deck. (`undefined` = host doesn't
+    // preload, which is the active case.)
+    if (xprops?.active === false) return;
+
+    // Never hijack typing — a plugin's own text field must keep its keystrokes.
+    const target = e.target as HTMLElement | null;
+    const tag = target?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return;
+
+    // Only serialisable fields: zoid cannot post DOM nodes (target/view) across origins.
+    emit({
+      key: e.key,
+      code: e.code,
+      keyCode: e.keyCode,
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey,
+      altKey: e.altKey,
+      metaKey: e.metaKey,
+      repeat: e.repeat,
+      location: e.location,
+      type: 'keydown',
+    });
+  });
 }
 
 const broadcastRegistry: Record<string, Function> = {};
