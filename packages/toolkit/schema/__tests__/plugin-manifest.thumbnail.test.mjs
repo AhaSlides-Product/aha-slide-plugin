@@ -53,6 +53,13 @@ test('thumbnail is optional (existing manifests without it remain valid)', () =>
   assert.equal(validate(m), true, 'slide type without thumbnail should still be valid');
 });
 
+test('empty thumbnail object is valid and defaults to icon mode', () => {
+  const validate = ajv.compile(schema);
+  const m = structuredClone(base);
+  m.slideTypes[0].thumbnail = {}; // mode omitted → schema default "icon"
+  assert.equal(validate(m), true, 'thumbnail: {} should be valid (mode defaults to icon)');
+});
+
 test('thumbnail rejects unknown mode values', () => {
   const validate = ajv.compile(schema);
   const m = structuredClone(base);

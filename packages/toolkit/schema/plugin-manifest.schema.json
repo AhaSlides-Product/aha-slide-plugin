@@ -150,10 +150,9 @@
               "minLength": 1
             }
           },
-          "required": ["mode"],
           "allOf": [
             {
-              "if": { "properties": { "mode": { "const": "static" } } },
+              "if": { "properties": { "mode": { "const": "static" } }, "required": ["mode"] },
               "then": { "required": ["thumbnailUrl"] }
             }
           ],

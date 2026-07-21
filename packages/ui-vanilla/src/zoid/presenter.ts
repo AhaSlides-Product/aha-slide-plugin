@@ -238,8 +238,12 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
 
   /** Plugin → host: send a captured thumbnail data URL for this slide. */
   setSlideThumbnail?: (dataUrl: string) => void;
-  /** Host → plugin: register a callback the host invokes before unmount to request a capture. */
-  onRequestThumbnailCapture?: (callback: () => void) => void;
+  /**
+   * Host → plugin: register a callback the host invokes before unmount to
+   * request a capture. The callback may return a promise; a host that awaits
+   * it can finish the capture before tearing the iframe down.
+   */
+  onRequestThumbnailCapture?: (callback: () => void | Promise<void>) => void;
 }
 
 export type BroadcastActionResult<T extends (...args: any[]) => any> = {
