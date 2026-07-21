@@ -10,11 +10,10 @@
 
 export type ThumbnailMode = 'icon' | 'static' | 'snapshot'
 
-export interface SlideTypeThumbnail {
-    mode: ThumbnailMode
-    /** Required when mode === 'static'. */
-    thumbnailUrl?: string
-}
+export type SlideTypeThumbnail =
+    | { mode: 'icon' | 'snapshot'; thumbnailUrl?: string }
+    /** static mode requires the image URL at compile time. */
+    | { mode: 'static'; thumbnailUrl: string }
 
 export interface MarketplaceSlideType {
     type: string;

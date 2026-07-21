@@ -16,10 +16,11 @@ export function sendThumbnail(dataUrl: string): void {
 
 /**
  * Register a callback the host invokes (before unmount / on switch-away)
- * to request the plugin capture its current thumbnail.
+ * to request the plugin capture its current thumbnail. The callback may return
+ * a promise; a host that awaits it can finish the capture before teardown.
  * No-ops gracefully if the host did not provide the hook.
  */
-export function registerThumbnailCaptureRequest(callback: () => void): void {
+export function registerThumbnailCaptureRequest(callback: () => void | Promise<void>): void {
   const fn = xprops().onRequestThumbnailCapture
   if (typeof fn === 'function') fn(callback)
 }
