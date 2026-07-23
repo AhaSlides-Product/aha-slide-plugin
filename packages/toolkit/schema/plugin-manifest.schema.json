@@ -133,6 +133,30 @@
             "enableFullScreenFrame": { "type": "boolean" },
             "enableIframePreload": { "type": "boolean" }
           }
+        },
+        "thumbnail": {
+          "type": "object",
+          "description": "Left-panel thumbnail behavior for this slide type.",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["icon", "static", "snapshot"],
+              "default": "icon",
+              "description": "icon = slide-type icon (default); static = thumbnailUrl image; snapshot = plugin-captured image persisted to slide.metadata.thumbnailUrl."
+            },
+            "thumbnailUrl": {
+              "type": "string",
+              "description": "Image shown in static mode. Required when mode = static.",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "mode": { "const": "static" } }, "required": ["mode"] },
+              "then": { "required": ["thumbnailUrl"] }
+            }
+          ],
+          "additionalProperties": false
         }
       }
     }
