@@ -102,6 +102,11 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   createLeaderboardSlide: (() => Promise<void>) | undefined;
 
   /**
+   * Allow the plugin to update slide properties, e.g. quizStatus.
+   */
+  updateSlide: ((payload: Record<string, any>) => void) | undefined;
+
+  /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender: (() => void) | undefined;
@@ -215,6 +220,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     setActionButtons: xprops?.setActionButtons,
     onActionInvoke: xprops?.onActionInvoke,
     createLeaderboardSlide: xprops?.createLeaderboardSlide,
+    updateSlide: xprops?.updateSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
 }
