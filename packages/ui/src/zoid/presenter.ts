@@ -102,6 +102,12 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   createLeaderboardSlide: (() => Promise<void>) | undefined;
 
   /**
+   * Merge partial slide fields into the active slide (host-allowlisted keys only,
+   * e.g. `{ quizStatus }`); the host persists + broadcasts so the audience follows.
+   */
+  updateSlide: ((payload: Record<string, any>) => void) | undefined;
+
+  /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
   allowPDFRender: (() => void) | undefined;
@@ -215,6 +221,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     setActionButtons: xprops?.setActionButtons,
     onActionInvoke: xprops?.onActionInvoke,
     createLeaderboardSlide: xprops?.createLeaderboardSlide,
+    updateSlide: xprops?.updateSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
 }
