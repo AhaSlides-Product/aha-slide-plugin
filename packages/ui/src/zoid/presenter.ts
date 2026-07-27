@@ -102,8 +102,7 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
   createLeaderboardSlide: (() => Promise<void>) | undefined;
 
   /**
-   * Merge partial slide fields into the active slide (host-allowlisted keys only,
-   * e.g. `{ quizStatus }`); the host persists + broadcasts so the audience follows.
+   * Allow the plugin to update slide properties, e.g. quizStatus.
    */
   updateSlide: ((payload: Record<string, any>) => void) | undefined;
 
