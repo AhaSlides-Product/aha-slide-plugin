@@ -243,7 +243,7 @@ export class ApiClient {
   /**
    * Fetch the top-N leaderboard.
    * @param request base scope plus optional `slideId`, `aggregation` and `n`
-   * @returns the ranked entries keyed by aggregation name
+   * @returns the ranked leaderboard entries
    */
   async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
     const { n, aggregation, slideId, slideVersion, ...scope } = request;
@@ -279,7 +279,7 @@ export class ApiClient {
    * Fetch the top-N leaderboard over a slide window.
    * Unlike {@link getLeaderboardTopN}, `oldScore` reflects the standings as of `lastSlideId`.
    * @param request base scope plus the required `slideIds` and optional `lastSlideId`, `aggregation` and `n`
-   * @returns the ranked entries keyed by aggregation name
+   * @returns the ranked entries over the slide window
    */
   async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardResponse> {
     const { n, aggregation, slideIds, lastSlideId, ...scope } = request;

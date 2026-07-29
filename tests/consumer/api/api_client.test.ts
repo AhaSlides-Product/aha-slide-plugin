@@ -86,4 +86,22 @@ describe('@aha/api - ApiClient', () => {
         mockOk(undefined);
         expect(await client.getSlideAnswers({ presentationId: 1, presentationVersion: 2, slideId: 3, slideVersion: 1 })).toEqual([]);
     });
+
+    // The path + query serialization is the wire contract with aha-sync; a typo
+    // (/scores -> /score, subjectId -> subject_id) is a silent 400 no type check catches.
+    it('should build the correct URL for the new answerstats endpoints', async () => {
+        mockOk({});
+        const scope = { presentationId: 1, presentationVersion: 2 };
+
+        await client.getLeaderboardSlideStreaks({ ...scope, slideId: 10 });
+        await client.getScore({ ...scope, slideIds: [10, 11], subjectId: 's-1', aggregation: 'first_score' });
+        await client.getStats({ ...scope, slideIds: [10, 11], subjectId: 's-1' });
+
+        const ids = encodeURIComponent(JSON.stringify([10, 11]));
+        expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
+            `${baseUrl}/api/aha-sync/answers/leaderboards/slide/streaks?presentationId=1&presentationVersion=2&slideId=10`,
+            `${baseUrl}/api/aha-sync/answers/scores?presentationId=1&presentationVersion=2&slideIds=${ids}&subjectId=s-1&aggregation=first_score`,
+            `${baseUrl}/api/aha-sync/answers/stats?presentationId=1&presentationVersion=2&slideIds=${ids}&subjectId=s-1`,
+        ]);
+    });
 });
