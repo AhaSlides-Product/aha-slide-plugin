@@ -83,8 +83,6 @@ export type LeaderboardSubject = "participant" | "team";
 export interface BaseLeaderboardScope {
   presentationId: number;
   presentationVersion: number;
-  /** Which score bucket to read, e.g. in-game vs final. */
-  scoreChannel?: string;
   /** Whether the leaderboard ranks participants or teams. Defaults to `participant`. */
   subject?: LeaderboardSubject;
 }
@@ -173,20 +171,12 @@ export interface AudienceInfo {
   teamName?: string;
 }
 
-/**
- * A single leaderboard entry.
- * The `around`/`slide-around` endpoints enrich only the pivot row (`id === subjectId`)
- * with `answerCount`/`correctAnswerCount`/`currentStreak`/`longestStreak`.
- */
+/** A single leaderboard entry. Per-subject stats live on the `/stats` endpoint. */
 export interface LeaderboardItem extends AudienceInfo {
   id: string;
   score: number;
   oldScore: number;
   rank: number;
-  currentStreak?: number;
-  longestStreak?: number;
-  answerCount?: number;
-  correctAnswerCount?: number;
   members?: AudienceInfo[];
 }
 
@@ -195,14 +185,50 @@ export interface LeaderboardResponse {
   items: LeaderboardItem[];
 }
 
-/**
- * A ranked list per requested aggregation, keyed by aggregation name.
- * For `subject=participant` the response also carries `current_streak` and
- * `longest_streak` buckets (each a single top-1 leader).
- * For `subject=team` only the ranking bucket is present.
- */
-export interface LeaderboardMultiResponse {
-  aggregations: Record<string, LeaderboardResponse>;
+/** Parameters for the per-slide streak leaderboards. */
+export interface GetLeaderboardSlideStreakRequest {
+  presentationId: number;
+  presentationVersion: number;
+  slideId: number;
+}
+
+/** Top current-streak and longest-streak leaders for a slide. */
+export interface LeaderboardStreakResponse {
+  currentStreak?: LeaderboardResponse;
+  longestStreak?: LeaderboardResponse;
+}
+
+/** Parameters for a single subject's score over a slide window. */
+export interface GetScoreRequest extends BaseLeaderboardScope {
+  slideIds: number[];
+  subjectId: string;
+  /** Aggregation to score by. Defaults to `total_score`. */
+  aggregation?: LeaderboardAggregation;
+}
+
+/** The first member (of a team) to score, enriched with audience info. */
+export interface FirstScoreMember extends AudienceInfo {
+  id: string;
+}
+
+/** A single subject's score, plus the first-scoring team member when applicable. */
+export interface ScoreResponse {
+  score: number;
+  firstScoreMember?: FirstScoreMember;
+}
+
+/** Parameters for a single subject's stats over a slide window. Aggregation-independent. */
+export interface GetStatsRequest extends BaseLeaderboardScope {
+  slideIds: number[];
+  subjectId: string;
+}
+
+/** Per-subject stats: streaks (participant only) and answer counts. */
+export interface StatsResponse {
+  currentStreak?: number;
+  longestStreak?: number;
+  answerCount?: number;
+  correctAnswerCount?: number;
 }
 
 /** Request body for `DELETE /api/live/answers/results` (ResetResult). */
