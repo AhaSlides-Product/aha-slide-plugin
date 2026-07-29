@@ -10,10 +10,15 @@ import {
   GetLeaderboardAroundRequest,
   GetLeaderboardSlideAroundRequest,
   GetLeaderboardSlideTopNRequest,
+  GetLeaderboardSlideStreakRequest,
   GetLeaderboardTopNRequest,
-  LeaderboardMultiResponse,
+  GetScoreRequest,
+  GetStatsRequest,
   LeaderboardResponse,
+  LeaderboardStreakResponse,
   ResetResultRequest,
+  ScoreResponse,
+  StatsResponse,
 } from "./answer";
 import { SlideType } from "./slideType";
 
@@ -231,7 +236,6 @@ export class ApiClient {
     const params = new URLSearchParams();
     params.append("presentationId", scope.presentationId.toString());
     params.append("presentationVersion", scope.presentationVersion.toString());
-    if (scope.scoreChannel) params.append("scoreChannel", scope.scoreChannel);
     if (scope.subject) params.append("subject", scope.subject);
     return params;
   }
@@ -241,7 +245,7 @@ export class ApiClient {
    * @param request base scope plus optional `slideId`, `aggregation` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
-  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardMultiResponse> {
+  async getLeaderboardTopN(request: GetLeaderboardTopNRequest): Promise<LeaderboardResponse> {
     const { n, aggregation, slideId, slideVersion, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     if (slideId) params.append("slideId", slideId.toString());
@@ -277,7 +281,7 @@ export class ApiClient {
    * @param request base scope plus the required `slideIds` and optional `lastSlideId`, `aggregation` and `n`
    * @returns the ranked entries keyed by aggregation name
    */
-  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardMultiResponse> {
+  async getLeaderboardSlideTopN(request: GetLeaderboardSlideTopNRequest): Promise<LeaderboardResponse> {
     const { n, aggregation, slideIds, lastSlideId, ...scope } = request;
     const params = this.toLeaderboardParams(scope);
     params.append("slideIds", JSON.stringify(slideIds));
@@ -303,6 +307,53 @@ export class ApiClient {
     if (k !== undefined) params.append("k", k.toString());
 
     const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/around?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch the top current-streak and longest-streak leaders for a single slide.
+   * @param request presentation scope plus the `slideId` to read streaks for
+   * @returns the current-streak and longest-streak leader lists
+   */
+  async getLeaderboardSlideStreaks(request: GetLeaderboardSlideStreakRequest): Promise<LeaderboardStreakResponse> {
+    const params = new URLSearchParams();
+    params.append("presentationId", request.presentationId.toString());
+    params.append("presentationVersion", request.presentationVersion.toString());
+    params.append("slideId", request.slideId.toString());
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/leaderboards/slide/streaks?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch a single subject's score over a slide window.
+   * @param request base scope plus the required `slideIds`/`subjectId` and optional `aggregation`
+   * @returns the subject score and, for teams, the first-scoring member
+   */
+  async getScore(request: GetScoreRequest): Promise<ScoreResponse> {
+    const { slideIds, subjectId, aggregation, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    params.append("subjectId", subjectId);
+    if (aggregation) params.append("aggregation", aggregation);
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/scores?${params.toString()}`;
+    return this.fetchUrl(url);
+  }
+
+  /**
+   * Fetch a single subject's stats (streaks + answer counts) over a slide window.
+   * Aggregation-independent — streaks are only populated for `subject=participant`.
+   * @param request base scope plus the required `slideIds`/`subjectId`
+   * @returns the subject's current/longest streak and answer/correct-answer counts
+   */
+  async getStats(request: GetStatsRequest): Promise<StatsResponse> {
+    const { slideIds, subjectId, ...scope } = request;
+    const params = this.toLeaderboardParams(scope);
+    params.append("slideIds", JSON.stringify(slideIds));
+    params.append("subjectId", subjectId);
+
+    const url = `${this.baseUrl}/api/aha-sync/answers/stats?${params.toString()}`;
     return this.fetchUrl(url);
   }
 
