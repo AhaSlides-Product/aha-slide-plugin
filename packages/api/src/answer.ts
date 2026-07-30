@@ -157,6 +157,8 @@ export interface GetSlideAnswersRequest extends BaseSlideAnswersRequest {
 
 /** One raw answer row from AnswersV3. */
 export interface AnswerRecord<T = unknown> {
+  /** The answer's id (its `answerId`). */
+  id?: string;
   /** Scope labels stored with the answer (snake_case, string-valued). */
   labels: Record<string, string>;
   /** The slide-type-specific answer payload. */
