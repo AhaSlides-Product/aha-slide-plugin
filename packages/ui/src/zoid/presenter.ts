@@ -216,15 +216,15 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     accessToken: xprops?.token,
     showConfirmModal: xprops?.showConfirmModal,
     clearSlideData: xprops?.clearSlideData,
+    createLeaderboardSlide: xprops?.createLeaderboardSlide,
+    removeLeaderboardSlide: xprops?.removeLeaderboardSlide,
+    updateSlide: xprops?.updateSlide,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     allowPDFRender: xprops?.allowPDFRender,
     onSlideAttributesChanged: xprops?.onSlideAttributesChanged,
     emitBroadcastAction: xprops?.emitBroadcastAction,
     setActionButtons: xprops?.setActionButtons,
     onActionInvoke: xprops?.onActionInvoke,
-    createLeaderboardSlide: xprops?.createLeaderboardSlide,
-    removeLeaderboardSlide: xprops?.removeLeaderboardSlide,
-    updateSlide: xprops?.updateSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };
 }

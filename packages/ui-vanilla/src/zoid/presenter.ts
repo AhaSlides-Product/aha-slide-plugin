@@ -402,6 +402,22 @@ export const presenterZoidProps = {
     type: 'function',
     required: false,
   },
+  clearSlideData: {
+    type: 'function',
+    required: false,
+  },
+  createLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  removeLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  updateSlide: {
+    type: 'function',
+    required: false,
+  },
   allowPDFRender: {
     type: 'function',
     required: false,
@@ -427,24 +443,6 @@ export const presenterZoidProps = {
     required: false,
   },
   onActionInvoke: {
-    type: 'function',
-    required: false,
-  },
-  /**
-   * Create a leaderboard slide immediately after the currently selected plugin slide.
-   * Mirrors the pickAnswer leaderboard toggle behaviour.
-   * @type {function}
-   * @returns {Promise<void>} Resolves once the leaderboard slide has been created.
-   */
-  createLeaderboardSlide: {
-    type: 'function',
-    required: false,
-  },
-  removeLeaderboardSlide: {
-    type: 'function',
-    required: false,
-  },
-  updateSlide: {
     type: 'function',
     required: false,
   },
