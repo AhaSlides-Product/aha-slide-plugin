@@ -101,6 +101,9 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    */
   createLeaderboardSlide: (() => Promise<void>) | undefined;
 
+  /** Remove counterpart to createLeaderboardSlide — drops the leaderboard slide after the active slide, if any. */
+  removeLeaderboardSlide: (() => Promise<void>) | undefined;
+
   /**
    * Allow the plugin to update slide properties, e.g. quizStatus.
    */
@@ -220,6 +223,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     setActionButtons: xprops?.setActionButtons,
     onActionInvoke: xprops?.onActionInvoke,
     createLeaderboardSlide: xprops?.createLeaderboardSlide,
+    removeLeaderboardSlide: xprops?.removeLeaderboardSlide,
     updateSlide: xprops?.updateSlide,
     filterProfaneWords: baseHook.filterProfaneWords,
   };

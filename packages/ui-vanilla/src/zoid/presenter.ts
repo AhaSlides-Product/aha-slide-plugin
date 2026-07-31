@@ -191,6 +191,9 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   createLeaderboardSlide?: () => Promise<void>;
 
+  /** Remove counterpart to createLeaderboardSlide — drops the leaderboard slide after the active slide, if any. */
+  removeLeaderboardSlide?: () => Promise<void>;
+
   /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
@@ -431,6 +434,10 @@ export const presenterZoidProps = {
    * @returns {Promise<void>} Resolves once the leaderboard slide has been created.
    */
   createLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  removeLeaderboardSlide: {
     type: 'function',
     required: false,
   },
