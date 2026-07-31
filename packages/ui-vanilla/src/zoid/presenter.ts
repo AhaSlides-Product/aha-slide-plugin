@@ -191,6 +191,12 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   createLeaderboardSlide?: () => Promise<void>;
 
+  /** Remove counterpart to createLeaderboardSlide — drops the leaderboard slide after the active slide, if any. */
+  removeLeaderboardSlide?: () => Promise<void>;
+
+  /** Update slide properties from the plugin, e.g. quizStatus. Host allowlists which fields apply. */
+  updateSlide?: (payload: Record<string, any>) => void;
+
   /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
@@ -396,6 +402,22 @@ export const presenterZoidProps = {
     type: 'function',
     required: false,
   },
+  clearSlideData: {
+    type: 'function',
+    required: false,
+  },
+  createLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  removeLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  updateSlide: {
+    type: 'function',
+    required: false,
+  },
   allowPDFRender: {
     type: 'function',
     required: false,
@@ -421,16 +443,6 @@ export const presenterZoidProps = {
     required: false,
   },
   onActionInvoke: {
-    type: 'function',
-    required: false,
-  },
-  /**
-   * Create a leaderboard slide immediately after the currently selected plugin slide.
-   * Mirrors the pickAnswer leaderboard toggle behaviour.
-   * @type {function}
-   * @returns {Promise<void>} Resolves once the leaderboard slide has been created.
-   */
-  createLeaderboardSlide: {
     type: 'function',
     required: false,
   },
