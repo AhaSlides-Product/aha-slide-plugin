@@ -194,6 +194,9 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   /** Remove counterpart to createLeaderboardSlide — drops the leaderboard slide after the active slide, if any. */
   removeLeaderboardSlide?: () => Promise<void>;
 
+  /** Update slide properties from the plugin, e.g. quizStatus. Host allowlists which fields apply. */
+  updateSlide?: (payload: Record<string, any>) => void;
+
   /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
    */
@@ -438,6 +441,10 @@ export const presenterZoidProps = {
     required: false,
   },
   removeLeaderboardSlide: {
+    type: 'function',
+    required: false,
+  },
+  updateSlide: {
     type: 'function',
     required: false,
   },
