@@ -7,61 +7,78 @@
 ## Problem
 
 Checking whether a UI element fires an analytics event is, today, entirely manual.
-A QA opens DevTools, clicks a button, reads the console, and decides whether a
-`[analytics]` line appeared. Repeat for every element on the screen. The process
-has four failure modes:
+A QA opens DevTools, clicks a button, reads the console, and decides whether an
+`[analytics]` line appeared. Repeat for every element on the screen. Four failure
+modes:
 
-1. **It does not scale.** An editor screen has 30–40 interactive elements. Nobody
-   clicks all of them, so coverage is whatever the tester remembered.
-2. **It is unverifiable.** "I checked the editor" carries no evidence. There is no
-   artefact showing which elements were exercised and which were not.
-3. **It only works where the console talks.** `aha-survey` logs `[analytics]` only
-   when `import.meta.env.DEV` or `VITE_MIXPANEL_DEBUG === 'true'`
+1. **It does not scale.** An editor screen carries dozens of interactive
+   elements. Nobody clicks all of them, so coverage is whatever the tester
+   remembered.
+2. **It is unverifiable.** "I checked the editor" leaves no artefact showing
+   which elements were exercised and which were not.
+3. **It only works where the console talks.** `aha-survey` logs `[analytics]`
+   only when `import.meta.env.DEV` or `VITE_MIXPANEL_DEBUG === 'true'`
    (`frontend/src/analytics/track.ts`). Production is silent, so the method
    reports *everything* as missing — confidently and uniformly wrong.
 4. **It does not work for slide plugins at all.** A slide plugin never calls
    Mixpanel; it calls `window.xprops.trackGA4AndMixpanel(...)` across a zoid
-   postMessage bridge (`packages/ui/src/tracking.ts`). Nothing appears in the
+   postMessage bridge (`packages/ui/src/tracking.ts`). Nothing reaches the
    plugin iframe's console.
+
+Multi-screen features are worse still: an event that should fire *between*
+screens (a funnel step, a page view) has no button to click, so the manual method
+rarely checks them at all.
 
 ## Goal
 
-A per-screen tool that produces a complete, evidenced answer to one question:
+A cross-repo tool that produces a complete, evidenced answer to one question:
 
-> For this screen, which interactive elements fire a tracking event, which do
-> not, and which could not be checked?
+> For this feature, which interactive elements and which screen transitions fire
+> a tracking event, which do not, and which could not be checked?
 
 Two priorities, in order:
 
-- **A — script does the mechanical work.** Element inventory, clicking safe
-  elements, capturing payloads, pairing action to event, and flagging
-  machine-detectable defects are all deterministic code. No LLM.
-- **B — LLM does only the final judgement.** Given a paired timeline, decide
+- **A — the script does the mechanical work.** Element inventory, clicking,
+  payload capture, action↔event pairing, and machine-detectable defects are all
+  deterministic code.
+- **B — the LLM does only the final judgement.** Given a paired timeline, decide
   whether each event *name* matches the action, whether *props* look sane, and
   write the report.
 
+### Division of labour
+
+The tester supplies **intent**; the tool supplies **thoroughness**.
+
+The tool cannot know what "the feature" is. Given a dashboard URL it cannot infer
+that the flow under test is *create survey → add three questions → publish →
+view results*, nor that Results is only meaningful after a response exists, nor
+what to type into a title field. Those are decisions, not clicks.
+
+So the tester walks the feature once and presses `s` at each screen. The tool
+does everything else — including clicking the elements the tester would never
+have thought to try. Autopilot (§ Roadmap) later removes even the walking, but
+sits on top of this engine rather than replacing it.
+
 ## Non-goals (explicit)
 
-- **No whole-app crawl.** One run covers one screen in one state. Reaching a
-  different state (a modal, a populated Results page) is the tester's job.
-- **No spec comparison in v1.** The tool does not read Jira tickets, the
-  `EVENTS` catalog, or the Mixpanel Lexicon. It judges an event against the
-  action that produced it, nothing more. Adding a spec source later is a new
-  input to the same evaluator.
+- **No spec comparison in v1.** The tool does not read Jira tickets, the `EVENTS`
+  catalog, or the Mixpanel Lexicon. It judges an event against the action that
+  produced it. A spec source can be added later as an extra input.
 - **No replay or regression mode.** A session is not re-runnable. Turning
-  recorded sessions into a CI suite is a future project.
+  sessions into a CI suite is a future project.
 - **No verification that Mixpanel received the event.** The tool proves the app
-  *sent* it. Delivery, ingestion, and Lexicon registration are separate.
-- **No judgement of naming conventions against the 2024 guideline.** The tool
-  reports the name observed; whether `click_submit_button` conforms is a human
-  call, except for the mechanical `_anonymous` / `undefined_action` cases below.
+  *sent* it. Delivery, ingestion, and Lexicon registration are separate concerns.
+- **No naming-convention judgement** beyond the two mechanical cases below.
 - **No Chrome extension.** A terminal command is the delivery mechanism.
+- **No app-specific hardcoding.** The tool runs against `aha-survey`, the
+  presenter app, and slide plugins. Anything that only holds for one of them
+  belongs in an app profile, not in the engine.
 
 ## Architecture
 
 ### Distribution
 
-Shipped as a Claude Code plugin in this repo, so a teammate installs it once and
+Shipped as a Claude Code plugin in this repo, so a teammate installs once and
 uses it in any repo:
 
 ```
@@ -81,7 +98,8 @@ aha-slide-plugin/
                 │   ├── record.mjs          # entry: launch, inject, sweep, write
                 │   ├── inpage.js           # hooks + action listener + inventory
                 │   ├── decode.mjs          # payload → { name, props }
-                │   ├── classify.mjs        # element → safe | risky | unreachable
+                │   ├── classify.mjs        # element → safe | last | external | unreachable
+                │   ├── profiles/           # per-app signal overrides (JSON)
                 │   ├── pair.mjs            # timeline → pairs + flags (pure)
                 │   ├── chrome.mjs          # Chrome path: macOS / Windows / Linux
                 │   └── test/               # node:test + fixtures
@@ -102,12 +120,12 @@ This repo already carries a repo-scoped skill
 (`slide-plugin-built-by-ahasliders/.claude/skills/creating-slide-type-plugins/`).
 That mechanism is deliberately **not** reused: a repo-scoped skill is only
 available while working inside that repo, and this tool must run against
-`aha-survey` and the presenter app too. The two mechanisms coexist —
-repo-scoped skills for authoring inside a repo, a plugin for cross-repo QA tooling.
+`aha-survey` and the presenter app too. The two coexist — repo-scoped skills for
+authoring inside a repo, a plugin for cross-repo QA tooling.
 
 ### Capture: three hook layers
 
-The recorder hooks the **send path in the page**, not the network, and not the
+The recorder hooks the **send path inside the page** — not the network, not the
 console. Injected via Playwright `addInitScript`, which applies to every frame
 and survives every navigation.
 
@@ -117,123 +135,141 @@ and survives every navigation.
 | SDK | `window.mixpanel.track` | any app embedding mixpanel-browser directly |
 | Bridge | `window.xprops.trackGA4AndMixpanel` | **slide plugins inside a zoid iframe** |
 
-Rationale for each rejected alternative is in *Rejected alternatives*.
-
 A payload counts as tracking when its URL path contains `/track` or `/engage`,
 or its body carries a `data=` parameter, or it decodes to `{ event, properties }`.
 `decode.mjs` normalises base64, URL-encoded, raw JSON, and batched-array forms
 to `{ name, props }`.
 
-The bridge layer is why frame identity is recorded on every record: layer 3 only
-ever fires inside an iframe, and a report that cannot distinguish host from
-plugin frame is unreadable.
+Frame identity is recorded on every record: layer 3 only ever fires inside an
+iframe, and a report that cannot separate host from plugin frame is unreadable.
 
-### Run model: one screen, three passes
+**Open risk (resolve in phase 2).** `xprops` is injected by zoid, and it is not
+yet verified whether it exists when `addInitScript` runs or is assigned later. If
+later, the hook must install a `defineProperty` trap that fires on assignment.
+
+### Run model: a feature is many screens
+
+Recording runs continuously from launch to `Ctrl+C` and spans any number of
+screens — hooks are re-injected on every navigation. The *sweep* is what is
+scoped to a screen, and it runs on demand:
 
 ```
-$ node record.mjs https://dev01.example/surveys/123/edit
+$ node record.mjs https://dev01.example/dashboard
 
-  Pass 0 — you steer
-    Chrome opens on a dedicated profile. Put the screen into the state you
-    want tested (log in, open the tab, seed data). Press Enter.
+  Chrome opens on a dedicated profile. Walk the feature.
+  Press [s] on any screen to sweep it. Ctrl+C when done.
 
-  Pass 1 — script inventories
-    Every interactive element on the screen is enumerated and classified:
-      button, a[href], input, textarea, select,
-      [role=button|switch|tab|menuitem|checkbox], [contenteditable]
-
-      34 found → 26 safe · 5 risky · 3 unreachable
-
-  Pass 2 — script sweeps the safe ones
-    For each: mark console/event high-water, click, wait 1500ms, re-read,
-    then recover state (see below). Live output per element.
-
-  Pass 3 — you do the rest
-    Terminal prints the 8 remaining elements and keeps recording. You click
-    Delete, Publish, open the dropdown. Ctrl+C writes session.json.
+  [s] at /dashboard
+      inventory → auto-click safe elements → recover → live results
+  … tester creates a survey, adds questions …
+  [s] at /surveys/123/edit
+  … tester publishes …
+  [s] at /surveys/123/share
+  ^C  → session.json
 ```
 
-Screen scope is defined by URL. If a click navigates away, the recorder
-navigates back to the target URL and re-enumerates — indices from pass 1 are
-stale after any DOM change.
+Each `s` keys its inventory to the URL at that moment. The session holds a
+`screens[]` array plus one continuous timeline across all of them.
+
+### Navigation is a first-class action
+
+Events that fire on entering a screen — page views, funnel steps — have no click
+to attribute to. They are recorded as `kind: "action", type: "navigate"` so
+events following a transition attribute to that transition instead of becoming
+orphans. This is what lets the report answer *"the four-step flow — which step is
+missing its event?"*, a question the manual method almost never reaches.
 
 ### Element classification (`classify.mjs`)
 
-Deterministic, and deliberately conservative — a misclassification that clicks
-Delete costs real data.
+Deterministic, app-agnostic, and layered so it degrades gracefully on an app the
+engine knows nothing about. Signals in descending reliability:
 
-| Class | Rule | Handling |
+| # | Signal | Why it is language-independent |
 |---|---|---|
-| **risky** | Accessible name matches destructive vocabulary (`delete`, `remove`, `xoá`, `publish`, `send`, `close`, `archive`, `reset`, `pay`, `upgrade`), or `type=submit` inside a form, or `href` leaving the screen origin | Never auto-clicked. Listed for the manual pass |
-| **unreachable** | Not visible, zero-size, `disabled`, `aria-hidden`, or inside a collapsed `[aria-expanded=false]` subtree | Not auto-clicked. Reported as ⚠️ with the reason |
-| **safe** | Everything else | Auto-clicked in pass 2 |
+| 1 | Framework danger markers — `.ant-btn-dangerous` and equivalents | Emitted by AntD from `<Button danger>`; present in both React (aha-survey) and Vue (slide plugins) |
+| 2 | `data-testid` keyword match | Test ids are authored in English and are not translated |
+| 3 | Structure — `type=submit`, cross-origin `href`, `disabled`, `aria-hidden`, inside `[aria-expanded=false]` | Markup, not copy |
+| 4 | App profile (`profiles/<app>.json`) | Explicit selectors/testids the team declares per app |
+| 5 | Visible text keyword match (en + vi) | **Last resort, explicitly unreliable** |
 
-Native dialogs are a hard stop: a `confirm()` freezes the automation and kills
-the session. Playwright's `dialog` event is registered to auto-dismiss and to
-mark the triggering element ⚠️ `native-dialog`, but destructive vocabulary is
-the primary defence — the dialog handler is the backstop, not the plan.
+Signal 5 is weak because `aha-survey` ships 37 locales (`frontend/src/i18n/`).
+A Delete button rendered in Japanese matches no English keyword. Mitigation:
+force the app locale to `en` before sweeping where the app allows it. Whether
+locale can be forced externally is unresolved — see phase 4.
 
-### State recovery after each auto-click
+Classes and handling:
 
-Bounded because scope is one screen:
+| Class | Handling |
+|---|---|
+| **safe** | Auto-clicked during the sweep |
+| **last** | Auto-clicked, but queued to the end — clicking Delete first would destroy the screen and strand the remaining elements. Ordering, not prohibition |
+| **external** | Consequences outside the test account: send email, invite, pay, upgrade, subscribe. Skipped by default; auto-clicked with `--allow-external` |
+| **unreachable** | Not visible, zero-size, `disabled`, or in a collapsed subtree that could not be expanded |
 
-- URL changed → `page.goto(targetUrl)`, wait for load, re-enumerate.
-- Modal or drawer opened → `Escape`, verify closed; if not, re-navigate.
-- DOM materially changed (element count differs) → re-enumerate before continuing.
-- Element vanished → mark ⚠️ `element-gone`; never guess.
+Collapsed subtrees are expanded rather than skipped: click the trigger,
+re-enumerate, sweep the revealed elements, `Escape`. Bounded recursion depth,
+default 3.
+
+Native dialogs are **not** a barrier. Playwright's `page.on('dialog')` dismisses
+them. (The prohibition in the older extension-based `aha-check-tracking` skill
+came from a browser extension, where a dialog freezes every subsequent command.
+It does not apply here.)
 
 ### Session JSON — the contract between script and LLM
 
 ```jsonc
 {
   "meta": {
-    "url": "https://dev01.example/surveys/123/edit",
     "startedAt": "2026-08-03T12:04:01Z",
     "endedAt": "2026-08-03T12:19:44Z",
     "recorderVersion": "1.0.0",
     "hooksArmed": ["sendBeacon", "fetch", "xhr", "mixpanel", "xprops"],
+    "allowExternal": false,
     "signalDetected": true
   },
-  "inventory": [
-    { "id": 7, "class": "safe", "tag": "button", "text": "Preview",
-      "testId": "preview-btn", "name": null, "section": "Editor top bar",
-      "path": "main>header>button:nth-of-type(2)", "frame": "top" },
-    { "id": 12, "class": "risky", "tag": "button", "text": "Delete",
-      "reason": "destructive-vocabulary", "frame": "top" }
+  "screens": [
+    { "screenId": 1, "url": "https://dev01.example/dashboard",
+      "sweptAt": "2026-08-03T12:05:12Z",
+      "inventory": [
+        { "id": 7, "class": "safe", "tag": "button", "text": "Preview",
+          "testId": "preview-btn", "section": "Top bar",
+          "path": "main>header>button:nth-of-type(2)", "frame": "top" },
+        { "id": 12, "class": "external", "tag": "button", "text": "Send invitations",
+          "reason": "testid-keyword:send", "frame": "top" }
+      ] }
   ],
   "timeline": [
     { "seq": 2, "t": 1203, "kind": "action", "type": "click",
-      "elementId": 7, "origin": "auto" },
-    { "seq": 3, "t": 1290, "kind": "event",
-      "name": "survey.editor_preview_clicked",
-      "props": { "survey_id": 42, "variant": "classic" },
-      "via": "sendBeacon", "frame": "top" },
-    { "seq": 4, "t": 8100, "kind": "action", "type": "click",
-      "elementId": 12, "origin": "manual" }
+      "screenId": 1, "elementId": 7, "origin": "auto" },
+    { "seq": 3, "t": 1290, "kind": "event", "name": "survey.dashboard.preview_clicked",
+      "props": { "survey_id": 42 }, "via": "sendBeacon", "frame": "top" },
+    { "seq": 4, "t": 8100, "kind": "action", "type": "navigate",
+      "from": "https://dev01.example/dashboard",
+      "to": "https://dev01.example/surveys/123/edit" }
   ]
 }
 ```
 
-`origin` separates what the script clicked from what the human clicked. The
-report distinguishes them because their reliability differs — an auto-click that
-produced nothing is stronger evidence than a manual click that may have missed.
+`origin` separates script clicks from human clicks: an auto-click that produced
+nothing is stronger evidence than a manual click that may have missed.
 
 ### Pairing and mechanical flags (`pair.mjs`)
 
-A pure function: `(timeline) → { pairs, orphans, checks }`. Each event is
-attributed to the nearest preceding action within 1500 ms. Then:
+A pure function: `(session) → { pairs, orphans, transitions, checks }`. Each
+event attributes to the nearest preceding action — click or navigate — within
+1500 ms. Then:
 
 | Flag | Meaning | Detection |
 |---|---|---|
 | `no-event` | Action produced zero events | count |
 | `anonymous-name` | Name contains `_anonymous` | `tracking.ts` falls back to `ANONYMOUS_ELEMENT` when the element has no `name` — a real slide-plugin defect class |
 | `undefined-action` | Name contains `undefined_action` | the `EVENT_ACTIONS` fallback in `tracking.ts` |
-| `duplicate` | Same event name ≥2× in one action window | string compare |
+| `duplicate` | Same event name ≥2× in one window | string compare |
 | `empty-props` | A prop value is `undefined`, `null`, or `""` | object walk |
-| `orphan-event` | Event with no preceding action in window | page views, timers — **reported separately, not a defect** |
+| `orphan-event` | Event with no preceding action in window | timers, retries — reported separately, **not** a defect |
 
 `anonymous-name` and `undefined-action` are exact-string defects derived from
-this repo's own directive. They are found by `String.includes`, never by the LLM.
+this repo's own directive. Found by `String.includes`, never by the LLM.
 
 ### What the LLM does
 
@@ -241,102 +277,103 @@ Given the paired session, exactly three things:
 
 1. **Name ↔ action semantics.** Clicking *Delete* and observing
    `click_publish_button` is a defect no string comparison can find.
-2. **Prop plausibility.** Missing `survey_id`; a user email in a payload; a prop
-   whose value contradicts the action.
-3. **Verdict and report.** Per element: ✅ / ❌ / ⚠️, plus a summary and the
-   recommended follow-up.
+2. **Prop plausibility.** Missing `survey_id`; a user email in a payload; a value
+   contradicting the action.
+3. **Verdict and report.** Per element and per transition: ✅ / ❌ / ⚠️, plus a
+   summary and recommended follow-up.
 
 ### Report
 
-Written to the existing QA outputs convention, so it sits beside the analysis,
-test cases, and bug reports for the same ticket:
+Written to the existing QA outputs convention, beside the analysis, test cases,
+and bug reports for the same ticket:
 
 ```
 <outputs-root>/<task-id>/7-tracking-check.md
-<outputs-root>/unscoped-tracking/<host>-<screen>-<YYYY-MM-DD>.md   # no task id
+<outputs-root>/unscoped-tracking/<feature>-<YYYY-MM-DD>.md   # no task id
 ```
 
 `<outputs-root>` is `$QA_WORKFLOW_OUTPUTS_DIR`, else
 `$HOME/Documents/QA Workflow/AhaSlides/outputs`. Never write outside it.
 
-The headline is a coverage statement, not a count of failures:
+Shape — a per-screen breakdown plus a transitions section:
 
 ```
-Screen /surveys/123/edit — 34 interactive elements
-  ✅ fires an event         24    (20 auto-clicked, 4 manual)
-  ❌ no event                7    ( 6 auto-clicked, 1 manual)
-  ⚠️ could not check         3    ( 3 unreachable)
+Feature: <name> — N screens
+
+  ① /dashboard            <count> elements · ✅ … ❌ … ⚠️ …
+  ② /surveys/:id/edit     <count> elements · ✅ … ❌ … ⚠️ …
+
+  Transitions
+  ① → ②   ✅ survey.editor_opened
+  ② → ③   ❌ no event
 ```
 
-The three buckets always sum to the inventory total. An element is ⚠️ only when
-nobody exercised it — the five `risky` elements above moved to ✅/❌ once the
-tester clicked them in pass 3. If the tester skips some, they stay ⚠️ with
-`reason: "risky, not manually exercised"`.
+Per screen, the three buckets always sum to the inventory total. An element is
+⚠️ only when nobody exercised it, and every ⚠️ line names its reason and the
+action needed — never a bare "check manually".
 
 ## Safety rules
 
-1. **`signalDetected === false` blocks the report.** If the whole session
-   captured zero tracking payloads, the hooks did not match this app — that is
-   not "everything is missing". The run exits `signal-not-detected` and the skill
-   refuses to produce a findings report. This is the single most dangerous
-   failure mode: uniformly wrong output that reads as authoritative.
-2. **Dedicated Chrome profile** (`~/.aha-track-profile`). The tool never drives
-   the tester's daily browser.
-3. **Data mutation is explicit.** Pass 2 clicks real buttons on real data. The
-   tool states this and requires confirmation before pass 2, and the target must
-   be a disposable survey.
-4. **⚠️ is never downgraded to ❌.** An element that was not successfully
-   interacted with is unknown, not failing.
-5. **Partial runs say so.** If a run ends early, the report names the elements
-   never reached rather than presenting partial coverage as complete.
+1. **`signalDetected === false` blocks the report.** Zero tracking payloads in a
+   whole session means the hooks did not match this app — not that everything is
+   missing. The run exits `signal-not-detected` and the skill refuses to produce
+   findings. This is the most dangerous failure mode: uniformly wrong output that
+   reads as authoritative.
+2. **Dedicated Chrome profile** (`~/.aha-track-profile`). Never the tester's
+   daily browser.
+3. **Data mutation is explicit.** The sweep clicks real buttons on real data. The
+   target must be a disposable account, confirmed before the first sweep.
+   `--allow-external` requires a second, separate confirmation.
+4. **⚠️ is never downgraded to ❌.** An element not successfully interacted with
+   is unknown, not failing.
+5. **Partial runs say so.** A run that ends early names what it never reached
+   rather than presenting partial coverage as complete.
 
 ## Rejected alternatives
 
-**Console scraping (`[analytics]` lines).** What the current manual process and
-the existing `aha-check-tracking` skill use. Rejected: silent on production,
-absent in slide-plugin iframes, and gated behind `VITE_MIXPANEL_DEBUG`.
+**Console scraping (`[analytics]` lines).** What the manual process and the
+existing `aha-check-tracking` skill use. Rejected: silent on production, absent
+in slide-plugin iframes, gated behind `VITE_MIXPANEL_DEBUG`.
 
 **Network interception by host (`api.mixpanel.com`).** Rejected: `aha-survey`
 sets `api_host` from `VITE_MIXPANEL_API_HOST`, which on dev01 is the first-party
-proxy `mt.dev.ahaslide.com`. A host filter silently captures nothing.
+proxy `mt.dev.ahaslide.com`. A host filter captures nothing.
 
-**Network interception by request, at the CDP layer.** Closer, but `sendBeacon`
-bodies are unreliable to read across CDP versions, and it still misses the zoid
-bridge entirely — a slide plugin's tracking never becomes a network request in
-its own frame.
+**Network interception at the CDP layer.** Closer, but `sendBeacon` bodies are
+unreliable to read across CDP versions, and it misses the zoid bridge entirely —
+a slide plugin's tracking never becomes a network request in its own frame.
 
-**Hand-rolled CDP client to avoid the `playwright-core` dependency.** Node 18
-has no global `WebSocket`, so a raw CDP client needs ~120 vendored lines. Cheaper
-in dependencies, more expensive where it matters: the bridge hook must run inside
-every iframe, which means managing `Target.setAutoAttach` per frame by hand.
-Playwright's `addInitScript` does this correctly for free. Precedent also exists
-— `aha-ui-audit/scripts/` already ships `playwright-core` under a skill.
+**Hand-rolled CDP client to avoid `playwright-core`.** Node 18 has no global
+`WebSocket`, so a raw client needs ~120 vendored lines. Cheaper in dependencies,
+more expensive where it matters: the bridge hook must run inside every iframe,
+which means managing `Target.setAutoAttach` per frame by hand. Playwright's
+`addInitScript` does this correctly for free. Precedent exists —
+`aha-ui-audit/scripts/` already ships `playwright-core` under a skill.
 
-**Full automatic crawl.** Rejected: it clicks Delete and Publish, and even then
-cannot reach state-dependent elements. It buys little coverage over the sweep +
-manual split and guarantees eventual data loss.
+**Refusing to click destructive elements at all.** Rejected in favour of ordering
+them last. On a disposable account the objection is not data loss but sequencing:
+clicking Delete first strands every remaining element on that screen.
 
-**Comparing against a spec (Jira / `EVENTS` catalog / Mixpanel Lexicon).**
-Deferred, not rejected. It requires either a per-ticket tracking table that does
-not reliably exist today, or a per-app catalog that does not exist for the
-presenter app. The action-relative judgement works everywhere with zero setup;
-a spec source can be added later as an extra input.
+**Comparing against a spec (Jira / `EVENTS` / Mixpanel Lexicon).** Deferred, not
+rejected. Requires either a per-ticket tracking table that does not reliably
+exist, or a per-app catalog that does not exist for the presenter app. The
+action-relative judgement works everywhere with zero setup.
 
 ## Trade-offs and edge cases
 
-- **Coverage equals one screen in one state.** The tool cannot claim anything
-  about states it was not driven into. The report is explicit about which URL
-  and which state it describes.
+- **Coverage equals the screens the tester visited, in the states they created.**
+  The report is explicit about which URLs and states it describes, and claims
+  nothing beyond them.
 - **The 1500 ms pairing window is a heuristic.** An event debounced beyond it is
-  attributed to the wrong action or becomes an orphan. Mitigated by reporting
-  orphans separately and never counting them as failures.
-- **Destructive-vocabulary matching is English + Vietnamese.** A destructive
-  button labelled only with an icon and no accessible name will classify as
-  `safe`. This is a real risk, reduced but not eliminated by the dialog handler.
-  It is also a genuine a11y defect worth reporting on its own.
-- **Auto-clicking changes app state even when it is not destructive.** A "safe"
-  click that opens a modal costs a recovery cycle; a safe click that silently
-  saves a draft is invisible. Runs must use disposable data.
+  misattributed or becomes an orphan. Mitigated by reporting orphans separately
+  and never counting them as failures.
+- **Text-keyword classification is the weakest signal and 37 locales make it
+  weaker.** Signals 1–4 carry the load; signal 5 is a backstop.
+- **An icon-only button with no accessible name and no test id cannot be
+  classified.** It falls to `unreachable` rather than `safe` — conservative by
+  design. It is also a genuine a11y defect worth reporting on its own.
+- **A "safe" click still changes state.** One that opens a modal costs a recovery
+  cycle; one that silently saves a draft is invisible. Runs need disposable data.
 - **`origin: "auto"` and `origin: "manual"` carry different confidence.** Stated
   in the report rather than smoothed over.
 
@@ -345,24 +382,58 @@ a spec source can be added later as an extra input.
 | File | Covers |
 |---|---|
 | `test/decode.test.mjs` | base64, URL-encoded, raw JSON, batched array, `xprops` bridge payload shapes |
-| `test/classify.test.mjs` | destructive vocabulary (en + vi), disabled/hidden/collapsed, icon-only unnamed elements |
-| `test/pair.test.mjs` | attribution inside/outside the 1500 ms window, orphans, every flag, empty timeline |
-| `test/smoke.test.mjs` | a static local HTML page calling `sendBeacon` and a stub `xprops` — asserts the recorder captures both end to end |
+| `test/classify.test.mjs` | each signal in isolation and in precedence order; disabled/hidden/collapsed; icon-only unnamed elements; profile overrides |
+| `test/pair.test.mjs` | attribution inside/outside the window, navigate-attributed events, orphans, every flag, empty timeline |
+| `test/smoke.test.mjs` | a static local page calling `sendBeacon` and a stub `xprops` — asserts end-to-end capture of both |
 
-The smoke test is the one `aha-ui-audit` lacks, and its absence is why that
-skill's `capture.mjs` can be missing from the repo without anyone noticing.
+The smoke test is what `aha-ui-audit` lacks, and its absence is why that skill's
+`capture.mjs` can be missing from the repo without anyone noticing.
 
-## Total change set
+## Build order
 
-New, all under `plugins/aha-tracking/` plus one repo-root file:
+Phases 1–2 come first because they prove the riskiest assumption — that the
+payload can be captured at all. If the bridge hook does not work, everything
+above it is void.
 
-- `.claude-plugin/marketplace.json` (repo root)
-- `plugins/aha-tracking/.claude-plugin/plugin.json`, `README.md`
-- `skills/check-tracking/SKILL.md`, `references/event-naming.md`,
-  `templates/report-template.md`
-- `skills/check-tracking/recorder/`: `package.json`, `.gitignore`, `record.mjs`,
-  `inpage.js`, `decode.mjs`, `classify.mjs`, `pair.mjs`, `chrome.mjs`
-- `skills/check-tracking/recorder/test/`: four test files plus fixtures
+| # | Phase | Done when |
+|---|---|---|
+| 1 | Runner + transport hooks + smoke test | Clicking in `aha-survey` prints a real event in the terminal |
+| 2 | `decode.mjs` + SDK hook + bridge hook | **A slide-plugin event is captured through zoid** |
+| 3 | Action + navigation recording, `session.json`, `signalDetected` | A manual walk produces a schema-valid session |
+| 4 | Inventory, `classify.mjs`, profiles, `[s]` sweep, recovery, `--allow-external` | A screen sweeps completely with no data loss |
+| 5 | `pair.mjs`, `SKILL.md`, report template | `/aha-check-tracking session.json` produces the markdown report |
+| 6 | `marketplace.json`, `plugin.json`, dependency bootstrap | A teammate installs with two commands and runs it |
 
-No existing file in this repo is modified. Nothing in `apps/`, `packages/`, or
-any submodule is touched.
+Unresolved, to be settled during the phase named:
+
+1. Whether `xprops` exists at `addInitScript` time or needs a `defineProperty`
+   trap *(phase 2)*.
+2. Whether app locale can be forced to `en` externally, and if not, how to
+   classify destructive elements in the other 36 locales *(phase 4)*.
+3. Which signals each app profile needs beyond the generic set *(phase 4)*.
+
+## Roadmap — phase 7: autopilot
+
+The tester's remaining job is supplying intent: walking the feature and pressing
+`s`. An optional mode removes it:
+
+```
+$ node record.mjs <url> --auto "create a survey, add 3 questions, publish, view results"
+```
+
+An LLM driver reads each screen and decides the next step, pausing at each screen
+for the normal sweep. Everything below the driver — capture, inventory, sweep,
+pairing, report — is unchanged. Autopilot is a steering wheel on this engine, not
+a different vehicle.
+
+Deliberately deferred, and deliberately opt-in when it lands:
+
+- **Non-deterministic coverage.** Two runs of the same command may walk different
+  paths. For a QA evidence tool that is a serious property, and it argues for
+  recording the driver's chosen steps so a run can be repeated exactly.
+- **Cost and latency.** One LLM call per navigation step versus one per session.
+- **Failure mode.** A stuck or misrouted driver can report a completed run that
+  never reached the feature. The manual mode has no such failure.
+
+Building it after phases 1–6 means the engine is proven first, and the tester has
+a working tool while the driver is developed.
