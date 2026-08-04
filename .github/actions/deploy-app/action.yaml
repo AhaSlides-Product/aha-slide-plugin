@@ -7,6 +7,10 @@ inputs:
   slides_agent_bucket:
     description: 'Target S3 Bucket for slides agents spec'
     required: false
+  path_prefix:
+    description: 'Optional S3 prefix (e.g. /plugins). Must match the build base (VITE_BASE_PATH). Empty = root only (default).'
+    required: false
+    default: ''
   aws_access_key_id:
     description: 'AWS Access Key ID'
     required: true
@@ -52,6 +56,7 @@ runs:
       env:
         S3_BUCKET: ${{ inputs.s3_bucket }}
         SLIDES_AGENT_BUCKET: ${{ inputs.slides_agent_bucket }}
+        PATH_PREFIX: ${{ inputs.path_prefix }}
       run: |
         INVALIDATION_PATHS=""
         MISSING_DIST=0
@@ -77,6 +82,11 @@ runs:
             aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}" --exclude "*/index.html" --exclude "index.html"
             aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
             INVALIDATION_PATHS="$INVALIDATION_PATHS /${app_name}/*"
+            if [ -n "$PATH_PREFIX" ]; then
+              aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}${PATH_PREFIX}" --exclude "*/index.html" --exclude "index.html"
+              aws s3 sync "${app_dir}frontend/dist" "s3://${S3_BUCKET}${PATH_PREFIX}/${app_name}" --exclude "*" --include "*/index.html" --include "index.html"
+              INVALIDATION_PATHS="$INVALIDATION_PATHS ${PATH_PREFIX}/*"
+            fi
           elif [ "$has_agent" = 1 ]; then
             # A slide-type plugin ships a slides_agent spec, so it must also have a
             # frontend build. Missing dist here means its build silently failed —
