@@ -132,6 +132,7 @@ runs:
         fi
 
         if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then
+          INVALIDATION_PATHS=$(printf '%s\n' $INVALIDATION_PATHS | sort -u | tr '\n' ' ')
           echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
           aws cloudfront create-invalidation --distribution-id "${{ inputs.cloudfront_distribution_id }}" --paths $INVALIDATION_PATHS
         fi
