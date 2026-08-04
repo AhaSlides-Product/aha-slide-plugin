@@ -5,31 +5,30 @@ export interface BaseSlidePluginProps {
   /** The URL of the plugin to be loaded in the iframe */
   url: string;
   /**
-   * Presentation-wide settings and data that affect the plugin's appearance and behavior.
+   * The full presentation object, passed straight through from the host — every
+   * field on the host's presentation model is available here (id, language,
+   * fontFamily, uniqueAccessCode, audiencePacing, presenting, …). The host no
+   * longer maintains a per-field allowlist, so this is intentionally an open
+   * record rather than a hand-mirrored field list; read whatever you need.
+   *
+   * The one nested field the host strips is `slides` (the whole deck) — it is
+   * large, deep-watched, and re-sent on every slide mutation, so it is not
+   * forwarded to plugin iframes.
+   *
+   * Only host-*derived* fields (not present on the raw presentation model) are
+   * documented explicitly below, since those can't be discovered from the model.
    */
   presentation?: {
-    /** The unique identifier of the presentation */
-    id?: string | number;
-    /** The language code (e.g., 'en', 'vi') */
-    language?: string;
-    /** The font family name used in the presentation */
-    fontFamily?: string;
-    /** Whether to show hyperlinks in the content */
-    showHyperLink?: boolean;
-    /** Whether profanity filtering is enabled */
-    filteringProfanity?: boolean;
-    /** The unique access code of the presentation */
-    uniqueAccessCode?: string;
-    /** The share code of the presentation */
-    shareCode?: string;
-    /** The access code of the presentation */
-    accessCode?: string;
-    /** Whether audience pacing is enabled */
-    audiencePacing?: boolean;
-    /** Whether the presentation is currently presenting */
-    presenting?: boolean;
-    /** The audience admission setting (e.g., 'auto', 'manual') */
-    audienceAdmission?: string;
+    /**
+     * Host-derived "session started at" timestamp for the current presenting
+     * session (see `resolveSessionSince` on the host). Not a raw model field.
+     */
+    sessionSince?: number | string | null;
+    /**
+     * Host-derived share/present state, merged in from the host's separate
+     * `sharePresentation` store slice — not a field of the presentation model.
+     */
+    sharePresentation?: Record<string, any>;
     [key: string]: any;
   };
   /**
@@ -41,13 +40,17 @@ export interface BaseSlidePluginProps {
    */
   presentationLighterColorPalette?: string[];
   /**
-   * Data specific to the currently active slide.
+   * The full active-slide object, passed straight through from the host — every
+   * field on the host's slide model is available here (id, version, title,
+   * timeToAnswer, multipleChoice, minPoint/maxPoint, imageSubmission, …). The
+   * host no longer maintains a per-field allowlist, so this is intentionally an
+   * open record rather than a hand-mirrored field list; read whatever you need.
+   *
+   * Only host-*derived* fields (which are NOT on the raw slide model — the host
+   * resolves/projects/computes them) are documented explicitly below, since a
+   * plugin dev can't discover them from the slide model.
    */
   slide?: {
-    /** The unique identifier of the slide */
-    id?: string | number;
-    /** The version of the slide */
-    version?: number;
     /**
      * Resolved primary text colour for the slide as a CSS colour string.
      * The host merges slide-level override over the deck-level theme
@@ -63,44 +66,21 @@ export interface BaseSlidePluginProps {
      */
     baseColour?: string;
     /**
-     * Resolved deck/slide background image URL. Same usage as
-     * `baseColour` — for in-iframe preview surfaces. When both are set
-     * the image visually wins (deck renderer paints it over the colour).
+     * Resolved deck/slide background image URL. The raw slide field is an object
+     * `{ large, xLarge, xxLarge }`; the host projects the largest available size
+     * to a single URL string here. Same usage as `baseColour` — for in-iframe
+     * preview surfaces. When both are set the image visually wins.
      */
     backgroundImage?: string;
-    /** Time allowed to answer the slide in seconds */
-    timeToAnswer?: number;
-    /** The timestamp when the quiz starts */
-    quizTimestamp?: number;
-    /** Whether multiple choices can be selected */
-    multipleChoice?: boolean;
-    /** Whether answering correctly awards points */
-    isCorrectGetPoint?: boolean;
-    /** Whether faster answers award more points */
-    fastAnswerGetMorePoint?: boolean;
-    /** Minimum points awarded */
-    minPoint?: number;
-    /** Maximum points awarded */
-    maxPoint?: number;
-    /** The type of the slide (e.g., 'multiple-choice', 'open-ended') */
+    /**
+     * The host's resolved slide type (e.g. 'multiple-choice', 'open-ended').
+     * Derived from the active slide config, not the raw slide's own `type`.
+     */
     slideType?: string;
-    /** Whether streak detection is enabled */
-    isEnableStreakDetection?: boolean;
-    /** Whether streak bonus is enabled */
-    isEnableStreakBonus?: boolean;
-    /** Whether the slide has a time limit */
-    hasTimeLimit?: boolean;
-    /** Whether to show voting results on audience devices */
-    showVotingResultsOnAudience?: boolean;
-    /** Whether image submission is allowed */
-    imageSubmission?: boolean;
-    /** The limit on the number of choices */
-    limitChoice?: number;
-
-    /** slide title */
-    title?: string;
-    /** Host quiz lifecycle phase (`QuizStatus` in `@aha/common`); undefined for non-quiz slides. */
+    /** Host quiz lifecycle phase (`QuizStatus` in `@aha/common`); undefined for non-quiz slides. Host-computed. */
     quizStatus?: number;
+    /** Host-computed: whether a leaderboard slide already follows the active slide. */
+    hasLeaderboardSlide?: boolean;
     [key: string]: any;
   };
   /**
