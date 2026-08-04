@@ -67,4 +67,59 @@
       return sendOriginal.apply(this, arguments);
     };
   }
+
+  const bridge = (name, props) =>
+    send({ kind: 'bridge', name: String(name), props: props ?? {}, t: Date.now() });
+
+  // Wraps `obj[method]`, forwarding to the original. Idempotent.
+  function wrapMethod(obj, method, onCall) {
+    const original = obj[method];
+    if (typeof original !== 'function' || original.__ahaWrapped) return;
+    const wrapper = function (...args) {
+      try {
+        onCall(...args);
+      } catch {
+        // recording must never break the call
+      }
+      return original.apply(this, args);
+    };
+    wrapper.__ahaWrapped = true;
+    obj[method] = wrapper;
+  }
+
+  // Watches for `window[prop]` to be assigned — the object may not exist yet
+  // (zoid assigns `xprops` after our injection). Fires once now if present,
+  // and again on every future assignment.
+  function onGlobal(prop, handler) {
+    if (window[prop]) handler(window[prop]);
+    let current = window[prop];
+    try {
+      Object.defineProperty(window, prop, {
+        configurable: true,
+        get: () => current,
+        set: (value) => {
+          current = value;
+          try {
+            handler(value);
+          } catch {
+            // ignore
+          }
+        },
+      });
+    } catch {
+      // A non-configurable global: the initial check above is all we get.
+    }
+  }
+
+  // --- window.mixpanel.track ----------------------------------------------
+  onGlobal('mixpanel', (mp) => {
+    if (mp && typeof mp.track === 'function') wrapMethod(mp, 'track', bridge);
+  });
+
+  // --- window.xprops.trackGA4AndMixpanel (zoid bridge, slide plugins) ------
+  onGlobal('xprops', (xp) => {
+    if (xp && typeof xp.trackGA4AndMixpanel === 'function') {
+      wrapMethod(xp, 'trackGA4AndMixpanel', bridge);
+    }
+  });
 })();

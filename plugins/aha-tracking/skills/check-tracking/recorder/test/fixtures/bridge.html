@@ -1,0 +1,19 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>bridge fixture</title>
+<button id="late">assign xprops late, then track</button>
+<button id="sdk">track via mixpanel sdk</button>
+<script>
+  // xprops is assigned AFTER the recorder was injected — the case the trap exists for.
+  document.getElementById('late').addEventListener('click', () => {
+    window.xprops = {
+      trackGA4AndMixpanel: (name, props) => { window.__lastBridge = [name, props]; },
+    };
+    window.xprops.trackGA4AndMixpanel('click_submit_button', { plugin: 'ranking' });
+  });
+
+  document.getElementById('sdk').addEventListener('click', () => {
+    window.mixpanel = { track: (name, props) => { window.__lastSdk = [name, props]; } };
+    window.mixpanel.track('survey.sdk_event', { a: 1 });
+  });
+</script>

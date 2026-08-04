@@ -58,3 +58,24 @@ test('captures sendBeacon, fetch and XHR payloads', { skip: !chromePath, timeout
     assert.match(beacon.body, /^data=/);
   });
 });
+
+test('captures the zoid bridge and the mixpanel SDK', { skip: !chromePath, timeout: 60_000 }, async () => {
+  await withRecorder(async ({ page, records }) => {
+    await page.goto(`${server.url}/bridge.html`);
+    await page.click('#late');
+    await page.click('#sdk');
+    await page.waitForTimeout(300);
+
+    // The wrapped functions must still reach the originals.
+    assert.deepEqual(await page.evaluate(() => window.__lastBridge), [
+      'click_submit_button',
+      { plugin: 'ranking' },
+    ]);
+    assert.deepEqual(await page.evaluate(() => window.__lastSdk), ['survey.sdk_event', { a: 1 }]);
+
+    const bridge = records.filter((r) => r.kind === 'bridge');
+    const names = bridge.map((r) => r.name);
+    assert.ok(names.includes('click_submit_button'), `bridge missing, got ${names.join()}`);
+    assert.ok(names.includes('survey.sdk_event'), `sdk missing, got ${names.join()}`);
+  });
+});
