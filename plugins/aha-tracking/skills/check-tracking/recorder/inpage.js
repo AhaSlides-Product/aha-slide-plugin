@@ -183,4 +183,79 @@
   document.addEventListener('click', (e) => action('click', e.target), true);
   document.addEventListener('change', (e) => action('change', e.target), true);
   document.addEventListener('submit', (e) => action('submit', e.target), true);
+
+  // === screen inventory ====================================================
+  const INTERACTIVE = [
+    'button',
+    'a[href]',
+    'input:not([type=hidden])',
+    'textarea',
+    'select',
+    '[contenteditable=true]',
+    '[role=button]',
+    '[role=switch]',
+    '[role=tab]',
+    '[role=menuitem]',
+    '[role=checkbox]',
+    '[role=radio]',
+    '[role=link]',
+  ].join(',');
+
+  function collect() {
+    return [...document.querySelectorAll(INTERACTIVE)].filter((el) => {
+      const style = getComputedStyle(el);
+      return style.visibility !== 'hidden' && style.display !== 'none';
+    });
+  }
+
+  // A selector that can be re-resolved later. A data-testid is stable across
+  // re-renders; the structural path is the fallback. Indices are NOT used:
+  // the sweep re-enumerates after every recovery, so any cached index goes
+  // stale the first time the DOM changes.
+  function selectorFor(el) {
+    const testId = el.getAttribute('data-testid');
+    if (testId) return `[data-testid="${CSS.escape(testId)}"]`;
+    return cssPath(el);
+  }
+
+  function resolve(selector, nth) {
+    let matches;
+    try {
+      matches = [...document.querySelectorAll(selector)];
+    } catch {
+      return null;
+    }
+    return matches[nth] ?? null;
+  }
+
+  window.__ahaInventory = () => {
+    const seen = new Map();
+    return collect().map((el, index) => {
+      const selector = selectorFor(el);
+      const nth = seen.get(selector) ?? 0;
+      seen.set(selector, nth + 1);
+      return {
+        index,
+        selector,
+        nth,
+        expandable:
+          el.getAttribute('aria-expanded') === 'false' || el.getAttribute('aria-haspopup') != null,
+        ...describe(el),
+      };
+    });
+  };
+
+  // Returns 'gone' when the element has detached since enumeration — the sweep
+  // marks those ⚠️ rather than guessing.
+  window.__ahaClickBySelector = (selector, nth) => {
+    const el = resolve(selector, nth);
+    if (!el || !el.isConnected) return 'gone';
+    el.click();
+    return 'clicked';
+  };
+
+  window.__ahaExpandables = () =>
+    window.__ahaInventory()
+      .filter((e) => e.expandable)
+      .map(({ selector, nth }) => ({ selector, nth }));
 })();

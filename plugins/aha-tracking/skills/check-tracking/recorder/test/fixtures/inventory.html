@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>inventory fixture</title>
+<main>
+  <h1>Editor</h1>
+  <button data-testid="preview-btn">Preview</button>
+  <button data-testid="canvas-image-delete-btn">Delete image</button>
+  <button class="ant-btn ant-btn-dangerous">削除</button>
+  <button id="vanish">Vanishes on click</button>
+  <button id="rerender">Re-render the list</button>
+  <a href="/settings">Settings</a>
+  <a href="https://other.example/docs">Docs</a>
+  <input type="text" name="title" />
+  <input type="hidden" name="secret" />
+  <div role="button" tabindex="0">Div button</div>
+  <button disabled>Disabled</button>
+  <button style="display:none">Hidden</button>
+  <button aria-expanded="false" id="menu">Menu</button>
+</main>
+<ul id="list"><li><button data-testid="row-action">Row 1</button></li></ul>
+<script>
+  document.getElementById('vanish').addEventListener('click', (e) => e.target.remove());
+
+  // Destroys and rebuilds the row, so any cached element reference or index
+  // is invalid afterwards — the case selector-based addressing exists for.
+  document.getElementById('rerender').addEventListener('click', () => {
+    const list = document.getElementById('list');
+    list.innerHTML = '';
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.setAttribute('data-testid', 'row-action');
+    b.textContent = 'Row 1 (rebuilt)';
+    b.addEventListener('click', () => { window.__rowClicked = true; });
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+</script>
