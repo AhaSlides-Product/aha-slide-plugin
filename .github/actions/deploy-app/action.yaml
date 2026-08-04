@@ -8,7 +8,7 @@ inputs:
     description: 'Target S3 Bucket for slides agents spec'
     required: false
   path_prefix:
-    description: 'Optional S3 key + invalidation prefix (e.g. /plugins) to additively serve apps under a sub-path. Must match the build base (VITE_PLUGINS_BASE). Empty = root only (default).'
+    description: 'Optional S3 prefix (e.g. /plugins). Must match the build base (VITE_BASE_PATH). Empty = root only (default).'
     required: false
     default: ''
   aws_access_key_id:
