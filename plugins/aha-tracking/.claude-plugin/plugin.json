@@ -1,0 +1,8 @@
+{
+  "name": "aha-tracking",
+  "description": "QA tooling for verifying analytics event tracking across AhaSlides apps",
+  "version": "1.0.0",
+  "author": { "name": "AhaSlides QA" },
+  "repository": "https://github.com/AhaSlides-Product/aha-slide-plugin",
+  "keywords": ["qa", "analytics", "mixpanel", "tracking"]
+}

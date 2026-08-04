@@ -1,0 +1,14 @@
+{
+  "name": "ahaslides",
+  "owner": {
+    "name": "AhaSlides Product",
+    "url": "https://github.com/AhaSlides-Product"
+  },
+  "plugins": [
+    {
+      "name": "aha-tracking",
+      "source": "./plugins/aha-tracking",
+      "description": "Records analytics events while a tester walks an AhaSlides feature, sweeps each screen, and reports which elements and transitions are missing tracking."
+    }
+  ]
+}
