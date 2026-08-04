@@ -59,6 +59,26 @@ does everything else — including clicking the elements the tester would never
 have thought to try. Autopilot (§ Roadmap) later removes even the walking, but
 sits on top of this engine rather than replacing it.
 
+## Runtime requirements
+
+The tool drives a **visible Chrome window on the machine the tester is sitting
+at**. That constrains where it can run:
+
+| Requirement | Why |
+|---|---|
+| Claude Code running **locally** — terminal, desktop app, or IDE | The recorder spawns a local process that opens a local Chrome window |
+| A real display | Chrome is launched headed; the tester clicks in it |
+| Chrome installed | `chrome.mjs` resolves the binary per OS and fails loudly if absent |
+| Node ≥ 18 | ESM, `node:test` |
+
+It does **not** run under `claude.ai/code`, over SSH, or from a scheduled or
+background agent — those have no display, so Chrome either fails to launch or
+opens where nobody can see it.
+
+Per-machine, not per-account: the `~/.aha-track-profile` login, the installed
+`node_modules`, and the written sessions and reports all live on the machine that
+ran the recorder. A tester using two laptops logs in once on each.
+
 ## Non-goals (explicit)
 
 - **No spec comparison in v1.** The tool does not read Jira tickets, the `EVENTS`
