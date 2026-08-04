@@ -6,6 +6,9 @@ on:
     branches:
       - staging
 
+env:
+  BASE_PATH: /plugins
+
 jobs:
   build:
     runs-on:
@@ -19,6 +22,8 @@ jobs:
 
       - name: Build
         uses: ./.github/actions/build-app
+        env:
+          VITE_BASE_PATH: ${{ env.BASE_PATH }}/
         with:
           repository_url: 018208337430.dkr.ecr.us-east-1.amazonaws.com/dev01/plugins
           commit_sha: ${{ github.sha }}
@@ -39,6 +44,7 @@ jobs:
         uses: ./.github/actions/deploy-app
         with:
           s3_bucket: plugins.dev.ahaslide.com
+          path_prefix: ${{ env.BASE_PATH }}
           slides_agent_bucket: chatbot.ahaslide.com
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
