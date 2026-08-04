@@ -122,4 +122,65 @@
       wrapMethod(xp, 'trackGA4AndMixpanel', bridge);
     }
   });
+
+  // === user actions ========================================================
+  const MAX_TEXT = 80;
+
+  function cssPath(el) {
+    const parts = [];
+    let node = el;
+    while (node && node.nodeType === 1 && parts.length < 4) {
+      let part = node.tagName.toLowerCase();
+      if (node.id) {
+        parts.unshift(`${part}#${node.id}`);
+        break;
+      }
+      const parent = node.parentElement;
+      if (parent) {
+        const siblings = [...parent.children].filter((c) => c.tagName === node.tagName);
+        if (siblings.length > 1) part += `:nth-of-type(${siblings.indexOf(node) + 1})`;
+      }
+      parts.unshift(part);
+      node = node.parentElement;
+    }
+    return parts.join('>');
+  }
+
+  function nearestSection(el) {
+    const container = el.closest('section, header, footer, aside, dialog, [role=dialog], main');
+    if (!container) return null;
+    const heading = container.querySelector('h1, h2, h3, [role=heading]');
+    const label = heading?.textContent ?? container.getAttribute('aria-label');
+    return label ? label.trim().slice(0, MAX_TEXT) : null;
+  }
+
+  function describe(el) {
+    if (!el || el.nodeType !== 1) return null;
+    const rect = el.getBoundingClientRect();
+    return {
+      tag: el.tagName.toLowerCase(),
+      text: (el.innerText ?? el.textContent ?? '').trim().slice(0, MAX_TEXT) || null,
+      testId: el.getAttribute('data-testid'),
+      ariaLabel: el.getAttribute('aria-label'),
+      name: el.getAttribute('name'),
+      role: el.getAttribute('role'),
+      type: el.getAttribute('type'),
+      href: el.getAttribute('href'),
+      classes: (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean),
+      disabled: el.hasAttribute('disabled') || el.getAttribute('aria-disabled') === 'true',
+      ariaHidden: el.getAttribute('aria-hidden') === 'true',
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+      section: nearestSection(el),
+      path: cssPath(el),
+    };
+  }
+  window.__ahaDescribe = describe;
+
+  const action = (type, el) => send({ kind: 'action', type, el: describe(el), t: Date.now() });
+
+  // Capture phase so the record exists even if the app stops propagation.
+  document.addEventListener('click', (e) => action('click', e.target), true);
+  document.addEventListener('change', (e) => action('change', e.target), true);
+  document.addEventListener('submit', (e) => action('submit', e.target), true);
 })();

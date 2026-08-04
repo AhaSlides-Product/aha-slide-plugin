@@ -59,6 +59,28 @@ test('captures sendBeacon, fetch and XHR payloads', { skip: !chromePath, timeout
   });
 });
 
+test('records the click that caused the payload', { skip: !chromePath, timeout: 60_000 }, async () => {
+  await withRecorder(async ({ page, records }) => {
+    await page.goto(`${server.url}/beacon.html`);
+    await page.click('#go');
+    await page.waitForTimeout(300);
+
+    const actions = records.filter((r) => r.kind === 'action');
+    assert.equal(actions.length >= 1, true, 'no action recorded');
+
+    const click = actions.find((a) => a.type === 'click');
+    assert.equal(click.el.tag, 'button');
+    assert.equal(click.el.text, 'go');
+    assert.equal(click.el.path, 'button#go');
+
+    // The action must be recorded BEFORE the payload it caused, so pairing
+    // can attribute the event to it.
+    const firstAction = records.findIndex((r) => r.kind === 'action');
+    const firstRaw = records.findIndex((r) => r.kind === 'raw');
+    assert.ok(firstAction < firstRaw, 'action must precede the payload it caused');
+  });
+});
+
 test('captures the zoid bridge and the mixpanel SDK', { skip: !chromePath, timeout: 60_000 }, async () => {
   await withRecorder(async ({ page, records }) => {
     await page.goto(`${server.url}/bridge.html`);
