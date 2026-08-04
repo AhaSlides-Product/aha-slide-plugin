@@ -5,6 +5,7 @@ import { ahaViteIconPlugin } from '@aha/ui/vite.config.icon'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.VITE_PLUGINS_BASE || '/',
   plugins: [
     vue(),
     tailwindcss(),
