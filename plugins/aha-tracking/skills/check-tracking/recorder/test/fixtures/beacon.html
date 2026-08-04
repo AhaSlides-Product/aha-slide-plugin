@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>beacon fixture</title>
+<button id="go">go</button>
+<script>
+  document.getElementById('go').addEventListener('click', () => {
+    const payload = 'data=' + btoa(JSON.stringify({
+      event: 'survey.fixture_clicked',
+      properties: { survey_id: 42 },
+    }));
+    navigator.sendBeacon('https://mt.example.test/track/', payload);
+    fetch('https://mt.example.test/track/', { method: 'POST', body: payload });
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://mt.example.test/track/');
+    xhr.send(payload);
+  });
+</script>

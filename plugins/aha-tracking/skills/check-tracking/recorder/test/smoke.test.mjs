@@ -1,0 +1,60 @@
+import { test, before, after } from 'node:test';
+import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import { chromium } from 'playwright-core';
+import { resolveChromePath } from '../chrome.mjs';
+import { startServer } from './helpers/server.mjs';
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const INPAGE = join(HERE, '..', 'inpage.js');
+
+let chromePath = null;
+try {
+  chromePath = resolveChromePath();
+} catch {
+  // Chrome absent — the suite skips rather than fails.
+}
+
+let server;
+before(async () => {
+  server = await startServer(join(HERE, 'fixtures'));
+});
+after(async () => {
+  await server?.close();
+});
+
+// Guarantees the browser is closed even when an assertion throws. Without this
+// a failing test leaves Chrome running and `node --test` never exits.
+async function withRecorder(fn) {
+  const browser = await chromium.launch({ executablePath: chromePath, headless: true });
+  try {
+    const context = await browser.newContext();
+    const records = [];
+    await context.exposeBinding('__ahaTrackSink', (_source, json) => {
+      records.push(JSON.parse(json));
+    });
+    await context.addInitScript({ path: INPAGE });
+    const page = await context.newPage();
+    return await fn({ page, records });
+  } finally {
+    await browser.close().catch(() => {});
+  }
+}
+
+test('captures sendBeacon, fetch and XHR payloads', { skip: !chromePath, timeout: 60_000 }, async () => {
+  await withRecorder(async ({ page, records }) => {
+    await page.goto(`${server.url}/beacon.html`);
+    await page.click('#go');
+    await page.waitForTimeout(500);
+
+    const vias = records.filter((r) => r.kind === 'raw').map((r) => r.via);
+    assert.ok(vias.includes('sendBeacon'), `sendBeacon missing, got ${vias.join()}`);
+    assert.ok(vias.includes('fetch'), `fetch missing, got ${vias.join()}`);
+    assert.ok(vias.includes('xhr'), `xhr missing, got ${vias.join()}`);
+
+    const beacon = records.find((r) => r.via === 'sendBeacon');
+    assert.match(beacon.url, /\/track\//);
+    assert.match(beacon.body, /^data=/);
+  });
+});
