@@ -29,6 +29,13 @@ export interface MarketplaceSlideSettings {
     enableLabelOtherSetting?: boolean;
     enableMultipleSubmission?: boolean;
     enableFullScreen?: boolean;
+    /**
+     * When true, the host's editor settings panel shows the native quiz settings
+     * cluster for this slide (Points max/min, Faster answers get more points, Time
+     * limit, Leaderboard toggle, General quiz settings). Set on scored / quiz-style
+     * slide types so they reuse the host scoring controls instead of rebuilding them.
+     */
+    enableQuizSetting?: boolean;
     [key: string]: boolean | undefined;
 }
 
