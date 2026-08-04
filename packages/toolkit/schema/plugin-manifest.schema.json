@@ -131,7 +131,11 @@
             "enableMultipleSubmission": { "type": "boolean" },
             "enableFullScreen": { "type": "boolean" },
             "enableFullScreenFrame": { "type": "boolean" },
-            "enableIframePreload": { "type": "boolean" }
+            "enableIframePreload": { "type": "boolean" },
+            "enableQuizSetting": {
+              "type": "boolean",
+              "description": "When true, the host's editor settings panel shows the native quiz settings cluster for this slide (Points max/min, Faster answers get more points, Time limit, Leaderboard toggle, and General quiz settings). Set this on scored / quiz-style slide types so they reuse the host's scoring controls instead of rebuilding them."
+            }
           }
         }
       }
