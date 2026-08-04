@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import { RouterModule } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
+import { PluginRegistryModule } from './plugin-registry/plugin-registry.module';
 import { AppModule as SampleSlideModule } from '@aha/sample-slide-backend';
 
 // Helper to get all modules imported by a specific module
@@ -16,6 +17,7 @@ function getChildModules(targetModule: any) {
 @Module({
   imports: [
     HealthModule,
+    PluginRegistryModule,
     SampleSlideModule,
     RouterModule.register([
       {
