@@ -203,8 +203,15 @@
 
   function collect() {
     return [...document.querySelectorAll(INTERACTIVE)].filter((el) => {
-      const style = getComputedStyle(el);
-      return style.visibility !== 'hidden' && style.display !== 'none';
+      // getClientRects() is empty when the element OR ANY ANCESTOR is
+      // display:none. Checking getComputedStyle(el).display would not: a
+      // button inside a `display:none` menu still computes its own
+      // `inline-block`, so closed dropdowns would leak into the depth-0
+      // inventory and the recursive expansion would never fire.
+      if (el.getClientRects().length === 0) return false;
+      // visibility IS inherited, so the element's own computed value already
+      // reflects a hidden ancestor.
+      return getComputedStyle(el).visibility !== 'hidden';
     });
   }
 

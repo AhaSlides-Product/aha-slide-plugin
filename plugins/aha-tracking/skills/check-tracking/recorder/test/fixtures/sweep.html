@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>sweep fixture</title>
+<main>
+  <h1>Sweep</h1>
+  <button data-testid="preview-btn">Preview</button>
+  <button data-testid="rename-btn">Rename</button>
+  <button data-testid="canvas-image-delete-btn">Delete image</button>
+  <button data-testid="csat-send-btn">Send invitations</button>
+  <button data-testid="menu-trigger" aria-expanded="false">Menu</button>
+  <div id="menu" hidden>
+    <button data-testid="menu-duplicate">Duplicate</button>
+  </div>
+</main>
+<script>
+  window.__order = [];
+  document.addEventListener('click', (e) => {
+    const id = e.target.getAttribute && e.target.getAttribute('data-testid');
+    if (id) window.__order.push(id);
+  }, true);
+
+  // Opening the menu reveals a button that is invisible until then — the case
+  // recursive expansion exists for.
+  document.querySelector('[data-testid=menu-trigger]').addEventListener('click', (e) => {
+    const menu = document.getElementById('menu');
+    const open = !menu.hasAttribute('hidden');
+    if (open) { menu.setAttribute('hidden', ''); e.target.setAttribute('aria-expanded', 'false'); }
+    else { menu.removeAttribute('hidden'); e.target.setAttribute('aria-expanded', 'true'); }
+  });
+</script>
