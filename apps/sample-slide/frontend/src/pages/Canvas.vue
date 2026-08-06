@@ -2,6 +2,26 @@
   <div class="canvas-page">
     <h1>Canvas View</h1>
     <p>Welcome to the Canvas for Slide: {{ slideId }} version {{ slideVersion }}</p>
+
+    <!-- Full-quiz plugin (setting.enableQuizSetting): the host runs the native
+         quiz machine (lobby → rule → countdown) and only mounts this canvas at
+         QUESTION/RESULT. Switch the rendered view on quizStatus. -->
+    <section
+      v-if="isQuestion"
+      class="quiz-phase quiz-phase--question"
+      data-testid="canvas-quiz-question"
+    >
+      <h2>Question</h2>
+      <p>The host is showing the question — render your question UI here.</p>
+    </section>
+    <section
+      v-else-if="isResult"
+      class="quiz-phase quiz-phase--result"
+      data-testid="canvas-quiz-result"
+    >
+      <h2>Result</h2>
+      <p>The host revealed the result — render your correct-answer / score UI here.</p>
+    </section>
     <div style="margin: 15px 0;">
       <button 
         @click="scrollToBottom" 
@@ -165,6 +185,8 @@ const {
 // A game plugin skips its lobby once the host leaves the lobby phase.
 const quizStatus = computed(() => slideProps.value?.quizStatus);
 const shouldSkipLobby = computed(() => quizStatus.value !== QuizStatus.Lobby);
+const isQuestion = computed(() => quizStatus.value === QuizStatus.Question);
+const isResult = computed(() => quizStatus.value === QuizStatus.Result);
 const slideVersion = slideProps.value?.version;
 const slideGreeting = useSync(`greeting-${slideId}`, '');
 const { imageUrl } = useSlideImage(slideId);

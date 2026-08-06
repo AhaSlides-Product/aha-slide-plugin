@@ -118,7 +118,13 @@
       <pre class="code-block">{{ JSON.stringify(slideAttributesProps, null, 2) }}</pre>
     </div>
 
-    <div class="vote-section">
+    <!-- Answering UI: shown at QUESTION for a full-quiz plugin, or always when
+         the host isn't driving a quiz phase (quizStatus undefined). -->
+    <div
+      class="vote-section"
+      v-if="isQuestion || quizStatus === undefined"
+      data-testid="audience-quiz-question"
+    >
       <h3>Realtime Vote</h3>
       <div class="vote-controls">
         <a-button ref="submitButtonRef" type="primary" size="large" @click="handleVote" :loading="voting">
@@ -170,6 +176,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Result view: shown at RESULT for a full-quiz plugin. -->
+    <div
+      v-else-if="isResult"
+      class="quiz-result-section"
+      data-testid="audience-quiz-result"
+    >
+      <h3>Result</h3>
+      <p>The host revealed the answer — render the participant's score / correct answer here.</p>
+    </div>
   </div>
 </template>
 
@@ -179,7 +195,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useAudiencePlugin } from '@aha/ui';
 import { ApiClient, type SubmissionPayload } from '@aha/api';
 import { SlideType } from '@aha/api';
-import { SubmissionSenderType, SubmissionType } from '@aha/common';
+import { SubmissionSenderType, SubmissionType, QuizStatus } from '@aha/common';
 import { getSubmissions, saveSubmission } from '@aha/db';
 const route = useRoute();
 const slideId = computed(() => route.params.slideId as string);
@@ -211,6 +227,14 @@ const {
   joinGame,
   emitTyping,
 } = useAudiencePlugin();
+
+// Full-quiz plugin: the host owns lobby/rule/countdown and only shows this
+// audience view at QUESTION/RESULT. Gate the answering UI vs the result view on
+// quizStatus. Answers are still submitted through the plugin's own API — the host
+// never submits on the plugin's behalf.
+const quizStatus = computed(() => slideProps.value?.quizStatus);
+const isQuestion = computed(() => quizStatus.value === QuizStatus.Question);
+const isResult = computed(() => quizStatus.value === QuizStatus.Result);
 
 const timerWidth = computed(() => {
   if (timeLimit.value === null || timeLimit.value === undefined) return 0;
