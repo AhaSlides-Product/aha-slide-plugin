@@ -51,8 +51,6 @@ packages/                   # Shared libraries
   db/                       # @aha/db — IndexedDB wrapper for client persistence
   api/                      # @aha/api — shared API types, auto-generated slide-type enum
   storybook/                # @aha/storybook — component documentation
-domains/
-  report/                   # aha-report — standalone report app (Vue 3, embedded as iframe)
 tests/                      # Playwright E2E tests
 mcp_server/                 # Python MCP server for slide plugin specs
 ```
@@ -93,7 +91,3 @@ src/
   types/         # TypeScript type definitions
   utils/         # Generic utilities
 ```
-
-## Report Domain
-
-The `domains/report/` app is a standalone Vue 3 SPA embedded as an iframe in the presenter app. See `domains/report/CLAUDE.md` for its specific conventions.

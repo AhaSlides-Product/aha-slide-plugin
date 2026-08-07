@@ -7,9 +7,6 @@
 [submodule "apps/pinOnImage"]
 	path = apps/pinOnImage
 	url = git@github.com:AhaSlides-Product/slide-plugin-pin-on-image
-[submodule "domains/report"]
-	path = domains/report
-	url = git@github.com:AhaSlides-Product/aha-report.git
 [submodule "apps/slide-plugin-by-ahasliders"]
 	path = apps/slide-plugin-by-ahasliders
 	url = git@github.com:AhaSlides-Product/slide-plugin-built-by-ahasliders.git

@@ -7,14 +7,12 @@
     "apps/*/*",
     "apps/slide-plugin-by-ahasliders/*/*",
     "packages/*",
-    "domains/*",
     "tests",
     "!apps/ideaBoard/tests"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "build:report": "turbo run build --filter=aha-report --filter=@aha/ui",
     "clean": "turbo run clean && rm -rf .turbo node_modules/.cache",
     "test": "turbo run test",
     "docs": "turbo run docs",
