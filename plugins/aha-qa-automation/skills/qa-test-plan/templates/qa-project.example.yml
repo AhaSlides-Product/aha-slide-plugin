@@ -1,0 +1,50 @@
+# qa-project.yml — reusable project profile for Phase 2 (Test Plan).
+# Fill this once per project. The qa-test-plan skill reads it so you do not re-enter
+# team / tools / SLAs every sprint. Copy to one of these locations (first match wins):
+#   <outputs-root>/<feature-key>/qa-project.yml
+#   <outputs-root>/qa-project.yml
+#   the path in $QA_PROJECT_PROFILE
+# All fields optional; the skill asks for anything missing.
+
+project: "My Product"
+
+team:
+  qa_lead: "Name"          # owns the plan, review, reporting
+  qa_engineers:
+    - "Name 1"
+    - "Name 2"
+  dev_support: "Name or team"   # who fixes bugs during the cycle
+
+tools:
+  test_management: "TestRail"    # or Zephyr, Xray
+  bug_tracker: "Jira"
+  api: "Postman"
+  cross_browser: "BrowserStack"
+  automation: "Playwright"
+
+environments:
+  - name: "staging"
+    description: "clone of production"
+    data: "seeded DB"
+    third_party: "sandbox"       # sandbox | mock
+  feature_flags: "Unleash"       # how flags are toggled on the test env
+  maintainer: "Name or team"     # who keeps the environment healthy
+
+defect_sla:                      # fix-time targets by severity
+  critical: "4h"
+  high: "24h"
+  medium: "48h"
+  low: "best effort"
+
+severity_owner: "QA proposes severity, PM sets priority"
+blocker_policy: "Any Critical, or any High on a core flow, blocks release"
+
+communication:
+  daily_status: { audience: "Dev, PM", channel: "#qa-daily" }
+  bug_summary:  { audience: "Dev Lead", channel: "#qa-bugs" }
+  signoff:      { audience: "PM, Dev Lead", channel: "#release" }
+
+approvers:
+  - { name: "Name", role: "QA Lead" }
+  - { name: "Name", role: "PM" }
+  - { name: "Name", role: "Dev Lead" }

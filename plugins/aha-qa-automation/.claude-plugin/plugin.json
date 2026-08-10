@@ -1,0 +1,17 @@
+{
+  "name": "aha-qa-automation",
+  "description": "Portable QA test pipeline for any AhaSlides repo: audit the existing test layers, scaffold a canonical Playwright structure in new repos, analyze requirements, plan, design test cases with explicit layer assignment, then implement API/E2E specs that conform to whatever conventions that repo already has. Every stage is paired with a validator that can fail it back.",
+  "version": "0.1.0",
+  "author": {
+    "name": "AhaSlides Product"
+  },
+  "license": "MIT",
+  "keywords": [
+    "qa",
+    "playwright",
+    "e2e",
+    "api-testing",
+    "test-design",
+    "page-object-model"
+  ]
+}

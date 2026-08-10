@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "repo": "longbien-automation-test",
+  "archetype": "standalone-qa",
+  "language": "js",
+  "testRoot": ".",
+
+  "conventions": [
+    "CLAUDE.md",
+    "docs/guidance/QA_STANDARDS.md"
+  ],
+
+  "paths": {
+    "specs": {
+      "api": "tests/api",
+      "e2e": "tests/ui-based",
+      "accessibility": "tests/UI/accessibility",
+      "eu": "tests/EU"
+    },
+    "pages": "objects/pages",
+    "apiObjects": "objects/apis",
+    "fixtures": "fixtures",
+    "helpers": "utils/helpers",
+    "designDocs": "docs/test-design"
+  },
+
+  "commands": {
+    "install": "npm ci",
+    "typecheck": null,
+    "lint": "npx eslint .",
+    "run": "npm run test:staging",
+    "runOne": "npx playwright test {file} --grep \"{id}\""
+  },
+
+  "caseIdPattern": "AHA-T\\d+",
+  "specNaming": "*.spec.js",
+
+  "rules": {
+    "noRawLocatorsInSpecs": false,
+    "locatorGetterPrefix": null,
+    "noExpectInPageObjects": false,
+    "pageObjectFileSuffix": null,
+    "pageObjectClassSuffix": null,
+    "requireCaseIdInTitle": false
+  },
+
+  "lowerLayers": [
+    {
+      "kind": "unit",
+      "tool": "node:test",
+      "cmd": "npm run test:unit",
+      "root": ".",
+      "paths": ["scripts"]
+    }
+  ],
+
+  "environments": ["localhost", "staging", "canary", "prod"],
+  "defaultEnvironment": "staging",
+
+  "integrations": {
+    "zephyr": {
+      "enabled": true,
+      "folderMap": "docs/zephyr-relate/.zephyr-folder-map.json"
+    }
+  }
+}

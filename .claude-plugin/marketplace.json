@@ -1,0 +1,16 @@
+{
+  "name": "ahaslides",
+  "owner": {
+    "name": "AhaSlides Product",
+    "url": "https://github.com/AhaSlides-Product"
+  },
+  "plugins": [
+    {
+      "name": "aha-qa-automation",
+      "source": "./plugins/aha-qa-automation",
+      "description": "Portable QA test pipeline for any AhaSlides repo: audit existing test layers, scaffold a canonical Playwright structure in new repos, analyze requirements, plan, design test cases with explicit layer assignment, then implement API/E2E specs that conform to whatever conventions that repo already has. Every stage is paired with a validator that can fail it back.",
+      "version": "0.1.0",
+      "category": "testing"
+    }
+  ]
+}

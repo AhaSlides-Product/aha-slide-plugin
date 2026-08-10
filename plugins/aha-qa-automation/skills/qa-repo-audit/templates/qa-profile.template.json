@@ -1,0 +1,55 @@
+{
+  "$schema": "../../../schemas/qa-profile.schema.json",
+  "version": 1,
+  "repo": "<repo-name>",
+  "archetype": "product-repo",
+  "language": "ts",
+  "testRoot": "tests",
+
+  "conventions": [
+    "<repo>/CLAUDE.md",
+    "CLAUDE.md",
+    "TEST_SCRIPT_RULES.md"
+  ],
+
+  "paths": {
+    "specs": {
+      "api": "specs/api",
+      "e2e": "specs/e2e"
+    },
+    "pages": "pages",
+    "apiObjects": null,
+    "fixtures": "fixtures",
+    "helpers": "helpers",
+    "designDocs": "docs/test-design"
+  },
+
+  "commands": {
+    "install": "pnpm install",
+    "typecheck": "npx tsc --noEmit",
+    "lint": null,
+    "run": "npx playwright test",
+    "runOne": "npx playwright test {file} --grep \"{id}\" --workers=1"
+  },
+
+  "caseIdPattern": "[A-Z]+-TC\\d+",
+  "specNaming": "*.spec.ts",
+
+  "rules": {
+    "noRawLocatorsInSpecs": true,
+    "locatorGetterPrefix": "get",
+    "noExpectInPageObjects": true,
+    "pageObjectFileSuffix": ".page.ts",
+    "pageObjectClassSuffix": "Page",
+    "requireCaseIdInTitle": true
+  },
+
+  "lowerLayers": [],
+
+  "environments": ["staging"],
+  "defaultEnvironment": "staging",
+
+  "integrations": {
+    "zephyr": { "enabled": false, "folderMap": null }
+  }
+}

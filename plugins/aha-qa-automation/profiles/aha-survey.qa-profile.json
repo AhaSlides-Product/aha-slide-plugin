@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "repo": "aha-survey",
+  "archetype": "product-repo",
+  "language": "ts",
+  "testRoot": "tests",
+
+  "conventions": [
+    "<repo>/CLAUDE.md",
+    "CLAUDE.md",
+    "TEST_SCRIPT_RULES.md"
+  ],
+
+  "paths": {
+    "specs": {
+      "api": "specs/api",
+      "e2e": "specs/e2e"
+    },
+    "pages": "pages",
+    "apiObjects": null,
+    "fixtures": "fixtures",
+    "helpers": null,
+    "designDocs": "docs/test-design"
+  },
+
+  "commands": {
+    "install": "pnpm install",
+    "typecheck": "npx tsc --noEmit",
+    "lint": null,
+    "run": "npx playwright test",
+    "runOne": "npx playwright test {file} --grep \"{id}\" --workers=1 --retries=1"
+  },
+
+  "caseIdPattern": "(AHA-\\d+(-AC\\d+)?|[A-Z]{1,3}-TC\\d+|AC-\\d+|SM-\\d+)",
+  "specNaming": "*.spec.ts",
+
+  "rules": {
+    "noRawLocatorsInSpecs": true,
+    "locatorGetterPrefix": null,
+    "noExpectInPageObjects": false,
+    "pageObjectFileSuffix": ".page.ts",
+    "pageObjectClassSuffix": "Page",
+    "requireCaseIdInTitle": false
+  },
+
+  "lowerLayers": [
+    { "kind": "unit",        "tool": "vitest", "cmd": "pnpm vitest run", "root": "frontend", "paths": ["src"] },
+    { "kind": "unit",        "tool": "pytest", "cmd": "pytest tests/unit", "root": "backend", "paths": ["tests/unit"] },
+    { "kind": "integration", "tool": "pytest", "cmd": "pytest tests/integration", "root": "backend", "paths": ["tests/integration"] },
+    { "kind": "property",    "tool": "pytest", "cmd": "pytest tests/property", "root": "backend", "paths": ["tests/property"] }
+  ],
+
+  "environments": ["local", "staging"],
+  "defaultEnvironment": "staging",
+
+  "integrations": {
+    "zephyr": { "enabled": false, "folderMap": null }
+  }
+}

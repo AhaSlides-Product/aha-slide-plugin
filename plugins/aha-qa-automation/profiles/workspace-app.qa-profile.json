@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "repo": "workspace-app",
+  "archetype": "product-repo",
+  "language": "ts",
+  "testRoot": "tests",
+
+  "conventions": [
+    "<repo>/CLAUDE.md",
+    "CONVENTIONS.md"
+  ],
+
+  "paths": {
+    "specs": {
+      "api": "specs/api",
+      "e2e": "specs/e2e"
+    },
+    "pages": "pages",
+    "apiObjects": "objects/api",
+    "fixtures": "fixtures",
+    "helpers": "helpers",
+    "designDocs": "docs/test-design"
+  },
+
+  "commands": {
+    "install": "npm install",
+    "typecheck": "npx tsc --noEmit",
+    "lint": null,
+    "run": "npx playwright test",
+    "runOne": "npx playwright test {file} --grep \"{id}\" --workers=1"
+  },
+
+  "caseIdPattern": "WS-TC\\d+",
+  "specNaming": "*.spec.ts",
+
+  "rules": {
+    "noRawLocatorsInSpecs": true,
+    "locatorGetterPrefix": "get",
+    "noExpectInPageObjects": true,
+    "pageObjectFileSuffix": ".page.ts",
+    "pageObjectClassSuffix": "Page",
+    "requireCaseIdInTitle": true
+  },
+
+  "lowerLayers": [
+    { "kind": "unit", "tool": "vitest", "cmd": "npm run test:unit", "root": "frontend", "paths": ["src"] }
+  ],
+
+  "environments": ["local", "staging"],
+  "defaultEnvironment": "staging",
+
+  "integrations": {
+    "zephyr": { "enabled": false, "folderMap": null }
+  }
+}

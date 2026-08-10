@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/AhaSlides-Product/aha-slide-plugin/schemas/qa-profile.schema.json",
+  "title": "QA Profile",
+  "description": "Machine-readable description of one repository's test layer. Every aha-qa-automation skill reads this file instead of hardcoding paths, commands, or conventions. One skill body, N profiles.",
+  "type": "object",
+  "required": ["version", "repo", "archetype", "language", "testRoot", "paths", "commands", "caseIdPattern"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "const": 1,
+      "description": "Profile format version. Bump only on a breaking shape change."
+    },
+    "repo": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Repository name, for logs and error messages."
+    },
+    "archetype": {
+      "enum": ["standalone-qa", "product-repo"],
+      "description": "standalone-qa: the repo IS the test suite (longbien). product-repo: tests live in a subfolder alongside product code (aha-survey, workspace-app, aha-slide-plugin)."
+    },
+    "language": {
+      "enum": ["js", "ts"],
+      "description": "Language of the Playwright layer. Drives file extensions and whether typecheck applies."
+    },
+    "testRoot": {
+      "type": "string",
+      "description": "Directory containing playwright.config.* , relative to repo root. '.' for standalone-qa repos. All paths below are relative to THIS directory unless they start with '<repo>/'."
+    },
+    "conventions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Repo-owned convention documents, in precedence order (most specific last). Skills MUST read these before writing code. This is how an un-migrated repo keeps its own rules."
+    },
+    "paths": {
+      "type": "object",
+      "required": ["specs", "pages", "fixtures", "designDocs"],
+      "additionalProperties": false,
+      "properties": {
+        "specs": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "minProperties": 1,
+          "description": "Map of layer name -> spec directory. Keys are typically 'api' and 'e2e'. A repo may declare more (e.g. 'accessibility', 'visual')."
+        },
+        "pages": { "type": "string", "description": "UI Page Object directory." },
+        "apiObjects": { "type": ["string", "null"], "default": null, "description": "API Object directory, or null if the repo calls the API directly from helpers." },
+        "fixtures": { "type": "string" },
+        "helpers": { "type": ["string", "null"], "default": null },
+        "designDocs": { "type": "string", "description": "Where committed test-design documents live. Implementation is validated against these." }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "required": ["run", "runOne"],
+      "additionalProperties": false,
+      "properties": {
+        "install": { "type": ["string", "null"], "default": null },
+        "typecheck": { "type": ["string", "null"], "default": null, "description": "Required when language is 'ts'." },
+        "lint": { "type": ["string", "null"], "default": null },
+        "run": { "type": "string", "description": "Run the whole suite." },
+        "runOne": {
+          "type": "string",
+          "description": "Run a single case. MUST contain the {file} placeholder, and {id} when the repo greps by case id."
+        }
+      }
+    },
+    "caseIdPattern": {
+      "type": "string",
+      "description": "ECMAScript regex (as a string) matching a valid test-case id in this repo. Examples: 'AHA-T\\\\d+' (longbien/Zephyr), '[A-Z]+-TC\\\\d+' (aha-survey). Used for design<->code coverage checking."
+    },
+    "specNaming": {
+      "type": "string",
+      "default": "*.spec.ts",
+      "description": "Glob for spec files."
+    },
+    "rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Mechanically checkable conventions. Anything false/absent is simply not enforced for this repo -- that is how existing repos keep their own standards without migration.",
+      "properties": {
+        "noRawLocatorsInSpecs": { "type": "boolean", "default": false, "description": "Forbid page.getByTestId/locator/getByRole/getByText inside spec files." },
+        "locatorGetterPrefix": { "type": ["string", "null"], "default": null, "description": "Required prefix for Page Object methods returning a Locator, e.g. 'get'." },
+        "noExpectInPageObjects": { "type": "boolean", "default": false },
+        "pageObjectFileSuffix": { "type": ["string", "null"], "default": null, "description": "e.g. '.page.ts'." },
+        "pageObjectClassSuffix": { "type": ["string", "null"], "default": null, "description": "e.g. 'Page'." },
+        "requireCaseIdInTitle": { "type": "boolean", "default": true, "description": "Every test title must contain a caseIdPattern match." }
+      }
+    },
+    "lowerLayers": {
+      "type": "array",
+      "default": [],
+      "description": "Unit/integration suites this repo already owns. The design phase reads this to push cases DOWN instead of proving them through the browser. Empty array means the repo owns no lower layer -- gaps become recommendations, not extra E2E.",
+      "items": {
+        "type": "object",
+        "required": ["kind", "tool", "cmd"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "enum": ["unit", "integration", "contract", "property", "load"] },
+          "tool": { "type": "string", "description": "vitest, pytest, jest, ..." },
+          "cmd": { "type": "string" },
+          "root": { "type": ["string", "null"], "default": null, "description": "Directory to run cmd from, relative to repo root." },
+          "paths": { "type": "array", "items": { "type": "string" }, "default": [] }
+        }
+      }
+    },
+    "environments": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Selectable target environments."
+    },
+    "defaultEnvironment": { "type": ["string", "null"], "default": null },
+    "integrations": {
+      "type": "object",
+      "additionalProperties": true,
+      "default": {},
+      "properties": {
+        "zephyr": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "folderMap": { "type": ["string", "null"], "default": null }
+          }
+        }
+      }
+    }
+  }
+}

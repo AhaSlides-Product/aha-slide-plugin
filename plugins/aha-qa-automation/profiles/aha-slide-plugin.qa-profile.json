@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "repo": "aha-slide-plugin",
+  "archetype": "product-repo",
+  "language": "ts",
+  "testRoot": "tests",
+
+  "conventions": [
+    "<repo>/CLAUDE.md",
+    "QA_GUIDE.md",
+    "README.md"
+  ],
+
+  "paths": {
+    "specs": {
+      "e2e": "e2e"
+    },
+    "pages": "pages",
+    "apiObjects": null,
+    "fixtures": "fixtures",
+    "helpers": "helpers",
+    "designDocs": "docs/test-design"
+  },
+
+  "commands": {
+    "install": "npm ci",
+    "typecheck": "npx tsc --noEmit",
+    "lint": null,
+    "run": "npx playwright test",
+    "runOne": "npx playwright test {file} --grep \"{id}\" --workers=1"
+  },
+
+  "caseIdPattern": "[A-Z]{1,4}-TC\\d+",
+  "specNaming": "*.spec.ts",
+
+  "rules": {
+    "noRawLocatorsInSpecs": false,
+    "locatorGetterPrefix": null,
+    "noExpectInPageObjects": false,
+    "pageObjectFileSuffix": null,
+    "pageObjectClassSuffix": null,
+    "requireCaseIdInTitle": false
+  },
+
+  "lowerLayers": [
+    { "kind": "contract", "tool": "vitest", "cmd": "npm run test:consumer", "root": "tests", "paths": ["consumer"] },
+    { "kind": "unit",     "tool": "jest",   "cmd": "npm run test",          "root": "packages", "paths": [] }
+  ],
+
+  "environments": ["staging"],
+  "defaultEnvironment": "staging",
+
+  "integrations": {
+    "zephyr": { "enabled": false, "folderMap": null }
+  }
+}
