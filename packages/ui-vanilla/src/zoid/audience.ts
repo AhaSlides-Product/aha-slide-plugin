@@ -37,6 +37,10 @@ export interface AudienceSlidePluginProps extends BaseSlidePluginProps {
    */
   uploadImage?: () => Promise<any>;
   /**
+   * Action to upload a base64 `data:` image URL from the plugin iframe.
+   */
+  uploadImageData?: (dataUrl: string) => Promise<any>;
+  /**
    * Notify the host that this audience participant is (or has stopped) typing,
    * so the presenter can show its "… is typing" indicator. Reuses the audience
    * app's existing typing signal (the `uit` socket event); the host throttles
@@ -239,6 +243,10 @@ export function initZoidForAudience() {
         required: false,
       },
       uploadImage: {
+        type: 'function',
+        required: false,
+      },
+      uploadImageData: {
         type: 'function',
         required: false,
       },

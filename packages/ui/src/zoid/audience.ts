@@ -46,6 +46,10 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   participantInfo: Ref<ParticipantInfo[] | undefined>;
   uploadImage: (() => Promise<any>) | undefined;
   /**
+   * Upload a base64 `data:` image URL from the plugin iframe.
+   */
+  uploadImageData: ((dataUrl: string) => Promise<any>) | undefined;
+  /**
    * Notify the host that this participant is (or has stopped) typing, so the
    * presenter shows its "… is typing" indicator. Call with `true` while typing
    * and `false` when the field is cleared/blurred or the answer is submitted.
@@ -89,6 +93,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
   const joinGame = xprops?.joinGame;
 
   const uploadImage = xprops?.uploadImage;
+  const uploadImageData = xprops?.uploadImageData;
   const emitTyping = xprops?.emitTyping;
   const showToastInfo = xprops?.showToastInfo;
   const showToastSuccess = xprops?.showToastSuccess;
@@ -155,6 +160,7 @@ export function useAudiencePlugin(options: UseSlidePluginOptions = { autoHeight:
     audienceTeam,
     audienceQuizTeam,
     uploadImage,
+    uploadImageData,
     emitTyping,
     showToastInfo,
     showToastSuccess,
