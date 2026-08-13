@@ -27,6 +27,22 @@ export const ParticipantReportPluginIframe = zoid.create({
       type: 'object',
       required: false,
     },
+    presentationLighterColorPalette: {
+      type: 'array',
+      required: false,
+    },
+    presentation: {
+      type: 'object',
+      required: false,
+    },
+    slide: {
+      type: 'object',
+      required: false,
+    },
+    slideAttributes: {
+      type: 'object',
+      required: false,
+    },
     answers: {
       type: 'array',
       required: false,
@@ -48,17 +64,33 @@ export const ParticipantReportPluginIframe = zoid.create({
  */
 export interface ParticipantReportPluginReturn {
   answers: Ref<any[] | undefined>;
+  /** The slide the answers belong to (`textColour`, `slideType`, …). */
+  slide: Ref<Record<string, any> | undefined>;
+  /** The slide's persisted attributes, keyed by attribute type — read config from `slideAttributes.config`. */
+  slideAttributes: Ref<Record<string, any> | undefined>;
+  /** The presentation the answers belong to (`language`, `fontFamily`, …). */
+  presentation: Ref<Record<string, any> | undefined>;
+  presentationColorPalette: Ref<string[] | undefined>;
+  presentationLighterColorPalette: Ref<string[] | undefined>;
   reportHeight: () => void;
 }
 
 /**
  * Hook for child iframes to access participant report data passed via zoid xprops.
+ *
+ * Read-only by design: a report view draws what one participant already submitted,
+ * so this exposes data plus the height reporter, and nothing that mutates.
  */
 export function useParticipantReportPlugin(
   options: UseSlidePluginOptions = { autoHeight: true }
 ): ParticipantReportPluginReturn {
   const xprops = (window as any).xprops;
   const answers = ref<any[] | undefined>(xprops?.answers);
+  const slide = ref<Record<string, any> | undefined>(xprops?.slide);
+  const slideAttributes = ref<Record<string, any> | undefined>(xprops?.slideAttributes);
+  const presentation = ref<Record<string, any> | undefined>(xprops?.presentation);
+  const presentationColorPalette = ref<string[] | undefined>(xprops?.presentationColorPalette);
+  const presentationLighterColorPalette = ref<string[] | undefined>(xprops?.presentationLighterColorPalette);
 
   onMounted(() => {
     let cleanup = () => {};
@@ -71,6 +103,15 @@ export function useParticipantReportPlugin(
     if (xprops && typeof xprops.onProps === 'function') {
       xprops.onProps((newProps: any) => {
         if (newProps.answers) answers.value = newProps.answers;
+        if (newProps.slide) slide.value = { ...newProps.slide };
+        if (newProps.slideAttributes) slideAttributes.value = { ...newProps.slideAttributes };
+        if (newProps.presentation) presentation.value = { ...newProps.presentation };
+        if (newProps.presentationColorPalette) {
+          presentationColorPalette.value = [...newProps.presentationColorPalette];
+        }
+        if (newProps.presentationLighterColorPalette) {
+          presentationLighterColorPalette.value = [...newProps.presentationLighterColorPalette];
+        }
       });
     }
     return cleanup;
@@ -86,5 +127,13 @@ export function useParticipantReportPlugin(
     }
   };
 
-  return { answers, reportHeight };
+  return {
+    answers,
+    slide,
+    slideAttributes,
+    presentation,
+    presentationColorPalette,
+    presentationLighterColorPalette,
+    reportHeight,
+  };
 }
