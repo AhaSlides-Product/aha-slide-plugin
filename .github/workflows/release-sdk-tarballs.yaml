@@ -10,15 +10,13 @@ name: "Release SDK tarballs (GitHub Releases)"
 # points its package.json deps at the asset URLs and runs a plain `npm install` — no
 # .npmrc, no GH_TOKEN, no npmjs.
 #
-# Consume (in the downstream app's package.json), e.g.:
-#   "@aha/common":     "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-common.tgz",
-#   "@aha/design":     "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-design.tgz",
-#   "@aha/ui-vanilla":  "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-ui-vanilla.tgz",
-#   "@aha/api":        "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-api.tgz",
-#   "@aha/db":         "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-db.tgz",
-#   "@aha/ui":         "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-ui.tgz"
-# List ALL of them (even the transitive design / ui-vanilla / common) so npm can
-# satisfy the packages' internal "@aha/*": "*" deps from these URLs by dedup.
+# Package set: REQUESTED_PACKAGES below are the app-facing SDK packages
+# (@aha/common, @aha/api, @aha/db, @aha/ui). The workflow then automatically adds any
+# transitive @aha/* dependency required to install them (today: @aha/ui pulls
+# @aha/design + @aha/ui-vanilla) so the release is actually installable — a tarball
+# whose package.json says "@aha/design": "*" is broken unless that package is also
+# available. The consumer lists ALL of them (requested + transitive) so npm satisfies
+# every internal "@aha/*": "*" dep by dedup.
 #
 # Update path:
 #  - Pinned/reproducible: run with a versioned tag (e.g. sdk-v2026.08.18); consumers
@@ -44,19 +42,10 @@ jobs:
   release-tarballs:
     runs-on: ubuntu-latest
     env:
-      # Local package name -> tarball base filename. This is the @aha/* dependency
-      # closure of the app-facing SDK (ui, api, common, db) plus the transitive
-      # @aha packages they require (design, ui-vanilla). Built in dependency order
-      # by turbo (build dependsOn ^build).
-      PKG_MAP: |
-        {
-          "@aha/common":     "aha-common",
-          "@aha/design":     "aha-design",
-          "@aha/ui-vanilla": "aha-ui-vanilla",
-          "@aha/api":        "aha-api",
-          "@aha/db":         "aha-db",
-          "@aha/ui":         "aha-ui"
-        }
+      # App-facing SDK packages to publish. Transitive @aha/* deps are added
+      # automatically (see "Resolve closure + build").
+      REQUESTED_PACKAGES: "@aha/common @aha/api @aha/db @aha/ui"
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,13 +64,41 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build SDK packages
+      - name: Resolve closure + build
         shell: bash
         run: |
           node <<'SCRIPT'
+          const fs = require('fs');
           const { execSync } = require('child_process');
-          const map = JSON.parse(process.env.PKG_MAP);
-          const filters = Object.keys(map).map((n) => '--filter=' + n).join(' ');
+
+          const requested = process.env.REQUESTED_PACKAGES.trim().split(/\s+/);
+          const dirFor = (name) => 'packages/' + name.replace('@aha/', '');
+
+          // Walk @aha/* runtime deps so the release is installable (e.g. @aha/ui
+          // needs @aha/design + @aha/ui-vanilla at runtime).
+          const closure = new Map();
+          function add(name) {
+            if (closure.has(name)) return;
+            const dir = dirFor(name);
+            const pkg = JSON.parse(fs.readFileSync(dir + '/package.json', 'utf8'));
+            closure.set(name, {
+              name,
+              dir,
+              base: name.replace('@aha/', 'aha-'),
+              version: pkg.version,
+              requested: requested.includes(name),
+            });
+            const deps = { ...(pkg.dependencies || {}), ...(pkg.peerDependencies || {}) };
+            for (const d of Object.keys(deps)) if (d.startsWith('@aha/')) add(d);
+          }
+          requested.forEach(add);
+
+          const list = [...closure.values()];
+          fs.writeFileSync('_closure.json', JSON.stringify(list, null, 2));
+          console.log('Requested :', requested.join(', '));
+          console.log('Transitive:', list.filter((p) => !p.requested).map((p) => p.name).join(', ') || '(none)');
+
+          const filters = list.map((p) => '--filter=' + p.name).join(' ');
           execSync('npx turbo run build ' + filters, { stdio: 'inherit' });
           SCRIPT
 
@@ -91,50 +108,47 @@ jobs:
           node <<'SCRIPT'
           const fs = require('fs');
           const { execSync } = require('child_process');
-          const map = JSON.parse(process.env.PKG_MAP);
+
+          const list = JSON.parse(fs.readFileSync('_closure.json', 'utf8'));
           fs.mkdirSync('_tarballs', { recursive: true });
 
           const repo = process.env.GITHUB_REPOSITORY || 'AhaSlides-Product/aha-slide-plugin';
           const tag = process.env.RELEASE_TAG;
           const manifest = { repo, tag, packages: {} };
 
-          for (const [name, base] of Object.entries(map)) {
-            const dir = 'packages/' + name.replace('@aha/', '');
-            const version = JSON.parse(fs.readFileSync(dir + '/package.json', 'utf8')).version;
-
+          for (const p of list) {
             // npm pack names the file "<scope>-<name>-<version>.tgz" -> e.g. aha-ui-1.4.0.tgz
-            execSync('npm pack --workspace=' + name + ' --pack-destination=_tarballs', { stdio: 'inherit' });
-            const versionedFile = base + '-' + version + '.tgz';
-            const stableFile = base + '.tgz';
+            execSync('npm pack --workspace=' + p.name + ' --pack-destination=_tarballs', { stdio: 'inherit' });
+            const versionedFile = p.base + '-' + p.version + '.tgz';
+            const stableFile = p.base + '.tgz';
             fs.copyFileSync('_tarballs/' + versionedFile, '_tarballs/' + stableFile);
 
-            const base_url = 'https://github.com/' + repo + '/releases/download/' + tag + '/';
-            manifest.packages[name] = {
-              version,
+            const baseUrl = 'https://github.com/' + repo + '/releases/download/' + tag + '/';
+            manifest.packages[p.name] = {
+              version: p.version,
+              requested: p.requested,
               versionedFile,
               stableFile,
-              versionedUrl: base_url + versionedFile,
-              stableUrl: base_url + stableFile,
+              versionedUrl: baseUrl + versionedFile,
+              stableUrl: baseUrl + stableFile,
             };
           }
 
           fs.writeFileSync('_tarballs/sdk-manifest.json', JSON.stringify(manifest, null, 2) + '\n');
 
-          // Ready-to-paste consumer deps block (stable URLs)
+          // Ready-to-paste consumer deps block (stable URLs) — includes transitive
+          // @aha packages so npm can satisfy every internal "@aha/*": "*" by dedup.
           const deps = {};
           for (const [name, info] of Object.entries(manifest.packages)) deps[name] = info.stableUrl;
           fs.writeFileSync('_tarballs/consumer-deps.json', JSON.stringify({ dependencies: deps }, null, 2) + '\n');
 
-          console.log('Packed:', Object.keys(manifest.packages).join(', '));
+          console.log('Packed:', list.map((p) => p.name).join(', '));
           SCRIPT
-        env:
-          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
 
       - name: Publish GitHub Release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
