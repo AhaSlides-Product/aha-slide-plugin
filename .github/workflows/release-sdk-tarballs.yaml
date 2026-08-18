@@ -1,0 +1,148 @@
+name: "Release SDK tarballs (GitHub Releases)"
+
+# Token-free distribution of the @aha/* SDK for public consumers.
+#
+# Why: the packages published to GitHub Packages / npmjs require the installer to
+# authenticate (GitHub Packages always needs a read token, even for public repos).
+# GitHub *Release assets* of a PUBLIC repo, by contrast, are downloadable by anyone
+# with NO token and NO env var. So this workflow builds the SDK packages, `npm pack`s
+# them, and uploads the resulting .tgz files to a GitHub Release. A consumer then
+# points its package.json deps at the asset URLs and runs a plain `npm install` — no
+# .npmrc, no GH_TOKEN, no npmjs.
+#
+# Consume (in the downstream app's package.json), e.g.:
+#   "@aha/common":     "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-common.tgz",
+#   "@aha/design":     "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-design.tgz",
+#   "@aha/ui-vanilla":  "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-ui-vanilla.tgz",
+#   "@aha/api":        "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-api.tgz",
+#   "@aha/db":         "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-db.tgz",
+#   "@aha/ui":         "https://github.com/AhaSlides-Product/aha-slide-plugin/releases/download/sdk-latest/aha-ui.tgz"
+# List ALL of them (even the transitive design / ui-vanilla / common) so npm can
+# satisfy the packages' internal "@aha/*": "*" deps from these URLs by dedup.
+#
+# Update path:
+#  - Pinned/reproducible: run with a versioned tag (e.g. sdk-v2026.08.18); consumers
+#    pin the aha-<pkg>-<version>.tgz URLs and bump when they want the new version.
+#  - Always-latest: the moving `sdk-latest` release keeps stable filenames
+#    (aha-<pkg>.tgz); consumers reinstall to pull the newest build.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish tarballs under (e.g. sdk-latest or sdk-v2026.08.18)"
+        required: true
+        default: "sdk-latest"
+  push:
+    tags:
+      - "sdk-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-tarballs:
+    runs-on: ubuntu-latest
+    env:
+      # Local package name -> tarball base filename. This is the @aha/* dependency
+      # closure of the app-facing SDK (ui, api, common, db) plus the transitive
+      # @aha packages they require (design, ui-vanilla). Built in dependency order
+      # by turbo (build dependsOn ^build).
+      PKG_MAP: |
+        {
+          "@aha/common":     "aha-common",
+          "@aha/design":     "aha-design",
+          "@aha/ui-vanilla": "aha-ui-vanilla",
+          "@aha/api":        "aha-api",
+          "@aha/db":         "aha-db",
+          "@aha/ui":         "aha-ui"
+        }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Submodules (the apps/*) are workspace members, so npm install needs them
+          # present. GH_PAT reads the private app submodules in CI (not exposed to
+          # consumers). The SDK packages themselves live in this repo, not submodules.
+          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build SDK packages
+        shell: bash
+        run: |
+          node <<'SCRIPT'
+          const { execSync } = require('child_process');
+          const map = JSON.parse(process.env.PKG_MAP);
+          const filters = Object.keys(map).map((n) => '--filter=' + n).join(' ');
+          execSync('npx turbo run build ' + filters, { stdio: 'inherit' });
+          SCRIPT
+
+      - name: Pack tarballs + manifest
+        shell: bash
+        run: |
+          node <<'SCRIPT'
+          const fs = require('fs');
+          const { execSync } = require('child_process');
+          const map = JSON.parse(process.env.PKG_MAP);
+          fs.mkdirSync('_tarballs', { recursive: true });
+
+          const repo = process.env.GITHUB_REPOSITORY || 'AhaSlides-Product/aha-slide-plugin';
+          const tag = process.env.RELEASE_TAG;
+          const manifest = { repo, tag, packages: {} };
+
+          for (const [name, base] of Object.entries(map)) {
+            const dir = 'packages/' + name.replace('@aha/', '');
+            const version = JSON.parse(fs.readFileSync(dir + '/package.json', 'utf8')).version;
+
+            // npm pack names the file "<scope>-<name>-<version>.tgz" -> e.g. aha-ui-1.4.0.tgz
+            execSync('npm pack --workspace=' + name + ' --pack-destination=_tarballs', { stdio: 'inherit' });
+            const versionedFile = base + '-' + version + '.tgz';
+            const stableFile = base + '.tgz';
+            fs.copyFileSync('_tarballs/' + versionedFile, '_tarballs/' + stableFile);
+
+            const base_url = 'https://github.com/' + repo + '/releases/download/' + tag + '/';
+            manifest.packages[name] = {
+              version,
+              versionedFile,
+              stableFile,
+              versionedUrl: base_url + versionedFile,
+              stableUrl: base_url + stableFile,
+            };
+          }
+
+          fs.writeFileSync('_tarballs/sdk-manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+
+          // Ready-to-paste consumer deps block (stable URLs)
+          const deps = {};
+          for (const [name, info] of Object.entries(manifest.packages)) deps[name] = info.stableUrl;
+          fs.writeFileSync('_tarballs/consumer-deps.json', JSON.stringify({ dependencies: deps }, null, 2) + '\n');
+
+          console.log('Packed:', Object.keys(manifest.packages).join(', '));
+          SCRIPT
+        env:
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release $RELEASE_TAG exists — clobbering assets."
+            gh release upload "$RELEASE_TAG" _tarballs/*.tgz _tarballs/sdk-manifest.json _tarballs/consumer-deps.json --clobber
+          else
+            echo "Creating release $RELEASE_TAG."
+            gh release create "$RELEASE_TAG" _tarballs/*.tgz _tarballs/sdk-manifest.json _tarballs/consumer-deps.json \
+              --title "SDK tarballs — $RELEASE_TAG" \
+              --notes "Token-free @aha/* SDK tarballs for public consumers (GitHub Release assets — no token, no env var, no npmjs). See sdk-manifest.json for versions/URLs and consumer-deps.json for a ready-to-paste package.json deps block."
+          fi
