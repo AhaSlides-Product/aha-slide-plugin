@@ -57,6 +57,7 @@ runs:
         S3_BUCKET: ${{ inputs.s3_bucket }}
         SLIDES_AGENT_BUCKET: ${{ inputs.slides_agent_bucket }}
         PATH_PREFIX: ${{ inputs.path_prefix }}
+        DIST_IDS: ${{ inputs.cloudfront_distribution_ids }}
       run: |
         INVALIDATION_PATHS=""
         MISSING_DIST=0
@@ -133,7 +134,7 @@ runs:
 
         if [ -n "$INVALIDATION_PATHS" ]; then
           INVALIDATION_PATHS=$(printf '%s\n' $INVALIDATION_PATHS | sort -u | tr '\n' ' ')
-          for DIST_ID in ${{ inputs.cloudfront_distribution_ids }}; do
+          for DIST_ID in $DIST_IDS; do
             echo "Invalidating $DIST_ID for paths: $INVALIDATION_PATHS"
             aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths $INVALIDATION_PATHS
           done
