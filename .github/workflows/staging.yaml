@@ -49,7 +49,8 @@ jobs:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
-          cloudfront_distribution_id: E24EITRV4LCVOE
+          # presenter.dev.ahaslide.com + audience.dev.ahaslide.com — the only edges plugins are served from.
+          cloudfront_distribution_ids: ERDMV7QAYEJA0 E1EU8EUYZG7UQW
           deploy_storybook: 'true'
 
       - name: Deploy Backend
