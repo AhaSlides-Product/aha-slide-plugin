@@ -23,3 +23,33 @@
 .ant-card .ant-card-head {
   padding: 0 var(--aha-baseSpacing);
 }
+
+/* Optically centre an icon + label inside a Button.
+ *
+ * ant-design-vue lays a Button out as `display: inline-block` with
+ * `text-align: center`, so a glyph BASELINE-aligns against the label's line box
+ * rather than centring in it. Combined with the icon's own `line-height: 0` and
+ * negative `vertical-align`, the glyph lands a few px BELOW the optical centre —
+ * measured on ant-design-vue@4.2.6, a `+` in a 32px block Button sat 4px low.
+ *
+ * Nobody authors that offset; it arrives with the library default, so it is
+ * present on EVERY icon+label Button until it is corrected here. Fixing it in the
+ * theme is deliberate: a per-button override patches one call site, leaves the
+ * rest misaligned, and reads to the next person like the intended pattern.
+ *
+ * Horizontal spacing is left alone — the library already spaces `.anticon + span`,
+ * and a `gap` here would double it.
+ */
+.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* A block Button still spans its container; only its inner layout changes.
+ * Two classes so this outranks the library's own `.ant-btn-block { display: block }`
+ * regardless of stylesheet order (antd injects its styles at runtime).
+ */
+.ant-btn.ant-btn-block {
+  display: flex;
+}
