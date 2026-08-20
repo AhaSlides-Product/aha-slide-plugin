@@ -20,8 +20,8 @@ inputs:
   aws_region:
     description: 'AWS Region'
     required: true
-  cloudfront_distribution_id:
-    description: 'CloudFront Distribution ID to invalidate'
+  cloudfront_distribution_ids:
+    description: 'Space-separated CloudFront Distribution IDs to invalidate'
     required: false
   deploy_storybook:
     description: 'Whether to deploy storybook'
@@ -131,10 +131,12 @@ runs:
           INVALIDATION_PATHS="$INVALIDATION_PATHS /schema/*"
         fi
 
-        if [ -n "${{ inputs.cloudfront_distribution_id }}" ] && [ -n "$INVALIDATION_PATHS" ]; then
+        if [ -n "$INVALIDATION_PATHS" ]; then
           INVALIDATION_PATHS=$(printf '%s\n' $INVALIDATION_PATHS | sort -u | tr '\n' ' ')
-          echo "Invalidating CloudFront cache for paths: $INVALIDATION_PATHS"
-          aws cloudfront create-invalidation --distribution-id "${{ inputs.cloudfront_distribution_id }}" --paths $INVALIDATION_PATHS
+          for DIST_ID in ${{ inputs.cloudfront_distribution_ids }}; do
+            echo "Invalidating $DIST_ID for paths: $INVALIDATION_PATHS"
+            aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths $INVALIDATION_PATHS
+          done
         fi
 
         # Deploy the plugins that DID build (above), then fail the job so a broken
