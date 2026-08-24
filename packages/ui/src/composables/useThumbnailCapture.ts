@@ -5,8 +5,6 @@ import { sendThumbnail, registerThumbnailCaptureRequest } from '@aha/ui-vanilla'
 export interface ThumbnailCaptureOptions {
   /** Width pixel budget for the captured image (height scales with the element's aspect ratio). Default 320. */
   maxWidth?: number
-  /** Reserved for a future lossy (JPEG/WebP) encode path; currently unused by the PNG capture. */
-  quality?: number
 }
 
 /**
@@ -33,7 +31,9 @@ export function useThumbnailCapture(
       // as a blank image and overwrite a good thumbnail on the host. Skip it.
       if (rect.width === 0 || rect.height === 0) return
       const pixelRatio = Math.min(1, maxWidth / rect.width)
-      const dataUrl = await toPng(el, { pixelRatio, cacheBust: true })
+      // No cacheBust: it appends a query param to every fetched asset URL, which
+      // invalidates CloudFront-signed slide images (403) and drops them from the capture.
+      const dataUrl = await toPng(el, { pixelRatio })
       sendThumbnail(dataUrl)
     } catch {
       // Capture is best-effort; failures fall back to the icon. Never throw.
