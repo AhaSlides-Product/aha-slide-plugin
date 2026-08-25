@@ -136,6 +136,10 @@
               "type": "boolean",
               "description": "When true, the host's editor settings panel shows the native quiz settings cluster for this slide (Points max/min, Faster answers get more points, Time limit, Leaderboard toggle, and General quiz settings). Set this on scored / quiz-style slide types so they reuse the host's scoring controls instead of rebuilding them."
             },
+            "enableHideQuestionTitle": {
+              "type": "boolean",
+              "description": "Set true on a FRAMED plugin slide (enableFullScreen false) to hide the host's question title on the presenter canvas because the plugin renders that title itself inside its iframe — otherwise the host paints a second copy above it."
+            },
             "enableAudioSlidePlugin": {
               "type": "boolean",
               "description": "Set true when this slide type plays its OWN audio — whether stored on the slide (e.g. slide.audioLink) or hard-coded/bundled in the plugin bundle (e.g. a game soundtrack). The host then stops competing background audio while the slide is active — the deck/presentation background music and the quiz background music — so the two never overlap (the host suppresses at the quiz question/result screens for a scored slide, and while the slide is on stage for a non-quiz slide)."
