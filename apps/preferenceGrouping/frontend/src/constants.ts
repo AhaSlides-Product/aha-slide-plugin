@@ -3,11 +3,12 @@ import { SlideType } from '@aha/api';
 /** This plugin's slide type — must match the app directory name. */
 export const SLIDE_TYPE = SlideType.PreferenceGrouping;
 
-/** Peers a participant may pick. Fixed in V1. */
-export const PICK_LIMIT = 3;
-
 /** Default ideal group size the presenter can change in settings. */
 export const DEFAULT_TARGET_SIZE = 4;
+
+/** Peers a participant may pick: a group of N already holds the picker, so they choose the other N-1. */
+export const pickLimitForTargetSize = (targetSize: number): number =>
+  Math.max(1, (targetSize || DEFAULT_TARGET_SIZE) - 1);
 
 /** Smallest group the algorithm forms where headcount allows. */
 export const MIN_GROUP_SIZE = 3;

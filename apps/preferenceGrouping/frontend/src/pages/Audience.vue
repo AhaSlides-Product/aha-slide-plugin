@@ -34,7 +34,7 @@
       <!-- Picker -->
       <section v-else class="pg-stack" data-testid="audience-preference-grouping-picker">
         <header class="pg-header">
-          <h2 class="pg-title">{{ t('Choose up to {limit} people you\'d like to team up with', { limit: PICK_LIMIT }) }}</h2>
+          <h2 class="pg-title">{{ t('Choose up to {limit} people you\'d like to team up with', { limit: pickLimit }) }}</h2>
           <p class="pg-tagline">{{ t('Everyone chooses. AhaSlides does the grouping.') }}</p>
         </header>
 
@@ -53,7 +53,7 @@
             data-testid="audience-preference-grouping-search"
           />
           <p class="pg-count" aria-live="polite">
-            {{ t('{selected} of {limit} selected', { selected: selected.length, limit: PICK_LIMIT }) }}
+            {{ t('{selected} of {limit} selected', { selected: selected.length, limit: pickLimit }) }}
           </p>
           <ul class="pg-peers">
             <li v-for="peer in visiblePeers" :key="peer.id">
@@ -108,7 +108,7 @@ import { useAudiencePlugin } from '@aha/ui';
 import { useTheme, readableInk } from '../composables/useTheme';
 import { useAudienceGrouping } from '../composables/useAudienceGrouping';
 import { syncLocale } from '../i18n';
-import { PICK_LIMIT } from '../constants';
+import { DEFAULT_TARGET_SIZE, pickLimitForTargetSize } from '../constants';
 import type { Group } from '../types';
 
 const { t } = useI18n();
@@ -146,7 +146,9 @@ const grouping = useAudienceGrouping({
   slideAttributes: slideAttributesProps,
   audienceId,
 });
-const { pickablePeers, revealed, myGroup, myGroupMates, submitted, submitting } = grouping;
+const { pickablePeers, targetSize, revealed, myGroup, myGroupMates, submitted, submitting } = grouping;
+
+const pickLimit = computed(() => pickLimitForTargetSize(targetSize.value ?? DEFAULT_TARGET_SIZE));
 
 const selected = ref<string[]>([]);
 const search = ref('');
@@ -159,7 +161,7 @@ const visiblePeers = computed(() => {
 });
 
 // Drop a pick whose peer has left, so a departed selection can't stay invisible
-// yet keep counting toward PICK_LIMIT and lock the whole picker. Skip the
+// yet keep counting toward the pick limit and lock the whole picker. Skip the
 // transient empty set during load so picks aren't wiped before the roster lands.
 watch(pickablePeers, (peers) => {
   if (!peers.length) return;
@@ -186,11 +188,11 @@ function isSelected(id: string): boolean {
   return selected.value.includes(id);
 }
 function isDisabled(id: string): boolean {
-  return !isSelected(id) && selected.value.length >= PICK_LIMIT;
+  return !isSelected(id) && selected.value.length >= pickLimit.value;
 }
 function toggle(id: string): void {
   if (isSelected(id)) selected.value = selected.value.filter((x) => x !== id);
-  else if (selected.value.length < PICK_LIMIT) selected.value = [...selected.value, id];
+  else if (selected.value.length < pickLimit.value) selected.value = [...selected.value, id];
 }
 
 function peerStyle(id: string): Record<string, string> {

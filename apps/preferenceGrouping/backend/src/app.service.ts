@@ -3,9 +3,9 @@ import { CountUnique, SubmissionRequest, SubmissionResult, Sync } from '@aha/bac
 import { getBucket } from '@aha/common';
 import { formGroups } from './grouping';
 import {
+  capPickLists,
   FormGroupsRequestDto,
   FormGroupsResponseDto,
-  MAX_PICKS_PER_PERSON,
   SUBMITTED_BUCKET,
 } from './dto';
 
@@ -47,7 +47,7 @@ export class AppService {
   computeGroups(request: FormGroupsRequestDto): FormGroupsResponseDto {
     const { groups, seed } = formGroups({
       participantIds: request.participantIds ?? [],
-      picks: this.capPickLists(request.picks ?? {}),
+      picks: capPickLists(request.picks ?? {}, request.targetSize),
       targetSize: request.targetSize,
       minSize: request.minSize,
       seed: request.seed,
@@ -60,17 +60,5 @@ export class AppService {
       })),
       seed,
     };
-  }
-
-  /**
-   * Trim every pick list to the authoritative per-person limit so a client that
-   * bypasses its own cap can't submit an over-long pick array.
-   */
-  private capPickLists(picks: Record<string, string[]>): Record<string, string[]> {
-    const capped: Record<string, string[]> = {};
-    for (const [picker, chosen] of Object.entries(picks)) {
-      capped[picker] = Array.isArray(chosen) ? chosen.slice(0, MAX_PICKS_PER_PERSON) : [];
-    }
-    return capped;
   }
 }

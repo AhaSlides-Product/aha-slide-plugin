@@ -148,6 +148,20 @@ export function usePresenterGrouping(ctx: PresenterContext) {
     });
   }
 
+  /**
+   * Publish the presenter's group size during picking so the audience picker
+   * derives its own pick limit from it — otherwise the audience only learns the
+   * group size at reveal, after picking is over.
+   */
+  function publishTargetSize(): void {
+    if (!ctx.upsertSlideAttribute) return;
+    ctx.upsertSlideAttribute({
+      slideId: ctx.slideProps.value?.id,
+      attributeKey: ATTR_TARGET_SIZE,
+      attributeValue: ctx.targetSize.value,
+    });
+  }
+
   const formGroupsUrl = computed(
     () => `${ctx.baseUrl.value}/api/plugins/${SLIDE_TYPE}/external/form-groups`,
   );
@@ -211,6 +225,7 @@ export function usePresenterGrouping(ctx: PresenterContext) {
   }
 
   watch(roster, () => publishRoster());
+  watch(() => ctx.targetSize.value, () => publishTargetSize());
 
   return {
     roster,
@@ -224,6 +239,7 @@ export function usePresenterGrouping(ctx: PresenterContext) {
     watchSubmissions,
     restoreState,
     publishRoster,
+    publishTargetSize,
     formGroups,
   };
 }
