@@ -74,6 +74,7 @@ const {
   slideProps,
   audiences,
   baseUrl,
+  getSlideAttributesAction,
   upsertSlideAttributeAction,
   subscribeTopic,
   unsubscribeTopic,
@@ -176,13 +177,24 @@ onActionInvoke?.((id) => {
   if (id === 'form-groups') onFormGroups();
 });
 
-onMounted(() => {
+let submittedTopic: string | undefined;
+
+onMounted(async () => {
+  if (slideId.value && getSlideAttributesAction) {
+    try {
+      const attributes = await getSlideAttributesAction(slideId.value);
+      grouping.restoreState(attributes);
+    } catch (error) {
+      console.warn('[preferenceGrouping] could not restore grouping state', error);
+    }
+  }
   grouping.loadSubmittedCount();
-  grouping.watchSubmissions();
+  submittedTopic = grouping.watchSubmissions();
   grouping.publishRoster();
 });
 
 onUnmounted(() => {
+  if (submittedTopic) unsubscribeTopic?.(submittedTopic);
   setActionButtons?.([]);
   onActionInvoke?.(() => {});
 });

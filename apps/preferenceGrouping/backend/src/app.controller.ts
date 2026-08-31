@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Post, ValidationPipe } from '@nestjs/common';
 import { SubmissionRequest } from '@aha/backend-utils';
 import { AppService } from './app.service';
 import { FormGroupsRequestDto, FormGroupsResponseDto } from './dto';
@@ -28,7 +28,10 @@ export class AppController {
    */
   @Post('/external/form-groups')
   @HttpCode(HttpStatus.OK)
-  formGroups(@Body() body: FormGroupsRequestDto): FormGroupsResponseDto {
+  formGroups(
+    @Body(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true }))
+    body: FormGroupsRequestDto,
+  ): FormGroupsResponseDto {
     this.logger.log('Forming groups', {
       participants: body.participantIds?.length ?? 0,
     });

@@ -53,9 +53,13 @@ export function useAudienceGrouping(ctx: AudienceContext) {
     return new ApiClient(ctx.baseUrl.value);
   }
 
-  /** Detect an existing submission for this participant on (re)mount. */
-  async function loadExistingSubmission(): Promise<void> {
-    if (!ctx.baseUrl.value || !myId.value || !ctx.slideProps.value?.id) return;
+  /**
+   * Detect an existing submission for this participant on (re)mount and return
+   * their real prior picks so the picker can hydrate from them — otherwise
+   * "Edit picks" would reopen empty and re-submitting would wipe their choices.
+   */
+  async function loadExistingSubmission(): Promise<string[]> {
+    if (!ctx.baseUrl.value || !myId.value || !ctx.slideProps.value?.id) return [];
     try {
       const prior = await makeClient().getParticipantSubmissions<PickAttributes>({
         audienceId: myId.value,
@@ -63,10 +67,14 @@ export function useAudienceGrouping(ctx: AudienceContext) {
         slideVersion: Number(ctx.slideProps.value.version),
         type: SubmissionType.Response,
       });
-      if (prior.length > 0) submitted.value = true;
+      if (prior.length > 0) {
+        submitted.value = true;
+        return prior[0]?.attributes?.pickedPeerIds ?? [];
+      }
     } catch (error) {
       console.warn('[preferenceGrouping] could not load prior submission', error);
     }
+    return [];
   }
 
   async function submitPicks(pickedPeerIds: string[]): Promise<void> {

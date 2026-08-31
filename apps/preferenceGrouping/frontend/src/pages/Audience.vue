@@ -14,7 +14,7 @@
           <ul class="pg-mates">
             <li v-for="mate in myGroupMates" :key="mate.id" class="pg-mate">
               <span class="pg-mate__emoji">{{ mate.emoji || '🙂' }}</span>
-              <span class="pg-mate__name">{{ mate.name || t('Group {number}', { number: '' }) }}</span>
+              <span class="pg-mate__name">{{ mate.name || mate.id }}</span>
             </li>
           </ul>
         </div>
@@ -122,6 +122,7 @@ const {
   slideAttributesProps,
   audienceId,
   showToastSuccess,
+  showToastError,
   onSubmitButtonHeightChange,
 } = useAudiencePlugin({ autoHeight: true });
 
@@ -205,8 +206,12 @@ const submitStyle = computed(() => {
 });
 
 async function onSubmit(): Promise<void> {
-  await grouping.submitPicks(selected.value);
-  showToastSuccess?.(t('You\'re all set'));
+  try {
+    await grouping.submitPicks(selected.value);
+    showToastSuccess?.(t('You\'re all set'));
+  } catch {
+    showToastError?.(t('Could not submit your picks. Please try again.'));
+  }
 }
 function onEdit(): void {
   grouping.editPicks();
@@ -219,8 +224,9 @@ function reportSubmitOffset(): void {
 }
 watch([visiblePeers, submitting, submitted, revealed], () => requestAnimationFrame(reportSubmitOffset));
 
-onMounted(() => {
-  grouping.loadExistingSubmission();
+onMounted(async () => {
+  const priorPicks = await grouping.loadExistingSubmission();
+  if (priorPicks.length) selected.value = priorPicks;
   requestAnimationFrame(reportSubmitOffset);
 });
 </script>

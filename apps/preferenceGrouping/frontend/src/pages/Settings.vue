@@ -30,9 +30,9 @@ import { useI18n } from '../i18n';
 import { usePresenterPlugin, useSync } from '@aha/ui';
 import { useTheme } from '../composables/useTheme';
 import { syncLocale } from '../i18n';
-import { ATTR_TARGET_SIZE, DEFAULT_TARGET_SIZE, syncKey } from '../constants';
+import { ATTR_TARGET_SIZE, DEFAULT_TARGET_SIZE, MIN_GROUP_SIZE, syncKey } from '../constants';
 
-const MIN_TARGET = 2;
+const MIN_TARGET = MIN_GROUP_SIZE;
 const MAX_TARGET = 12;
 
 const { t } = useI18n();

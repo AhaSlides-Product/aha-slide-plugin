@@ -94,8 +94,12 @@ export function usePresenterGrouping(ctx: PresenterContext) {
     }
   }
 
-  /** Live-update the tally from the backend's per-submission ping. */
-  function watchSubmissions(): void {
+  /**
+   * Live-update the tally from the backend's per-submission ping. Returns the
+   * subscribed topic so the caller can release it on unmount — otherwise the
+   * keep-alive preload iframe stacks stale handlers that each recount pings.
+   */
+  function watchSubmissions(): string {
     const topic = getBucket(SUBMITTED_BUCKET, bucketConfig());
     ctx.subscribeTopic?.({
       topic,
@@ -108,6 +112,22 @@ export function usePresenterGrouping(ctx: PresenterContext) {
         }
       },
     });
+    return topic;
+  }
+
+  /**
+   * Rehydrate the reveal from persisted slide attributes so a presenter
+   * refresh or back-nav after forming groups shows the groups again rather
+   * than the "Choose up to N…" tally.
+   */
+  function restoreState(attributes: Record<string, any> | undefined): void {
+    if (!attributes) return;
+    const storedGroups = attributes[ATTR_GROUPS] ?? attributes.preferenceGrouping?.[ATTR_GROUPS];
+    const storedRevealed = attributes[ATTR_REVEALED] ?? attributes.preferenceGrouping?.[ATTR_REVEALED];
+    if (Array.isArray(storedGroups) && storedGroups.length > 0) {
+      groups.value = storedGroups;
+      revealed.value = !!storedRevealed;
+    }
   }
 
   /** Keep the audience-visible roster in sync with who has joined. */
@@ -121,7 +141,7 @@ export function usePresenterGrouping(ctx: PresenterContext) {
   }
 
   const formGroupsUrl = computed(
-    () => `${window.location.origin}/api/plugins/${SLIDE_TYPE}/external/form-groups`,
+    () => `${ctx.baseUrl.value}/api/plugins/${SLIDE_TYPE}/external/form-groups`,
   );
 
   /**
@@ -190,6 +210,7 @@ export function usePresenterGrouping(ctx: PresenterContext) {
     error,
     loadSubmittedCount,
     watchSubmissions,
+    restoreState,
     publishRoster,
     formGroups,
   };
