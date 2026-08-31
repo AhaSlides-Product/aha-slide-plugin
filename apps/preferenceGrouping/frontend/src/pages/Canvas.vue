@@ -27,7 +27,7 @@
 
     <!-- Collecting picks: the live tally -->
     <section v-else class="pg-tally" data-testid="canvas-preference-grouping-tally">
-      <p class="pg-prompt">{{ t('Choose up to {limit} people you\'d like to team up with', { limit: PICK_LIMIT }) }}</p>
+      <p class="pg-prompt">{{ t('Choose up to {limit} people you\'d like to team up with', { limit: pickLimit }) }}</p>
       <p class="pg-tagline">{{ t('Everyone chooses. AhaSlides does the grouping.') }}</p>
 
       <div v-if="totalCount > 0" class="pg-counter">
@@ -62,7 +62,7 @@ import { usePresenterPlugin, type PluginAction } from '@aha/ui';
 import { useTheme, readableInk } from '../composables/useTheme';
 import { usePresenterGrouping } from '../composables/usePresenterGrouping';
 import { syncLocale } from '../i18n';
-import { DEFAULT_TARGET_SIZE, PICK_LIMIT, syncKey } from '../constants';
+import { DEFAULT_TARGET_SIZE, pickLimitForTargetSize, syncKey } from '../constants';
 import { useSync } from '@aha/ui';
 
 const { t } = useI18n();
@@ -101,6 +101,7 @@ const targetSize = useSync<number>(
   computed(() => (slideId.value ? syncKey.targetSize(slideId.value) : undefined)),
   DEFAULT_TARGET_SIZE,
 );
+const pickLimit = computed(() => pickLimitForTargetSize(targetSize.value ?? DEFAULT_TARGET_SIZE));
 
 const grouping = usePresenterGrouping({
   baseUrl,
@@ -191,6 +192,7 @@ onMounted(async () => {
   grouping.loadSubmittedCount();
   submittedTopic = grouping.watchSubmissions();
   grouping.publishRoster();
+  grouping.publishTargetSize();
 });
 
 onUnmounted(() => {

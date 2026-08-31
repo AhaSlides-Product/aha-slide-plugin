@@ -1,7 +1,9 @@
 # Preference-based Grouping
 
-A slide type where everyone privately picks up to 3 peers they'd like to team up
-with, and AhaSlides auto-forms balanced groups that maximise satisfied picks,
+A slide type where everyone privately picks the peers they'd like to team up
+with — up to one fewer than the presenter's group size (a group of N already
+holds the picker, so they choose the other N-1) — and AhaSlides auto-forms
+balanced groups that maximise satisfied picks,
 prioritising **mutual** choices. Individual picks stay private — only the final
 groups are shown, and no match rate is ever displayed.
 
@@ -10,7 +12,7 @@ groups are shown, and no match rate is ever displayed.
 ## How it works
 
 1. **Audience** (`frontend/src/pages/Audience.vue`) — each participant multi-selects
-   up to 3 peers from the live roster and submits via `sendLiveSubmission` with
+   up to `targetSize - 1` peers from the live roster and submits via `sendLiveSubmission` with
    `attributes: { pickedPeerIds }`. Abstaining (zero picks) is allowed.
 2. **Backend tally** (`backend/src/app.service.ts`) — each submission returns a
    `count_unique` of submitters plus a live ping carrying **only** the sender id

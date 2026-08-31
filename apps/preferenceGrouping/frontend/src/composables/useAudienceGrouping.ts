@@ -30,6 +30,9 @@ export function useAudienceGrouping(ctx: AudienceContext) {
     (attributes.value.roster ?? []).filter((p) => p.id !== myId.value),
   );
 
+  /** The presenter's group size, as published to the audience via slide attributes. */
+  const targetSize = computed<number | undefined>(() => attributes.value.targetSize);
+
   const revealed = computed(() => !!attributes.value.revealed && !!attributes.value.groups?.length);
 
   const myGroup = computed<Group | undefined>(() =>
@@ -103,6 +106,7 @@ export function useAudienceGrouping(ctx: AudienceContext) {
 
   return {
     pickablePeers,
+    targetSize,
     revealed,
     myGroup,
     myGroupMates,

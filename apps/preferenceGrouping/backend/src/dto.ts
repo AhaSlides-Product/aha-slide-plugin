@@ -22,8 +22,29 @@ export const MAX_ROOM_SIZE = 500;
 /** Largest ideal group size the presenter may request. */
 export const MAX_TARGET_SIZE = 50;
 
-/** Peers one participant's pick list may carry (mirrors the client PICK_LIMIT). */
-export const MAX_PICKS_PER_PERSON = 3;
+/** Default ideal group size when the presenter hasn't chosen one (mirrors the client). */
+export const DEFAULT_TARGET_SIZE = 4;
+
+/** Peers one participant may pick: a group of N already holds the picker, so they choose the other N-1. */
+export const pickLimitForTargetSize = (targetSize?: number): number =>
+  Math.max(1, (targetSize || DEFAULT_TARGET_SIZE) - 1);
+
+/**
+ * Trim each pick list to the derived per-person limit so a client that bypasses
+ * its own cap can't submit an over-long pick array — while a legitimately larger
+ * pick list (a bigger group size) is kept intact rather than truncated to 3.
+ */
+export function capPickLists(
+  picks: Record<string, string[]>,
+  targetSize?: number,
+): Record<string, string[]> {
+  const limit = pickLimitForTargetSize(targetSize);
+  const capped: Record<string, string[]> = {};
+  for (const [picker, chosen] of Object.entries(picks)) {
+    capped[picker] = Array.isArray(chosen) ? chosen.slice(0, limit) : [];
+  }
+  return capped;
+}
 
 /** Slide-type-specific submission payload: the peers this participant picked. */
 export interface PickAttributes {
