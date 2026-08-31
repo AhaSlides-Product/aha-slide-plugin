@@ -62,7 +62,7 @@ import { usePresenterPlugin, type PluginAction } from '@aha/ui';
 import { useTheme, readableInk } from '../composables/useTheme';
 import { usePresenterGrouping } from '../composables/usePresenterGrouping';
 import { syncLocale } from '../i18n';
-import { DEFAULT_TARGET_SIZE, pickLimitForTargetSize, syncKey } from '../constants';
+import { DEFAULT_TARGET_SIZE, pickLimitForTargetSize, readStoredTargetSize, syncKey } from '../constants';
 import { useSync } from '@aha/ui';
 
 const { t } = useI18n();
@@ -184,6 +184,8 @@ onMounted(async () => {
   if (slideId.value && getSlideAttributesAction) {
     try {
       const attributes = await getSlideAttributesAction(slideId.value);
+      const storedTargetSize = readStoredTargetSize(attributes);
+      if (storedTargetSize != null) targetSize.value = storedTargetSize;
       grouping.restoreState(attributes);
     } catch (error) {
       console.warn('[preferenceGrouping] could not restore grouping state', error);

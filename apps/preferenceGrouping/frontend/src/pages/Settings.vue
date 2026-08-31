@@ -30,7 +30,7 @@ import { useI18n } from '../i18n';
 import { usePresenterPlugin, useSync } from '@aha/ui';
 import { useTheme } from '../composables/useTheme';
 import { syncLocale } from '../i18n';
-import { ATTR_TARGET_SIZE, DEFAULT_TARGET_SIZE, MIN_GROUP_SIZE, syncKey } from '../constants';
+import { ATTR_TARGET_SIZE, DEFAULT_TARGET_SIZE, MIN_GROUP_SIZE, readStoredTargetSize, syncKey } from '../constants';
 
 const MIN_TARGET = MIN_GROUP_SIZE;
 const MAX_TARGET = 12;
@@ -86,8 +86,8 @@ onMounted(async () => {
   if (!slideId.value || !getSlideAttributesAction) return;
   try {
     const attributes = await getSlideAttributesAction(slideId.value);
-    const stored = attributes?.[ATTR_TARGET_SIZE] ?? attributes?.preferenceGrouping?.[ATTR_TARGET_SIZE];
-    if (typeof stored === 'number') targetSize.value = stored;
+    const stored = readStoredTargetSize(attributes);
+    if (stored != null) targetSize.value = stored;
   } catch (error) {
     console.warn('[preferenceGrouping] could not load settings', error);
   }

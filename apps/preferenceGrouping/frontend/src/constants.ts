@@ -22,6 +22,18 @@ export const ATTR_ROSTER = 'roster';
 export const ATTR_TARGET_SIZE = 'targetSize';
 export const ATTR_REVEALED = 'revealed';
 
+/**
+ * Read the persisted group size from slide attributes — the useSync channel
+ * never replays it to a late subscriber, so it must be read back here. Returns
+ * undefined when genuinely unset so the caller falls back to DEFAULT_TARGET_SIZE.
+ */
+export const readStoredTargetSize = (
+  attributes: Record<string, any> | undefined,
+): number | undefined => {
+  const stored = attributes?.[ATTR_TARGET_SIZE] ?? attributes?.preferenceGrouping?.[ATTR_TARGET_SIZE];
+  return typeof stored === 'number' ? stored : undefined;
+};
+
 /** useSync channel keys (canvas <-> settings), suffixed with the slide id. */
 export const syncKey = {
   targetSize: (slideId: string | number) => `pg-target-size-${slideId}`,
