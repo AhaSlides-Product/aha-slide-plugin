@@ -158,6 +158,15 @@ const visiblePeers = computed(() => {
   return pickablePeers.value.filter((p) => (p.name || p.id).toLowerCase().includes(query));
 });
 
+// Drop a pick whose peer has left, so a departed selection can't stay invisible
+// yet keep counting toward PICK_LIMIT and lock the whole picker. Skip the
+// transient empty set during load so picks aren't wiped before the roster lands.
+watch(pickablePeers, (peers) => {
+  if (!peers.length) return;
+  const ids = new Set(peers.map((p) => p.id));
+  selected.value = selected.value.filter((id) => ids.has(id));
+});
+
 const rootStyle = computed(() => ({
   color: 'var(--pg-text)',
   fontFamily: 'var(--pg-font)',

@@ -1,4 +1,17 @@
-import { ArrayMaxSize, IsArray, IsInt, IsObject, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  Validate,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 
 /** Topic (bucket) the tally pings are published to; the canvas subscribes to it. */
 export const SUBMITTED_BUCKET = 'picks-submitted';
@@ -15,6 +28,20 @@ export const MAX_PICKS_PER_PERSON = 3;
 /** Slide-type-specific submission payload: the peers this participant picked. */
 export interface PickAttributes {
   pickedPeerIds: string[];
+}
+
+/** `minSize` must not exceed the sibling `targetSize`, or a group can never reach it. */
+@ValidatorConstraint({ name: 'minSizeNotAboveTargetSize', async: false })
+class MinSizeNotAboveTargetSize implements ValidatorConstraintInterface {
+  validate(minSize: unknown, args: ValidationArguments): boolean {
+    const { targetSize } = args.object as FormGroupsRequestDto;
+    if (typeof minSize !== 'number' || typeof targetSize !== 'number') return true;
+    return minSize <= targetSize;
+  }
+
+  defaultMessage(): string {
+    return 'minSize must be less than or equal to targetSize';
+  }
 }
 
 /**
@@ -46,6 +73,8 @@ export class FormGroupsRequestDto {
   @IsOptional()
   @IsInt()
   @Min(2)
+  @Max(MAX_TARGET_SIZE)
+  @Validate(MinSizeNotAboveTargetSize)
   minSize?: number;
 
   /** Optional seed so a re-run reproduces the same groups. */

@@ -73,6 +73,8 @@ interface Graph {
   adjacency: Map<string, Set<string>>;
   /** Unordered "a b" (a < b) keys of mutual pairs. */
   mutualPairs: Set<string>;
+  /** person -> the peers they form a mutual pair with (both directions stored). */
+  mutualAdjacency: Map<string, Set<string>>;
 }
 
 function pairKey(a: string, b: string): string {
@@ -95,13 +97,18 @@ function buildGraph(participantIds: string[], picks: Record<string, string[]>): 
   }
 
   const mutualPairs = new Set<string>();
+  const mutualAdjacency = new Map<string, Set<string>>();
+  for (const id of participantIds) mutualAdjacency.set(id, new Set());
   for (const [picker, peers] of adjacency) {
     for (const peer of peers) {
-      if (adjacency.get(peer)?.has(picker)) mutualPairs.add(pairKey(picker, peer));
+      if (adjacency.get(peer)?.has(picker)) {
+        mutualPairs.add(pairKey(picker, peer));
+        mutualAdjacency.get(picker)!.add(peer);
+      }
     }
   }
 
-  return { adjacency, mutualPairs };
+  return { adjacency, mutualPairs, mutualAdjacency };
 }
 
 /**
@@ -187,7 +194,17 @@ function connectionGain(person: string, members: string[], graph: Graph): number
   return gain;
 }
 
-/** Total satisfaction of an assignment: same-group edges + mutual bonuses. */
+/**
+ * Total satisfaction of an assignment: same-group edges + mutual bonuses.
+ *
+ * The mutual bonus is summed from each group's OWN in-group mutual pairs
+ * (via the per-person mutual adjacency), not by scanning the whole room's
+ * pair set for every group — a pair split across groups contributes nothing,
+ * so scanning it was both wasteful and pointless. Each in-group pair is
+ * counted once, from its lexicographically smaller endpoint. The score is
+ * identical to a global scan; only the cost drops from O(groups · all_pairs)
+ * to O(members + in-group mutual degree).
+ */
 function totalSatisfaction(groups: string[][], graph: Graph): number {
   let score = 0;
   for (const members of groups) {
@@ -196,10 +213,9 @@ function totalSatisfaction(groups: string[][], graph: Graph): number {
       for (const peer of graph.adjacency.get(person) ?? []) {
         if (inGroup.has(peer)) score += 1;
       }
-    }
-    for (const key of graph.mutualPairs) {
-      const [a, b] = key.split(' ');
-      if (inGroup.has(a) && inGroup.has(b)) score += MUTUAL_BONUS;
+      for (const partner of graph.mutualAdjacency.get(person) ?? []) {
+        if (person < partner && inGroup.has(partner)) score += MUTUAL_BONUS;
+      }
     }
   }
   return score;

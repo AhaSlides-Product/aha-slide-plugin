@@ -50,7 +50,15 @@ export function usePresenterGrouping(ctx: PresenterContext) {
   const totalCount = computed(() => roster.value.length);
 
   const submittedIds = ref<Set<string>>(new Set());
-  const submittedCount = computed(() => submittedIds.value.size);
+  // Count only submitters still in the roster: a participant who submits and
+  // then leaves stays in submittedIds while totalCount shrinks, which would
+  // otherwise render a tally of N / M with N > M.
+  const submittedCount = computed(() => {
+    const rosterIds = new Set(roster.value.map((p) => p.id));
+    let count = 0;
+    for (const id of submittedIds.value) if (rosterIds.has(id)) count++;
+    return count;
+  });
 
   const forming = ref(false);
   const error = ref<string | null>(null);
@@ -163,6 +171,10 @@ export function usePresenterGrouping(ctx: PresenterContext) {
           picks,
           targetSize: ctx.targetSize.value,
           minSize: MIN_GROUP_SIZE,
+          // A re-form (already revealed) must reshuffle, so send a fresh random
+          // seed; the first form omits it so the backend's roster-derived
+          // default keeps that run reproducible.
+          seed: revealed.value ? Math.floor(Math.random() * 2 ** 31) : undefined,
         }),
       });
       const formed: Group[] = response?.groups ?? [];
