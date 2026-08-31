@@ -25,6 +25,3 @@ export const ATTR_REVEALED = 'revealed';
 export const syncKey = {
   targetSize: (slideId: string | number) => `pg-target-size-${slideId}`,
 };
-
-/** Broadcast key for the synced reveal across presenter/casting screens. */
-export const BROADCAST_REVEAL = 'pg-reveal-groups';

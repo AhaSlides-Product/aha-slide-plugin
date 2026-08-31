@@ -1,18 +1,25 @@
 {
-  "type": "preferenceGrouping",
+  "$schema": "https://plugins.ahaslides.com/schema/plugin-manifest.schema.json",
+  "id": "preference-grouping",
   "name": "Preference-based Grouping",
-  "description": "Everyone privately picks up to 3 peers; AhaSlides auto-forms balanced groups that maximise satisfied picks, prioritising mutual choices. Individual picks stay private — only the final groups are shown.",
-  "tagline": "Everyone chooses. AhaSlides does the grouping.",
-  "routes": {
-    "canvasUrl": "/preferenceGrouping/canvas/{slideId}",
-    "settingUrl": "/preferenceGrouping/settings/{slideId}",
-    "audienceUrl": "/preferenceGrouping/audience/{slideId}"
-  },
-  "setting": {
-    "enableFullScreen": false,
-    "enableQuestionTitle": true,
-    "enableTimeLimit": true,
-    "enableStopSubmitssionSetting": true
-  },
-  "notes": "V1 descriptor. Real host-side registration (wiring these URLs + flags into the presenter/audience apps and the marketplace listing) is a follow-up — see the PR body."
+  "baseUrl": "{{VITE_PUBLIC_BASE_URL}}",
+  "staticTabs": [
+    { "contentUrl": "/", "context": "editor", "name": "Preference-based Grouping" }
+  ],
+  "slideTypes": [
+    {
+      "type": "preferenceGrouping",
+      "name": "Preference-based Grouping",
+      "desc": "Everyone privately picks up to 3 peers; AhaSlides auto-forms balanced groups that maximise satisfied picks, prioritising mutual choices. Individual picks stay private — only the final groups are shown.",
+      "canvasUrl": "/preferenceGrouping/canvas/{slideId}",
+      "settingUrl": "/preferenceGrouping/settings/{slideId}",
+      "audienceUrl": "/preferenceGrouping/audience/{slideId}",
+      "setting": {
+        "enableFullScreen": false,
+        "enableQuestionTitle": true,
+        "enableTimeLimit": true,
+        "enableStopSubmitssionSetting": true
+      }
+    }
+  ]
 }

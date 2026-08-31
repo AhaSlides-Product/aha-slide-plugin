@@ -187,10 +187,10 @@ function peerStyle(id: string): Record<string, string> {
   if (isSelected(id)) {
     return {
       borderColor: 'var(--pg-text)',
-      background: `color-mix(in srgb, ${accent.value} 8%, #FFFFFF)`,
+      background: `color-mix(in srgb, ${accent.value} 8%, var(--aha-colorBgContainer))`,
     };
   }
-  return { borderColor: 'var(--pg-border)', background: '#FFFFFF' };
+  return { borderColor: 'var(--pg-border)', background: 'var(--aha-colorBgContainer)' };
 }
 
 const submitStyle = computed(() => {
@@ -232,7 +232,7 @@ onMounted(() => {
   max-width: 840px;
   margin: 0 auto;
   padding: 16px;
-  background: #ffffff;
+  background: var(--aha-colorBgLayout);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -278,7 +278,7 @@ onMounted(() => {
   padding: 0 12px;
   font-size: 16px;
   color: var(--pg-text);
-  background: #ffffff;
+  background: var(--aha-colorBgContainer);
   border: 1px solid var(--pg-border);
   border-radius: 8px;
   outline: none;

@@ -3,7 +3,6 @@
   "Everyone chooses. AhaSlides does the grouping.": "Everyone chooses. AhaSlides does the grouping.",
   "Search people": "Search people",
   "{selected} of {limit} selected": "{selected} of {limit} selected",
-  "You can pick up to {limit}": "You can pick up to {limit}",
   "No one else has joined yet": "No one else has joined yet",
   "People will appear here as they join.": "People will appear here as they join.",
   "Submit": "Submit",
@@ -11,7 +10,6 @@
   "You're all set": "You're all set",
   "Your picks are in — sit tight while the groups are formed.": "Your picks are in — sit tight while the groups are formed.",
   "Edit picks": "Edit picks",
-  "Waiting for the groups to be formed…": "Waiting for the groups to be formed…",
   "You're in {group}": "You're in {group}",
   "with {names}": "with {names}",
   "You're flying solo for this round.": "You're flying solo for this round.",
@@ -26,7 +24,6 @@
   "Groups are ready": "Groups are ready",
   "Could not form groups. Please try again.": "Could not form groups. Please try again.",
   "Group size": "Group size",
-  "Ideal number of people per group": "Ideal number of people per group",
   "Groups are formed to this size where the headcount allows.": "Groups are formed to this size where the headcount allows.",
   "people per group": "people per group"
 }

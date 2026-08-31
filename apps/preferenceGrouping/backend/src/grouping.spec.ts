@@ -125,6 +125,20 @@ describe('Preference Grouping > formGroups', () => {
     }
   });
 
+  it('Verify that the repair pass rescues a one-way picker the greedy pass strands', () => {
+    // One-way picks only. Greedy fills p3's group and strands p1, whose sole pick
+    // (p3) then sits in another, full group. Only the giveUnluckyPickersOne repair
+    // pass can swap p1 in to give it its one satisfiable pick.
+    const participantIds = roster(6);
+    const picks: Record<string, string[]> = {
+      p1: ['p3'],
+      p5: ['p1'],
+      p6: ['p3'],
+    };
+    const { groups } = formGroups({ participantIds, picks, targetSize: 3 });
+    expect(satisfied(groups, 'p1', picks.p1)).toBeGreaterThanOrEqual(1);
+  });
+
   it('Verify that the same input and seed reproduce identical groups', () => {
     const input: FormGroupsInput = {
       participantIds: roster(13),
@@ -213,11 +227,21 @@ describe('Preference Grouping > formGroups', () => {
   });
 
   it('Verify that mutual pairs are prioritised over one-way picks', () => {
-    // p1<->p2 mutual; p3->p1 one-way. The mutual pair must be honoured.
+    // Contended: with groups of 3, satisfying the four one-way picks (p3, p4 -> p1
+    // and p5, p6 -> p2) would force the mutual pair p1<->p2 into separate groups.
+    // Splitting satisfies more one-way edges, so this test fails if mutual picks
+    // are not weighted above one-way picks; the pair must stay together.
     const participantIds = roster(6);
     const { groups } = formGroups({
       participantIds,
-      picks: { p1: ['p2'], p2: ['p1'], p3: ['p1'] },
+      picks: {
+        p1: ['p2'],
+        p2: ['p1'],
+        p3: ['p1'],
+        p4: ['p1'],
+        p5: ['p2'],
+        p6: ['p2'],
+      },
       targetSize: 3,
     });
     expect(groupOf(groups, 'p1')).toBe(groupOf(groups, 'p2'));
