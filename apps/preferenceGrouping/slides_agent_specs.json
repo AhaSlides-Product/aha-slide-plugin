@@ -1,0 +1,12 @@
+{
+  "name": "create_preference_grouping_slide",
+  "description": "Creates a Preference-based Grouping slide where everyone privately picks up to 3 peers they'd like to team up with and AhaSlides auto-forms balanced groups. Only the final groups are shown; individual picks stay private.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string" },
+      "targetSize": { "type": "integer", "description": "Ideal number of people per group (default 4)." }
+    },
+    "required": ["title"]
+  }
+}

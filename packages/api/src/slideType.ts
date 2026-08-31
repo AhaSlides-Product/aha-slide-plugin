@@ -4,6 +4,7 @@
  */
 export enum SlideType {
   IdeaBoard = 'ideaBoard',
+  PreferenceGrouping = 'preferenceGrouping',
   Markdown = 'markdown',
   PinOnImage = 'pinOnImage',
   Ranking = 'ranking',
