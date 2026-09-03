@@ -99,6 +99,15 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
    */
   getSlideAttributesAction?: (slideId?: string | number) => Promise<any>;
   /**
+   * Ask the host to run an AI call that generates candidate answers for a question.
+   * The host owns the model/credentials; the plugin passes the question text and
+   * receives the generated answer strings.
+   *
+   * @param question - The question to generate answers for.
+   * @returns A promise resolving to the generated answer strings.
+   */
+  generateAnswers?: (question: string) => Promise<string[]>;
+  /**
    * Action to create or update a specific attribute for the current slide in the parent application.
    *
    * @param payload - The attribute data to sync.
@@ -305,6 +314,10 @@ export const presenterZoidProps = {
     required: false,
   },
   upsertSlideAttributeAction: {
+    type: 'function',
+    required: false,
+  },
+  generateAnswers: {
     type: 'function',
     required: false,
   },

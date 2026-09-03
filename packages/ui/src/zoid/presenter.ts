@@ -32,6 +32,11 @@ export const PresenterSlidePluginIframe = initZoidForPresenter();
 export type PresenterPluginReturn = BaseSlidePluginReturn & {
   getSlideAttributesAction: (slideId?: string | number) => Promise<any>;
   upsertSlideAttributeAction: ((payload: { slideId?: string | number, attributeKey: string; attributeValue: any; }) => Promise<any>) | undefined;
+  /**
+   * Ask the host to run an AI call that generates candidate answers for a question.
+   * The host owns the model/credentials.
+   */
+  generateAnswers: ((question: string) => Promise<string[]>) | undefined;
   onKeyboard: ((callback: (event: PluginKeyboardEvent) => void) => void) | undefined;
   emitKeyboardEvent: ((event: PluginKeyboardEvent) => void) | undefined;
   /**
@@ -198,6 +203,7 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     getValues: baseHook.getValues,
     getSlideAttributesAction,
     upsertSlideAttributeAction,
+    generateAnswers: xprops?.generateAnswers,
     uploadImage,
     onKeyboard,
     emitKeyboardEvent,
