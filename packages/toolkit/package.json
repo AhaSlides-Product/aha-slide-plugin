@@ -18,7 +18,8 @@
     "build": "mkdir -p dist/schema && cp schema/*.json dist/schema/ && cp src/*.js dist/ && chmod +x dist/generateSampleManifest.js dist/buildManifest.js",
     "clean": "rm -rf dist samples",
     "generate-sample": "node src/generateSampleManifest.js",
-    "build-manifest": "node src/buildManifest.js"
+    "build-manifest": "node src/buildManifest.js",
+    "test": "node --test schema/__tests__/*.test.mjs"
   },
   "dependencies": {
     "ajv": "8.17.1"
