@@ -3,6 +3,13 @@
   "generatedAt": null,
   "component": "Button",
   "summary": "Interactive control that triggers an action. The single source of truth for Button across every framework tier.",
+  "primitive": {
+    "tag": "aha-button",
+    "package": "lit",
+    "wrapsNative": false,
+    "tier": "primitive",
+    "note": "The primitive tier (architecture 2a): a framework-agnostic Lit custom element themed by @aha/design and imported unchanged by React and Vue. It wraps no native component — it IS the primitive the antd wrappers otherwise re-implement per framework, so two per-framework tiers can never drift. The antd `wraps` above are the composite/legacy path."
+  },
   "frameworks": {
     "react": {
       "package": "antd",

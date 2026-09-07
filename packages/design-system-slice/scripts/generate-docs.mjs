@@ -34,7 +34,10 @@ function generateMarkdown() {
   lines.push(`# ${contract.component}`, '');
   lines.push('> Generated from `button.contract.json` — do not edit by hand. Run `npm run generate` to refresh.', '');
   lines.push(contract.summary, '');
-  lines.push(`Wraps: React \`${contract.wraps.react.package}@${contract.wraps.react.major}\` · Vue \`${contract.wraps.vue.package}@${contract.wraps.vue.major}\`.`, '');
+  if (contract.webComponent) {
+    lines.push(`Primitive: \`<${contract.webComponent.tag}>\` (\`${contract.webComponent.package}\`) — one framework-agnostic element imported unchanged by React and Vue.`, '');
+  }
+  lines.push(`Composite/legacy wrappers: React \`${contract.wraps.react.package}@${contract.wraps.react.major}\` · Vue \`${contract.wraps.vue.package}@${contract.wraps.vue.major}\`.`, '');
   lines.push('## Props', '');
   lines.push('| Prop | Type | Values | Default | Description |');
   lines.push('| --- | --- | --- | --- | --- |');
@@ -57,7 +60,10 @@ function generateLlmsFragment() {
   const lines = [];
   lines.push(`## ${contract.component}`);
   lines.push(contract.summary);
-  lines.push(`Frameworks: React (${contract.wraps.react.package}@${contract.wraps.react.major}), Vue (${contract.wraps.vue.package}@${contract.wraps.vue.major}).`);
+  if (contract.webComponent) {
+    lines.push(`Primitive element: <${contract.webComponent.tag}> (${contract.webComponent.package}) — framework-agnostic, imported unchanged by React and Vue.`);
+  }
+  lines.push(`Composite/legacy wrappers: React (${contract.wraps.react.package}@${contract.wraps.react.major}), Vue (${contract.wraps.vue.package}@${contract.wraps.vue.major}).`);
   lines.push('Props:');
   for (const [name, def] of propRows) {
     const vals = def.type === 'enum' ? ` one of [${def.values.join(', ')}]` : def.type === 'boolean' ? ' boolean' : ' node/slot';
@@ -74,6 +80,7 @@ function generateAgentJson() {
       generatedAt: null,
       component: contract.component,
       summary: contract.summary,
+      primitive: contract.webComponent ?? null,
       frameworks: contract.wraps,
       props: contract.props,
       resolvedTokens,

@@ -7,6 +7,13 @@
     "react": { "package": "antd", "major": 6, "component": "Button" },
     "vue": { "package": "ant-design-vue", "major": 4, "component": "Button" }
   },
+  "webComponent": {
+    "tag": "aha-button",
+    "package": "lit",
+    "wrapsNative": false,
+    "tier": "primitive",
+    "note": "The primitive tier (architecture 2a): a framework-agnostic Lit custom element themed by @aha/design and imported unchanged by React and Vue. It wraps no native component — it IS the primitive the antd wrappers otherwise re-implement per framework, so two per-framework tiers can never drift. The antd `wraps` above are the composite/legacy path."
+  },
   "props": {
     "variant": {
       "type": "enum",

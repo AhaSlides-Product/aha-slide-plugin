@@ -27,12 +27,21 @@ export interface SlotProp {
 
 export type ContractProp = EnumProp | BooleanProp | SlotProp;
 
+export interface WebComponentBinding {
+  tag: string;
+  package: string;
+  wrapsNative: boolean;
+  tier: string;
+  note: string;
+}
+
 export interface ButtonContract {
   $schemaVersion: string;
   component: string;
   summary: string;
   sourceOfTruth: string;
   wraps: Record<string, { package: string; major: number; component: string }>;
+  webComponent: WebComponentBinding;
   props: Record<string, ContractProp>;
   tokenBindings: { note: string; source: string; consumes: string[] };
 }

@@ -11,6 +11,37 @@ source of truth is a shared **contract + tokens**, and each framework's Button i
 **projection** of that contract — an Ant Design wrapper themed by `@aha/design` tokens and validated
 back against the same contract.
 
+## 2a: primitives are Lit web components
+
+The permanent architecture (Brian's pick, **2a**) is that a shared design-system **primitive**
+is one framework-agnostic **Web Component**, not a pair of per-framework wrappers. antd is
+React-only, so an antd primitive forces a second, separately-maintained Vue wrapper — and two
+wrappers of one primitive can always drift. Instead the primitive is a single compiled element,
+themed by `@aha/design` tokens, that **every** repo imports unchanged whatever its framework.
+
+Button proves it. `src/web-components/aha-button.ts` is a Lit `LitElement` registered as
+`<aha-button>`. It honours the *same* `button.contract.json` vocabulary (`variant`/`size`/`state`/
+`danger`/`block`, an `icon` slot, a default label slot, a click event), reflected to attributes and
+styled entirely from `@aha/design` token **values** — no hardcoded hex or px for a themable value,
+so one `@aha/design` change re-themes it. The `state` enum reuses the contract's own
+`disabled`/`loading` expansion, so the element cannot drift from the source of truth.
+
+The identical element is imported by both frameworks — no wrapper per framework:
+
+- `src/web-components/react-consumer.tsx` — registers the element and uses
+  `<aha-button variant="primary">…</aha-button>` in JSX (with the intrinsic-element typing React
+  needs).
+- `src/web-components/vue-consumer.vue` — the same `<aha-button variant="primary">…` in a Vue SFC.
+
+`test/webcomponent.conformance.test.ts` reads `button.contract.json` and asserts `<aha-button>`
+honours every attribute, the state expansion, the slots, the click behaviour, and that the
+`@aha/design` token values are actually applied.
+
+The **antd** React and Vue wrappers (`src/react/Button.tsx`, `src/vue/Button.vue`) remain as the
+**composite / legacy** path for cases still built on Ant Design; the contract stays the single
+source of truth for both paths. The generated agent feed (`generated/`) now advertises
+`<aha-button>` as the primitive tier.
+
 ## The pipeline
 
 ```

@@ -4,7 +4,9 @@
 
 Interactive control that triggers an action. The single source of truth for Button across every framework tier.
 
-Wraps: React `antd@6` · Vue `ant-design-vue@4`.
+Primitive: `<aha-button>` (`lit`) — one framework-agnostic element imported unchanged by React and Vue.
+
+Composite/legacy wrappers: React `antd@6` · Vue `ant-design-vue@4`.
 
 ## Props
 
