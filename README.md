@@ -84,7 +84,7 @@ To start the sample slide frontend in development mode:
 npm run dev -w @aha/sample-slide-frontend
 ```
 
-This will launch the Vite development server. You can go to https://presenter.sandbox.ahaslide.com/ and add a sample slide to see the result.
+This will launch the Vite development server. You can go to https://presenter.dev.ahaslide.com/ and add a sample slide to see the result.
 
 You can also start the sample slide from a different package:
 ```bash
@@ -117,9 +117,9 @@ curl https://plugins.dev.ahaslide.com/api/plugins/sample-slide/external/example
 
 #### Local development
 
-For local development, please use Ahaslides' sandbox environment at `https://presenter.sandbox.ahaslide.com`. The environment is pre-configured with `localhost:5173` for slide types `ranking`, `pin on image` and `ideas board`.
+For local development, please use AhaSlides' staging environment at `https://presenter.dev.ahaslide.com`. The environment is pre-configured with `localhost:5173` for slide types `ranking`, `pin on image` and `ideas board`.
 
 #### Staging
 
-Plugins are deployed at `plugins.dev.ahaslide.com` and can be tested with `https://presenter.dev.ahaslides.com`
+Plugins are deployed at `plugins.dev.ahaslide.com` and can be tested with `https://presenter.dev.ahaslide.com`
 
