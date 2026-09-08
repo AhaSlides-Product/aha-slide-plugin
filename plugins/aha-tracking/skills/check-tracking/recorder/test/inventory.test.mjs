@@ -110,3 +110,58 @@ test('a selector still resolves after the element is destroyed and rebuilt', { s
   assert.equal(result, 'clicked');
   assert.equal(await page.evaluate(() => window.__rowClicked), true);
 });
+
+// --- PR #125 review findings ------------------------------------------------
+
+test('nth addresses the visible element, not a hidden namesake', { skip: !chromePath, timeout: 60_000 }, async () => {
+  // A hidden element sharing a data-testid, EARLIER in document order. If
+  // resolve() indexed the unfiltered node set, nth=0 would address the hidden
+  // one while the inventory called it the visible one — silently attributing
+  // the visible element's verdict to a click that never touched it.
+  await page.goto(
+    'data:text/html,' +
+      encodeURIComponent(
+        '<div style="display:none"><button data-testid="dup">HIDDEN</button></div>' +
+          '<button data-testid="dup">VISIBLE</button>',
+      ),
+  );
+
+  const inv = await page.evaluate(() => window.__ahaInventory());
+  const dup = inv.filter((e) => e.selector.includes('dup'));
+  assert.equal(dup.length, 1, 'only the visible one is enumerated');
+  assert.equal(dup[0].text, 'VISIBLE');
+  assert.equal(dup[0].nth, 0);
+
+  const hit = await page.evaluate(() => {
+    window.__hit = null;
+    document
+      .querySelectorAll('[data-testid=dup]')
+      .forEach((el) => el.addEventListener('click', () => { window.__hit = el.textContent; }));
+    window.__ahaClickBySelector('[data-testid="dup"]', 0);
+    return window.__hit;
+  });
+  assert.equal(hit, 'VISIBLE', 'nth must resolve against the same visible set the inventory used');
+});
+
+test('a manually clicked element carries selector and nth', { skip: !chromePath, timeout: 60_000 }, async () => {
+  // SKILL.md Step 2 matches pairs to inventory entries on selector+nth. An
+  // action record lacking them can never be matched, so a button the tester
+  // clicked by hand would be reported as never exercised.
+  const records = [];
+  const context = await browser.newContext();
+  await context.exposeBinding('__ahaTrackSink', (_s, json) => records.push(JSON.parse(json)));
+  await context.addInitScript({ path: INPAGE });
+  const p2 = await context.newPage();
+  await p2.goto(
+    'data:text/html,' +
+      encodeURIComponent('<button id="m" data-testid="manual-btn">Manual</button>'),
+  );
+  await p2.click('#m');
+  await p2.waitForTimeout(200);
+  await context.close();
+
+  const action = records.filter((r) => r.kind === 'action').pop();
+  assert.ok(action, 'the manual click must be recorded');
+  assert.equal(action.el.selector, '[data-testid="manual-btn"]');
+  assert.equal(action.el.nth, 0);
+});

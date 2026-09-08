@@ -88,7 +88,47 @@ test('an aria-label alone is enough to be judged', () => {
   assert.equal(r.class, 'last');
 });
 
-test('a mailto link is treated as leaving the app', () => {
-  const r = classify(el({ tag: 'a', text: 'Contact', href: 'mailto:qa@example.com' }), generic);
+
+// --- PR #125 review findings ------------------------------------------------
+
+test('common English labels are not swallowed by short foreign keywords', () => {
+  // "gui" (Vietnamese "gửi") and "pay" are substrings of ordinary words. A
+  // false `external` hit means the element is skipped and reported unchecked.
+  for (const text of ['Guide', 'Guidelines', 'Guided tour', 'Repay later', 'Company']) {
+    assert.equal(classify(el({ text }), generic).class, 'safe', `"${text}" must stay safe`);
+  }
+});
+
+test('whole-word keywords still match what they should', () => {
+  assert.equal(classify(el({ text: 'Send' }), generic).class, 'external');
+  assert.equal(classify(el({ text: 'Upgrade plan' }), generic).class, 'external');
+  assert.equal(classify(el({ text: 'Gửi lời mời' }), generic).class, 'external');
+});
+
+test('folded Vietnamese phrases survive word splitting', () => {
+  // "Thanh toán" folds to `thanhtoan`, which is not a word in the split label.
+  assert.equal(classify(el({ text: 'Thanh toán' }), generic).class, 'external');
+  assert.equal(classify(el({ text: 'Lưu trữ' }), generic).class, 'last');
+  assert.equal(classify(el({ text: 'Đặt lại' }), generic).class, 'last');
+});
+
+test('kebab-case testids still match, and guide-btn does not', () => {
+  assert.equal(classify(el({ text: 'OK', testId: 'csat-send-btn' }), generic).class, 'external');
+  assert.equal(classify(el({ text: 'OK', testId: 'creation-upgrade-cta' }), generic).class, 'external');
+  assert.equal(classify(el({ text: 'OK', testId: 'canvas-image-delete-btn' }), generic).class, 'last');
+  assert.equal(classify(el({ text: 'OK', testId: 'guide-btn' }), generic).class, 'safe');
+});
+
+test('mailto and tel are external, not last', () => {
+  // `last` is clicked unconditionally; these hand off to an OS app, so they
+  // belong behind --allow-external.
+  for (const href of ['mailto:qa@example.com', 'tel:+84123', 'sms:+84123']) {
+    const r = classify(el({ tag: 'a', text: 'Contact', href }), generic, 'https://app.example');
+    assert.equal(r.class, 'external', `${href} must be gated`);
+  }
+});
+
+test('an off-site http link stays in last — navigation is recoverable', () => {
+  const r = classify(el({ tag: 'a', text: 'Docs', href: 'https://other.example/d' }), generic, 'https://app.example');
   assert.equal(r.class, 'last');
 });

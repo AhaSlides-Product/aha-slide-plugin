@@ -157,7 +157,14 @@
   function describe(el) {
     if (!el || el.nodeType !== 1) return null;
     const rect = el.getBoundingClientRect();
+    const selector = selectorFor(el);
     return {
+      // selector + nth make EVERY action record addressable, not just the ones
+      // the sweep produced. The skill matches pairs to inventory entries on
+      // these two fields, so a manually clicked element without them would be
+      // reported as never clicked.
+      selector,
+      nth: visibleMatches(selector).indexOf(el),
       tag: el.tagName.toLowerCase(),
       text: (el.innerText ?? el.textContent ?? '').trim().slice(0, MAX_TEXT) || null,
       testId: el.getAttribute('data-testid'),
@@ -201,24 +208,39 @@
     '[role=link]',
   ].join(',');
 
+  // The one visibility predicate. Every place that enumerates or re-resolves
+  // elements MUST use it: `nth` is an index into the set this produces, so if
+  // two call sites disagree about what is visible, `nth` addresses a different
+  // element in each and the sweep clicks the wrong node.
+  //
+  // getClientRects() is empty when the element OR ANY ANCESTOR is display:none.
+  // getComputedStyle(el).display would not be: a button inside a display:none
+  // menu still computes its own `inline-block`.
+  function isVisible(el) {
+    if (el.getClientRects().length === 0) return false;
+    // visibility IS inherited, so the element's own computed value already
+    // reflects a hidden ancestor.
+    return getComputedStyle(el).visibility !== 'hidden';
+  }
+
   function collect() {
-    return [...document.querySelectorAll(INTERACTIVE)].filter((el) => {
-      // getClientRects() is empty when the element OR ANY ANCESTOR is
-      // display:none. Checking getComputedStyle(el).display would not: a
-      // button inside a `display:none` menu still computes its own
-      // `inline-block`, so closed dropdowns would leak into the depth-0
-      // inventory and the recursive expansion would never fire.
-      if (el.getClientRects().length === 0) return false;
-      // visibility IS inherited, so the element's own computed value already
-      // reflects a hidden ancestor.
-      return getComputedStyle(el).visibility !== 'hidden';
-    });
+    return [...document.querySelectorAll(INTERACTIVE)].filter(isVisible);
+  }
+
+  // Visible elements matching `selector`, in document order — the set `nth`
+  // indexes into.
+  function visibleMatches(selector) {
+    try {
+      return [...document.querySelectorAll(selector)].filter(isVisible);
+    } catch {
+      return [];
+    }
   }
 
   // A selector that can be re-resolved later. A data-testid is stable across
-  // re-renders; the structural path is the fallback. Indices are NOT used:
-  // the sweep re-enumerates after every recovery, so any cached index goes
-  // stale the first time the DOM changes.
+  // re-renders; the structural path is the fallback. Indices into a cached
+  // array are NOT used: the sweep re-enumerates after every recovery, so any
+  // cached index goes stale the first time the DOM changes.
   function selectorFor(el) {
     const testId = el.getAttribute('data-testid');
     if (testId) return `[data-testid="${CSS.escape(testId)}"]`;
@@ -226,31 +248,16 @@
   }
 
   function resolve(selector, nth) {
-    let matches;
-    try {
-      matches = [...document.querySelectorAll(selector)];
-    } catch {
-      return null;
-    }
-    return matches[nth] ?? null;
+    return visibleMatches(selector)[nth] ?? null;
   }
 
-  window.__ahaInventory = () => {
-    const seen = new Map();
-    return collect().map((el, index) => {
-      const selector = selectorFor(el);
-      const nth = seen.get(selector) ?? 0;
-      seen.set(selector, nth + 1);
-      return {
-        index,
-        selector,
-        nth,
-        expandable:
-          el.getAttribute('aria-expanded') === 'false' || el.getAttribute('aria-haspopup') != null,
-        ...describe(el),
-      };
-    });
-  };
+  window.__ahaInventory = () =>
+    collect().map((el, index) => ({
+      index,
+      expandable:
+        el.getAttribute('aria-expanded') === 'false' || el.getAttribute('aria-haspopup') != null,
+      ...describe(el), // supplies selector + nth, both computed over isVisible
+    }));
 
   // Returns 'gone' when the element has detached since enumeration — the sweep
   // marks those ⚠️ rather than guessing.
