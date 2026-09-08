@@ -7,6 +7,7 @@ import { resolveChromePath } from '../chrome.mjs';
 import { loadProfile } from '../classify.mjs';
 import { createSession } from '../session.mjs';
 import { sweepScreen } from '../sweep.mjs';
+import { pairSession } from '../pair.mjs';
 import { startServer } from './helpers/server.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -89,10 +90,27 @@ test('a collapsed menu is expanded and its contents swept', { skip: !chromePath,
   assert.equal(duplicate.depth, 1, 'the revealed element belongs to the nested level');
 });
 
-test('every swept element is recorded as an auto-origin action', { skip: !chromePath, timeout: 120_000 }, async () => {
+test('every swept element is recorded exactly once', { skip: !chromePath, timeout: 120_000 }, async () => {
   const { counts, session } = await runSweep();
-  const actions = session.toJSON().timeline.filter((e) => e.kind === 'action' && e.origin === 'auto');
-  assert.equal(actions.length, counts.swept);
+  const actions = session.toJSON().timeline.filter((e) => e.kind === 'action');
+
+  // Counting only origin:'auto' hid a real bug: el.click() also fired the
+  // in-page listener, so each swept element produced a second entry labelled
+  // 'manual'. Assert the TOTAL, which is what pair.mjs and the report see.
+  assert.equal(
+    actions.length,
+    counts.swept,
+    `expected ${counts.swept} action entries, got ${actions.length} ` +
+      `(auto=${actions.filter((a) => a.origin === 'auto').length}, ` +
+      `manual=${actions.filter((a) => a.origin === 'manual').length}) — duplicates double the report`,
+  );
+  assert.equal(actions.every((a) => a.origin === 'auto'), true);
+});
+
+test('a swept element yields one pair, not a phantom no-event twin', { skip: !chromePath, timeout: 120_000 }, async () => {
+  const { counts, session } = await runSweep();
+  const { checks } = pairSession(session.toJSON());
+  assert.equal(checks.totalActions, counts.swept);
 });
 
 test('the three buckets sum to the inventory total', { skip: !chromePath, timeout: 120_000 }, async () => {

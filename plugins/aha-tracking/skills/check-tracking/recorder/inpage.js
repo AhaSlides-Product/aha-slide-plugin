@@ -187,9 +187,21 @@
   const action = (type, el) => send({ kind: 'action', type, el: describe(el), t: Date.now() });
 
   // Capture phase so the record exists even if the app stops propagation.
-  document.addEventListener('click', (e) => action('click', e.target), true);
-  document.addEventListener('change', (e) => action('change', e.target), true);
-  document.addEventListener('submit', (e) => action('submit', e.target), true);
+  //
+  // `isTrusted` gates out synthetic events. The sweep clicks via el.click(),
+  // which fires this listener with isTrusted=false; sweep.mjs already records
+  // that click as origin:'auto'. Without the gate every swept element lands in
+  // the timeline TWICE — once here as 'manual', once there as 'auto' — which
+  // doubles totalActions and splits attribution, so the real event pairs with
+  // one copy and the other becomes a phantom "no-event" ❌.
+  const userAction = (type) => (e) => {
+    if (!e.isTrusted) return;
+    action(type, e.target);
+  };
+
+  document.addEventListener('click', userAction('click'), true);
+  document.addEventListener('change', userAction('change'), true);
+  document.addEventListener('submit', userAction('submit'), true);
 
   // === screen inventory ====================================================
   const INTERACTIVE = [
