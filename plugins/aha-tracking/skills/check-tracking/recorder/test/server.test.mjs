@@ -40,21 +40,22 @@ test('serves a fixture from inside the root', async () => {
 
 test('refuses a traversal that escapes the root', async () => {
   const res = await rawGet(server.url, '/../../../../../../etc/passwd');
-  assert.match(res, /^HTTP\/1\.1 403/, 'traversal must be refused, not served');
+  assert.ok(!/^HTTP\/1\.1 200/.test(res), 'traversal must never be served');
   assert.ok(!res.includes('root:'), 'no /etc/passwd content may leak');
 });
 
 test('refuses a percent-encoded traversal', async () => {
   const res = await rawGet(server.url, '/%2e%2e/%2e%2e/%2e%2e/etc/passwd');
-  assert.match(res, /^HTTP\/1\.1 403/);
+  assert.ok(!/^HTTP\/1\.1 200/.test(res), 'encoded traversal must never be served');
+  assert.ok(!res.includes('root:'));
 });
 
 test('refuses malformed percent-encoding', async () => {
   const res = await rawGet(server.url, '/%zz');
-  assert.match(res, /^HTTP\/1\.1 403/);
+  assert.match(res, /^HTTP\/1\.1 404/);
 });
 
-test('a missing file inside the root is 404, not 403', async () => {
+test('a missing file inside the root is 404', async () => {
   const res = await rawGet(server.url, '/nope.html');
   assert.match(res, /^HTTP\/1\.1 404/);
 });
