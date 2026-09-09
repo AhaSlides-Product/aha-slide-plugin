@@ -1,0 +1,83 @@
+{
+  "$schemaVersion": "1.0.0",
+  "component": "Button",
+  "summary": "Interactive control that triggers an action. The single source of truth for Button across every framework tier.",
+  "sourceOfTruth": "This file. Framework wrappers and generated docs are projections of it; any divergence is a failing conformance test, never a silent drift.",
+  "wraps": {
+    "react": { "package": "antd", "major": 6, "component": "Button" },
+    "vue": { "package": "ant-design-vue", "major": 4, "component": "Button" }
+  },
+  "webComponent": {
+    "tag": "aha-button",
+    "package": "lit",
+    "wrapsNative": false,
+    "tier": "primitive",
+    "note": "The primitive tier (architecture 2a): a framework-agnostic Lit custom element themed by @aha/design and imported unchanged by React and Vue. It wraps no native component — it IS the primitive the antd wrappers otherwise re-implement per framework, so two per-framework tiers can never drift. The antd `wraps` above are the composite/legacy path."
+  },
+  "props": {
+    "variant": {
+      "type": "enum",
+      "values": ["primary", "default", "dashed", "text", "link"],
+      "default": "default",
+      "description": "Visual emphasis of the button.",
+      "projectsTo": { "antdProp": "type", "identityMap": true },
+      "tokens": ["colorPrimary"]
+    },
+    "size": {
+      "type": "enum",
+      "values": ["small", "middle", "large"],
+      "default": "middle",
+      "description": "Control height and padding.",
+      "projectsTo": { "antdProp": "size", "identityMap": true },
+      "tokens": ["fontSize", "borderRadius"]
+    },
+    "state": {
+      "type": "enum",
+      "values": ["default", "disabled", "loading"],
+      "default": "default",
+      "description": "Interaction state. Projects to the boolean antd props `disabled` and `loading`.",
+      "projectsTo": {
+        "expand": {
+          "default": { "disabled": false, "loading": false },
+          "disabled": { "disabled": true, "loading": false },
+          "loading": { "disabled": false, "loading": true }
+        }
+      },
+      "tokens": ["colorTextDisabled", "colorBgFillDisabled"]
+    },
+    "danger": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marks a destructive action.",
+      "projectsTo": { "antdProp": "danger", "identityMap": true },
+      "tokens": ["colorError"]
+    },
+    "block": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stretches the button to the full width of its container.",
+      "projectsTo": { "antdProp": "block", "identityMap": true },
+      "tokens": []
+    },
+    "icon": {
+      "type": "slot",
+      "default": null,
+      "description": "Optional leading icon. React: `icon` prop (ReactNode). Vue: `icon` slot.",
+      "projectsTo": { "react": { "prop": "icon" }, "vue": { "slot": "icon" } },
+      "tokens": []
+    }
+  },
+  "tokenBindings": {
+    "note": "Token NAMES only. Actual values are resolved live from @aha/design so this contract never restates or drifts from the source palette.",
+    "source": "@aha/design",
+    "consumes": [
+      "colorPrimary",
+      "colorError",
+      "colorTextDisabled",
+      "colorBgFillDisabled",
+      "borderRadius",
+      "fontSize",
+      "fontFamily"
+    ]
+  }
+}

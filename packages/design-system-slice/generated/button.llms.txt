@@ -1,0 +1,12 @@
+## Button
+Interactive control that triggers an action. The single source of truth for Button across every framework tier.
+Primitive element: <aha-button> (lit) — framework-agnostic, imported unchanged by React and Vue.
+Composite/legacy wrappers: React (antd@6), Vue (ant-design-vue@4).
+Props:
+- variant: one of [primary, default, dashed, text, link], default "default". Visual emphasis of the button.
+- size: one of [small, middle, large], default "middle". Control height and padding.
+- state: one of [default, disabled, loading], default "default". Interaction state. Projects to the boolean antd props `disabled` and `loading`.
+- danger: boolean, default false. Marks a destructive action.
+- block: boolean, default false. Stretches the button to the full width of its container.
+- icon: node/slot, default null. Optional leading icon. React: `icon` prop (ReactNode). Vue: `icon` slot.
+Tokens (from @aha/design): colorPrimary=#6A1EBB, colorError=#F5222D, colorTextDisabled=#B5B5B5, colorBgFillDisabled=#E3E3E3, borderRadius=8, fontSize=14, fontFamily=Plus Jakarta Sans, sans-serif.

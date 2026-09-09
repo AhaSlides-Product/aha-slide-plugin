@@ -1,0 +1,43 @@
+{
+  "name": "@aha/design-system-slice",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Phase-1 spike: one Button contract projected to React (antd v6) + Vue (ant-design-vue v4) tiers, with generated docs and conformance tests. Proof of the single-source-of-truth pipeline. Not for publish.",
+  "type": "module",
+  "exports": {
+    "./contract": "./contract/button.contract.json",
+    "./web-components": "./src/web-components/aha-button.ts",
+    "./react": "./src/react/index.ts",
+    "./vue": "./src/vue/index.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "scripts": {
+    "generate": "node scripts/generate-docs.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "conformance": "vitest run",
+    "check": "npm run generate && npm run typecheck && npm run test",
+    "build": "echo \"@aha/design-system-slice: spike, no build step\"",
+    "clean": "echo \"@aha/design-system-slice: nothing to clean\""
+  },
+  "dependencies": {
+    "@aha/design": "*",
+    "ant-design-vue": "^4.2.6",
+    "antd": "^6.0.0",
+    "lit": "^3.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^25.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}
