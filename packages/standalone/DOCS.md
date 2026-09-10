@@ -143,7 +143,7 @@ xp.onActionInvoke?.((id) => { if (id === 'reveal') reveal(); });
 const A = window.AhaSlidePlugin;
 A.initZoidForAudience();
 A.initializeApp();
-A.createHeightReporter().start();          // so the host sizes the iframe
+A.createHeightReporter({ rootSelector: '#app' }).start(); // so the host sizes the iframe (pass your mount id; default is '#root')
 
 const xp = window.xprops;
 renderForm(xp.slide, xp.audience);
@@ -302,11 +302,15 @@ content height. `createHeightReporter` watches the DOM and calls `xprops.onHeigh
 
 ```js
 const reporter = A.createHeightReporter({
-  rootSelector: '#app',   // element to measure (default: document root)
+  rootSelector: '#app',   // element to measure (default: '#root')
   throttleMs: 100         // optional throttle
 });
 reporter.start();   // begin observing; reporter.stop() on unmount
 ```
+
+> ⚠️ The default `rootSelector` is **`'#root'`**, not the document root. If the selector
+> matches no element, `start()` reports nothing — **silently**, with no error — and the host
+> mis-sizes the iframe. Always pass the id your audience content actually mounts on.
 
 ---
 

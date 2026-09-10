@@ -45,7 +45,8 @@ exposes `window.AhaSlidePlugin`. **Today you host that file yourself** and refer
 <script src="/assets/aha-slide-plugin.global.js"></script>
 <script>
   AhaSlidePlugin.initZoidForAudience();
-  AhaSlidePlugin.createHeightReporter().start(); // auto-reports iframe height
+  // pass the id your content mounts on — default rootSelector is '#root'
+  AhaSlidePlugin.createHeightReporter({ rootSelector: '#app' }).start();
 </script>
 ```
 
