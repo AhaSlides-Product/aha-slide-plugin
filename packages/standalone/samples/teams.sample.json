@@ -1,0 +1,7 @@
+[
+  { "id": 1, "name": "Team 1", "color": "#FFAF09" },
+  { "id": 2, "name": "Team 2", "color": "#28C270" },
+  { "id": 3, "name": "Team 3", "color": "#FD5DA1" },
+  { "id": 4, "name": "Team 4", "color": "#7669BF" },
+  { "id": 5, "name": "Team 5", "color": "#124345" }
+]

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@aha/standalone — smoke test</title>
+    <!--
+      Minimal, framework-free page proving the global build loads and exposes
+      the SDK surface. For local dev, point the src at the built file:
+          ../dist/aha-slide-plugin.global.js
+      In production, load the pinned CDN URL instead (see README).
+    -->
+    <script src="../dist/aha-slide-plugin.global.js"></script>
+    <style>
+      body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; }
+      code { background: #f3f3f3; padding: 0 4px; border-radius: 4px; }
+      li { margin: 2px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>@aha/standalone</h1>
+    <p>Global <code>window.AhaSlidePlugin</code> exposes:</p>
+    <ul id="surface"></ul>
+
+    <script>
+      // NOTE: this page only verifies the global is present and shaped
+      // correctly. It does NOT run inside an AhaSlides host, so the zoid
+      // bridge has no parent to talk to — that is expected here.
+      const api = window.AhaSlidePlugin || {};
+      const names = Object.keys(api).sort();
+      const ul = document.getElementById('surface');
+      for (const n of names) {
+        const li = document.createElement('li');
+        li.innerHTML = '<code>AhaSlidePlugin.' + n + '</code> — ' + typeof api[n];
+        ul.appendChild(li);
+      }
+      // Spot-check a couple of core primitives.
+      const store = api.createSync ? api.createSync('demo', { ok: true }) : null;
+      console.log('createSync works:', !!(store && typeof store.subscribe === 'function'));
+      console.log('ApiClient is a constructor:', typeof api.ApiClient === 'function');
+    </script>
+  </body>
+</html>

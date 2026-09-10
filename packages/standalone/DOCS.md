@@ -1,0 +1,800 @@
+# AhaSlides Plugin SDK — `@aha/standalone`
+
+Build an AhaSlides **slide type** in plain JavaScript. `@aha/standalone` packages the
+entire framework-agnostic slide-plugin SDK into a single browser file. Drop it in with a
+`<script>` tag, use `window.AhaSlidePlugin`, and talk to the AhaSlides host — no Vue, no
+bundler, no build step on your side.
+
+> This is the repo-local, agent/developer-readable companion to the hosted docs page and
+> to [`README.md`](./README.md). It documents the runtime contract in full.
+
+---
+
+## 1. Overview
+
+An AhaSlides **slide type** is an interactive slide (poll, quiz, live race, …) that runs
+as an **iframe** embedded inside the AhaSlides presenter and audience apps. The host hands
+the iframe its data and a set of callbacks; the iframe renders the slide and sends
+submissions back.
+
+The SDK is already split into a **framework-agnostic core** (plain functions and classes)
+and an **optional Vue layer** (`@aha/ui`). This package bundles just the core into one
+script-loadable global:
+
+| Bundled package | What it provides |
+| --- | --- |
+| **`@aha/ui-vanilla`** | zoid host bridge, live-state sync, audience height reporting, auth, host fonts, image/audio upload helpers |
+| **`@aha/api`** | `ApiClient` — submissions, scored answers, leaderboards — and every request/response type |
+| **`@aha/common`** | shared types/utilities, exposed under the `AhaSlidePlugin.common` namespace |
+
+**Why it exists:** the first-party workbench (`slide-type-creator`) builds slide types in
+Vue 3. This package lets you build the same three-surface slide type in vanilla JS,
+decoupled from that repo's registry/build, while speaking the identical host protocol.
+
+It is **not** AI-driven and carries no framework runtime of its own beyond what it bundles.
+
+---
+
+## 2. The mental model
+
+Every slide type renders up to **three coordinated surfaces**, each a separate iframe entry
+loaded at its own URL:
+
+- **Presenter / Canvas** — the projector stage the room sees.
+- **Settings / Editor** — the configuration panel in the deck editor.
+- **Audience** — what each participant sees on their phone.
+
+The host and your iframe live on different origins, so they communicate through **zoid** (a
+`postMessage` wrapper). zoid populates a global `window.xprops` inside your iframe with all
+the host's data and callback functions. The SDK wraps that surface and adds two things the
+iframe can't get from the host alone: in-browser **state sync** and a typed **ApiClient**.
+
+```
+┌──────────────┐   zoid    ┌──────────────────────────────┐
+│ AhaSlides    │ postMessage│ Your slide iframe            │
+│ host         │ ◀───────▶ │  • window.xprops  (host data) │
+│ presenter /  │           │  • createSync()   (canvas⇄settings) │
+│ audience app │           │  • new ApiClient() (submissions) │
+└──────────────┘           └──────────────────────────────┘
+```
+
+The same iframe code runs in the local workbench and in production; only what fills
+`xprops` differs (the workbench's `parentBroker` fakes it; production wires the real host).
+
+---
+
+## 3. Loading the SDK
+
+### Via `<script src>` (no build step)
+
+The build produces one self-contained file, `dist/aha-slide-plugin.global.js`, exposing
+`window.AhaSlidePlugin`. **Today you host that file yourself** (get it from
+`npm run build -w @aha/standalone`, or from the `aha-standalone.tgz` Release asset):
+
+```html
+<!-- self-hosted: point at wherever you serve the built file -->
+<script src="/assets/aha-slide-plugin.global.js"></script>
+
+<script>
+  const { initZoidForPresenter, createSync, ApiClient } = window.AhaSlidePlugin;
+</script>
+```
+
+> ⚠️ **CDN (unpkg / jsDelivr) is not live yet.** They mirror public `registry.npmjs.org`,
+> and this package is not published there (this repo publishes to GitHub Packages + Release
+> tarballs only — see §12). Once a public-npm publish workflow lands, the pinned URL will be
+> `https://unpkg.com/@ahaslides-product/plugins-standalone@<version>/dist/aha-slide-plugin.global.js`.
+
+### Via ESM (bundler consumers)
+
+```ts
+import { initZoidForPresenter, createSync, ApiClient } from '@ahaslides-product/plugins-standalone';
+```
+
+The package ships TypeScript declarations (`dist/index.d.ts`), so the ESM import is fully
+typed; the `<script>` global carries the same shape at runtime.
+
+---
+
+## 4. The global surface — `window.AhaSlidePlugin`
+
+| Member | Signature | What it does |
+| --- | --- | --- |
+| `initZoidForPresenter` | `(tag?) => component` | Registers the presenter iframe with the host bridge. Call once at boot. |
+| `initZoidForAudience` | `() => component` | Same, for the audience iframe entry. |
+| `initializeApp` | `() => app` | Reads `window.xprops` into app state. Call after zoid connects. |
+| `getApp` | `() => AppPluginProps` | The resolved host props (typed view over `xprops`). |
+| `isInitialized` | `() => boolean` | Whether the host bridge has connected. |
+| `presenterZoidProps` | object | The zoid prop contract (advanced / host-side). |
+| `createSync` | `<T>(name, initial) => SyncStore<T>` | Read/write live state shared across surfaces in the same browser. |
+| `createReadOnlySync` | `<T>(name, initial) => ReadOnlySyncStore<T>` | The read-only twin — subscribe, no `set`. |
+| `createHeightReporter` | `(options?) => { start, stop }` | Auto-reports the audience iframe's content height. |
+| `getAccessToken` | `() => string \| null` | Host access token for authenticated API calls. |
+| `ensureHostFontLoaded` | `(stack?) => string` | Loads the deck's font into the iframe; returns the resolved stack. |
+| `installHostFontAutoLoad` | `(options?) => () => void` | Keeps the iframe font in sync with the deck; returns an unsubscribe. |
+| `ApiClient` | class | The live-data client — see §8. |
+| `common` | namespace | Shared types/utilities from `@aha/common` (e.g. `common.QuizStatus`). |
+
+---
+
+## 5. Bootstrapping a surface
+
+Each surface is its own HTML entry. Connect the bridge, then read the host.
+
+**Presenter / Canvas**
+
+```js
+const A = window.AhaSlidePlugin;
+A.initZoidForPresenter();
+const app = A.initializeApp();
+
+const xp = window.xprops;                 // host data + callbacks
+render(xp.slide, xp.presentationColorPalette);
+
+xp.setActionButtons?.([                    // control-bar buttons the host renders
+  { id: 'reveal', label: 'Reveal', variant: 'primary' }
+]);
+xp.onActionInvoke?.((id) => { if (id === 'reveal') reveal(); });
+```
+
+**Audience**
+
+```js
+const A = window.AhaSlidePlugin;
+A.initZoidForAudience();
+A.initializeApp();
+A.createHeightReporter({ rootSelector: '#app' }).start(); // so the host sizes the iframe (pass your mount id; default is '#root')
+
+const xp = window.xprops;
+renderForm(xp.slide, xp.audience);
+const api = new A.ApiClient(xp.baseUrl ?? '');
+```
+
+> **Cross-boundary rule:** every host function on `xprops` is passed across the zoid iframe
+> boundary, so calls that return a value return a **Promise** (e.g.
+> `getSlideAttributesAction()`, `showConfirmModal()`, `filterProfaneWords()`). Always `await`.
+
+---
+
+## 6. Host contract (`xprops`)
+
+What the host provides inside the iframe. Shared fields appear on both surfaces.
+
+### Shared — data
+
+| Prop | Type | Notes |
+| --- | --- | --- |
+| `slide` | object | The full active-slide model (open record) — title/content, images, audio, quiz/answering, results, options. Host-derived extras: `textColour`, `baseColour`, `backgroundImage`, `slideType`, `quizStatus`, `hasLeaderboardSlide`. **Every field is enumerated in [Appendix B](#appendix-b--the-slide-object).** |
+| `presentation` | object | The full presentation model (open record). Deck-wide identity, session state, feature toggles, team play, reactions, Q&A, branding. Host-derived: `sessionSince`, `sharePresentation`. The deck's `slides` array is intentionally stripped. **Every field is enumerated in [Appendix A](#appendix-a--the-presentation-object).** |
+| `presentationColorPalette` | `string[]` | Deck theme palette — an array of **hex** strings (e.g. `"#FF4181"`). Use it for all slide colour so the slide matches the room's theme. |
+| `presentationLighterColorPalette` | `string[]` | The companion palette, **index-aligned** with the above. Each entry is the *same* colour at **0.8 alpha** as an `rgba(r, g, b, 0.8)` string — **not** a separate lighter tint, and note the format differs from the hex main palette. Sample: [`samples/palette.sample.json`](./samples/palette.sample.json). |
+| `baseUrl` | string | Base URL of the parent app — pass to `ApiClient`. |
+
+### Shared — functions
+
+| Function | Signature | Notes |
+| --- | --- | --- |
+| `onHeightChange` | `(h: number\|null) => void` | Report iframe height; `null` means "use 100%". Usually via `createHeightReporter`. |
+| `subscribeTopic` | `({ type?, topic, callback }) => void` | Subscribe to an MQTT topic for live events. |
+| `unsubscribeTopic` | `(topic) => void` | Unsubscribe. |
+| `trackGA4AndMixpanel` | `(payload) => void` | Emit an analytics event through the host. |
+| `filterProfaneWords` | `(text) => Promise<string>` | Host-side profanity filter; returns input unchanged when disabled. |
+
+### Presenter only (`SlidePluginProps`)
+
+| Member | Signature | Notes |
+| --- | --- | --- |
+| `active` | boolean | Keep-alive preload gate. When `false` the iframe is preloaded but must render a blank shell and not consume slide data yet. |
+| `currentUser` | `{ presenterLanguage? }` | Drive the editor/UI language from `presenterLanguage`. |
+| `audiences` | `Record<id, details>` | Joined participants keyed by id — name, emoji, team, online status, answers. Shape in [Appendix C](#appendix-c--audience-audiences--teams). |
+| `getSlideAttributesAction` | `(slideId?) => Promise<any>` | Fetch this slide's persisted config. Call on mount to hydrate. |
+| `upsertSlideAttributeAction` | `(payload) => Promise` | Persist a config attribute host-side (the Settings save path). |
+| `uploadImage` | `() => Promise<ImageUploadResult>` | Opens the host image picker; resolves to `{ path, url }`. |
+| `openUploadAudioModal` | `() => Promise<AudioUploadResult>` | Host audio uploader; resolves to `{ url, name }`. |
+| `sendVoteOutcome` | `({ count?, tooltip? }) => void` | Push the live vote count + tooltip to the presenter chrome. |
+| `setActionButtons` | `(actions: PluginAction[]) => void` | Declare control-bar buttons the host renders (Next, Reveal, …). |
+| `onActionInvoke` | `(cb: (id) => void) => void` | Receive control-bar button presses by `id`. |
+| `showToastInfo` / `showToastSuccess` / `showToastError` | `(text, uniqName?, action?, options?)` | Host toast notifications — reuse these, don't build your own. |
+| `showConfirmModal` | `(payload) => Promise<boolean>` | Host confirm dialog; resolves to the user's choice. |
+| `openPluginModal` / `closePluginModal` | `(path?) => void` | Open/close a host-framed modal route. |
+| `clearSlideData` | `(slideId) => Promise<void>` | Clear this slide's submissions. |
+| `createLeaderboardSlide` / `removeLeaderboardSlide` | `() => Promise<void>` | Add/remove the follow-up leaderboard slide. |
+| `updateSlide` | `(payload) => void` | Patch the active slide model. |
+| `allowPDFRender` | `() => void` | Signal the slide is painted and safe to screenshot for PDF export. |
+| `onSlideAttributesChanged` | `(cb) => void` | React to config changes made in another surface. |
+| `onKeyboard` / `emitKeyboardEvent` | `(cb)` / `(event)` | Receive/forward keyboard events across the boundary (shortcuts). |
+| `onTyping` | `(cb) => void` | "Audience is typing" events, for a live indicator. |
+| `emitBroadcastAction` / `onBroadcastAction` | `(key, args)` / `(cb)` | Broadcast a custom action to the other surfaces. |
+
+### Audience only (`AudienceSlidePluginProps`)
+
+| Member | Signature | Notes |
+| --- | --- | --- |
+| `audience` | object | This participant: `audienceName`, `audienceEmoji`, `audienceId`, `audienceEmail`, `audienceTeam` (free-text org), `audienceQuizTeam` (team-play team id). Detail in [Appendix C](#appendix-c--audience-audiences--teams). |
+| `currentUser` | `{ email? }` | The signed-in participant, if any. |
+| `slideAttributes` | `Record<string, any>` | The persisted slide config, read-only on the audience side. |
+| `isParticipantVerificationEnabled` | boolean | Whether the deck requires verified participants. |
+| `timeLimit` | `number \| null` | Answer time limit for the slide, if any. |
+| `uploadImage` | `() => Promise<any>` | Host image picker for image-answer slides. |
+| `updateAudienceData` | `({ audienceName?, audienceEmail?, audienceEmoji? })` | Update this participant's identity. |
+| `emitTyping` | `(isTyping: boolean) => void` | Tell the host this participant is typing. |
+| `joinGame` | `(payload) => Promise<JoinGameResult>` | Join a team game; result may carry an `error` (`invalid-name` \| `invalid-team` \| `team-full` \| `network`). |
+| `teams` | `Team[]` | Available teams for team games (`{ id, name, color? }`, `color` is **hex**). Detail in [Appendix C](#appendix-c--audience-audiences--teams). |
+| `scrollTo` | `(yOffset) => void` | Scroll the host viewport (e.g. "scroll to submit"). |
+| `getWindowHeight` | `() => Promise<number>` | The host window height. |
+| `onSubmitButtonHeightChange` | `(height) => void` | Report the sticky submit button's height. |
+| `showToastInfo` / `showToastSuccess` / `showToastError` | `(text, …)` | Audience-side host toasts. |
+
+**`PluginAction` shape:** `{ id, label, variant?: 'primary'|'default', icon?, iconViewBox?, disabled?, loading?, shortcut? }`.
+Pass **booleans** for `disabled`/`loading` — the host coerces them; a function value silently breaks.
+
+---
+
+## 7. State sync
+
+`createSync` returns a tiny observable store backed by a `BroadcastChannel`. The Settings
+surface writes config; the Canvas surface subscribes and re-renders. `createReadOnlySync` is
+the same without `set`.
+
+```ts
+interface SyncStore<T> {
+  get(): T;                                   // current local value
+  set(value: T): void;                        // update + broadcast to other surfaces
+  subscribe(listener: (v: T) => void): () => void;  // returns an unsubscribe fn
+  close(): void;                              // tear down the channel
+}
+```
+
+```js
+// Settings.html
+const config = A.createSync('my-slide', { question: '', options: [] });
+input.addEventListener('input', () => config.set({ ...config.get(), question: input.value }));
+
+// Canvas.html
+const config = A.createReadOnlySync('my-slide', { question: '', options: [] });
+const off = config.subscribe((c) => paintQuestion(c.question));
+```
+
+> **Same browser only.** `createSync` uses `BroadcastChannel`, so it synchronises surfaces
+> within *one* browser (the presenter's tabs). It does **not** reach a participant's phone.
+> For cross-device state, persist config host-side via `upsertSlideAttributeAction` and send
+> live answers through `ApiClient` — never stream a live clock across devices.
+
+---
+
+## 8. Live data — `ApiClient`
+
+Construct it with the host `baseUrl` (and optionally an access token). In the workbench an
+empty string works because the broker intercepts calls; in production pass `xprops.baseUrl`.
+
+```js
+const api = new A.ApiClient(xprops.baseUrl ?? '', A.getAccessToken() ?? undefined);
+```
+
+Constructor: `new ApiClient(baseUrl: string, accessToken?: string, options?: { logFn? })`.
+
+| Method | Purpose |
+| --- | --- |
+| `sendLiveSubmission(slideType, payload)` | Submit a live answer/vote (the audience → presenter count path). |
+| `updateSubmission(id, payload)` | Change an existing submission. |
+| `deleteSubmission(id)` | Remove a submission (e.g. presenter removes one). |
+| `getSubmissions({ slideId, slideVersion, type })` | Fetch all submissions for the slide. |
+| `getParticipantSubmissions({ audienceId, slideId, slideVersion, type })` | One participant's submissions. |
+| `createAnswer(slideType, payload)` | Submit a **scored** answer → `AnswerResponse` (verdict, points). |
+| `createAnswerResults(payload)` | Write aggregated answer results. |
+| `getSlideAnswers(req)` / `getParticipantSlideAnswers(req)` | Read scored answers for the slide / a participant. |
+| `getLeaderboardTopN(req)` / `getLeaderboardAround(req)` | Presentation-wide leaderboard (top N, or around a player). |
+| `getLeaderboardSlideTopN(req)` / `getLeaderboardSlideAround(req)` | Per-slide leaderboard. |
+| `resetAnswerResult(payload)` | Reset a scored result. |
+| `fetchUrl(url, options?)` | Low-level authenticated fetch. |
+
+> **Production wiring.** A live-counting or scored slide needs a real backend handler
+> deployed for its slug — the local workbench *fakes* both the count aggregation and the
+> answer endpoint. Without the deployed handler, `sendLiveSubmission` shows no data and
+> `createAnswer` returns 404 in the real product.
+
+---
+
+## 9. Audience height
+
+The audience iframe sits in a mobile layout the host controls, so you must report your
+content height. `createHeightReporter` watches the DOM and calls `xprops.onHeightChange`.
+
+```js
+const reporter = A.createHeightReporter({
+  rootSelector: '#app',   // element to measure (default: '#root')
+  throttleMs: 100         // optional throttle
+});
+reporter.start();   // begin observing; reporter.stop() on unmount
+```
+
+> ⚠️ The default `rootSelector` is **`'#root'`**, not the document root. If the selector
+> matches no element, `start()` reports nothing — **silently**, with no error — and the host
+> mis-sizes the iframe. Always pass the id your audience content actually mounts on.
+
+---
+
+## 10. Vue ↔ vanilla
+
+`slide-type-creator` builds slide types in Vue with `@aha/ui`. Those composables are **thin
+adapters** — they read the exact same `window.xprops` and wrap it in reactive refs. Dropping
+the Vue layer loses nothing but the reactivity glue.
+
+**Vue (`@aha/ui`)**
+
+```js
+import { mountPresenter } from '@/iframe/mountPresenter';
+import Canvas from './Canvas.vue';
+mountPresenter(Canvas);
+
+// inside Canvas.vue
+const { slide, palette } = usePresenterPlugin();  // refs
+const config = useSync('poll', def);              // Ref<T>
+const api = new ApiClient(baseUrl.value ?? '');
+```
+
+**Vanilla (`@aha/standalone`)**
+
+```js
+const A = window.AhaSlidePlugin;
+A.initZoidForPresenter();
+A.initializeApp();
+
+const xp = window.xprops;              // plain object
+const { slide, presentationColorPalette: palette } = xp;
+const config = A.createSync('poll', def);  // { get, set, subscribe }
+const api = new A.ApiClient(xp.baseUrl ?? '');
+```
+
+---
+
+## 11. A slide type, end-to-end
+
+A minimal "this or that" vote — presenter counts, audience taps.
+
+**`audience.html`** — participant taps an option
+
+```html
+<script src="/assets/aha-slide-plugin.global.js"></script>
+<div id="app"></div>
+<script>
+  const A = window.AhaSlidePlugin;
+  A.initZoidForAudience();
+  A.initializeApp();
+  A.createHeightReporter({ rootSelector: '#app' }).start();
+
+  const xp = window.xprops;
+  const api = new A.ApiClient(xp.baseUrl ?? '');
+  const options = xp.slideAttributes?.options ?? ['This', 'That'];
+
+  const app = document.getElementById('app');
+  options.forEach((label, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.style.cssText = 'display:block;width:100%;padding:16px;margin:8px 0';
+    btn.onclick = async () => {
+      try {
+        await api.sendLiveSubmission('this-or-that', {
+          audienceId: xp.audience?.audienceId,
+          slideId: xp.slide?.id,
+          data: { choice: i }
+        });
+        xp.showToastSuccess?.('Submitted!');
+      } catch (e) {
+        xp.showToastError?.('Could not submit — try again');
+      }
+    };
+    app.appendChild(btn);
+  });
+</script>
+```
+
+**`presenter.html`** — live tally on the canvas
+
+```html
+<script src="/assets/aha-slide-plugin.global.js"></script>
+<script>
+  const A = window.AhaSlidePlugin;
+  A.initZoidForPresenter();
+  A.initializeApp();
+  const xp = window.xprops;
+  const api = new A.ApiClient(xp.baseUrl ?? '');
+
+  async function refresh() {
+    const subs = await api.getSubmissions({ slideId: xp.slide?.id });
+    const counts = [0, 0];
+    subs.forEach((s) => counts[s.data.choice]++);
+    paint(counts);
+    xp.sendVoteOutcome?.({ count: subs.length });   // show total in host chrome
+  }
+  xp.subscribeTopic?.({ topic: `slide/${xp.slide?.id}`, callback: refresh });
+  refresh();
+</script>
+```
+
+Add a `settings.html` using `createSync('this-or-that', …)` to edit the two option labels and
+you have the full presenter / settings / audience loop — the same contract the Vue workbench
+ships, written in plain JS.
+
+---
+
+## 12. Versioning & updates
+
+The global file bakes in a specific build of `@aha/ui-vanilla` + `@aha/api` + `@aha/common`.
+To ship an update:
+
+1. Update the underlying SDK package(s) and bump their versions as usual.
+2. **Bump `version` in `packages/standalone/package.json`**.
+3. Rebuild: `npm run build -w @aha/standalone` (Turborepo builds the deps first).
+4. Publish through the release workflows. **Today** `@aha/standalone` is wired into:
+   - `publish-packages.yaml` — **GitHub Packages** (auth-gated; not CDN-mirrored).
+   - `release-sdk-tarballs.yaml` — attaches `aha-standalone.tgz` to the `sdk-latest` GitHub
+     Release (transitive `@aha/*` deps added automatically); the token-free path the public
+     template already consumes.
+
+> **Not yet wired: public npm / CDN.** `unpkg` and `jsDelivr` mirror only public
+> `registry.npmjs.org`, and nothing in this repo publishes there — there is no
+> `publish-packages-npmjs.yaml`. Making the `<script src>` CDN URLs resolve is a **follow-up**:
+> add that public-npm publish workflow and map
+> `"@aha/standalone": "@ahaslides-product/plugins-standalone"` in its `PACKAGE_NAME_MAP`.
+> Until then, consumers self-host the built file or use the GitHub Release tarball.
+
+---
+
+## 13. Caveats & gotchas
+
+| Gotcha | What to do |
+| --- | --- |
+| **Eager bridge init.** Loading the script runs zoid's host-bridge setup immediately. | Load it only in the iframe document that talks to the AhaSlides host — not a generic page. |
+| **Host functions are async.** Anything on `xprops` that returns a value crosses the zoid boundary as a Promise. | `await` `getSlideAttributesAction`, `showConfirmModal`, `filterProfaneWords`, `joinGame`, `getWindowHeight`. |
+| **`createSync` is same-browser.** It won't reach a participant's phone. | Persist config via `upsertSlideAttributeAction`; move live answers through `ApiClient`. |
+| **Live/scored slides need a backend.** The workbench fakes counts and the answer endpoint. | Deploy a handler for the slug before trusting `sendLiveSubmission` / `createAnswer` in production. |
+| **Preload gate.** A presenter iframe may boot with `active: false`. | Render a blank shell and don't consume slide data until `active` flips true. |
+| **Theme from the deck.** Colours and fonts come from the host, not your CSS. | Read `presentationColorPalette` / `slide.textColour`; call `ensureHostFontLoaded()`. |
+
+---
+
+## Appendix A — the `presentation` object
+
+`xprops.presentation` is passed straight through from the host and is intentionally an **open
+record** (the host no longer maintains a per-field allowlist), so new fields can appear and
+unused ones may be `null`. The table below enumerates the fields observed on a real presenter
+session so an AI or developer knows what is available. A matching TypeScript reference type,
+`PresentationProps`, ships with the package (`import type { PresentationProps }`) — best-effort
+autocomplete, not a closed guarantee.
+
+> The nested `slides` array (the whole deck) is the one field the host **strips** before
+> forwarding — it is never present here.
+
+> 📦 **Sample fixture:** a real captured payload ships at
+> [`samples/presentation.sample.json`](./samples/presentation.sample.json) — use it to fake
+> `window.xprops` when testing a slide type without a live host. See
+> [`samples/README.md`](./samples/README.md).
+
+### Identity & ownership
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | number | Numeric presentation id. |
+| `globalId` | string \| null | Global (cross-region) id. |
+| `name` | string | Presentation title. |
+| `description` | string \| null | Long description. |
+| `userId` / `ownerId` | number | Creator / current owner ids. |
+| `accountId` | number \| null | Billing/account id. |
+| `folderId` / `folder` | number \| null / object | Containing folder. |
+| `version` | number | Model version. |
+| `PresentationsCategories` | array | Public-gallery category links. |
+
+### Join / share codes
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `accessCode` | string | Short human join code (e.g. `KX660`). |
+| `uniqueAccessCode` | string | Stable code used in join URLs. |
+| `shareCode` | string | Timestamped share-session code. |
+| `remoteAccessCode` | string | Remote-control pairing code. |
+| `moderationCode` | string | Code gating moderation access. |
+
+### Live session state
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `presenting` | boolean | True while actively presenting. |
+| `activeSlide` / `lastSlide` | number | Current / last slide id. |
+| `slideActiveTimestamp` | string \| null | Epoch-ms the active slide became active. |
+| `resetTimeStamp` | string \| number \| null | Epoch-ms of the last reset. |
+| `takenOverBy` | number \| null | User id that took over control. |
+| `session` / `token` / `expiredToken` | object / string \| null | Session payload & host token (often null). |
+| `sessionSince` | number \| string \| null | **Host-derived** session start. Not a raw field. |
+| `sharePresentation` | object | **Host-derived** share/present state slice. Not a raw field. |
+
+### Counts
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `onlineCount` / `userOnline` / `realtimeOnlineCount` | number | Online participant tallies (several sources). |
+| `participantsCount` | number | Total joined. |
+| `slideCount` | number | Slides in the deck. |
+| `copyCount` | number | Times the deck was copied. |
+| `numberOfAuthens` | number | Authentication seats/limit. |
+
+### Localization & content
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `language` | string | Deck language code (e.g. `en`). |
+| `fontFamily` | string | Deck font — mirror via `ensureHostFontLoaded`. |
+| `tags` / `keyword` / `forWho` / `cta` | mixed \| null | Marketing / SEO metadata. |
+
+### Pacing & quiz flow
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audiencePacing` | boolean | Each participant advances themselves. |
+| `manualRevealCorrectAnswers` | boolean | Reveal correct answers only on presenter action. |
+| `notRemindCorrectAnswer` | boolean | Suppress the correct-answer reminder. |
+| `enableQuizCoundown` | boolean | Show the quiz countdown. |
+| `areSlideOptionsShuffling` | boolean \| null | Shuffle options per participant. |
+| `isHideEntrySpinnerWheen` | boolean \| null | Hide the spinner-wheel entry. |
+
+### Audio · music · sound effects
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableMusic` / `isEnableQuizMusic` | boolean | Background / quiz music. |
+| `isEnableSoundEffects` / `isEnableSoundEffectsForAudience` | boolean | SFX for presenter / audience. |
+| `audioLink` / `audioName` | string \| null | Custom background audio URL / name. |
+
+### Reactions
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isReactionEnabled` | boolean | Live reactions on. |
+| `numberOfLikes` / `Hearts` / `Laughs` / `Sads` / `Wows` | number | Reaction tallies. |
+
+### Chat · Q&A · moderation
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableChat` | boolean | Audience chat on. |
+| `qnaAllSlide` / `qnaAudienceShowAll` / `qnaAnonymous` | boolean | Q&A availability / visibility / anonymity. |
+| `isModerationMode` | boolean \| null | Moderation mode. |
+| `filteringProfanity` | mixed | Profanity filter setting. |
+
+### Streak & scoring
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableStreakDetection` / `isEnableStreakBonus` | boolean | Streak detection / bonus. |
+| `isShowSettingStreak` / `isShowSettingStreakBonus` | boolean | Show the streak settings. |
+| `isHideIndividualLeaderboard` | boolean | Hide the individual leaderboard. |
+
+### Team play
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `teamPlay` | boolean | Team mode on. |
+| `teamCount` / `teamSize` | number | Number of teams / max per team. |
+| `teamScoringRule` | string | Aggregation (`average`, `total`, …). |
+| `teamData` | `{ id, name, color, visible }[]` | The configured teams (`color` is a CSS/rgba string). |
+
+### Audience access & behaviour
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audienceAdmission` | `{ isAudienceAdmission }` | Admission gate config. |
+| `isAudienceAuthentication` | boolean \| null | Require verified participants. |
+| `isAudienceLimitation` | boolean | A participant cap is in effect. |
+| `isDisableEveryoneHasAnswered` | boolean | Don't auto-advance once all answered. |
+| `enableAudienceRequestPresentation` | boolean \| null | Audience may request to present. |
+| `isEnableAudienceReviewSlides` | boolean | Audience can review slides afterward. |
+| `isEnableAudienceAhaSlideLabel` | boolean | Show the "made with AhaSlides" label. |
+
+### Branding · visibility · sharing
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `notShowAhaSlidesLogo` / `showAhaSlidesCTA` | boolean | Hide logo / show CTA. |
+| `privateMode` / `isPublicSearch` / `isIndexBot` | boolean \| null | Privacy / search / indexing. |
+| `isAdminPick` | boolean \| null | Featured by an admin. |
+| `showHyperLink` | boolean | Render hyperlinks in content. |
+| `disableConversationPresenterShare` | boolean | Disable presenter-share of Q&A. |
+| `hideInstructionBar` / `hideIntroBarDocument` | boolean | Hide instruction / intro bars. |
+| `isAccountTabVisible` | boolean | Show the account tab in the editor. |
+| `enableCopySlideNote` / `isResizeCustomThumbnail` | boolean \| null | Copy notes / resize thumbnail. |
+| `publicSource` / `crawlSource` / `sourcePresentation` / `source` / `sender` | mixed | Source lineage metadata. |
+
+### Results · ratings · lifecycle
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `hasResults` / `hasExampleResponses` | boolean | Stored results / seeded examples. |
+| `hasAutoSuggestedTitle` / `hasSharedUser` / `isNewlyAdded` | boolean \| null | UI/state flags. |
+| `avgRating` / `totalRatings` | number \| null | Ratings. |
+| `createdAt` / `updatedAt` | string | ISO timestamps. |
+| `publishedAt` / `publishedBy` / `deletedAt` / `deletedById` | mixed \| null | Publish / delete lifecycle. |
+
+---
+
+## Appendix B — the `slide` object
+
+`xprops.slide` is the active-slide model, passed straight through as an **open record**. Many
+fields are only meaningful for a particular built-in slide type (word cloud, quiz, audio, …)
+and are `null`/default otherwise. The reference type `SlideProps` ships with the package
+(`import type { SlideProps }`).
+
+> 📦 **Sample fixture:** [`samples/slide.sample.json`](./samples/slide.sample.json) — a real
+> captured quiz slide, for faking `window.xprops.slide` in tests.
+
+### Identity & type
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | number | Numeric slide id. |
+| `globalId` | string \| null | Global (cross-region) id. |
+| `type` | string | Declared type. Marketplace slides: `"marketplace/<slug>"` (e.g. `marketplace/loi-brawl-quiz`). |
+| `slideType` | string \| null | Host-resolved type (`multiple-choice`, `open-ended`, …) — derived, may be null. |
+| `presentationId` | number | Parent presentation id. |
+| `order` | number | 1-based position in the deck. |
+| `version` | number | Model version — **bumped on reset**, which re-keys the audience submission lock. |
+| `sourceSlideId` | number \| null | Slide this was copied from. |
+| `createdBy` | number | Creator user id. |
+| `deleted` / `deletedAt` / `deletedById` | mixed | Soft-delete state. |
+| `isTouched` | boolean | Edited at least once. |
+| `createdAt` / `updatedAt` | string | ISO timestamps. |
+
+### Title & content
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `title` / `titleHTML` | string \| null | Question/title, plain and HTML. |
+| `sanitizedTitle` / `sanitizedTitleHTML` | string \| null | Host-sanitised variants. |
+| `bodyHTML` / `subheading` / `titleDesc` / `description` | string \| null | Body & secondary text. |
+| `notes` | string \| null | Presenter notes. |
+| `textAlign` | string | `left` \| `center` \| `right`. |
+
+### Resolved theme
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `textColour` | string | Resolved text colour (slide override merged over deck theme). |
+| `baseColour` | string | Resolved background colour. |
+| `backgroundImage` | string \| null | Resolved background image URL. |
+| `backgroundSize` | string \| null | Background sizing mode. |
+| `randomColours` | string[] | Palette of random colours the slide may use. |
+
+### Images
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `image` | string \| null | Current question image URL. |
+| `originQuestionImage` / `originBackgroundImage` | string \| null | Pre-crop originals. |
+| `questionImageLayout` / `imageType` | string | Image layout / type. |
+| `showQuestionImage` | boolean | Show the question image. |
+| `imageCaption` | string \| null | Caption under the image. |
+| `imageSubmission` | boolean | Audience may submit an image as their answer. |
+| `questionImageCropperData` / `backgroundImageCropperData` | object \| null | Cropper state. |
+| `canvasBlocksUrl` / `contentTemplateThumbnail` | string \| null | Canvas layout / template thumbnail. |
+
+### Audio
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audioLink` / `audioName` | string \| null | Custom audio URL / name. |
+| `audioShowControl` / `audioAutoPlay` / `audioRepeat` / `audioVolume` / `audioMuted` | mixed | Presenter audio controls. |
+| `audioPlayOnAudience` / `audioAudienceShowControl` / `audioAudienceAutoPlay` / `audioAudienceRepeat` | mixed | Audience audio controls. |
+| `voiceActive` | boolean \| null | Text-to-speech / voice on. |
+
+### Video / embeds
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `youtubeLink` / `showYouTubeIframe` | mixed \| null | YouTube link + iframe toggle. |
+| `showIframe` | boolean | Generic iframe embed toggle. |
+| `publishedLink` | string \| null | Published external link. |
+| `googleSlide` | mixed | Imported Google Slide reference. |
+
+### Quiz / answering
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `votingStep` | string | Current voting phase (e.g. `submission`). |
+| `multipleChoice` / `limitChoice` | boolean / number | Multi-select mode + max choices. |
+| `entriesPerParticipant` | number | Max entries per participant. |
+| `timeToAnswer` / `hasTimeLimit` | number / boolean | Answer time limit (seconds) + whether enforced. |
+| `fastAnswerGetMorePoint` | boolean | Faster answers score more. |
+| `quizStatus` | number | Quiz phase: **1 Lobby · 2 Rule · 3 Countdown · 4 Question · 5 Result**. |
+| `questionIndex` / `questionCount` | number | 1-based question index / total. |
+| `quizTimestamp` / `timestampLeaderboard` | mixed | Per-phase / leaderboard timestamps. |
+| `isCorrectGetPoint` | boolean | Correct answers award points. |
+| `maxPoint` / `minPoint` | number | Score bounds. |
+| `addCorrectOption` / `showCorrectOption` | boolean \| null | Correct-option add / reveal. |
+| `otherCorrectQuiz` / `correctQuizTypeAnswer` / `matchingQuestionOptions` | mixed | Alternate answers / matching options. |
+| `stopSubmission` / `stopSubmissionTime` | mixed | Submission gate + close time. |
+| `resetTimeStamp` / `slideTimestamp` | string \| null | Last reset / slide-active epoch-ms. |
+| `cacheLeaderboardUrl` | string | Precomputed leaderboard URL. |
+
+### Display & results
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `typeChart` | string | Result chart (`barChart`, `pieChart`, …). |
+| `layout` | string | Answer layout (`grid`, `list`, …). |
+| `hideResult` / `showPercentage` | boolean | Hide results / show as %. |
+| `showVotes` / `showSubmissions` / `showVotingResultsOnAudience` | boolean \| null | Count & result visibility. |
+| `visibility` | number | Slide visibility flag (host enum). |
+| `scale` | object \| null | Scale-question config. |
+| `showAllBulletPoints` / `bulletPointsIndex` | mixed | Bullet-point reveal state. |
+| `hintsShowingIndex` / `numberOfHintsShown` / `isHintsVisible` / `hints` | mixed | Hint reveal state. |
+
+### Options, data & AI
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `SlideOptions` | array | The slide's answer options. |
+| `ideasCount` / `multipleCountAnswer` | number | Idea / multi-answer counts. |
+| `additionalFields` / `metadata` | mixed | Slide-type-specific extras / metadata bag. |
+| `wordCloudSmartGrouping` / `numberOfWordsInGroup` / `isGroupWordCloudWords` / `hasUserGroupedWords` / `openEndedAIGroupedAnswers` | mixed | Word-cloud / AI grouping state. |
+| `aiBotMessages` / `isAIIndicatorVisible` | array / boolean | AI assistant messages & indicator. |
+
+---
+
+## Appendix C — `audience`, `audiences` & `teams`
+
+The participant-facing identity props. `Team`, `JoinGamePayload`, `JoinGameResult` and
+`ParticipantInfo` are **real SDK types** re-exported by this package (`import { … } from
+'@ahaslides-product/plugins-standalone'`); `AudienceProps`, `AudienceEntry` and
+`PresenterAudiences` are reference aliases this package adds.
+
+> ⚠️ Unlike the presentation / slide / palette fixtures (captured from a real session), the
+> `audience`, `audiences` and `teams` samples are **schema-accurate examples**, not captured
+> payloads — the SDK types the presenter roster as `Record<string, any>`, so read defensively.
+
+### `xprops.audience` — the current participant (audience side)
+
+Reference type `AudienceProps`. Fixture: [`samples/audience.sample.json`](./samples/audience.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audienceName` | string | Display name. |
+| `audienceEmoji` | string | Emoji avatar. |
+| `audienceId` | string \| number | Unique participant id. |
+| `audienceEmail` | string | Email, when verified/collected. |
+| `audienceTeam` | string | Free-text admission "organisation/team" field — **not** the team-play team. |
+| `audienceQuizTeam` | string \| number | Team-play team id joined; resolve its name via `xprops.teams`. |
+
+### `xprops.teams` — joinable teams (audience side)
+
+SDK type `Team`. Present only when team play is enabled. Fixture:
+[`samples/teams.sample.json`](./samples/teams.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | string \| number | Unique team id (matches `audienceQuizTeam`). |
+| `name` | string | Display name. |
+| `color` | string (hex) | Team colour — **hex** here (note: `presentation.teamData[].color` is `rgba()`). |
+
+Related: `joinGame(payload: JoinGamePayload) => Promise<JoinGameResult>` where
+`JoinGamePayload = { audienceName?, audienceEmoji?, teamId? }` and
+`JoinGameResult = { success: boolean, error?: 'invalid-name' | 'invalid-team' | 'team-full' | 'network' }`.
+
+### `xprops.audiences` — the presenter roster (presenter side)
+
+A map of participant id → entry (reference type `PresenterAudiences` / `AudienceEntry`;
+the SDK types the value as `any`). Fixture:
+[`samples/audiences.sample.json`](./samples/audiences.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| _(key)_ | string | Participant id. |
+| `audienceId` | string \| number | Participant id (mirrors the key). |
+| `audienceName` / `audienceEmoji` | string | Name / emoji. |
+| `audienceTeam` / `audienceQuizTeam` | mixed | Org field / team-play team id. |
+| `online` | boolean | Currently connected. |
+| `answers` | mixed | Submitted answers for the active slide, when exposed. |
+
+---
+
+*Part of the `aha-slide-plugin` monorepo. The framework-agnostic core also ships as
+`@ahaslides-product/plugins-ui-vanilla` and `@ahaslides-product/plugins-api` if you prefer to
+compose them yourself. This document tracks v1.0.0.*
