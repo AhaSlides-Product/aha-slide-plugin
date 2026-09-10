@@ -161,7 +161,7 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 | Prop | Type | Notes |
 | --- | --- | --- |
 | `slide` | object | The full active-slide model (open record). Host-derived extras: `textColour`, `baseColour`, `backgroundImage`, `slideType`, `quizStatus`, `hasLeaderboardSlide`. |
-| `presentation` | object | The full presentation model (open record): `id`, `language`, `fontFamily`, … Host-derived: `sessionSince`, `sharePresentation`. The deck's `slides` array is intentionally stripped. |
+| `presentation` | object | The full presentation model (open record). Deck-wide identity, session state, feature toggles, team play, reactions, Q&A, branding. Host-derived: `sessionSince`, `sharePresentation`. The deck's `slides` array is intentionally stripped. **Every field is enumerated in [Appendix A](#appendix-a--the-presentation-object).** |
 | `presentationColorPalette` | `string[]` | Deck theme palette — use it for all slide colour so the slide matches the room's theme. |
 | `presentationLighterColorPalette` | `string[]` | The lighter companion palette. |
 | `baseUrl` | string | Base URL of the parent app — pass to `ApiClient`. |
@@ -440,6 +440,163 @@ version stay put until they bump the URL.
 | **Live/scored slides need a backend.** The workbench fakes counts and the answer endpoint. | Deploy a handler for the slug before trusting `sendLiveSubmission` / `createAnswer` in production. |
 | **Preload gate.** A presenter iframe may boot with `active: false`. | Render a blank shell and don't consume slide data until `active` flips true. |
 | **Theme from the deck.** Colours and fonts come from the host, not your CSS. | Read `presentationColorPalette` / `slide.textColour`; call `ensureHostFontLoaded()`. |
+
+---
+
+## Appendix A — the `presentation` object
+
+`xprops.presentation` is passed straight through from the host and is intentionally an **open
+record** (the host no longer maintains a per-field allowlist), so new fields can appear and
+unused ones may be `null`. The table below enumerates the fields observed on a real presenter
+session so an AI or developer knows what is available. A matching TypeScript reference type,
+`PresentationProps`, ships with the package (`import type { PresentationProps }`) — best-effort
+autocomplete, not a closed guarantee.
+
+> The nested `slides` array (the whole deck) is the one field the host **strips** before
+> forwarding — it is never present here.
+
+### Identity & ownership
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | number | Numeric presentation id. |
+| `globalId` | string \| null | Global (cross-region) id. |
+| `name` | string | Presentation title. |
+| `description` | string \| null | Long description. |
+| `userId` / `ownerId` | number | Creator / current owner ids. |
+| `accountId` | number \| null | Billing/account id. |
+| `folderId` / `folder` | number \| null / object | Containing folder. |
+| `version` | number | Model version. |
+| `PresentationsCategories` | array | Public-gallery category links. |
+
+### Join / share codes
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `accessCode` | string | Short human join code (e.g. `KX660`). |
+| `uniqueAccessCode` | string | Stable code used in join URLs. |
+| `shareCode` | string | Timestamped share-session code. |
+| `remoteAccessCode` | string | Remote-control pairing code. |
+| `moderationCode` | string | Code gating moderation access. |
+
+### Live session state
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `presenting` | boolean | True while actively presenting. |
+| `activeSlide` / `lastSlide` | number | Current / last slide id. |
+| `slideActiveTimestamp` | string \| null | Epoch-ms the active slide became active. |
+| `resetTimeStamp` | string \| number \| null | Epoch-ms of the last reset. |
+| `takenOverBy` | number \| null | User id that took over control. |
+| `session` / `token` / `expiredToken` | object / string \| null | Session payload & host token (often null). |
+| `sessionSince` | number \| string \| null | **Host-derived** session start. Not a raw field. |
+| `sharePresentation` | object | **Host-derived** share/present state slice. Not a raw field. |
+
+### Counts
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `onlineCount` / `userOnline` / `realtimeOnlineCount` | number | Online participant tallies (several sources). |
+| `participantsCount` | number | Total joined. |
+| `slideCount` | number | Slides in the deck. |
+| `copyCount` | number | Times the deck was copied. |
+| `numberOfAuthens` | number | Authentication seats/limit. |
+
+### Localization & content
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `language` | string | Deck language code (e.g. `en`). |
+| `fontFamily` | string | Deck font — mirror via `ensureHostFontLoaded`. |
+| `tags` / `keyword` / `forWho` / `cta` | mixed \| null | Marketing / SEO metadata. |
+
+### Pacing & quiz flow
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audiencePacing` | boolean | Each participant advances themselves. |
+| `manualRevealCorrectAnswers` | boolean | Reveal correct answers only on presenter action. |
+| `notRemindCorrectAnswer` | boolean | Suppress the correct-answer reminder. |
+| `enableQuizCoundown` | boolean | Show the quiz countdown. |
+| `areSlideOptionsShuffling` | boolean \| null | Shuffle options per participant. |
+| `isHideEntrySpinnerWheen` | boolean \| null | Hide the spinner-wheel entry. |
+
+### Audio · music · sound effects
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableMusic` / `isEnableQuizMusic` | boolean | Background / quiz music. |
+| `isEnableSoundEffects` / `isEnableSoundEffectsForAudience` | boolean | SFX for presenter / audience. |
+| `audioLink` / `audioName` | string \| null | Custom background audio URL / name. |
+
+### Reactions
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isReactionEnabled` | boolean | Live reactions on. |
+| `numberOfLikes` / `Hearts` / `Laughs` / `Sads` / `Wows` | number | Reaction tallies. |
+
+### Chat · Q&A · moderation
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableChat` | boolean | Audience chat on. |
+| `qnaAllSlide` / `qnaAudienceShowAll` / `qnaAnonymous` | boolean | Q&A availability / visibility / anonymity. |
+| `isModerationMode` | boolean \| null | Moderation mode. |
+| `filteringProfanity` | mixed | Profanity filter setting. |
+
+### Streak & scoring
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `isEnableStreakDetection` / `isEnableStreakBonus` | boolean | Streak detection / bonus. |
+| `isShowSettingStreak` / `isShowSettingStreakBonus` | boolean | Show the streak settings. |
+| `isHideIndividualLeaderboard` | boolean | Hide the individual leaderboard. |
+
+### Team play
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `teamPlay` | boolean | Team mode on. |
+| `teamCount` / `teamSize` | number | Number of teams / max per team. |
+| `teamScoringRule` | string | Aggregation (`average`, `total`, …). |
+| `teamData` | `{ id, name, color, visible }[]` | The configured teams (`color` is a CSS/rgba string). |
+
+### Audience access & behaviour
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audienceAdmission` | `{ isAudienceAdmission }` | Admission gate config. |
+| `isAudienceAuthentication` | boolean \| null | Require verified participants. |
+| `isAudienceLimitation` | boolean | A participant cap is in effect. |
+| `isDisableEveryoneHasAnswered` | boolean | Don't auto-advance once all answered. |
+| `enableAudienceRequestPresentation` | boolean \| null | Audience may request to present. |
+| `isEnableAudienceReviewSlides` | boolean | Audience can review slides afterward. |
+| `isEnableAudienceAhaSlideLabel` | boolean | Show the "made with AhaSlides" label. |
+
+### Branding · visibility · sharing
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `notShowAhaSlidesLogo` / `showAhaSlidesCTA` | boolean | Hide logo / show CTA. |
+| `privateMode` / `isPublicSearch` / `isIndexBot` | boolean \| null | Privacy / search / indexing. |
+| `isAdminPick` | boolean \| null | Featured by an admin. |
+| `showHyperLink` | boolean | Render hyperlinks in content. |
+| `disableConversationPresenterShare` | boolean | Disable presenter-share of Q&A. |
+| `hideInstructionBar` / `hideIntroBarDocument` | boolean | Hide instruction / intro bars. |
+| `isAccountTabVisible` | boolean | Show the account tab in the editor. |
+| `enableCopySlideNote` / `isResizeCustomThumbnail` | boolean \| null | Copy notes / resize thumbnail. |
+| `publicSource` / `crawlSource` / `sourcePresentation` / `source` / `sender` | mixed | Source lineage metadata. |
+
+### Results · ratings · lifecycle
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `hasResults` / `hasExampleResponses` | boolean | Stored results / seeded examples. |
+| `hasAutoSuggestedTitle` / `hasSharedUser` / `isNewlyAdded` | boolean \| null | UI/state flags. |
+| `avgRating` / `totalRatings` | number \| null | Ratings. |
+| `createdAt` / `updatedAt` | string | ISO timestamps. |
+| `publishedAt` / `publishedBy` / `deletedAt` / `deletedById` | mixed \| null | Publish / delete lifecycle. |
 
 ---
 

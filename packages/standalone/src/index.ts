@@ -29,3 +29,8 @@ export * from '@aha/api';
 // Shared primitives/types kept under a namespace so a duplicate export name in
 // @aha/common can never shadow or clash with the flat surface above.
 export * as common from '@aha/common';
+
+// Observed reference shape of `xprops.presentation` — documentation + optional
+// autocomplete over the host's open presentation record. Type-only (erased at
+// runtime), so it does not appear on the browser global.
+export type { PresentationProps } from './presentation.reference';
