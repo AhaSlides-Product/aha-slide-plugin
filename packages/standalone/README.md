@@ -4,6 +4,9 @@ An **all-in-one, framework-agnostic** browser build of the AhaSlides slide-plugi
 SDK. Drop it in with a `<script src>` tag and use `window.AhaSlidePlugin` — no
 bundler, no Vue, no npm install required on the consumer side.
 
+> Full runtime reference (the host `xprops` contract, the complete `ApiClient` surface, a
+> slide type built end-to-end): [`DOCS.md`](./DOCS.md).
+
 It bundles, into one file:
 
 - **`@aha/ui-vanilla`** — the zoid host bridge (`initZoidForPresenter` /
