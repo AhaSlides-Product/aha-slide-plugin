@@ -160,7 +160,7 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 
 | Prop | Type | Notes |
 | --- | --- | --- |
-| `slide` | object | The full active-slide model (open record). Host-derived extras: `textColour`, `baseColour`, `backgroundImage`, `slideType`, `quizStatus`, `hasLeaderboardSlide`. |
+| `slide` | object | The full active-slide model (open record) — title/content, images, audio, quiz/answering, results, options. Host-derived extras: `textColour`, `baseColour`, `backgroundImage`, `slideType`, `quizStatus`, `hasLeaderboardSlide`. **Every field is enumerated in [Appendix B](#appendix-b--the-slide-object).** |
 | `presentation` | object | The full presentation model (open record). Deck-wide identity, session state, feature toggles, team play, reactions, Q&A, branding. Host-derived: `sessionSince`, `sharePresentation`. The deck's `slides` array is intentionally stripped. **Every field is enumerated in [Appendix A](#appendix-a--the-presentation-object).** |
 | `presentationColorPalette` | `string[]` | Deck theme palette — use it for all slide colour so the slide matches the room's theme. |
 | `presentationLighterColorPalette` | `string[]` | The lighter companion palette. |
@@ -602,6 +602,129 @@ autocomplete, not a closed guarantee.
 | `avgRating` / `totalRatings` | number \| null | Ratings. |
 | `createdAt` / `updatedAt` | string | ISO timestamps. |
 | `publishedAt` / `publishedBy` / `deletedAt` / `deletedById` | mixed \| null | Publish / delete lifecycle. |
+
+---
+
+## Appendix B — the `slide` object
+
+`xprops.slide` is the active-slide model, passed straight through as an **open record**. Many
+fields are only meaningful for a particular built-in slide type (word cloud, quiz, audio, …)
+and are `null`/default otherwise. The reference type `SlideProps` ships with the package
+(`import type { SlideProps }`).
+
+> 📦 **Sample fixture:** [`samples/slide.sample.json`](./samples/slide.sample.json) — a real
+> captured quiz slide, for faking `window.xprops.slide` in tests.
+
+### Identity & type
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | number | Numeric slide id. |
+| `globalId` | string \| null | Global (cross-region) id. |
+| `type` | string | Declared type. Marketplace slides: `"marketplace/<slug>"` (e.g. `marketplace/loi-brawl-quiz`). |
+| `slideType` | string \| null | Host-resolved type (`multiple-choice`, `open-ended`, …) — derived, may be null. |
+| `presentationId` | number | Parent presentation id. |
+| `order` | number | 1-based position in the deck. |
+| `version` | number | Model version — **bumped on reset**, which re-keys the audience submission lock. |
+| `sourceSlideId` | number \| null | Slide this was copied from. |
+| `createdBy` | number | Creator user id. |
+| `deleted` / `deletedAt` / `deletedById` | mixed | Soft-delete state. |
+| `isTouched` | boolean | Edited at least once. |
+| `createdAt` / `updatedAt` | string | ISO timestamps. |
+
+### Title & content
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `title` / `titleHTML` | string \| null | Question/title, plain and HTML. |
+| `sanitizedTitle` / `sanitizedTitleHTML` | string \| null | Host-sanitised variants. |
+| `bodyHTML` / `subheading` / `titleDesc` / `description` | string \| null | Body & secondary text. |
+| `notes` | string \| null | Presenter notes. |
+| `textAlign` | string | `left` \| `center` \| `right`. |
+
+### Resolved theme
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `textColour` | string | Resolved text colour (slide override merged over deck theme). |
+| `baseColour` | string | Resolved background colour. |
+| `backgroundImage` | string \| null | Resolved background image URL. |
+| `backgroundSize` | string \| null | Background sizing mode. |
+| `randomColours` | string[] | Palette of random colours the slide may use. |
+
+### Images
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `image` | string \| null | Current question image URL. |
+| `originQuestionImage` / `originBackgroundImage` | string \| null | Pre-crop originals. |
+| `questionImageLayout` / `imageType` | string | Image layout / type. |
+| `showQuestionImage` | boolean | Show the question image. |
+| `imageCaption` | string \| null | Caption under the image. |
+| `imageSubmission` | boolean | Audience may submit an image as their answer. |
+| `questionImageCropperData` / `backgroundImageCropperData` | object \| null | Cropper state. |
+| `canvasBlocksUrl` / `contentTemplateThumbnail` | string \| null | Canvas layout / template thumbnail. |
+
+### Audio
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audioLink` / `audioName` | string \| null | Custom audio URL / name. |
+| `audioShowControl` / `audioAutoPlay` / `audioRepeat` / `audioVolume` / `audioMuted` | mixed | Presenter audio controls. |
+| `audioPlayOnAudience` / `audioAudienceShowControl` / `audioAudienceAutoPlay` / `audioAudienceRepeat` | mixed | Audience audio controls. |
+| `voiceActive` | boolean \| null | Text-to-speech / voice on. |
+
+### Video / embeds
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `youtubeLink` / `showYouTubeIframe` | mixed \| null | YouTube link + iframe toggle. |
+| `showIframe` | boolean | Generic iframe embed toggle. |
+| `publishedLink` | string \| null | Published external link. |
+| `googleSlide` | mixed | Imported Google Slide reference. |
+
+### Quiz / answering
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `votingStep` | string | Current voting phase (e.g. `submission`). |
+| `multipleChoice` / `limitChoice` | boolean / number | Multi-select mode + max choices. |
+| `entriesPerParticipant` | number | Max entries per participant. |
+| `timeToAnswer` / `hasTimeLimit` | number / boolean | Answer time limit (seconds) + whether enforced. |
+| `fastAnswerGetMorePoint` | boolean | Faster answers score more. |
+| `quizStatus` | number | Quiz phase: **1 Lobby · 2 Rule · 3 Countdown · 4 Question · 5 Result**. |
+| `questionIndex` / `questionCount` | number | 1-based question index / total. |
+| `quizTimestamp` / `timestampLeaderboard` | mixed | Per-phase / leaderboard timestamps. |
+| `isCorrectGetPoint` | boolean | Correct answers award points. |
+| `maxPoint` / `minPoint` | number | Score bounds. |
+| `addCorrectOption` / `showCorrectOption` | boolean \| null | Correct-option add / reveal. |
+| `otherCorrectQuiz` / `correctQuizTypeAnswer` / `matchingQuestionOptions` | mixed | Alternate answers / matching options. |
+| `stopSubmission` / `stopSubmissionTime` | mixed | Submission gate + close time. |
+| `resetTimeStamp` / `slideTimestamp` | string \| null | Last reset / slide-active epoch-ms. |
+| `cacheLeaderboardUrl` | string | Precomputed leaderboard URL. |
+
+### Display & results
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `typeChart` | string | Result chart (`barChart`, `pieChart`, …). |
+| `layout` | string | Answer layout (`grid`, `list`, …). |
+| `hideResult` / `showPercentage` | boolean | Hide results / show as %. |
+| `showVotes` / `showSubmissions` / `showVotingResultsOnAudience` | boolean \| null | Count & result visibility. |
+| `visibility` | number | Slide visibility flag (host enum). |
+| `scale` | object \| null | Scale-question config. |
+| `showAllBulletPoints` / `bulletPointsIndex` | mixed | Bullet-point reveal state. |
+| `hintsShowingIndex` / `numberOfHintsShown` / `isHintsVisible` / `hints` | mixed | Hint reveal state. |
+
+### Options, data & AI
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `SlideOptions` | array | The slide's answer options. |
+| `ideasCount` / `multipleCountAnswer` | number | Idea / multi-answer counts. |
+| `additionalFields` / `metadata` | mixed | Slide-type-specific extras / metadata bag. |
+| `wordCloudSmartGrouping` / `numberOfWordsInGroup` / `isGroupWordCloudWords` / `hasUserGroupedWords` / `openEndedAIGroupedAnswers` | mixed | Word-cloud / AI grouping state. |
+| `aiBotMessages` / `isAIIndicatorVisible` | array / boolean | AI assistant messages & indicator. |
 
 ---
 

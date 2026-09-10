@@ -30,7 +30,8 @@ export * from '@aha/api';
 // @aha/common can never shadow or clash with the flat surface above.
 export * as common from '@aha/common';
 
-// Observed reference shape of `xprops.presentation` — documentation + optional
-// autocomplete over the host's open presentation record. Type-only (erased at
-// runtime), so it does not appear on the browser global.
+// Observed reference shapes of the host's open records — documentation + optional
+// autocomplete over `xprops.presentation` and `xprops.slide`. Type-only (erased
+// at runtime), so they do not appear on the browser global.
 export type { PresentationProps } from './presentation.reference';
+export type { SlideProps } from './slide.reference';

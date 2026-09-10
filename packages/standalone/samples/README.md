@@ -5,7 +5,8 @@ Real, captured payloads for building a mock host when testing a slide type again
 
 | File | What it is |
 | --- | --- |
-| [`presentation.sample.json`](./presentation.sample.json) | A real `xprops.presentation` object from a presenter session (v1). Matches the [`PresentationProps`](../src/presentation.reference.ts) reference type and [DOCS.md Appendix A](../DOCS.md#appendix-a--the-presentation-object). |
+| [`presentation.sample.json`](./presentation.sample.json) | A real `xprops.presentation` object from a presenter session (v1). Matches [`PresentationProps`](../src/presentation.reference.ts) and [DOCS.md Appendix A](../DOCS.md#appendix-a--the-presentation-object). |
+| [`slide.sample.json`](./slide.sample.json) | A real `xprops.slide` object (a quiz slide, v1). Matches [`SlideProps`](../src/slide.reference.ts) and [DOCS.md Appendix B](../DOCS.md#appendix-b--the-slide-object). |
 
 ## Use it to fake `window.xprops`
 
@@ -14,11 +15,12 @@ fixture before your slide code runs:
 
 ```js
 import presentation from '@ahaslides-product/plugins-standalone/samples/presentation.sample.json' assert { type: 'json' };
+import slide from '@ahaslides-product/plugins-standalone/samples/slide.sample.json' assert { type: 'json' };
 
 // Minimal presenter host mock — enough for a slide to render without a real host.
 window.xprops = {
   presentation,
-  slide: { id: presentation.activeSlide, textColour: '#1c1528', slideType: 'multiple-choice' },
+  slide,
   presentationColorPalette: ['#6A1EBB', '#E6007E', '#28C270', '#7669BF'],
   presentationLighterColorPalette: ['#efe6fb', '#fce4f0', '#dff4ef', '#eae7f6'],
   baseUrl: '',
