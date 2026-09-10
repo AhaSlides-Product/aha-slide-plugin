@@ -48,7 +48,7 @@ jobs:
     env:
       # App-facing SDK packages to publish. Transitive @aha/* deps are added
       # automatically (see "Resolve closure + build").
-      REQUESTED_PACKAGES: "@aha/common @aha/api @aha/db @aha/ui"
+      REQUESTED_PACKAGES: "@aha/common @aha/api @aha/db @aha/ui @aha/standalone"
       # dispatch -> the chosen tag; sdk-v* tag push -> that tag; branch push -> sdk-latest
       RELEASE_TAG: ${{ github.event.inputs.tag || (startsWith(github.ref, 'refs/tags/') && github.ref_name) || 'sdk-latest' }}
     steps:

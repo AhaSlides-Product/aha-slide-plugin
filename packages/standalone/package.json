@@ -1,0 +1,35 @@
+{
+  "name": "@aha/standalone",
+  "version": "1.0.0",
+  "description": "All-in-one standalone browser bundle of the AhaSlides slide-plugin SDK — load via <script src> and use window.AhaSlidePlugin. Bundles @aha/ui-vanilla (zoid host bridge, sync, height, auth, fonts, media) + @aha/api (ApiClient) + @aha/common.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/aha-slide-plugin.global.js",
+  "jsdelivr": "./dist/aha-slide-plugin.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./global": "./dist/aha-slide-plugin.global.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node build.mjs",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@aha/api": "*",
+    "@aha/common": "*",
+    "@aha/ui-vanilla": "*"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3",
+    "typescript": "^5.0.0"
+  }
+}
