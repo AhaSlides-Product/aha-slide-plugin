@@ -67,19 +67,23 @@ The same iframe code runs in the local workbench and in production; only what fi
 
 ### Via `<script src>` (no build step)
 
-Published to npm as `@ahaslides-product/plugins-standalone`, so any npm CDN serves the
-global build. **Always pin an exact version in production.**
+The build produces one self-contained file, `dist/aha-slide-plugin.global.js`, exposing
+`window.AhaSlidePlugin`. **Today you host that file yourself** (get it from
+`npm run build -w @aha/standalone`, or from the `aha-standalone.tgz` Release asset):
 
 ```html
-<!-- unpkg -->
-<script src="https://unpkg.com/@ahaslides-product/plugins-standalone@1.0.0/dist/aha-slide-plugin.global.js"></script>
-<!-- or jsDelivr -->
-<script src="https://cdn.jsdelivr.net/npm/@ahaslides-product/plugins-standalone@1.0.0/dist/aha-slide-plugin.global.js"></script>
+<!-- self-hosted: point at wherever you serve the built file -->
+<script src="/assets/aha-slide-plugin.global.js"></script>
 
 <script>
   const { initZoidForPresenter, createSync, ApiClient } = window.AhaSlidePlugin;
 </script>
 ```
+
+> ⚠️ **CDN (unpkg / jsDelivr) is not live yet.** They mirror public `registry.npmjs.org`,
+> and this package is not published there (this repo publishes to GitHub Packages + Release
+> tarballs only — see §12). Once a public-npm publish workflow lands, the pinned URL will be
+> `https://unpkg.com/@ahaslides-product/plugins-standalone@<version>/dist/aha-slide-plugin.global.js`.
 
 ### Via ESM (bundler consumers)
 
@@ -347,7 +351,7 @@ A minimal "this or that" vote — presenter counts, audience taps.
 **`audience.html`** — participant taps an option
 
 ```html
-<script src="https://unpkg.com/@ahaslides-product/plugins-standalone@1.0.0/dist/aha-slide-plugin.global.js"></script>
+<script src="/assets/aha-slide-plugin.global.js"></script>
 <div id="app"></div>
 <script>
   const A = window.AhaSlidePlugin;
@@ -384,7 +388,7 @@ A minimal "this or that" vote — presenter counts, audience taps.
 **`presenter.html`** — live tally on the canvas
 
 ```html
-<script src="https://unpkg.com/@ahaslides-product/plugins-standalone@1.0.0/dist/aha-slide-plugin.global.js"></script>
+<script src="/assets/aha-slide-plugin.global.js"></script>
 <script>
   const A = window.AhaSlidePlugin;
   A.initZoidForPresenter();
@@ -416,17 +420,20 @@ The global file bakes in a specific build of `@aha/ui-vanilla` + `@aha/api` + `@
 To ship an update:
 
 1. Update the underlying SDK package(s) and bump their versions as usual.
-2. **Bump `version` in `packages/standalone/package.json`** — this is what CDN consumers pin to.
+2. **Bump `version` in `packages/standalone/package.json`**.
 3. Rebuild: `npm run build -w @aha/standalone` (Turborepo builds the deps first).
-4. Publish through the release workflows — `@aha/standalone` is wired into
-   `publish-packages.yaml` and `release-sdk-tarballs.yaml`.
+4. Publish through the release workflows. **Today** `@aha/standalone` is wired into:
+   - `publish-packages.yaml` — **GitHub Packages** (auth-gated; not CDN-mirrored).
+   - `release-sdk-tarballs.yaml` — attaches `aha-standalone.tgz` to the `sdk-latest` GitHub
+     Release (transitive `@aha/*` deps added automatically); the token-free path the public
+     template already consumes.
 
-Consumers on `@latest` pick up the new build on their next load; consumers who pinned an exact
-version stay put until they bump the URL.
-
-> **One-time follow-up.** The npm-public workflow (`publish-packages-npmjs.yaml`) — the CDN
-> path — needs one line added to its `PACKAGE_NAME_MAP` once it lands on the default branch:
-> `"@aha/standalone": "@ahaslides-product/plugins-standalone"`
+> **Not yet wired: public npm / CDN.** `unpkg` and `jsDelivr` mirror only public
+> `registry.npmjs.org`, and nothing in this repo publishes there — there is no
+> `publish-packages-npmjs.yaml`. Making the `<script src>` CDN URLs resolve is a **follow-up**:
+> add that public-npm publish workflow and map
+> `"@aha/standalone": "@ahaslides-product/plugins-standalone"` in its `PACKAGE_NAME_MAP`.
+> Until then, consumers self-host the built file or use the GitHub Release tarball.
 
 ---
 

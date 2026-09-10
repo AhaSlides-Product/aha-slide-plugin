@@ -15,10 +15,13 @@ const pkg = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 );
 
+// NOTE: keep the banner deterministic — no timestamps or other per-build values,
+// so the same commit produces byte-identical output (reproducible build; Turbo's
+// dist/** cache stays valid). The version is recorded in dist/VERSION too.
 const banner = [
   `/*! AhaSlides Slide Plugin SDK — standalone global build v${pkg.version}`,
   ` *  bundles @aha/ui-vanilla + @aha/api + @aha/common`,
-  ` *  global: window.AhaSlidePlugin  |  built ${new Date().toISOString()}`,
+  ` *  global: window.AhaSlidePlugin`,
   ` */`,
 ].join('\n');
 
