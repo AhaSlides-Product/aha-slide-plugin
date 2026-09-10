@@ -455,6 +455,11 @@ autocomplete, not a closed guarantee.
 > The nested `slides` array (the whole deck) is the one field the host **strips** before
 > forwarding — it is never present here.
 
+> 📦 **Sample fixture:** a real captured payload ships at
+> [`samples/presentation.sample.json`](./samples/presentation.sample.json) — use it to fake
+> `window.xprops` when testing a slide type without a live host. See
+> [`samples/README.md`](./samples/README.md).
+
 ### Identity & ownership
 
 | Field | Type | Meaning |

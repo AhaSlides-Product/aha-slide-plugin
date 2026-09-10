@@ -17,7 +17,8 @@
     "./global": "./dist/aha-slide-plugin.global.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "samples"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && node build.mjs",
