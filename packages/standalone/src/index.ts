@@ -35,3 +35,4 @@ export * as common from '@aha/common';
 // at runtime), so they do not appear on the browser global.
 export type { PresentationProps } from './presentation.reference';
 export type { SlideProps } from './slide.reference';
+export type { AudienceProps, AudienceEntry, PresenterAudiences } from './audience.reference';

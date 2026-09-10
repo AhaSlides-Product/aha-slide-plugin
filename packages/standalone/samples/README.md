@@ -8,6 +8,9 @@ Real, captured payloads for building a mock host when testing a slide type again
 | [`presentation.sample.json`](./presentation.sample.json) | A real `xprops.presentation` object from a presenter session (v1). Matches [`PresentationProps`](../src/presentation.reference.ts) and [DOCS.md Appendix A](../DOCS.md#appendix-a--the-presentation-object). |
 | [`slide.sample.json`](./slide.sample.json) | A real `xprops.slide` object (a quiz slide, v1). Matches [`SlideProps`](../src/slide.reference.ts) and [DOCS.md Appendix B](../DOCS.md#appendix-b--the-slide-object). |
 | [`palette.sample.json`](./palette.sample.json) | The default AhaSlides deck palette. `colors` → `xprops.presentationColorPalette`, `lighterColors` → `xprops.presentationLighterColorPalette`. **`lighterColors[i]` is `colors[i]` at 0.8 alpha as `rgba()`, index-aligned** — note the format differs (hex vs rgba). |
+| [`audience.sample.json`](./audience.sample.json) | The current participant (`xprops.audience`). Matches [`AudienceProps`](../src/audience.reference.ts) — schema example, not a captured payload. |
+| [`teams.sample.json`](./teams.sample.json) | Joinable teams (`xprops.teams`, `Team[]`). `color` is **hex** (vs `presentation.teamData[].color` which is `rgba`). |
+| [`audiences.sample.json`](./audiences.sample.json) | The presenter roster (`xprops.audiences`) keyed by participant id. Illustrative shape — the SDK types the value as `any`. |
 
 ## Use it to fake `window.xprops`
 

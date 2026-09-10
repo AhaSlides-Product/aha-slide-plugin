@@ -1,0 +1,29 @@
+{
+  "90210": {
+    "audienceId": 90210,
+    "audienceName": "Lina",
+    "audienceEmoji": "😎",
+    "audienceTeam": "",
+    "audienceQuizTeam": 2,
+    "online": true,
+    "answers": [{ "choice": 0 }]
+  },
+  "90211": {
+    "audienceId": 90211,
+    "audienceName": "Marcus",
+    "audienceEmoji": "🚀",
+    "audienceTeam": "",
+    "audienceQuizTeam": 4,
+    "online": true,
+    "answers": [{ "choice": 1 }]
+  },
+  "90212": {
+    "audienceId": 90212,
+    "audienceName": "Priya",
+    "audienceEmoji": "🎯",
+    "audienceTeam": "",
+    "audienceQuizTeam": 2,
+    "online": false,
+    "answers": []
+  }
+}

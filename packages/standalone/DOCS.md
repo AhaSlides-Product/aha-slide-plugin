@@ -182,7 +182,7 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 | --- | --- | --- |
 | `active` | boolean | Keep-alive preload gate. When `false` the iframe is preloaded but must render a blank shell and not consume slide data yet. |
 | `currentUser` | `{ presenterLanguage? }` | Drive the editor/UI language from `presenterLanguage`. |
-| `audiences` | `Record<id, details>` | Joined participants — name, emoji, team, online status, answers. |
+| `audiences` | `Record<id, details>` | Joined participants keyed by id — name, emoji, team, online status, answers. Shape in [Appendix C](#appendix-c--audience-audiences--teams). |
 | `getSlideAttributesAction` | `(slideId?) => Promise<any>` | Fetch this slide's persisted config. Call on mount to hydrate. |
 | `upsertSlideAttributeAction` | `(payload) => Promise` | Persist a config attribute host-side (the Settings save path). |
 | `uploadImage` | `() => Promise<ImageUploadResult>` | Opens the host image picker; resolves to `{ path, url }`. |
@@ -206,7 +206,7 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 
 | Member | Signature | Notes |
 | --- | --- | --- |
-| `audience` | object | This participant: `audienceName`, `audienceEmoji`, `audienceId`, `audienceEmail`, `audienceTeam`, `audienceQuizTeam`. |
+| `audience` | object | This participant: `audienceName`, `audienceEmoji`, `audienceId`, `audienceEmail`, `audienceTeam` (free-text org), `audienceQuizTeam` (team-play team id). Detail in [Appendix C](#appendix-c--audience-audiences--teams). |
 | `currentUser` | `{ email? }` | The signed-in participant, if any. |
 | `slideAttributes` | `Record<string, any>` | The persisted slide config, read-only on the audience side. |
 | `isParticipantVerificationEnabled` | boolean | Whether the deck requires verified participants. |
@@ -215,7 +215,7 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 | `updateAudienceData` | `({ audienceName?, audienceEmail?, audienceEmoji? })` | Update this participant's identity. |
 | `emitTyping` | `(isTyping: boolean) => void` | Tell the host this participant is typing. |
 | `joinGame` | `(payload) => Promise<JoinGameResult>` | Join a team game; result may carry an `error` (`invalid-name` \| `invalid-team` \| `team-full` \| `network`). |
-| `teams` | `Team[]` | Available teams for team games. |
+| `teams` | `Team[]` | Available teams for team games (`{ id, name, color? }`, `color` is **hex**). Detail in [Appendix C](#appendix-c--audience-audiences--teams). |
 | `scrollTo` | `(yOffset) => void` | Scroll the host viewport (e.g. "scroll to submit"). |
 | `getWindowHeight` | `() => Promise<number>` | The host window height. |
 | `onSubmitButtonHeightChange` | `(height) => void` | Report the sticky submit button's height. |
@@ -725,6 +725,62 @@ and are `null`/default otherwise. The reference type `SlideProps` ships with the
 | `additionalFields` / `metadata` | mixed | Slide-type-specific extras / metadata bag. |
 | `wordCloudSmartGrouping` / `numberOfWordsInGroup` / `isGroupWordCloudWords` / `hasUserGroupedWords` / `openEndedAIGroupedAnswers` | mixed | Word-cloud / AI grouping state. |
 | `aiBotMessages` / `isAIIndicatorVisible` | array / boolean | AI assistant messages & indicator. |
+
+---
+
+## Appendix C — `audience`, `audiences` & `teams`
+
+The participant-facing identity props. `Team`, `JoinGamePayload`, `JoinGameResult` and
+`ParticipantInfo` are **real SDK types** re-exported by this package (`import { … } from
+'@ahaslides-product/plugins-standalone'`); `AudienceProps`, `AudienceEntry` and
+`PresenterAudiences` are reference aliases this package adds.
+
+> ⚠️ Unlike the presentation / slide / palette fixtures (captured from a real session), the
+> `audience`, `audiences` and `teams` samples are **schema-accurate examples**, not captured
+> payloads — the SDK types the presenter roster as `Record<string, any>`, so read defensively.
+
+### `xprops.audience` — the current participant (audience side)
+
+Reference type `AudienceProps`. Fixture: [`samples/audience.sample.json`](./samples/audience.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `audienceName` | string | Display name. |
+| `audienceEmoji` | string | Emoji avatar. |
+| `audienceId` | string \| number | Unique participant id. |
+| `audienceEmail` | string | Email, when verified/collected. |
+| `audienceTeam` | string | Free-text admission "organisation/team" field — **not** the team-play team. |
+| `audienceQuizTeam` | string \| number | Team-play team id joined; resolve its name via `xprops.teams`. |
+
+### `xprops.teams` — joinable teams (audience side)
+
+SDK type `Team`. Present only when team play is enabled. Fixture:
+[`samples/teams.sample.json`](./samples/teams.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | string \| number | Unique team id (matches `audienceQuizTeam`). |
+| `name` | string | Display name. |
+| `color` | string (hex) | Team colour — **hex** here (note: `presentation.teamData[].color` is `rgba()`). |
+
+Related: `joinGame(payload: JoinGamePayload) => Promise<JoinGameResult>` where
+`JoinGamePayload = { audienceName?, audienceEmoji?, teamId? }` and
+`JoinGameResult = { success: boolean, error?: 'invalid-name' | 'invalid-team' | 'team-full' | 'network' }`.
+
+### `xprops.audiences` — the presenter roster (presenter side)
+
+A map of participant id → entry (reference type `PresenterAudiences` / `AudienceEntry`;
+the SDK types the value as `any`). Fixture:
+[`samples/audiences.sample.json`](./samples/audiences.sample.json).
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| _(key)_ | string | Participant id. |
+| `audienceId` | string \| number | Participant id (mirrors the key). |
+| `audienceName` / `audienceEmoji` | string | Name / emoji. |
+| `audienceTeam` / `audienceQuizTeam` | mixed | Org field / team-play team id. |
+| `online` | boolean | Currently connected. |
+| `answers` | mixed | Submitted answers for the active slide, when exposed. |
 
 ---
 
