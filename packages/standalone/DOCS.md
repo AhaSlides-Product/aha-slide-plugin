@@ -162,8 +162,8 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 | --- | --- | --- |
 | `slide` | object | The full active-slide model (open record) — title/content, images, audio, quiz/answering, results, options. Host-derived extras: `textColour`, `baseColour`, `backgroundImage`, `slideType`, `quizStatus`, `hasLeaderboardSlide`. **Every field is enumerated in [Appendix B](#appendix-b--the-slide-object).** |
 | `presentation` | object | The full presentation model (open record). Deck-wide identity, session state, feature toggles, team play, reactions, Q&A, branding. Host-derived: `sessionSince`, `sharePresentation`. The deck's `slides` array is intentionally stripped. **Every field is enumerated in [Appendix A](#appendix-a--the-presentation-object).** |
-| `presentationColorPalette` | `string[]` | Deck theme palette — use it for all slide colour so the slide matches the room's theme. |
-| `presentationLighterColorPalette` | `string[]` | The lighter companion palette. |
+| `presentationColorPalette` | `string[]` | Deck theme palette — an array of **hex** strings (e.g. `"#FF4181"`). Use it for all slide colour so the slide matches the room's theme. |
+| `presentationLighterColorPalette` | `string[]` | The companion palette, **index-aligned** with the above. Each entry is the *same* colour at **0.8 alpha** as an `rgba(r, g, b, 0.8)` string — **not** a separate lighter tint, and note the format differs from the hex main palette. Sample: [`samples/palette.sample.json`](./samples/palette.sample.json). |
 | `baseUrl` | string | Base URL of the parent app — pass to `ApiClient`. |
 
 ### Shared — functions
