@@ -1,0 +1,76 @@
+name: "Build standalone CDN asset"
+
+# Rebuilds the @aha/standalone browser global and force-updates the `cdn` branch,
+# so a public GitHub CDN (jsDelivr) always serves the latest staging build:
+#
+#   https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js   (latest, ~12h cache)
+#   https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@<sha>/aha-slide-plugin.global.js  (immutable)
+#
+# Runs on staging whenever the SDK source that the bundle includes changes. It
+# pushes to the dedicated `cdn` branch (not staging), so it needs no access to the
+# protected branch and cannot loop (the trigger only watches `staging`).
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'packages/standalone/**'
+      - 'packages/ui-vanilla/**'
+      - 'packages/api/**'
+      - 'packages/common/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-cdn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          token: ${{ secrets.GH_PAT_WRITE }}
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build @aha/standalone
+        run: npx turbo run build --filter=@aha/standalone
+
+      - name: Publish global to the cdn branch
+        env:
+          GH_PAT_WRITE: ${{ secrets.GH_PAT_WRITE }}
+        run: |
+          set -euo pipefail
+          SRC_SHA="$(git rev-parse --short HEAD)"
+          ASSET="packages/standalone/dist/aha-slide-plugin.global.js"
+          test -f "$ASSET" || { echo "::error::built asset missing: $ASSET"; exit 1; }
+
+          WORK="$(mktemp -d)"
+          cp "$ASSET" "$WORK/aha-slide-plugin.global.js"
+          cat > "$WORK/README.md" <<EOF
+          # \`cdn\` branch — generated asset (do not edit by hand)
+
+          Built \`@aha/standalone\` browser global, auto-refreshed from \`staging\` by
+          \`.github/workflows/build-standalone-cdn.yml\`. Force-updated on each change.
+
+          Latest: https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js
+          Source: \`packages/standalone/\` on \`staging\`.
+          EOF
+
+          cd "$WORK"
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -q -m "cdn: rebuild @aha/standalone global (from staging ${SRC_SHA})"
+          git push -f "https://x-access-token:${GH_PAT_WRITE}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/cdn
+          echo "Updated cdn branch from staging ${SRC_SHA}"
