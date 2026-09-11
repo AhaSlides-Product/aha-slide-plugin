@@ -1,18 +1,19 @@
-name: "Publish Packages"
+name: "Publish Packages (npmjs public)"
 
 on:
   workflow_dispatch:
 
-# Publishes the @aha/* SDK packages to GitHub Packages under the @ahaslides-product
-# scope. The local -> published name mapping and the rewrite/build/publish logic are
-# shared with publish-packages-npmjs.yaml via scripts/publish/*.
+# Publishes the @aha/* SDK packages to public npm (registry.npmjs.org) under the
+# @ahaslides-product scope. The local -> published name mapping and the
+# rewrite/build/publish logic are shared with publish-packages.yaml via
+# scripts/publish/*.
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Publishing goes to npmjs.org via NPM_TOKEN, so GITHUB_TOKEN only needs read.
     permissions:
       contents: read
-      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,11 +25,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@ahaslides-product'
 
       - name: Apply publish name map
         run: node scripts/publish/apply-name-map.mjs
+        env:
+          # Public npm: force publishConfig access=public + this registry.
+          PUBLISH_REGISTRY: https://registry.npmjs.org
 
       - name: Install dependencies
         run: npm install
@@ -39,4 +43,5 @@ jobs:
       - name: Publish mapped packages
         run: node scripts/publish/publish-mapped.mjs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PUBLISH_ACCESS: public
