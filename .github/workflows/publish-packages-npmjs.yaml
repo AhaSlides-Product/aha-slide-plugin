@@ -21,6 +21,9 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Publishing goes to npmjs.org via NPM_TOKEN, so GITHUB_TOKEN only needs read.
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
