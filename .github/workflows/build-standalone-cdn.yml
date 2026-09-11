@@ -1,0 +1,122 @@
+name: "Build standalone CDN asset"
+
+# Rebuilds the @aha/standalone browser global and updates the dedicated `cdn`
+# branch, so a public GitHub CDN (jsDelivr) always serves the latest staging build:
+#
+#   https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js   (latest, ~12h cache)
+#   https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@<cdn-sha>/aha-slide-plugin.global.js  (immutable)
+#
+# Runs on staging whenever the SDK source the bundle includes changes. It commits
+# ON TOP of the existing cdn branch (so every published sha stays reachable) and
+# pushes to `cdn` (never the protected staging branch), so it cannot loop.
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'packages/standalone/**'
+      - 'packages/ui-vanilla/**'
+      - 'packages/api/**'
+      - 'packages/common/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Only the newest build should win the race to the cdn branch: back-to-back staging
+# pushes otherwise each push independently, and a slower older-commit run could
+# finish last and silently regress cdn. Cancel any in-progress run when a newer one starts.
+concurrency:
+  group: build-standalone-cdn
+  cancel-in-progress: true
+
+jobs:
+  build-cdn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: staging
+          # GH_PAT (read) is what every other workflow uses to clone the private
+          # app submodules that npm workspaces need. GH_PAT_WRITE is used only for
+          # the push to the cdn branch below.
+          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build @aha/standalone
+        run: npx turbo run build --filter=@aha/standalone
+
+      - name: Publish global to the cdn branch
+        env:
+          GH_PAT_WRITE: ${{ secrets.GH_PAT_WRITE }}
+        run: |
+          set -euo pipefail
+          SRC_SHA="$(git rev-parse --short HEAD)"
+          ASSET="packages/standalone/dist/aha-slide-plugin.global.js"
+          test -f "$ASSET" || { echo "::error::built asset missing: $ASSET"; exit 1; }
+
+          REMOTE="https://x-access-token:${GH_PAT_WRITE}@github.com/${GITHUB_REPOSITORY}.git"
+          WORK="$(mktemp -d)"
+
+          # Commit ON TOP of the existing cdn history so every published sha stays
+          # reachable (a fresh orphan per run would leave old shas unreferenced).
+          # cdn holds only the built asset + README — no submodules — so GH_PAT_WRITE
+          # is enough to clone it.
+          if git clone --depth 1 --branch cdn --single-branch "$REMOTE" "$WORK" 2>/dev/null; then
+            echo "Cloned existing cdn branch."
+          else
+            echo "cdn branch not found — starting it."
+            git init -q "$WORK"
+            git -C "$WORK" checkout -q -b cdn
+          fi
+
+          cp "$ASSET" "$WORK/aha-slide-plugin.global.js"
+          cat > "$WORK/README.md" <<EOF
+          # \`cdn\` branch — generated asset (do not edit by hand)
+
+          Built \`@aha/standalone\` browser global, auto-refreshed from \`staging\` by
+          \`.github/workflows/build-standalone-cdn.yml\`. Latest build from staging \`${SRC_SHA}\`.
+
+          Load it:
+
+          \`\`\`html
+          <!-- latest staging build (jsDelivr caches ~12h) -->
+          <script src="https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@cdn/aha-slide-plugin.global.js"></script>
+
+          <!-- immutable: pin to a commit SHA OF THIS cdn branch (see git log or a
+               workflow run summary for the exact sha) for a permanent, fresh link -->
+          <script src="https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@<cdn-sha>/aha-slide-plugin.global.js"></script>
+          \`\`\`
+
+          Source: \`packages/standalone/\` on \`staging\`.
+          EOF
+
+          cd "$WORK"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No change to the built global — cdn already up to date."
+            exit 0
+          fi
+          git commit -q -m "cdn: rebuild @aha/standalone global (from staging ${SRC_SHA})"
+          git push "$REMOTE" HEAD:refs/heads/cdn
+
+          CDN_SHA="$(git rev-parse HEAD)"
+          {
+            echo "### standalone CDN updated"
+            echo ""
+            echo "- from staging: \`${SRC_SHA}\`"
+            echo "- cdn commit (use for the immutable URL): \`${CDN_SHA}\`"
+            echo "- latest: https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@cdn/aha-slide-plugin.global.js"
+            echo "- immutable: https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@${CDN_SHA}/aha-slide-plugin.global.js"
+          } >> "$GITHUB_STEP_SUMMARY"
