@@ -23,6 +23,13 @@ on:
 permissions:
   contents: read
 
+# Only the newest build should win the race to the cdn branch: back-to-back staging
+# pushes otherwise each force-push independently, and a slower older-commit run could
+# finish last and silently regress cdn. Cancel any in-progress run when a newer one starts.
+concurrency:
+  group: build-standalone-cdn
+  cancel-in-progress: true
+
 jobs:
   build-cdn:
     runs-on: ubuntu-latest
