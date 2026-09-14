@@ -127,6 +127,35 @@ describe('callbackPageHtml', () => {
     expect(close).toHaveBeenCalled();
   });
 
+  // PR #131 review, round 3. The script context was escaped from the start; the
+  // HTML context was not, which is the inconsistency that mattered — a
+  // `pendingText` fed from a translation catalogue is an ordinary thing to do.
+  it.each([
+    ['title', { title: '<img src=x onerror=alert(1)>' }],
+    ['pendingText', { pendingText: '<img src=x onerror=alert(1)>' }],
+  ])('escapes %s so it cannot inject markup', (_label, options) => {
+    const html = callbackPageHtml(options);
+    expect(html).not.toContain('<img src=x');
+    expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('escapes lang so it cannot close the attribute and add another', () => {
+    const html = callbackPageHtml({ lang: '" onload="alert(1)' });
+    expect(html).not.toContain('onload="alert(1)"');
+    expect(html).toContain('lang="&quot; onload=&quot;alert(1)"');
+  });
+
+  // Escaping has to be reversible, not just destructive: the visitor must still
+  // read the text the caller passed.
+  it('renders escaped copy back as the original text', () => {
+    const text = 'Signing you in… <Ben & co> "now"';
+    document.documentElement.innerHTML = callbackPageHtml({ pendingText: text })
+      .replace(/^[\s\S]*?<body>/, '<body>')
+      .replace(/<script>[\s\S]*?<\/script>/i, '');
+
+    expect(document.getElementById('aha-auth-popup-message')?.textContent).toBe(text);
+  });
+
   it('takes the page copy from options', () => {
     const html = callbackPageHtml({ title: 'Nearly there', pendingText: 'One moment' });
     expect(html).toContain('<title>Nearly there</title>');

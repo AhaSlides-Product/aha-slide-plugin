@@ -5,10 +5,31 @@ const DEFAULT_PENDING_TEXT = 'Signing you in…';
 const DEFAULT_SETTLED_TEXT = 'You are signed in. You can close this window.';
 const MESSAGE_ELEMENT_ID = 'aha-auth-popup-message';
 
-/** Embed a value as a JS literal. `JSON.stringify` also escapes the `<` in a
- *  hostile `</script>` sequence once the result is spliced into a page. */
+/** Embed a value as a JS literal, for the script context. `JSON.stringify`
+ *  also escapes the `<` in a hostile `</script>` sequence once the result is
+ *  spliced into a page. */
 function literal(value: string): string {
   return JSON.stringify(value).replace(/</g, '\\u003c');
+}
+
+/**
+ * Embed a value in the HTML context — element text or a quoted attribute.
+ *
+ * `literal()` above is NOT interchangeable with this: it produces a JavaScript
+ * string, which is the wrong escaping for markup and would leave `<` intact
+ * inside `<title>`. Quotes are escaped too, so a value landing in
+ * `lang="…"` cannot close the attribute and add another.
+ *
+ * `&` must be replaced first or it would double-escape the entities the later
+ * replacements introduce.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /**
@@ -75,6 +96,12 @@ export function callbackScript(options: CallbackPageOptions = {}): string {
  * Deliberately unstyled beyond centring: it exists for a few hundred
  * milliseconds inside a window that is closing. A consumer who wants branding
  * should write their own page and call {@link callbackScript} instead.
+ *
+ * Every option is escaped for the context it lands in — `title`, `pendingText`
+ * and `lang` as markup, `channelName` and `settledText` as JavaScript. Callers
+ * today all pass literals, but a `pendingText` fed from a translation catalogue
+ * is an ordinary thing to do and must not be able to inject markup on the
+ * consumer's own origin.
  */
 export function callbackPageHtml(options: CallbackPageOptions = {}): string {
   const {
@@ -83,12 +110,12 @@ export function callbackPageHtml(options: CallbackPageOptions = {}): string {
     lang = 'en',
   } = options;
   return `<!doctype html>
-<html lang="${lang}">
+<html lang="${escapeHtml(lang)}">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>${title}</title>
+    <title>${escapeHtml(title)}</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -110,7 +137,7 @@ export function callbackPageHtml(options: CallbackPageOptions = {}): string {
     </style>
   </head>
   <body>
-    <p id="${MESSAGE_ELEMENT_ID}">${pendingText}</p>
+    <p id="${MESSAGE_ELEMENT_ID}">${escapeHtml(pendingText)}</p>
     <script>
 ${callbackScript(options)
   .split('\n')
