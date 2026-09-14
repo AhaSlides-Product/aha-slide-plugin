@@ -2,6 +2,9 @@ import { DEFAULT_CHANNEL, DEFAULT_WINDOW_NAME, DONE_MESSAGE } from './constants.
 import { resolveLoginUrl } from './url.js';
 import type { SignInOptions, SignInOutcome, SignInStatus } from './types.js';
 
+/** What one identity re-check learned. `busy` is "ask again", not "no". */
+type CheckResult = 'confirmed' | 'negative' | 'busy';
+
 interface ActiveFlow {
   promise: Promise<SignInOutcome>;
   popup: Window | null;
@@ -106,6 +109,7 @@ export function signIn(options: SignInOptions): Promise<SignInOutcome> {
   let settled = false;
   let checking = false;
   let checks = 0;
+  let pingSeen = false;
   let channel: BroadcastChannel | null = null;
   let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -134,14 +138,22 @@ export function signIn(options: SignInOptions): Promise<SignInOutcome> {
       resolve({ status });
     };
 
-    /** One identity re-check. Never throws; a failing check is just "not yet". */
-    const check = async (): Promise<boolean> => {
-      if (settled || checking) return false;
+    /**
+     * One identity re-check. Never throws.
+     *
+     * Three outcomes, not two. "A check is already running" is NOT the same
+     * answer as "there is no session", and collapsing them is what let a
+     * successful login settle as `abandoned`: the callback page pings AND
+     * closes, so focus arrives while the ping's own `onDone()` is still in
+     * flight, and a `false` there read as confirmed-negative.
+     */
+    const check = async (): Promise<CheckResult> => {
+      if (settled || checking) return 'busy';
       checking = true;
       try {
-        return (await onDone()) === true;
+        return (await onDone()) === true ? 'confirmed' : 'negative';
       } catch {
-        return false;
+        return 'negative';
       } finally {
         checking = false;
       }
@@ -154,16 +166,22 @@ export function signIn(options: SignInOptions): Promise<SignInOutcome> {
      */
     const onStrongSignal = () => {
       if (settled) return;
-      void check().then((ok) => {
+      pingSeen = true;
+      void check().then((result) => {
         if (settled) return;
-        if (ok) {
+        if (result === 'confirmed') {
           settle('authenticated');
           return;
         }
-        checks += 1;
-        if (checks >= maxChecks) {
-          settle('unresolved');
-          return;
+        // Only a real negative spends an attempt. A 'busy' result means another
+        // check is mid-flight and this one learned nothing, so counting it
+        // would burn the retry budget on nothing and give up early.
+        if (result === 'negative') {
+          checks += 1;
+          if (checks >= maxChecks) {
+            settle('unresolved');
+            return;
+          }
         }
         retryTimer = setTimeout(onStrongSignal, retryDelayMs);
       });
@@ -176,10 +194,20 @@ export function signIn(options: SignInOptions): Promise<SignInOutcome> {
      */
     function onWeakSignal(): void {
       if (settled) return;
-      void check().then((ok) => {
+      void check().then((result) => {
         if (settled) return;
-        if (ok) settle('authenticated');
-        else if (isClosed(popup)) settle('abandoned');
+        if (result === 'confirmed') {
+          settle('authenticated');
+          return;
+        }
+        // 'busy' — a check is already deciding; let it.
+        //
+        // `pingSeen` — the popup reported success, so the strong sequence owns
+        // the outcome and will land on 'authenticated' or 'unresolved'. Focus
+        // must not pre-empt its retries with 'abandoned': after a ping, a
+        // negative check means a slow identity endpoint, which is exactly what
+        // those retries exist to absorb.
+        if (result === 'negative' && !pingSeen && isClosed(popup)) settle('abandoned');
       });
     }
 

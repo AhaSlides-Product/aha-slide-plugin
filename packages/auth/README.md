@@ -34,74 +34,162 @@ throwing on `//evil`, `/\evil`, absolutes and non-http schemes. An app served
 from two hosts gets the right answer for free; a hardcoded absolute URL would
 set a host-only cookie on the wrong host and leave the opener waiting forever.
 
-## Opener side
+## Integrating it — five steps
 
-Call `signIn` **synchronously from the click handler** — an `await` before it
-loses the user gesture and the popup blocker eats the window.
+### 1. Install
+
+```bash
+npm install @ahaslides-product/plugins-auth
+```
+
+### 2. Serve a callback page on your own origin
+
+Anything that calls `notifyDone()` will do. A **dedicated static page** is the
+most robust choice:
+
+```html
+<!-- public/auth-popup.html -->
+<p>Signing you in…</p>
+<script>
+  // Hard-coded duplicate of DEFAULT_CHANNEL / DONE_MESSAGE: a static page has
+  // no bundler and cannot import them. Pin it with a test (see step 5).
+  try {
+    const channel = new BroadcastChannel('aha-auth');
+    channel.postMessage({ type: 'aha-auth:done' });
+    channel.close();
+  } catch (error) {
+    /* no channel — the opener's focus fallback still covers this */
+  }
+  window.close();
+</script>
+```
+
+Point the callback at an application route instead and the popup must download
+that bundle — and run whatever the entry point runs — before it can close. If
+the bundle is ever slow or broken, the window never closes and the user is left
+staring at it. A worker can serve the equivalent inline with no file at all.
+
+### 3. Open the popup from the click handler
+
+Call `signIn` **synchronously** — an `await` before it loses the user gesture
+and the popup blocker eats the window.
 
 ```ts
 import { signIn, resolveSameOrigin } from '@ahaslides-product/plugins-auth';
 
-const login = new URL('/pages/login', PRESENTER_APP_URL);
-login.searchParams.set('redirect', resolveSameOrigin('/auth-popup.html'));
+function onSignInClick(event: MouseEvent) {
+  event.preventDefault();
 
-const { status } = await signIn({
-  url: login.toString(),
-  onDone: async () => (await refetchIdentity()).signedIn,
-  onBlocked: () => location.assign(fullPageLoginUrl),
-});
+  const login = new URL('/pages/login', PRESENTER_APP_URL);
+  login.searchParams.set('redirect', resolveSameOrigin('/auth-popup.html'));
+
+  void signIn({
+    url: login.toString(),
+    onDone: recheckIdentity,
+    onBlocked: () => location.assign(fullPageLoginUrl),
+  }).then(({ status }) => {
+    // 'authenticated' needs nothing here — your gate re-renders off step 4.
+    // 'abandoned' is the user's choice; leave it alone.
+    if (status === 'unresolved') location.assign(fullPageLoginUrl);
+  });
+}
 ```
 
-`onDone` is **"re-check identity"**, never "assume success". That single choice
-removes a whole class of special cases: a user who closes the popup without
-logging in travels the same path, re-checks, comes back unauthenticated, and the
-gate stays up.
+Keep the button a real `<a href>` pointing at the full-page login and
+`preventDefault()` in the handler. Middle-click, "open in new tab" and a
+JS-less load then all still work, and you have the popup-blocked fallback
+already written.
 
-### Outcomes
+### 4. Make your identity state reactive — the step everyone misses
 
-| `status` | Meaning |
-| --- | --- |
-| `authenticated` | `onDone()` reported a session. The only success. |
-| `abandoned` | Popup closed, still no session. The user gave up — usually not an error worth showing. |
-| `blocked` | `window.open` returned nothing. `onBlocked` has already run. |
-| `unresolved` | Completion was signalled but `onDone()` never confirmed. A real fault — surface it, or fall back to the full-page login. |
-| `timeout` | Nothing happened within `timeoutMs` (default 10 min). |
-| `cancelled` | `cancelSignIn()` was called, e.g. on unmount. |
+`onDone` must **re-check identity and report the answer**, never assume success:
 
-### How completion is detected
+```ts
+async function recheckIdentity(): Promise<boolean> {
+  notifySessionChanged();          // see below
+  if (!isSignedIn()) return false; // reads the cookie fresh
+  await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+  return true;
+}
+```
 
-Two independent signals, no polling of `popup.closed` anywhere:
+**A cookie appearing fires no event of any kind.** If your "am I signed in?"
+state is computed by reading `document.cookie` during render — which is the
+normal shape — then nothing re-renders when the popup completes, and the gate
+sits there over a session that already exists. This package cannot fix that for
+you; it lives in your state layer.
+
+aha-elearning solves it with a counter and `useSyncExternalStore`:
+
+```ts
+const listeners = new Set<() => void>();
+let revision = 0;
+
+export function notifySessionChanged(): void {
+  revision += 1;
+  for (const listener of listeners) listener();
+}
+
+export function useSessionRevision(): number {
+  return useSyncExternalStore(
+    (listener) => (listeners.add(listener), () => listeners.delete(listener)),
+    () => revision,
+    () => revision,
+  );
+}
+```
+
+The signal carries **no data** on purpose: subscribers re-read the cookies
+themselves, so it can never disagree with the jar it is announcing. Subscribe
+in the hook that decides the gate — and subscribe there *directly*. On a
+hardened cookie jar the readable token is `undefined` both before and after
+sign-in, so a hook whose state is derived from the token never changes and
+re-renders nothing.
+
+### 5. Pin the duplicated constants
+
+The callback page hard-codes the channel name and message. Add a test that
+reads the file and asserts they match the package's exports, so the two cannot
+drift:
+
+```ts
+import { DEFAULT_CHANNEL, DONE_MESSAGE } from '@ahaslides-product/plugins-auth';
+
+const html = readFileSync(resolve(__dirname, '../../public/auth-popup.html'), 'utf8');
+expect(html).toContain(`'${DEFAULT_CHANNEL}'`);
+expect(html).toContain(`'${DONE_MESSAGE}'`);
+```
+
+## Outcomes
+
+| `status` | Meaning | What to do |
+| --- | --- | --- |
+| `authenticated` | `onDone()` reported a session. The only success. | Nothing — your reactive state closes the gate. |
+| `abandoned` | Popup closed, still no session. | Nothing. The user chose this. |
+| `blocked` | `window.open` returned nothing. | Already handled by `onBlocked`. |
+| `unresolved` | Completion was signalled but `onDone()` never confirmed. | A real fault — recover via the full-page login. |
+| `timeout` | Nothing happened within `timeoutMs` (default 10 min). | Leave the gate up; the user can click again. |
+| `cancelled` | `cancelSignIn()` was called, e.g. on unmount. | Nothing. |
+
+Call `cancelSignIn()` on teardown so listeners and timers cannot outlive the
+component that started them.
+
+## How completion is detected
+
+Two independent signals, and no polling of `popup.closed` anywhere:
 
 1. **`BroadcastChannel` ping** from the callback page — the fast path, and the
    only one that works while the opener already has focus.
 2. **`focus` / `visibilitychange` on the opener** — the universal fallback.
-   Closing a popup returns focus to whoever opened it, and that *is* an event.
+   There is no close event on an opener, but closing a popup returns focus to
+   whoever opened it, and *that* is an event.
 
 Focus also fires when the user merely clicks back to the parent window, so it is
-only conclusive alongside a closed popup; otherwise the flow re-checks and keeps
-waiting. After a ping, a failed check is retried (`maxChecks`, `retryDelayMs`) —
-the session is already in the jar, so `false` there means a slow identity
-endpoint, not a failed login.
-
-## Popup side
-
-Whatever is served at the callback URL calls `notifyDone()` and nothing else:
-
-```ts
-import { notifyDone } from '@ahaslides-product/plugins-auth';
-notifyDone();
-```
-
-A **dedicated static page** is the most robust option. Point the callback at an
-application route instead and the popup must download that bundle — and run
-whatever the entry point runs — before it can close; if the bundle is ever slow
-or broken, the window never closes and the user is left staring at it. A page
-whose whole body is the snippet above has almost nothing that can fail. A worker
-can serve the equivalent inline without a file at all.
-
-That page cannot import this module (it has no bundler), so it hard-codes
-`DEFAULT_CHANNEL` and `DONE_MESSAGE`. Pin the duplicate with a test that reads
-the file — aha-elearning does this in `LearnerSignInModal.test.tsx`.
+only conclusive alongside a closed popup. After a ping, a negative check is
+*retried* (`maxChecks`, `retryDelayMs`) rather than believed — the session is
+already in the jar, so `false` there means a slow identity endpoint. Once a ping
+has arrived, focus can no longer settle the flow as `abandoned`; the ping's
+retry sequence owns the outcome.
 
 ## Contract between apps
 

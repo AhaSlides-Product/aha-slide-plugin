@@ -119,6 +119,59 @@ describe('signIn', () => {
     await expect(flow).resolves.toEqual({ status: 'authenticated' });
   });
 
+  // Regression, PR #131 review. notifyDone() pings AND closes, so on the happy
+  // path focus arrives while the ping's own onDone() is still in flight. With a
+  // synchronous onDone the strong microtask wins and this passes trivially —
+  // the delay is what makes the race real.
+  it('reports a success as authenticated when the ping and the close race', async () => {
+    const onDone = vi
+      .fn()
+      .mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve(true), 10)));
+    const flow = signIn({ url: LOGIN, onDone });
+
+    broadcastDone();
+    // The popup closes immediately after pinging, exactly as notifyDone() does.
+    popup.closed = true;
+    globalThis.dispatchEvent(new Event('focus'));
+
+    await expect(flow).resolves.toEqual({ status: 'authenticated' });
+  });
+
+  // The same bug class one step later: the ping's check legitimately returns
+  // false (slow session propagation) and a retry is pending. Focus must not
+  // call that abandoned and cancel the retry the ping earned.
+  it('lets the retry finish when focus lands between a negative check and it', async () => {
+    // Negative for BOTH the ping's check and the focus check, so the focus path
+    // reaches its terminal branch rather than confirming and masking the bug.
+    const onDone = vi
+      .fn()
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValue(true);
+    const flow = signIn({ url: LOGIN, onDone, retryDelayMs: 5 });
+
+    broadcastDone();
+    await flush(2); // first check resolves negative, retry scheduled
+
+    popup.closed = true;
+    globalThis.dispatchEvent(new Event('focus'));
+
+    await expect(flow).resolves.toEqual({ status: 'authenticated' });
+    expect(onDone.mock.calls.length).toBeGreaterThanOrEqual(3);
+  });
+
+  // Without a ping, focus IS the only signal, so a closed popup with no session
+  // must still be abandoned — the guard above must not swallow this.
+  it('still reports abandoned when the popup closes with no ping at all', async () => {
+    const onDone = vi.fn().mockResolvedValue(false);
+    const flow = signIn({ url: LOGIN, onDone });
+
+    popup.closed = true;
+    globalThis.dispatchEvent(new Event('focus'));
+
+    await expect(flow).resolves.toEqual({ status: 'abandoned' });
+  });
+
   it('falls back to onBlocked when the popup is blocked', async () => {
     openSpy.mockReturnValue(null);
     const onBlocked = vi.fn();
