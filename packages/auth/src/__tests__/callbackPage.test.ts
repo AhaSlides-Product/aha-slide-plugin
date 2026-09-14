@@ -11,10 +11,18 @@ function run(source: string): void {
   new Function(source)();
 }
 
-/** The `<script>` body out of a generated page, so the page and the bare
- *  script cannot drift apart unnoticed. */
+/**
+ * The `<script>` body out of a generated page, so the page and the bare script
+ * cannot drift apart unnoticed.
+ *
+ * Case-insensitive and attribute-tolerant. Not for safety — the input is a
+ * string this very module produced, and nothing here sanitizes anything — but
+ * a parser that only recognises one exact spelling breaks the moment the
+ * generator emits `<script type="module">`, and CodeQL flags the narrow form
+ * on sight because the same shape IS a hole in code that does filter.
+ */
 function scriptFrom(html: string): string {
-  const match = /<script>([\s\S]*?)<\/script>/.exec(html);
+  const match = /<script\b[^>]*>([\s\S]*?)<\/script\s*>/i.exec(html);
   if (!match) throw new Error('no <script> in generated page');
   return match[1];
 }
