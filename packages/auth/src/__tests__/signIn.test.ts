@@ -119,6 +119,30 @@ describe('signIn', () => {
     await expect(flow).resolves.toEqual({ status: 'authenticated' });
   });
 
+  // Documents what the channel actually buys, so nobody mistakes it for
+  // decoration. Focus says the popup went away; only the ping says it went away
+  // because it succeeded. With no ping there is nothing to justify a retry, so
+  // a REAL login whose identity check is momentarily slow settles as
+  // 'abandoned' and the caller's gate stays up over a live session.
+  //
+  // This asserts current behaviour, not desired behaviour. Making it resolve
+  // 'authenticated' would mean retrying on every focus event, which would turn
+  // an ordinary click back to the parent window into a burst of identity
+  // requests. The fix is for consumers without BroadcastChannel to keep
+  // `onDone` cheap — see the README.
+  it('degraded: without a channel, a slow check on a real login reads as abandoned', async () => {
+    channels.breakConstructor();
+    const onDone = vi.fn().mockResolvedValueOnce(false).mockResolvedValue(true);
+    const flow = signIn({ url: LOGIN, onDone, retryDelayMs: 5 });
+
+    popup.closed = true;
+    globalThis.dispatchEvent(new Event('focus'));
+
+    await expect(flow).resolves.toEqual({ status: 'abandoned' });
+    // One call and no retry: the retry budget is only unlocked by a ping.
+    expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
   // Regression, PR #131 review. notifyDone() pings AND closes, so on the happy
   // path focus arrives while the ping's own onDone() is still in flight. With a
   // synchronous onDone the strong microtask wins and this passes trivially —

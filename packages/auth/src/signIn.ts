@@ -57,11 +57,18 @@ function openPopup(url: string, name: string, width: number, height: number): Wi
  * Must be called SYNCHRONOUSLY from the click handler — an `await` before this
  * line loses the user gesture and the popup blocker eats the window.
  *
- * The flow listens on two independent signals. A BroadcastChannel ping from the
- * callback page is the fast path and works even while the opener already has
- * focus. `focus`/`visibilitychange` on the opener is the universal fallback:
- * closing a popup returns focus to whoever opened it, and that IS an event — no
- * polling of `popup.closed` anywhere.
+ * The flow listens on two independent signals, and polls `popup.closed` nowhere.
+ *
+ * `focus`/`visibilitychange` on the opener tells you the popup went AWAY: there
+ * is no close event on an opener, but closing a popup returns focus to whoever
+ * opened it, and that IS an event.
+ *
+ * The BroadcastChannel ping tells you it went away because it SUCCEEDED — which
+ * focus can never distinguish from the user giving up. That is what makes the
+ * retries safe: after a ping, a negative check means a slow identity endpoint
+ * rather than a failed login, so it is worth asking again. Without a ping the
+ * flow still completes, but a slow check on a real login is read as `abandoned`
+ * (see the degraded-mode test).
  *
  * @example
  * ```ts

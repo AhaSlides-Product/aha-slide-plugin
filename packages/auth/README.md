@@ -176,20 +176,36 @@ component that started them.
 
 ## How completion is detected
 
-Two independent signals, and no polling of `popup.closed` anywhere:
+Two independent signals, and no polling of `popup.closed` anywhere. They answer
+**different questions**, which is why both are needed:
 
-1. **`BroadcastChannel` ping** from the callback page — the fast path, and the
-   only one that works while the opener already has focus.
-2. **`focus` / `visibilitychange` on the opener** — the universal fallback.
-   There is no close event on an opener, but closing a popup returns focus to
-   whoever opened it, and *that* is an event.
+1. **`focus` / `visibilitychange` on the opener** — tells you the popup went
+   *away*. There is no close event on an opener, but closing a popup returns
+   focus to whoever opened it, and *that* is an event. Focus also fires when the
+   user merely clicks back to the parent window, so it is only conclusive
+   alongside a closed popup.
+2. **`BroadcastChannel` ping** from the callback page — tells you it went away
+   because it *succeeded*. Focus can never distinguish that from the user giving
+   up, because both look identical from the opener.
 
-Focus also fires when the user merely clicks back to the parent window, so it is
-only conclusive alongside a closed popup. After a ping, a negative check is
-*retried* (`maxChecks`, `retryDelayMs`) rather than believed — the session is
-already in the jar, so `false` there means a slow identity endpoint. Once a ping
-has arrived, focus can no longer settle the flow as `abandoned`; the ping's
-retry sequence owns the outcome.
+That second distinction is what makes the retries safe. After a ping, a negative
+check means a slow identity endpoint rather than a failed login, so it is worth
+asking again (`maxChecks`, `retryDelayMs`) — and once a ping has arrived, focus
+can no longer settle the flow as `abandoned` at all; the retry sequence owns the
+outcome.
+
+### If `BroadcastChannel` is unavailable
+
+The flow still completes — old Safari and hardened contexts fall back to focus
+alone, and a login whose identity check answers promptly resolves as
+`authenticated` exactly as usual.
+
+What is lost is the retry safety net. With no ping there is nothing asserting
+success, so a real login whose identity check is momentarily slow settles as
+**`abandoned`**: the gate stays up over a session that exists. This is measured,
+not theoretical — `src/__tests__/signIn.test.ts` pins the behaviour so nobody
+mistakes the channel for decoration. If your consumers include browsers without
+it, make `onDone` cheap (read a cookie, do not await a network round trip).
 
 ## Contract between apps
 
