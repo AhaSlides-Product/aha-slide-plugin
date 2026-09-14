@@ -70,3 +70,19 @@ export interface NotifyOptions {
   /** Close the window after signalling. Default `true`. */
   close?: boolean;
 }
+
+export interface CallbackPageOptions {
+  /** BroadcastChannel name. Must match the opener. Default `'aha-auth'`. */
+  channelName?: string;
+  /** `<title>` of the generated page. */
+  title?: string;
+  /** Text shown while the window is closing. */
+  pendingText?: string;
+  /**
+   * Text shown when the window is still open half a second later — which means
+   * there was no opener to return to, so nothing is going to close it.
+   */
+  settledText?: string;
+  /** `lang` attribute of the generated page. Default `'en'`. */
+  lang?: string;
+}

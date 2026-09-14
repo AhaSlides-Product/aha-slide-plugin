@@ -44,30 +44,60 @@ npm install @ahaslides-product/plugins-auth
 
 ### 2. Serve a callback page on your own origin
 
-Anything that calls `notifyDone()` will do. A **dedicated static page** is the
-most robust choice:
+The package generates the page, so nothing needs hand-rolling. What is easy to
+get wrong is not the channel name — it is the four decisions around it:
+guarding `BroadcastChannel` (absent in older Safari and hardened contexts),
+closing the channel only *after* `postMessage` has queued delivery, tolerating
+a `window.close()` the browser refuses, and saying something useful when there
+is no opener to return to.
 
-```html
-<!-- public/auth-popup.html -->
-<p>Signing you in…</p>
-<script>
-  // Hard-coded duplicate of DEFAULT_CHANNEL / DONE_MESSAGE: a static page has
-  // no bundler and cannot import them. Pin it with a test (see step 5).
-  try {
-    const channel = new BroadcastChannel('aha-auth');
-    channel.postMessage({ type: 'aha-auth:done' });
-    channel.close();
-  } catch (error) {
-    /* no channel — the opener's focus fallback still covers this */
-  }
-  window.close();
-</script>
+**From a worker or any server** — return it directly:
+
+```ts
+import { callbackPageHtml } from '@ahaslides-product/plugins-auth';
+
+return new Response(callbackPageHtml(), {
+  headers: { 'content-type': 'text/html; charset=utf-8' },
+});
 ```
 
-Point the callback at an application route instead and the popup must download
-that bundle — and run whatever the entry point runs — before it can close. If
-the bundle is ever slow or broken, the window never closes and the user is left
-staring at it. A worker can serve the equivalent inline with no file at all.
+**From a static-site build** — `public/` is copied verbatim by most bundlers, so
+a page there cannot import this module. Generate it instead, and commit the
+output so `vite dev` needs no build step:
+
+```js
+// scripts/write-auth-popup.mjs   (run from prebuild)
+import { writeFileSync } from 'node:fs';
+import { callbackPageHtml } from '@ahaslides-product/plugins-auth';
+
+writeFileSync('public/auth-popup.html', callbackPageHtml());
+```
+
+Then pin the committed file with a test, the same generate-and-verify shape as
+any other generated artifact:
+
+```ts
+expect(readFileSync('public/auth-popup.html', 'utf8')).toBe(callbackPageHtml());
+```
+
+**If you want your own branding**, write the page yourself and embed just the
+behaviour:
+
+```ts
+import { callbackScript } from '@ahaslides-product/plugins-auth';
+// ...
+`<script>${callbackScript()}</script>`
+```
+
+`callbackScript()` is plain ES5 with no imports, so it runs in a `public/` file
+or a worker-generated response. Both take `channelName`, `title`, `pendingText`,
+`settledText` and `lang`; every option is escaped for embedding.
+
+**Why a dedicated page rather than an app route.** Point the callback at an
+application route and the popup must download that bundle — and run whatever the
+entry point runs — before it can close. If the bundle is ever slow or broken,
+the window never closes and the user is left staring at it. The generated page
+has almost nothing that can fail.
 
 ### 3. Open the popup from the click handler
 
@@ -146,11 +176,11 @@ hardened cookie jar the readable token is `undefined` both before and after
 sign-in, so a hook whose state is derived from the token never changes and
 re-renders nothing.
 
-### 5. Pin the duplicated constants
+### 5. Pin the page, if you hand-wrote it
 
-The callback page hard-codes the channel name and message. Add a test that
-reads the file and asserts they match the package's exports, so the two cannot
-drift:
+Generated pages are pinned by the equality check in step 2 and need nothing
+further. If you wrote your own page and copied the script by hand, assert that
+the constants still match so the two cannot drift:
 
 ```ts
 import { DEFAULT_CHANNEL, DONE_MESSAGE } from '@ahaslides-product/plugins-auth';

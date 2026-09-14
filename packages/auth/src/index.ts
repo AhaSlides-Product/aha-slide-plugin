@@ -24,6 +24,13 @@
  */
 export { signIn, cancelSignIn } from './signIn.js';
 export { notifyDone } from './complete.js';
+export { callbackPageHtml, callbackScript } from './callbackPage.js';
 export { resolveSameOrigin, resolveLoginUrl } from './url.js';
 export { DEFAULT_CHANNEL, DEFAULT_WINDOW_NAME, DONE_MESSAGE } from './constants.js';
-export type { SignInOptions, SignInOutcome, SignInStatus, NotifyOptions } from './types.js';
+export type {
+  SignInOptions,
+  SignInOutcome,
+  SignInStatus,
+  NotifyOptions,
+  CallbackPageOptions,
+} from './types.js';
