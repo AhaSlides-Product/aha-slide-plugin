@@ -12,19 +12,25 @@ function run(source: string): void {
 }
 
 /**
- * The `<script>` body out of a generated page, so the page and the bare script
- * cannot drift apart unnoticed.
+ * Parse a generated page the way a browser would.
  *
- * Case-insensitive and attribute-tolerant. Not for safety — the input is a
- * string this very module produced, and nothing here sanitizes anything — but
- * a parser that only recognises one exact spelling breaks the moment the
- * generator emits `<script type="module">`, and CodeQL flags the narrow form
- * on sight because the same shape IS a hole in code that does filter.
+ * A real parser rather than a regex, and not only to satisfy the scanner that
+ * flagged the regex twice: `</script\t\n bar>` is a valid end tag, `<SCRIPT>`
+ * is a valid start tag, and a pattern that keeps growing to cover them is a
+ * worse version of the parser already sitting in the test environment. It also
+ * asserts something the regex never did — that the generated string is
+ * well-formed HTML at all.
  */
+function parse(html: string): Document {
+  return new DOMParser().parseFromString(html, 'text/html');
+}
+
+/** The `<script>` body out of a generated page, so the page and the bare
+ *  script cannot drift apart unnoticed. */
 function scriptFrom(html: string): string {
-  const match = /<script\b[^>]*>([\s\S]*?)<\/script\s*>/i.exec(html);
-  if (!match) throw new Error('no <script> in generated page');
-  return match[1];
+  const script = parse(html).querySelector('script');
+  if (!script) throw new Error('no <script> in generated page');
+  return script.textContent ?? '';
 }
 
 beforeEach(() => {
@@ -149,11 +155,10 @@ describe('callbackPageHtml', () => {
   // read the text the caller passed.
   it('renders escaped copy back as the original text', () => {
     const text = 'Signing you in… <Ben & co> "now"';
-    document.documentElement.innerHTML = callbackPageHtml({ pendingText: text })
-      .replace(/^[\s\S]*?<body>/, '<body>')
-      .replace(/<script>[\s\S]*?<\/script>/i, '');
 
-    expect(document.getElementById('aha-auth-popup-message')?.textContent).toBe(text);
+    const doc = parse(callbackPageHtml({ pendingText: text }));
+
+    expect(doc.getElementById('aha-auth-popup-message')?.textContent).toBe(text);
   });
 
   it('takes the page copy from options', () => {
