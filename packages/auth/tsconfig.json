@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  // Tests INCLUDED here on purpose. They were excluded originally and silently
+  // went unchecked — a type error in them passed CI and only surfaced when the
+  // same files were typechecked elsewhere. `npm test` runs this config with
+  // --noEmit before vitest, so that gap cannot reopen; tsconfig.build.json is
+  // what keeps the emitted dist/ free of test files.
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

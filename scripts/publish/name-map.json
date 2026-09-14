@@ -6,5 +6,6 @@
   "@aha/api": "@ahaslides-product/plugins-api",
   "@aha/db": "@ahaslides-product/plugins-db",
   "@aha/common": "@ahaslides-product/plugins-common",
-  "@aha/standalone": "@ahaslides-product/plugins-standalone"
+  "@aha/standalone": "@ahaslides-product/plugins-standalone",
+  "@aha/auth": "@ahaslides-product/plugins-auth"
 }

@@ -1,0 +1,6 @@
+{
+  // Emit-only variant: same options, minus the tests, so dist/ contains the
+  // published surface and nothing else. Typechecking lives in tsconfig.json.
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "dist", "src/__tests__"]
+}
