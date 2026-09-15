@@ -1,7 +1,7 @@
 # `cdn` branch — generated asset (do not edit by hand)
 
 Built `@aha/standalone` browser global, auto-refreshed from `staging` by
-`.github/workflows/build-standalone-cdn.yml`. Latest build from staging `3244b9c`.
+`.github/workflows/build-standalone-cdn.yml`. Latest build from staging `52116c3`.
 
 Load it:
 
