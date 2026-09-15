@@ -164,7 +164,7 @@
           "allOf": [
             {
               "if": { "properties": { "mode": { "const": "iframe" } } },
-              "then": { "required": ["iframeUrl"] }
+              "then": { "properties": { "iframeUrl": {} }, "required": ["iframeUrl"] }
             }
           ]
         }

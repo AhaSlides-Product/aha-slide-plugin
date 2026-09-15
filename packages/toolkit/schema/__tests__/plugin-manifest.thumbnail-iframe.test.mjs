@@ -5,7 +5,10 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const Ajv = require('ajv/dist/2020');
 const schema = require('../plugin-manifest.schema.json');
-const ajv = new Ajv({ allErrors: true });
+// Same options as the toolkit CLIs (generateSampleManifest / buildManifest):
+// `strict: true` makes Ajv reject schema shapes at compile time, so a bad
+// edit fails here instead of in every developer's `build-manifest`.
+const ajv = new Ajv({ allErrors: true, strict: true });
 
 const base = {
   id: 'test-plugin',
