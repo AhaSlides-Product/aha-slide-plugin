@@ -39,4 +39,15 @@ jobs:
       - name: Publish mapped packages
         run: node scripts/publish/publish-mapped.mjs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          # The built-in token, not a PAT. GitHub Packages lets a repository's
+          # GITHUB_TOKEN publish any npm package LINKED to that repository, and
+          # all of these now are — seven of them linked by hand after the
+          # `repository` field landed, the rest auto-linking on first publish.
+          # Before that they read NOT LINKED and only a PAT could publish them.
+          #
+          # This removes the `NPM_AUTH_TOKEN` secret from the critical path. It
+          # went missing at some point between 2026-08-13 and 2026-09-14 and
+          # took the workflow down with it; a token scoped to this run cannot
+          # disappear or expire that way. `packages: write` above is what grants
+          # it, and is already the minimum this job needs.
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
