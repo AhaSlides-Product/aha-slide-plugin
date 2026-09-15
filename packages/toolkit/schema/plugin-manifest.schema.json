@@ -137,6 +137,36 @@
               "description": "When true, the host's editor settings panel shows the native quiz settings cluster for this slide (Points max/min, Faster answers get more points, Time limit, Leaderboard toggle, and General quiz settings). Set this on scored / quiz-style slide types so they reuse the host's scoring controls instead of rebuilding them."
             }
           }
+        },
+        "thumbnail": {
+          "type": "object",
+          "description": "Left-panel thumbnail behaviour for this slide type in the presenter editor.",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["icon", "iframe"],
+              "default": "icon",
+              "description": "icon = slide-type icon (default); iframe = the host mounts `iframeUrl/<slideId>` in a plain iframe inside the slide row and feeds it the slide attributes + deck theme over postMessage (`aha:slide-preview:update` / `aha:slide-preview:ready`)."
+            },
+            "iframeUrl": {
+              "type": "string",
+              "description": "Absolute base URL of the static preview page; the host appends `/<slideId>`. Required when mode = iframe.",
+              "minLength": 1
+            },
+            "attributeKeys": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "description": "Slide attribute keys the host must load and forward to the preview iframe (mode = iframe), e.g. [\"dsl\"]."
+            }
+          },
+          "allOf": [
+            {
+              "if": { "properties": { "mode": { "const": "iframe" } } },
+              "then": { "required": ["iframeUrl"] }
+            }
+          ]
         }
       }
     }
