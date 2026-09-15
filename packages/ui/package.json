@@ -1,6 +1,11 @@
 {
   "name": "@aha/ui",
   "version": "1.6.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhaSlides-Product/aha-slide-plugin.git",
+    "directory": "packages/ui"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

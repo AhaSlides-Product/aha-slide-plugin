@@ -1,7 +1,12 @@
 {
   "name": "@aha/auth",
   "version": "0.1.0",
-  "description": "Framework-agnostic popup sign-in orchestration for AhaSlides apps \u2014 opens the platform login in a popup, learns when it finished, and never touches a credential.",
+  "description": "Framework-agnostic popup sign-in orchestration for AhaSlides apps — opens the platform login in a popup, learns when it finished, and never touches a credential.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhaSlides-Product/aha-slide-plugin.git",
+    "directory": "packages/auth"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

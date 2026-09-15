@@ -2,6 +2,11 @@
   "name": "@aha/api",
   "version": "1.0.15",
   "description": "Shared utilities for both backend and frontend",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhaSlides-Product/aha-slide-plugin.git",
+    "directory": "packages/api"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
