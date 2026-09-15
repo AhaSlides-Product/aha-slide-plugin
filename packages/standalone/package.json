@@ -2,6 +2,11 @@
   "name": "@aha/standalone",
   "version": "1.0.0",
   "description": "All-in-one standalone browser bundle of the AhaSlides slide-plugin SDK — load via <script src> and use window.AhaSlidePlugin. Bundles @aha/ui-vanilla (zoid host bridge, sync, height, auth, fonts, media) + @aha/api (ApiClient) + @aha/common.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhaSlides-Product/aha-slide-plugin.git",
+    "directory": "packages/standalone"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
