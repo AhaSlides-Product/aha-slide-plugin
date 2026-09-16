@@ -34,6 +34,20 @@ export interface PluginAction {
   shortcut?: string;
 }
 
+/**
+ * A visible team-play team, as returned by {@link SlidePluginProps.getTeams}.
+ */
+export type PluginTeam = {
+  /** Unique team identifier — pass to {@link SlidePluginProps.setAudienceTeam}. */
+  id: string | number;
+  /** Display name of the team. */
+  name: string;
+  /** Whether the team is currently visible in the presentation. */
+  visible: boolean;
+  /** Current number of members assigned to the team. */
+  memberCount: number;
+};
+
 export type ConfirmModalPayload = {
   /** The title of the confirm modal */
   title: string;
@@ -196,6 +210,24 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
 
   /** Update slide properties from the plugin, e.g. quizStatus. Host allowlists which fields apply. */
   updateSlide?: (payload: Record<string, any>) => void;
+
+  /**
+   * List the presentation's visible team-play teams, with current membership counts.
+   *
+   * @returns A promise resolving to the visible teams.
+   */
+  getTeams?: () => Promise<PluginTeam[]>;
+
+  /**
+   * Set (or move) a participant's team-play team assignment.
+   *
+   * An explicit call here overrides the host's auto-assign behaviour for that
+   * participant.
+   *
+   * @param audienceId - The participant to assign.
+   * @param teamId - The team to assign them to.
+   */
+  setAudienceTeam?: (audienceId: string | number, teamId: string | number) => Promise<void>;
 
   /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
@@ -415,6 +447,14 @@ export const presenterZoidProps = {
     required: false,
   },
   updateSlide: {
+    type: 'function',
+    required: false,
+  },
+  getTeams: {
+    type: 'function',
+    required: false,
+  },
+  setAudienceTeam: {
     type: 'function',
     required: false,
   },

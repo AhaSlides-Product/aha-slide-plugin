@@ -19,7 +19,10 @@ export type {
   ConfirmModalPayload,
   BroadcastActionResult,
   PluginAction,
+  PluginTeam,
 } from '@aha/ui-vanilla';
+
+import type { PluginTeam } from '@aha/ui-vanilla';
 
 import type { PluginAction } from '@aha/ui-vanilla';
 
@@ -108,6 +111,16 @@ export type PresenterPluginReturn = BaseSlidePluginReturn & {
    * Allow the plugin to update slide properties, e.g. quizStatus.
    */
   updateSlide: ((payload: Record<string, any>) => void) | undefined;
+
+  /**
+   * List the presentation's visible team-play teams, with current membership counts.
+   */
+  getTeams: (() => Promise<PluginTeam[]>) | undefined;
+
+  /**
+   * Set (or move) a participant's team-play team assignment. Overrides auto-assign.
+   */
+  setAudienceTeam: ((audienceId: string | number, teamId: string | number) => Promise<void>) | undefined;
 
   /**
    * Method to allow PDF rendering after the plugin has finished loading and rendering its UI.
@@ -219,6 +232,8 @@ export function usePresenterPlugin(options: UseSlidePluginOptions = {}): Present
     createLeaderboardSlide: xprops?.createLeaderboardSlide,
     removeLeaderboardSlide: xprops?.removeLeaderboardSlide,
     updateSlide: xprops?.updateSlide,
+    getTeams: xprops?.getTeams,
+    setAudienceTeam: xprops?.setAudienceTeam,
     trackGA4AndMixpanel: baseHook.trackGA4AndMixpanel,
     allowPDFRender: xprops?.allowPDFRender,
     onSlideAttributesChanged: xprops?.onSlideAttributesChanged,

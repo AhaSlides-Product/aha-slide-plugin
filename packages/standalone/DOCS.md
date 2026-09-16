@@ -200,6 +200,8 @@ What the host provides inside the iframe. Shared fields appear on both surfaces.
 | `clearSlideData` | `(slideId) => Promise<void>` | Clear this slide's submissions. |
 | `createLeaderboardSlide` / `removeLeaderboardSlide` | `() => Promise<void>` | Add/remove the follow-up leaderboard slide. |
 | `updateSlide` | `(payload) => void` | Patch the active slide model. |
+| `getTeams` | `() => Promise<PluginTeam[]>` | List the presentation's visible team-play teams (`{ id, name, visible, memberCount }`), with current membership counts. |
+| `setAudienceTeam` | `(audienceId, teamId) => Promise<void>` | Set/move a participant's team-play team assignment. An explicit call here overrides the host's auto-assign. |
 | `allowPDFRender` | `() => void` | Signal the slide is painted and safe to screenshot for PDF export. |
 | `onSlideAttributesChanged` | `(cb) => void` | React to config changes made in another surface. |
 | `onKeyboard` / `emitKeyboardEvent` | `(cb)` / `(event)` | Receive/forward keyboard events across the boundary (shortcuts). |
