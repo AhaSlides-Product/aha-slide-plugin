@@ -35,14 +35,20 @@ export interface PluginAction {
 }
 
 /**
- * A visible team-play team, as returned by {@link SlidePluginProps.getTeams}.
+ * A team-play team as returned by {@link SlidePluginProps.getTeams}, which
+ * lists only the presentation's currently-visible teams.
  */
 export type PluginTeam = {
   /** Unique team identifier — pass to {@link SlidePluginProps.setAudienceTeam}. */
   id: string | number;
   /** Display name of the team. */
   name: string;
-  /** Whether the team is currently visible in the presentation. */
+  /**
+   * Whether the team is visible in the presentation. Always `true` for teams
+   * from {@link SlidePluginProps.getTeams} (it returns only visible teams), so
+   * filtering on it is a no-op today; the flag mirrors the host team model and
+   * is carried so the shape stays stable if getTeams ever surfaces hidden teams.
+   */
   visible: boolean;
   /** Current number of members assigned to the team. */
   memberCount: number;
@@ -212,9 +218,10 @@ export interface SlidePluginProps extends BaseSlidePluginProps {
   updateSlide?: (payload: Record<string, any>) => void;
 
   /**
-   * List the presentation's visible team-play teams, with current membership counts.
+   * List the presentation's currently-visible team-play teams, with current
+   * membership counts. Hidden teams are omitted.
    *
-   * @returns A promise resolving to the visible teams.
+   * @returns A promise resolving to the currently-visible teams.
    */
   getTeams?: () => Promise<PluginTeam[]>;
 
