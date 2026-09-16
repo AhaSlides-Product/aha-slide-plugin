@@ -255,3 +255,30 @@ describe('signInWithFrame', () => {
     await flow;
   });
 });
+
+// --- review reproductions (PR #136) ---
+describe('review regressions', () => {
+  it('survives a throwing session reader', async () => {
+    expect(() =>
+      start({ watchSession: () => { throw new Error('reader failed'); } }),
+    ).toThrow('reader failed');
+
+    const flow = start();
+    expect(mounted).toHaveLength(1);
+    postFromFrame(AUTH_EMBED_EVENT.close);
+    expect(await flow).toEqual({ status: 'abandoned' });
+  });
+
+  it('runs the teardown when the flow is cancelled during mount', async () => {
+    const teardown = vi.fn<() => void>();
+    const flow = signInWithFrame({
+      baseUrl: AUTH,
+      watchSession: false,
+      onDone: () => true,
+      mount: () => { cancelFrameSignIn(); return teardown; },
+    });
+
+    expect(await flow).toEqual({ status: 'cancelled' });
+    expect(teardown).toHaveBeenCalledTimes(1);
+  });
+});

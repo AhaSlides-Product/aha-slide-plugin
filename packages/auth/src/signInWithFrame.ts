@@ -71,7 +71,7 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
   // Subscribed BEFORE the promise exists, so a bad `baseUrl` throws at the call
   // site rather than leaving a flow that can never settle. The two callbacks
   // are wired through `handlers`, which the executor fills in below.
-  const handlers: { success?: () => void; close?: () => void } = {};
+  const handlers: { success?: () => void; close?: () => void; marker?: () => void } = {};
   const session = createSignInFrame({
     ...frameOptions,
     onReady,
@@ -91,10 +91,30 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
   let successSeen = false;
   let unwatch: (() => void) | undefined;
   let unmount: (() => void) | void;
+  let unmounted = false;
   let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
   // Assigned synchronously by the executor below, read only afterwards.
   let settleFlow!: (status: SignInStatus) => void;
+
+  /**
+   * Run the host's teardown, exactly once, and never before it exists.
+   *
+   * The `!unmount` guard is load-bearing rather than defensive: a host whose
+   * `mount()` tears itself down synchronously (a component unmounting mid-call)
+   * settles the flow BEFORE `mount` has returned the teardown, so this runs
+   * once with nothing to call and once more from the tail below. Marking it
+   * done on the empty first pass would strand the frame on screen forever.
+   */
+  const runUnmount = () => {
+    if (unmounted || !unmount) return;
+    unmounted = true;
+    try {
+      unmount();
+    } catch {
+      // A host teardown that throws must not strand the promise.
+    }
+  };
 
   const promise = new Promise<SignInOutcome>((resolve) => {
     const settle = (status: SignInStatus) => {
@@ -104,14 +124,13 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
       if (retryTimer !== undefined) clearTimeout(retryTimer);
       unwatch?.();
       session.dispose();
-      try {
-        unmount?.();
-      } catch {
-        // A host teardown that throws must not strand the promise.
-      }
+      runUnmount();
       if (active?.promise === promise) active = null;
       resolve({ status });
     };
+    // Published before anything below runs: an executor that throws half-way
+    // must still leave a flow that can be settled and a slot that can be freed.
+    settleFlow = settle;
 
     /**
      * One identity re-check. Never throws.
@@ -161,36 +180,44 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
       // 'authenticated' or 'unresolved'.
       if (!successSeen) settle('abandoned');
     };
-
-    if (watchSession !== false) {
-      unwatch = watchSessionSignal({
-        intervalMs: sessionPollMs,
-        read: typeof watchSession === 'function' ? watchSession : undefined,
-        onAppear: () => {
-          void check().then((result) => {
-            if (result === 'confirmed') settle('authenticated');
-            // Anything else: a guess that did not pan out. Leave the form up.
-          });
-        },
+    handlers.marker = () => {
+      void check().then((result) => {
+        if (result === 'confirmed') settle('authenticated');
+        // Anything else: a guess that did not pan out. Leave the form up.
       });
-    }
+    };
 
     timeoutTimer = setTimeout(() => settle('timeout'), timeoutMs);
-    settleFlow = settle;
   });
 
   // Registered AFTER construction: the executor runs synchronously inside the
   // Promise constructor, where `promise` is still in its temporal dead zone.
   active = { promise, settle: settleFlow };
 
+  // Both of these can throw on a caller's own code — a custom session reader,
+  // a host that cannot render — and both run OUTSIDE the promise executor for
+  // that reason: an executor that throws rejects the promise silently, leaving
+  // this module holding a dead flow that every later call would be handed.
   try {
+    if (watchSession !== false) {
+      unwatch = watchSessionSignal({
+        intervalMs: sessionPollMs,
+        read: typeof watchSession === 'function' ? watchSession : undefined,
+        onAppear: () => handlers.marker?.(),
+      });
+    }
     unmount = mount(session.src);
   } catch (error) {
-    // Nothing is rendered, so there is no flow to wait on. Tear the
-    // subscription down and let the caller see its own error.
+    // Nothing usable is rendered, so there is no flow to wait on. Tear the
+    // subscription down, free the slot, and let the caller see its own error.
     settleFlow('cancelled');
     throw error;
   }
+
+  // The host may have settled the flow from inside `mount()` — unmounting
+  // synchronously, cancelling on a route change. The teardown it just handed
+  // back still has to run.
+  if (settled) runUnmount();
 
   return promise;
 }
