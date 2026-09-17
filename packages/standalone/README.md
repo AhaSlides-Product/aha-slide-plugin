@@ -12,11 +12,14 @@ It bundles, into one file:
 - **`@aha/ui-vanilla`** — the zoid host bridge (`initZoidForPresenter` /
   `initZoidForAudience` / `initializeApp` / `getApp` / `isInitialized` /
   `presenterZoidProps`), live-state sync (`createSync` / `createReadOnlySync`),
-  audience height reporting (`createHeightReporter`), auth (`getAccessToken`),
-  host fonts and image/audio upload helpers.
+  the cross-device session relay (`RelayClient`), audience height reporting
+  (`createHeightReporter`), auth (`getAccessToken`), host fonts and image/audio
+  upload helpers.
 - **`@aha/api`** — `ApiClient` (`sendLiveSubmission`, `createAnswer`,
   `getLeaderboard*`, …) and its request/response types.
-- **`@aha/common`** — shared types/utilities, under `AhaSlidePlugin.common.*`.
+- **`@aha/common`** — shared types/utilities, under `AhaSlidePlugin.common.*`, including
+  `getRelaySession` — the derived `liverelay` session key, which both surfaces must compute
+  through this helper rather than by hand.
 
 ## Use it via `<script src>`
 

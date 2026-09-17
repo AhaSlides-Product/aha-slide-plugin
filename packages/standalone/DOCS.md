@@ -113,7 +113,8 @@ typed; the `<script>` global carries the same shape at runtime.
 | `ensureHostFontLoaded` | `(stack?) => string` | Loads the deck's font into the iframe; returns the resolved stack. |
 | `installHostFontAutoLoad` | `(options?) => () => void` | Keeps the iframe font in sync with the deck; returns an unsubscribe. |
 | `ApiClient` | class | The live-data client — see §8. |
-| `common` | namespace | Shared types/utilities from `@aha/common` (e.g. `common.QuizStatus`). |
+| `RelayClient` | class | Cross-device session relay for 2–50 participants — see §7.1. |
+| `common` | namespace | Shared types/utilities from `@aha/common` (e.g. `common.QuizStatus`, `common.getRelaySession`). |
 
 ---
 
@@ -257,8 +258,74 @@ const off = config.subscribe((c) => paintQuestion(c.question));
 
 > **Same browser only.** `createSync` uses `BroadcastChannel`, so it synchronises surfaces
 > within *one* browser (the presenter's tabs). It does **not** reach a participant's phone.
-> For cross-device state, persist config host-side via `upsertSlideAttributeAction` and send
-> live answers through `ApiClient` — never stream a live clock across devices.
+> For cross-device state, persist config host-side via `upsertSlideAttributeAction`, send
+> live answers through `ApiClient`, and reach for `RelayClient` (§7.1) when a slide needs
+> low-latency two-way traffic between the canvas and a handful of phones.
+
+---
+
+## 7.1 Cross-device state — `RelayClient`
+
+`liverelay` is one Durable Object per live slide, for **2–50 participants**. Large audiences
+never connect to it — they read counts over MQTT as usual. Use it for the interactive middle:
+buzzers, cursors, a shared board, anything where a phone and the canvas need to see each
+other in tens of milliseconds.
+
+**The session key is derived, never minted.** Both surfaces already hold the slide id and
+version, so both compute the same key with nothing to exchange:
+
+```js
+const A = window.AhaSlidePlugin;
+const { slide } = A.getApp();
+const sessionKey = A.common.getRelaySession(
+  { slideId: slide.id, slideVersion: slide.version },
+);  // "slide-42-3"
+```
+
+**Always call `getRelaySession`; never hand-write that string.** Two surfaces that disagree
+do not error — they attach to two different objects and simply never hear each other.
+
+A version bump is a different key, so the host's **"Reset result"** drops everyone into a
+fresh, empty session for free. Do not cache the key across a reset.
+
+```js
+const relay = new A.RelayClient({
+  url: 'wss://liverelay.ahaslides.io',
+  sessionKey,
+  role: 'participant',              // 'presenter' on the canvas entry
+  channels: {                       // optional; this is the default shape
+    signal: { topology: 'mesh', addressing: 'any',       retained: false, logged: false },
+    state:  { topology: 'mesh', addressing: 'none',      retained: true,  logged: false },
+    log:    { topology: 'hub',  addressing: 'presenter', retained: false, logged: true  },
+  },
+  onRoster: (r) => console.log('attached as', r.participantId, 'with', r.participants.length),
+  onFrame: (f) => { if (f.type === 'relay') paint(f.from, f.payload); },
+});
+relay.connect();
+relay.send('state', { slide: 4 });          // mesh: everyone but the sender
+relay.send('log', { answer: 'b' });         // hub: presenters only
+```
+
+| Channel trait | Meaning |
+| --- | --- |
+| `topology` | `mesh` fans out to everyone but the sender. `hub` sends a participant's frame to presenters only — participants never see each other — while a presenter's frame still reaches everyone. |
+| `addressing` | governs the optional third argument to `send`. `any` lets a participant address a peer, `presenter` confines them to a presenter, `none` rejects it. |
+| `retained` | the latest payload is replayed to every joiner in the roster frame. Never combine with addressing. |
+| `logged` | every frame is recorded before it is relayed. |
+| `bufferMs` | 16–1000 ms; frames coalesce into one `batch`. Required above ~10 Hz. |
+
+The first surface to attach fixes the channel map for that session; a later one offering a
+different shape is refused with `409`. Send at **5–10 Hz**, not 20 — above that, coalesce
+with `bufferMs` or pay for it in request charges.
+
+`RelayClient` keeps one participant id across reconnects and buffers per channel semantics
+while disconnected, so a retained channel replays only its newest frame and a transient one
+replays nothing. Pass `participantId` to keep the same identity across a page refresh.
+
+> ⚠️ **Nothing authenticates yet — staging only.** Knowing a session key is the whole
+> authorisation, `role` is a self-declared claim nobody verifies, and the key is derived from
+> a sequential slide id. Do not put anything through this that a participant must not read or
+> forge.
 
 ---
 
