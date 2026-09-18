@@ -8,6 +8,11 @@
  * This package is the HOST half of that conversation — `signInWithFrame()` for
  * a whole flow, `createSignInFrame()` for the raw events.
  *
+ * A host that needs an OAuth authorization code rather than just a session
+ * passes `redirectUri`. That switches the embed into a popup-backed mode and
+ * adds a second outcome — the consent card's answer — which is why `success`
+ * stops being terminal there. See `awaitConsent` on `FrameSignInOptions`.
+ *
  * It is a SIGNAL ORCHESTRATOR, not an auth library. It renders nothing, styles
  * nothing, and never sees a password or a token: the session arrives as a
  * cookie the frame sets, which is first-party to the host because the frame is
@@ -34,6 +39,7 @@ export {
   AUTH_EMBED_EVENT,
   EMBED_LOGIN_PATH,
   EMBED_SIGNUP_PATH,
+  EMBED_REDIRECT_URI_PARAM,
   SESSION_MARKER_COOKIES,
 } from './constants.js';
 export type {

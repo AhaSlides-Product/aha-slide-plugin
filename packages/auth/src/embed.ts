@@ -2,6 +2,7 @@ import {
   AUTH_EMBED_EVENT,
   AUTH_EMBED_SOURCE,
   EMBED_LOGIN_PATH,
+  EMBED_REDIRECT_URI_PARAM,
   EMBED_SIGNUP_PATH,
 } from './constants.js';
 import type { AuthEmbedMessage, AuthEmbedUrlOptions, AuthEmbedUser } from './types.js';
@@ -34,6 +35,35 @@ function requireHttpUrl(base: string): URL {
 }
 
 /**
+ * Vet a `redirectUri` before it goes on the query string.
+ *
+ * Separate from {@link requireHttpUrl} because the two are rejected for
+ * different reasons and the error has to say which one the caller got wrong.
+ * This one is never framed — it is a destination the auth app's popup will
+ * navigate to — so the risk is not script execution here but a value the auth
+ * app silently discards: it re-validates with `safeExternalRedirect` and treats
+ * anything it rejects as ABSENT, which drops the caller back into the ordinary
+ * password flow with no error raised anywhere. Failing loudly at the call site
+ * is the difference between a typo and a mode switch that mysteriously did
+ * nothing.
+ */
+function requireRedirectUri(raw: string): string {
+  if (typeof raw !== 'string' || !raw.trim()) {
+    throw new Error('@aha/auth: redirectUri must not be empty');
+  }
+  let url: URL;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    throw new Error(`@aha/auth: redirectUri ${JSON.stringify(raw)} is not an absolute url`);
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw new Error(`@aha/auth: refusing ${url.protocol} redirectUri`);
+  }
+  return url.toString();
+}
+
+/**
  * The origin of the framed auth app — the ONLY origin whose messages count, and
  * the value `event.origin` is compared against.
  */
@@ -49,7 +79,7 @@ export function authEmbedOrigin(base: string): string {
  * serves it.
  */
 export function authEmbedUrl(base: string, options: AuthEmbedUrlOptions = {}): string {
-  const { signup = false, hostOrigin, dim, closable, query } = options;
+  const { signup = false, hostOrigin, dim, closable, redirectUri, query } = options;
   const url = new URL(signup ? EMBED_SIGNUP_PATH : EMBED_LOGIN_PATH, requireHttpUrl(base));
 
   const origin = hostOrigin ?? globalThis.location?.origin;
@@ -57,6 +87,13 @@ export function authEmbedUrl(base: string, options: AuthEmbedUrlOptions = {}): s
   // Only the non-defaults are sent, so a URL stays readable in a network log.
   if (dim === false) url.searchParams.set('dim', '0');
   if (closable === false) url.searchParams.set('closable', '0');
+  // Checked here as well as on the far side: the auth app treats a redirect it
+  // rejects as absent, which drops the caller back into the ordinary password
+  // flow with no error anywhere. A typo would read as "the mode switch did
+  // nothing", which is the hardest kind of bug to find.
+  if (redirectUri !== undefined) {
+    url.searchParams.set(EMBED_REDIRECT_URI_PARAM, requireRedirectUri(redirectUri));
+  }
   for (const [key, value] of Object.entries(query ?? {})) url.searchParams.set(key, value);
 
   return url.toString();
@@ -84,7 +121,12 @@ export function readAuthEmbedMessage(
 ): AuthEmbedMessage | null {
   if (!expectedOrigin || event.origin !== expectedOrigin) return null;
 
-  const data = event.data as { source?: unknown; type?: unknown; user?: unknown } | null;
+  const data = event.data as {
+    source?: unknown;
+    type?: unknown;
+    user?: unknown;
+    granted?: unknown;
+  } | null;
   if (!data || typeof data !== 'object') return null;
   if (data.source !== AUTH_EMBED_SOURCE) return null;
   if (typeof data.type !== 'string' || !EVENT_VALUES.has(data.type)) return null;
@@ -93,6 +135,13 @@ export function readAuthEmbedMessage(
   if (message.type === AUTH_EMBED_EVENT.success) {
     const user = readUser(data.user);
     if (user) message.user = user;
+  }
+  // A consent that does not actually carry a decision is dropped rather than
+  // defaulted: `granted` IS the user's answer, and guessing it either invents a
+  // refusal nobody made or authorises on their behalf.
+  if (message.type === AUTH_EMBED_EVENT.consent) {
+    if (typeof data.granted !== 'boolean') return null;
+    message.granted = data.granted;
   }
   return message;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@aha/auth",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Framework-agnostic embedded sign-in orchestration for AhaSlides apps — frames the platform login, learns when it finished, and never touches a credential.",
   "repository": {
     "type": "git",

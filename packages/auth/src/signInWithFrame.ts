@@ -36,6 +36,12 @@ let active: ActiveFlow | null = null;
  * `close` is the user's answer. It settles `'abandoned'` unless a success
  * sequence is already running, which owns the outcome.
  *
+ * A CONSENT FLOW (`redirectUri`, see `awaitConsent`) rewires all of that:
+ * `success` stops being terminal, `onDone()` and the marker watch are both
+ * switched off, and the `consent` message is what settles the promise. The
+ * frame must stay mounted across that gap — the popup relays through
+ * `window.opener`, which is the frame itself.
+ *
  * @example
  * ```ts
  * const { status } = await signInWithFrame({
@@ -56,6 +62,9 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
     onReady,
     onSuccess,
     onClose,
+    onConsent,
+    awaitConsent,
+    consentTimeoutMs = 5 * 60 * 1000,
     watchSession = true,
     sessionPollMs = 1000,
     maxChecks = 5,
@@ -64,6 +73,12 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
     ...frameOptions
   } = options;
 
+  // Opting in explicitly is allowed, but a `redirectUri` implies it: the auth
+  // app switches modes on that param whether or not the host thought about it,
+  // and a host left on the old semantics would settle at `success` and tear the
+  // frame down while the consent card was still on screen.
+  const consentFlow = awaitConsent ?? frameOptions.redirectUri !== undefined;
+
   // A flow is already up: hand back the SAME promise rather than framing a
   // second login over the first and racing two checks against one identity.
   if (active) return active.promise;
@@ -71,7 +86,12 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
   // Subscribed BEFORE the promise exists, so a bad `baseUrl` throws at the call
   // site rather than leaving a flow that can never settle. The two callbacks
   // are wired through `handlers`, which the executor fills in below.
-  const handlers: { success?: () => void; close?: () => void; marker?: () => void } = {};
+  const handlers: {
+    success?: () => void;
+    close?: () => void;
+    marker?: () => void;
+    consent?: (granted: boolean) => void;
+  } = {};
   const session = createSignInFrame({
     ...frameOptions,
     onReady,
@@ -82,6 +102,10 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
     onClose: () => {
       onClose?.();
       handlers.close?.();
+    },
+    onConsent: (granted) => {
+      onConsent?.(granted);
+      handlers.consent?.(granted);
     },
   });
 
@@ -94,6 +118,7 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
   let unmounted = false;
   let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
   let retryTimer: ReturnType<typeof setTimeout> | undefined;
+  let consentTimer: ReturnType<typeof setTimeout> | undefined;
   // Assigned synchronously by the executor below, read only afterwards.
   let settleFlow!: (status: SignInStatus) => void;
 
@@ -122,6 +147,7 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
       settled = true;
       if (timeoutTimer !== undefined) clearTimeout(timeoutTimer);
       if (retryTimer !== undefined) clearTimeout(retryTimer);
+      if (consentTimer !== undefined) clearTimeout(consentTimer);
       unwatch?.();
       session.dispose();
       runUnmount();
@@ -174,10 +200,39 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
       });
     };
 
-    handlers.success = onStrongSignal;
+    /**
+     * `success` in a consent flow. The user has a platform session now, but the
+     * flow is not over: the popup still has to reach the authorize endpoint,
+     * the consent card, and finally the host's own redirect URI.
+     *
+     * Deliberately no `check()`. `onDone()` asks whether the HOST has a session,
+     * and until the host's callback exchanges the code the honest answer is no —
+     * cross-site it cannot read the cookie at all, and same-site it can, which
+     * is the dangerous half: it would confirm, settle, and unmount the frame the
+     * popup is still relaying through.
+     */
+    const onConsentPendingSignal = () => {
+      if (settled || successSeen) return;
+      successSeen = true;
+      // The bridge has no abandon or timeout event — a user who closes the popup
+      // or walks away from the card sends nothing at all — so the only way this
+      // flow ends other than an answer is a deadline of our own.
+      consentTimer = setTimeout(() => settle('consent_abandoned'), consentTimeoutMs);
+    };
+
+    handlers.success = consentFlow ? onConsentPendingSignal : onStrongSignal;
+    // Only a flow that opted in is settled by the card's answer. A host on the
+    // ordinary semantics — including one that passed `awaitConsent: false`
+    // deliberately — asked for `authenticated`/`unresolved` and must not be
+    // handed an outcome it never wrote a branch for. The raw `onConsent`
+    // callback still fires either way.
+    if (consentFlow) {
+      handlers.consent = (granted) => settle(granted ? 'consent_granted' : 'consent_denied');
+    }
     handlers.close = () => {
       // A success already owns the outcome; its ladder will land on
-      // 'authenticated' or 'unresolved'.
+      // 'authenticated' or 'unresolved', and in a consent flow the card's answer
+      // decides. The host taking its modal down does not revoke either.
       if (!successSeen) settle('abandoned');
     };
     handlers.marker = () => {
@@ -199,7 +254,10 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
   // that reason: an executor that throws rejects the promise silently, leaving
   // this module holding a dead flow that every later call would be handed.
   try {
-    if (watchSession !== false) {
+    // Forced off in a consent flow for the same reason `onDone()` is not called:
+    // same-site, the marker WOULD appear after the popup login, and confirming
+    // on it would settle the flow mid-consent.
+    if (watchSession !== false && !consentFlow) {
       unwatch = watchSessionSignal({
         intervalMs: sessionPollMs,
         read: typeof watchSession === 'function' ? watchSession : undefined,

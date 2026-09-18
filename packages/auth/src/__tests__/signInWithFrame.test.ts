@@ -14,6 +14,16 @@ function postFromFrame(type: string, origin = AUTH, user?: unknown): void {
   );
 }
 
+/** What the framed auth page posts when the consent card is answered. */
+function postConsent(granted: unknown, origin = AUTH): void {
+  window.dispatchEvent(
+    new MessageEvent('message', {
+      data: { source: AUTH_EMBED_SOURCE, type: AUTH_EMBED_EVENT.consent, granted },
+      origin,
+    }),
+  );
+}
+
 let unmount: Mock<() => void>;
 let mounted: string[];
 
@@ -256,6 +266,153 @@ describe('signInWithFrame', () => {
   });
 });
 
+// A `redirectUri` makes the embed collect an email and do the real sign-in in a
+// popup, then relay the OAuth consent card's answer. `success` there means "the
+// user has a platform session", NOT "the flow is over" — the popup still has to
+// reach the authorize endpoint, the card, and the host's own redirect URI.
+describe('consent flow', () => {
+  const AUTHORIZE = 'https://presenter.ahaslides.com/api/auth/oauth/authorize?client_id=x';
+
+  function startConsent(options: Partial<FrameSignInOptions> = {}) {
+    return start({ redirectUri: AUTHORIZE, ...options });
+  }
+
+  it('puts the redirect on the framed url', () => {
+    const flow = startConsent();
+    expect(new URL(mounted[0]).searchParams.get('redirect_uri')).toBe(AUTHORIZE);
+    cancelFrameSignIn();
+    return flow;
+  });
+
+  // The frame is the popup's `window.opener`. Settling here would unmount it and
+  // drop the user's answer on the floor.
+  it('does not settle on success, and leaves the frame up', async () => {
+    const onDone = vi.fn().mockReturnValue(true);
+    const settled = vi.fn();
+    const flow = startConsent({ onDone }).then(settled);
+
+    postFromFrame(AUTH_EMBED_EVENT.success, AUTH, { id: 7 });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(settled).not.toHaveBeenCalled();
+    expect(unmount).not.toHaveBeenCalled();
+    // `onDone()` asks whether the HOST has a session. Until its own callback
+    // exchanges the code the honest answer is no, so it is not asked at all —
+    // and same-site it would wrongly say yes.
+    expect(onDone).not.toHaveBeenCalled();
+
+    postConsent(true);
+    await flow;
+  });
+
+  it('settles consent_granted when the user allows', async () => {
+    const onConsent = vi.fn();
+    const flow = startConsent({ onConsent });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postConsent(true);
+
+    expect(await flow).toEqual({ status: 'consent_granted' });
+    expect(onConsent).toHaveBeenCalledWith(true);
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
+
+  it('settles consent_denied when the user refuses', async () => {
+    const flow = startConsent();
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postConsent(false);
+
+    expect(await flow).toEqual({ status: 'consent_denied' });
+  });
+
+  // The bridge has no abandon or timeout event: a user who closes the popup or
+  // walks away from the card sends nothing at all. Without a deadline of our own
+  // this would hang to `timeoutMs`.
+  it('settles consent_abandoned when the card is never answered', async () => {
+    vi.useFakeTimers();
+    const flow = startConsent({ consentTimeoutMs: 1_000, timeoutMs: 60_000 });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(await flow).toEqual({ status: 'consent_abandoned' });
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
+
+  // Same-site, the marker WOULD appear once the popup logs in — and confirming
+  // on it would settle the flow while the consent card was still on screen.
+  it('ignores the session marker for the whole flow', async () => {
+    vi.useFakeTimers();
+    const onDone = vi.fn().mockReturnValue(true);
+    const flow = startConsent({ watchSession: true, sessionPollMs: 10, onDone });
+
+    document.cookie = 'ahaLoggedIn=1';
+    await vi.advanceTimersByTimeAsync(100);
+
+    expect(onDone).not.toHaveBeenCalled();
+    expect(unmount).not.toHaveBeenCalled();
+
+    postConsent(true);
+    expect(await flow).toEqual({ status: 'consent_granted' });
+  });
+
+  it('still settles abandoned if the user dismisses before signing in', async () => {
+    const flow = startConsent();
+
+    postFromFrame(AUTH_EMBED_EVENT.close);
+
+    expect(await flow).toEqual({ status: 'abandoned' });
+  });
+
+  // The host taking its own modal down does not revoke a decision still in
+  // flight; the card's answer owns the outcome once sign-in has happened.
+  it('lets the consent answer win over a close that follows success', async () => {
+    const flow = startConsent();
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postFromFrame(AUTH_EMBED_EVENT.close);
+    postConsent(false);
+
+    expect(await flow).toEqual({ status: 'consent_denied' });
+  });
+
+  it('opts out with awaitConsent:false, keeping the ordinary semantics', async () => {
+    const onDone = vi.fn().mockReturnValue(true);
+    const flow = startConsent({ awaitConsent: false, onDone });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+
+    expect(await flow).toEqual({ status: 'authenticated' });
+    expect(onDone).toHaveBeenCalled();
+  });
+
+  it('opts in with awaitConsent:true and no redirect of its own', async () => {
+    const flow = start({ awaitConsent: true });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postConsent(true);
+
+    expect(await flow).toEqual({ status: 'consent_granted' });
+  });
+
+  // `granted` IS the decision; a consent without one is dropped upstream, so it
+  // must not settle the flow either way.
+  it('is not settled by a consent that carries no decision', async () => {
+    const flow = startConsent({ consentTimeoutMs: 60_000 });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postConsent(undefined);
+    postConsent('yes');
+    await Promise.resolve();
+    expect(unmount).not.toHaveBeenCalled();
+
+    postConsent(true);
+    expect(await flow).toEqual({ status: 'consent_granted' });
+  });
+});
+
 // --- review reproductions (PR #136) ---
 describe('review regressions', () => {
   it('survives a throwing session reader', async () => {
@@ -265,6 +422,29 @@ describe('review regressions', () => {
 
     const flow = start();
     expect(mounted).toHaveLength(1);
+    postFromFrame(AUTH_EMBED_EVENT.close);
+    expect(await flow).toEqual({ status: 'abandoned' });
+  });
+
+  // `consent` was added to the vocabulary after the dispatcher was written, and
+  // its `default:` branch routed everything unrecognised to onSuccess — so an
+  // ordinary flow would have treated a consent message as a completed sign-in.
+  it('does not mistake a consent message for a success in an ordinary flow', async () => {
+    const onDone = vi.fn().mockReturnValue(true);
+    const onSuccess = vi.fn();
+    const onConsent = vi.fn();
+    const flow = start({ onDone, onSuccess, onConsent });
+
+    postConsent(true);
+    await Promise.resolve();
+
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(onDone).not.toHaveBeenCalled();
+    // Reported, but not acted on: a host that never opted in has no branch for
+    // a consent outcome, so it keeps the semantics it asked for.
+    expect(onConsent).toHaveBeenCalledWith(true);
+    expect(unmount).not.toHaveBeenCalled();
+
     postFromFrame(AUTH_EMBED_EVENT.close);
     expect(await flow).toEqual({ status: 'abandoned' });
   });

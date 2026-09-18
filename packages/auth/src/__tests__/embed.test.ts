@@ -39,6 +39,38 @@ describe('authEmbedUrl', () => {
     expect(new URL(authEmbedUrl(`${AUTH}/elearning/`)).pathname).toBe('/authen/embed/login');
   });
 
+  describe('redirectUri', () => {
+    const AUTHORIZE = 'https://presenter.ahaslides.com/api/auth/oauth/authorize?client_id=x';
+
+    it('sends it as redirect_uri, which is what switches the embed to popup mode', () => {
+      const url = new URL(authEmbedUrl(AUTH, { redirectUri: AUTHORIZE }));
+      expect(url.searchParams.get('redirect_uri')).toBe(AUTHORIZE);
+    });
+
+    it('is absent unless asked for', () => {
+      expect(new URL(authEmbedUrl(AUTH)).searchParams.get('redirect_uri')).toBeNull();
+    });
+
+    // The auth app re-validates and treats anything it rejects as ABSENT, which
+    // silently restores the ordinary password flow. A caller who fat-fingers the
+    // value would see the mode switch do nothing and have nothing to go on.
+    it('refuses a value the auth app would silently discard', () => {
+      expect(() => authEmbedUrl(AUTH, { redirectUri: 'javascript:alert(1)' }))
+        .toThrow(/refusing javascript: redirectUri/);
+      expect(() => authEmbedUrl(AUTH, { redirectUri: '/api/auth/oauth/authorize' }))
+        .toThrow(/is not an absolute url/);
+      expect(() => authEmbedUrl(AUTH, { redirectUri: '' })).toThrow(/must not be empty/);
+    });
+
+    // The error has to name the thing the caller got wrong: these two are
+    // rejected by different rules and only one of them becomes an iframe src.
+    it('does not report a bad redirect as a bad auth app url', () => {
+      expect(() => authEmbedUrl(AUTH, { redirectUri: 'ftp://x.example' }))
+        .toThrow(/redirectUri/);
+      expect(() => authEmbedUrl('ftp://x.example')).toThrow(/auth app url/);
+    });
+  });
+
   it('defaults the host origin to this document', () => {
     expect(new URL(authEmbedUrl(AUTH)).searchParams.get('origin')).toBe(window.location.origin);
   });
@@ -99,6 +131,51 @@ describe('readAuthEmbedMessage', () => {
       .toBeNull();
     // An empty expectation must never match an empty origin (file://, sandbox).
     expect(readAuthEmbedMessage({ origin: '', data: ready }, '')).toBeNull();
+  });
+
+  describe('consent', () => {
+    it('carries the decision through', () => {
+      for (const granted of [true, false]) {
+        expect(
+          readAuthEmbedMessage(
+            {
+              origin: AUTH,
+              data: { source: AUTH_EMBED_SOURCE, type: AUTH_EMBED_EVENT.consent, granted },
+            },
+            AUTH,
+          ),
+        ).toEqual({ type: AUTH_EMBED_EVENT.consent, granted });
+      }
+    });
+
+    // `granted` IS the user's answer. Defaulting a missing one either invents a
+    // refusal nobody made or authorises a client on their behalf, so the message
+    // is dropped instead.
+    it('drops a consent that carries no decision', () => {
+      for (const granted of [undefined, null, 'true', 1]) {
+        expect(
+          readAuthEmbedMessage(
+            {
+              origin: AUTH,
+              data: { source: AUTH_EMBED_SOURCE, type: AUTH_EMBED_EVENT.consent, granted },
+            },
+            AUTH,
+          ),
+        ).toBeNull();
+      }
+    });
+
+    it('is still subject to the origin check', () => {
+      expect(
+        readAuthEmbedMessage(
+          {
+            origin: 'https://evil.example',
+            data: { source: AUTH_EMBED_SOURCE, type: AUTH_EMBED_EVENT.consent, granted: true },
+          },
+          AUTH,
+        ),
+      ).toBeNull();
+    });
   });
 
   it('ignores traffic that is not ours', () => {
