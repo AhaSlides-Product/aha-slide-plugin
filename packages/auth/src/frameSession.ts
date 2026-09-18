@@ -21,6 +21,7 @@ import type { SignInFrameOptions, SignInFrameSession } from './types.js';
  *   onReady: () => (iframe.style.opacity = '1'),
  *   onSuccess: () => refetchIdentity(),
  *   onClose: () => unmount(),
+ *   onConsent: (granted) => report(granted),   // redirectUri flows only
  * });
  * iframe.src = session.src;
  * // later
@@ -28,7 +29,7 @@ import type { SignInFrameOptions, SignInFrameSession } from './types.js';
  * ```
  */
 export function createSignInFrame(options: SignInFrameOptions): SignInFrameSession {
-  const { baseUrl, onReady, onSuccess, onClose, ...urlOptions } = options;
+  const { baseUrl, onReady, onSuccess, onClose, onConsent, onAbandon, ...urlOptions } = options;
 
   // Both throw on a non-http(s) base, before any listener is attached — a bad
   // config must fail at the call site, not leave a subscription behind.
@@ -40,15 +41,29 @@ export function createSignInFrame(options: SignInFrameOptions): SignInFrameSessi
   function onMessage(event: MessageEvent): void {
     const message = readAuthEmbedMessage(event, origin);
     if (!message || disposed) return;
+    // Every case is named rather than leaning on a `default`. An event added to
+    // the vocabulary is then inert here until someone wires it up — where a
+    // catch-all would quietly route it to whichever handler sat under it.
     switch (message.type) {
       case AUTH_EMBED_EVENT.ready:
         onReady?.();
         return;
+      case AUTH_EMBED_EVENT.success:
+        onSuccess?.(message.user);
+        return;
       case AUTH_EMBED_EVENT.close:
         onClose?.();
         return;
-      default:
-        onSuccess?.(message.user);
+      case AUTH_EMBED_EVENT.consent:
+        // `granted` is guaranteed a boolean here: readAuthEmbedMessage drops a
+        // consent that does not carry one.
+        onConsent?.(message.granted === true);
+        return;
+      case AUTH_EMBED_EVENT.abandoned:
+        // `reason` is guaranteed valid here: readAuthEmbedMessage drops an
+        // abandon that does not carry one it recognises.
+        if (message.reason) onAbandon?.(message.reason);
+        return;
     }
   }
 

@@ -5,7 +5,7 @@
  */
 export const AUTH_EMBED_SOURCE = 'ahaslides-auth';
 
-/** The three things an embedded auth page ever says to its host. */
+/** Everything an embedded auth page ever says to its host. */
 export const AUTH_EMBED_EVENT = {
   /** Sent once on mount: the form is up and the host can reveal the frame. */
   ready: 'ahaslides:auth:ready',
@@ -13,6 +13,24 @@ export const AUTH_EMBED_EVENT = {
   success: 'ahaslides:auth:success',
   /** The user dismissed the form (✕ or backdrop); the host should unmount it. */
   close: 'ahaslides:auth:close',
+  /**
+   * The OAuth consent card that followed a `redirectUri` sign-in was answered,
+   * carrying `granted`. Sent only in that flow, and always AFTER `success`:
+   * signing in and authorising a client are two separate outcomes, and folding
+   * them together would report a refusal as a completed flow.
+   */
+  consent: 'ahaslides:auth:consent',
+  /**
+   * The popup stopped reporting: the user dismissed it, or it outlived the auth
+   * app's watchdog. Carries `reason`. NOT specific to the consent flow — a login
+   * abandoned mid-popup sends it too.
+   *
+   * It is silent in one case by design: a popup the browser refused to open at
+   * all. The form is still up and clickable there, so a host must not tear the
+   * frame down over it — which is why a deadline of the host's own stays
+   * necessary as a backstop even with this event in hand.
+   */
+  abandoned: 'ahaslides:auth:abandoned',
 } as const;
 
 /** Path of the framed login form on the auth app. */
@@ -20,6 +38,13 @@ export const EMBED_LOGIN_PATH = '/authen/embed/login';
 
 /** Path of the framed signup form on the auth app. */
 export const EMBED_SIGNUP_PATH = '/authen/embed/signup';
+
+/**
+ * Query param naming where the auth app should send the session once it has
+ * one. Its presence is also what switches the embed into email-only mode, so it
+ * is a behaviour switch on the far side and not merely a destination.
+ */
+export const EMBED_REDIRECT_URI_PARAM = 'redirect_uri';
 
 /**
  * Non-httpOnly cookies the platform sets alongside the session. Their PRESENCE
