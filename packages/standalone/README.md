@@ -21,11 +21,12 @@ It bundles, into one file:
 ## Use it via `<script src>`
 
 The build produces a single self-contained file, `dist/aha-slide-plugin.global.js`, that
-exposes `window.AhaSlidePlugin`. **Today you host that file yourself** and reference it:
+exposes `window.AhaSlidePlugin`. It is served from **jsDelivr**, straight off this repo's
+`cdn` branch:
 
 ```html
-<!-- self-hosted: point at wherever you serve the built file -->
-<script src="/assets/aha-slide-plugin.global.js"></script>
+<!-- latest staging build (jsDelivr caches ~12h) -->
+<script src="https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js"></script>
 
 <script>
   // Presenter iframe entry — plain JS, no framework.
@@ -42,7 +43,7 @@ exposes `window.AhaSlidePlugin`. **Today you host that file yourself** and refer
 
 ```html
 <!-- Audience iframe entry -->
-<script src="/assets/aha-slide-plugin.global.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js"></script>
 <script>
   AhaSlidePlugin.initZoidForAudience();
   // pass the id your content mounts on — default rootSelector is '#root'
@@ -50,14 +51,14 @@ exposes `window.AhaSlidePlugin`. **Today you host that file yourself** and refer
 </script>
 ```
 
-Get the file by building it (`npm run build -w @aha/standalone`), or by extracting it from
-the `aha-standalone.tgz` asset on the SDK Release (`package/dist/aha-slide-plugin.global.js`).
+| URL | Use it for |
+| --- | --- |
+| `https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js` | Latest build from `staging`. jsDelivr caches it for ~12h, so a fresh build can take that long to show up. |
+| `https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@<cdn-sha>/aha-slide-plugin.global.js` | **Immutable** — pin to a commit SHA of the `cdn` branch (shown in each *Build standalone CDN asset* run summary, or `git log origin/cdn`). Use this in production so the SDK never changes under you. |
 
-> ⚠️ **CDN (unpkg / jsDelivr) is not live yet.** Those mirror public `registry.npmjs.org`,
-> and this package is not yet published there (see [Updating](#updating-the-library--releasing-a-new-version)).
-> Once a public-npm publish workflow lands, the pinned CDN URL will be
-> `https://unpkg.com/@ahaslides-product/plugins-standalone@<version>/dist/aha-slide-plugin.global.js` —
-> until then, self-host as shown above.
+The `cdn` branch is generated — see [Updating](#updating-the-library--releasing-a-new-version).
+You can still self-host instead: build the file (`npm run build -w @aha/standalone`) or extract
+it from the `aha-standalone.tgz` asset on the SDK Release (`package/dist/aha-slide-plugin.global.js`).
 
 > The script runs zoid's host-bridge setup **on load** (eager). Load it in the
 > iframe document that talks to the AhaSlides host.
@@ -98,18 +99,18 @@ taken at build time. To ship an update:
 1. Update the underlying SDK package(s) (`packages/ui-vanilla`, `packages/api`,
    `packages/common`) and bump their versions as usual.
 2. **Bump `version` in this package's `package.json`** (semver).
-3. Rebuild: `npm run build` (Turborepo builds the deps first, then this package).
-4. Publish through the release workflows. **Today** `@aha/standalone` is wired into:
+3. Merge to `staging`. That's all the CDN needs:
+   **`.github/workflows/build-standalone-cdn.yml`** runs on every `staging` push that touches
+   `packages/standalone`, `packages/ui-vanilla`, `packages/api` or `packages/common`
+   (or manually via *workflow_dispatch*). It builds this package and commits
+   `aha-slide-plugin.global.js` on top of the **`cdn` branch**, which jsDelivr serves
+   (the repo is public). Each run's summary prints the new `cdn` SHA for the immutable URL.
+   Old SHAs stay reachable, so pinned URLs keep working.
+4. The package is also shipped through the release workflows:
    - **`.github/workflows/publish-packages.yaml`** — **GitHub Packages** (auth-gated;
-     *not* CDN-mirrored).
+     for bundler/ESM consumers).
    - **`.github/workflows/release-sdk-tarballs.yaml`** — attaches `aha-standalone.tgz`
      to the `sdk-latest` GitHub Release (its transitive `@aha/*` deps are added
      automatically). This is the token-free path the public template already consumes.
 
-**Not yet wired: public npm / CDN.** `unpkg` and `jsDelivr` mirror only public
-`registry.npmjs.org`, and nothing in this repo publishes there — there is no
-`publish-packages-npmjs.yaml`. Making the `<script src>` CDN URLs resolve is a
-**follow-up**: add that public-npm publish workflow and map
-`"@aha/standalone": "@ahaslides-product/plugins-standalone"` in its `PACKAGE_NAME_MAP`.
-Until then, consumers self-host the built `dist/aha-slide-plugin.global.js` (or use the
-GitHub Release tarball).
+To build locally, `npm run build` (Turborepo builds the deps first, then this package).
