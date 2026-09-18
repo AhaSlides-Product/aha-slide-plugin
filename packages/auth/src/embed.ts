@@ -126,6 +126,7 @@ export function readAuthEmbedMessage(
     type?: unknown;
     user?: unknown;
     granted?: unknown;
+    reason?: unknown;
   } | null;
   if (!data || typeof data !== 'object') return null;
   if (data.source !== AUTH_EMBED_SOURCE) return null;
@@ -142,6 +143,12 @@ export function readAuthEmbedMessage(
   if (message.type === AUTH_EMBED_EVENT.consent) {
     if (typeof data.granted !== 'boolean') return null;
     message.granted = data.granted;
+  }
+  // Same rule as `granted`: the payload IS the information. An abandon with an
+  // unrecognised reason is dropped rather than guessed at.
+  if (message.type === AUTH_EMBED_EVENT.abandoned) {
+    if (data.reason !== 'closed' && data.reason !== 'timeout') return null;
+    message.reason = data.reason;
   }
   return message;
 }

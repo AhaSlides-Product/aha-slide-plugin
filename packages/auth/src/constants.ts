@@ -20,6 +20,17 @@ export const AUTH_EMBED_EVENT = {
    * them together would report a refusal as a completed flow.
    */
   consent: 'ahaslides:auth:consent',
+  /**
+   * The popup stopped reporting: the user dismissed it, or it outlived the auth
+   * app's watchdog. Carries `reason`. NOT specific to the consent flow — a login
+   * abandoned mid-popup sends it too.
+   *
+   * It is silent in one case by design: a popup the browser refused to open at
+   * all. The form is still up and clickable there, so a host must not tear the
+   * frame down over it — which is why a deadline of the host's own stays
+   * necessary as a backstop even with this event in hand.
+   */
+  abandoned: 'ahaslides:auth:abandoned',
 } as const;
 
 /** Path of the framed login form on the auth app. */

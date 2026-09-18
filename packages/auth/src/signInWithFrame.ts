@@ -42,6 +42,9 @@ let active: ActiveFlow | null = null;
  * frame must stay mounted across that gap — the popup relays through
  * `window.opener`, which is the frame itself.
  *
+ * `abandoned` reports that the auth app gave up on its popup. It is a render
+ * signal, not an outcome: see `onAbandon`.
+ *
  * @example
  * ```ts
  * const { status } = await signInWithFrame({
@@ -63,6 +66,7 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
     onSuccess,
     onClose,
     onConsent,
+    onAbandon,
     awaitConsent,
     consentTimeoutMs = 5 * 60 * 1000,
     watchSession = true,
@@ -107,6 +111,12 @@ export function signInWithFrame(options: FrameSignInOptions): Promise<SignInOutc
       onConsent?.(granted);
       handlers.consent?.(granted);
     },
+    // Reported and deliberately not settled. The framed form is still up and
+    // still clickable when the popup goes away, so ending the flow here would
+    // take away the surface the user would retry from — the same mistake as
+    // settling on a marker-watch negative. A host that would rather give up
+    // calls `cancelFrameSignIn()` from this callback.
+    onAbandon,
   });
 
   let settled = false;

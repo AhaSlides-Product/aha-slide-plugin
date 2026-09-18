@@ -19,6 +19,13 @@ export interface AuthEmbedUser {
   avatar?: string;
 }
 
+/**
+ * Why the auth app stopped waiting on its popup. `closed` is the user
+ * dismissing it; `timeout` is that app's own watchdog giving up on a window
+ * still sitting open.
+ */
+export type AuthAbandonReason = 'closed' | 'timeout';
+
 /** A validated message from the framed auth page. */
 export interface AuthEmbedMessage {
   type: AuthEmbedEvent;
@@ -26,6 +33,8 @@ export interface AuthEmbedMessage {
   user?: AuthEmbedUser;
   /** Present on `consent` only: how the OAuth consent card was answered. */
   granted?: boolean;
+  /** Present on `abandoned` only: why the popup stopped reporting. */
+  reason?: AuthAbandonReason;
 }
 
 export interface AuthEmbedUrlOptions {
@@ -86,6 +95,19 @@ export interface SignInFrameOptions extends AuthEmbedUrlOptions {
    * closes the popup. `granted === false` is genuinely terminal.
    */
   onConsent?: (granted: boolean) => void;
+  /**
+   * The auth app gave up on its popup — the user closed it, or its watchdog
+   * expired. Fires in EVERY flow, not just the consent one.
+   *
+   * Reported, never acted on: this does NOT settle the flow, because the framed
+   * form is still up and still clickable and tearing it down would take away a
+   * surface the user can retry from. Use it to stop a spinner and offer that
+   * retry; call `cancelFrameSignIn()` if your host would rather give up.
+   *
+   * It stays silent when the browser blocked the popup outright, so it cannot
+   * be the only thing a host waits on.
+   */
+  onAbandon?: (reason: AuthAbandonReason) => void;
 }
 
 export interface SignInFrameSession {
@@ -173,13 +195,14 @@ export interface FrameSignInOptions extends SignInFrameOptions {
   awaitConsent?: boolean;
 
   /**
-   * How long to wait for `consent` after `success`, in ms. Default 5 minutes,
-   * matching the auth app's own popup budget (`POPUP_TIMEOUT_MS`).
+   * How long to wait for `consent` after `success`, in ms. Default 5 minutes.
+   * Expiring settles `'consent_abandoned'`.
    *
-   * This is a host-side deadline by necessity: the bridge has no abandon or
-   * timeout event, so a user who closes the popup or walks away from the card
-   * produces no message at all. Without it such a flow would hang to
-   * `timeoutMs`. Expiring settles `'consent_abandoned'`.
+   * A BACKSTOP, not the primary signal. The auth app reports a closed or
+   * timed-out popup as {@link SignInFrameOptions.onAbandon}, which is both
+   * faster and better-informed — but it stays silent when the browser REFUSED
+   * to open the popup, and that case is otherwise indistinguishable from a user
+   * who simply never answered. This deadline is what covers it.
    */
   consentTimeoutMs?: number;
 

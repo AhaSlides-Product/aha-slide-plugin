@@ -165,7 +165,7 @@ describe('readAuthEmbedMessage', () => {
       }
     });
 
-    it('is still subject to the origin check', () => {
+      it('is still subject to the origin check ', () => {
       expect(
         readAuthEmbedMessage(
           {
@@ -175,6 +175,31 @@ describe('readAuthEmbedMessage', () => {
           AUTH,
         ),
       ).toBeNull();
+    });
+  });
+
+  describe('abandoned', () => {
+    const abandon = (reason: unknown) => ({
+      source: AUTH_EMBED_SOURCE,
+      type: AUTH_EMBED_EVENT.abandoned,
+      reason,
+    });
+
+    it('carries the reason through', () => {
+      for (const reason of ['closed', 'timeout']) {
+        expect(readAuthEmbedMessage({ origin: AUTH, data: abandon(reason) }, AUTH)).toEqual({
+          type: AUTH_EMBED_EVENT.abandoned,
+          reason,
+        });
+      }
+    });
+
+    // Same rule as `granted`: the payload is the information, so an
+    // unrecognised reason is dropped rather than guessed at.
+    it('drops an abandon with no reason it recognises', () => {
+      for (const reason of [undefined, null, '', 'blocked', 1]) {
+        expect(readAuthEmbedMessage({ origin: AUTH, data: abandon(reason) }, AUTH)).toBeNull();
+      }
     });
   });
 

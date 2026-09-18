@@ -122,6 +122,21 @@ has one. Disable with `watchSession: false`, or substitute your own predicate.
 **`close`** is the user's answer, and settles `abandoned` — unless a success
 sequence is already running, which owns the outcome.
 
+**`abandoned`** is the auth app saying it stopped waiting on its popup — the
+user dismissed it (`closed`), or its own watchdog expired (`timeout`). It fires
+in every flow, not just the consent one.
+
+It is **reported and never acted on**: `onAbandon` fires, and the promise stays
+live. The framed form is still up and still clickable when the popup goes away,
+so settling here would tear down the very surface the user would retry from —
+the same mistake as settling on a marker-watch negative. Use it to stop a
+spinner and offer that retry; call `cancelFrameSignIn()` from the callback if
+your host would rather give up.
+
+It is also **silent when the browser refused to open the popup at all**, which
+is why `consentTimeoutMs` is still load-bearing. That case is indistinguishable
+from a user who never answered, so a deadline is the only thing covering it.
+
 ## Getting an authorization code: `redirectUri`
 
 A host that needs an OAuth code rather than just a session passes one:
@@ -154,11 +169,34 @@ handled for you:
   flow, and unmount the frame mid-consent.
 - **The frame must stay mounted until `consent` arrives.** The popup relays
   through `window.opener`, and that is the frame. Do not unmount on `success`.
-- **A deadline is enforced from this side.** The bridge has no abandon or
-  timeout event, so a user who closes the popup or walks away from the card
-  sends nothing at all. `consentTimeoutMs` (default 5 min, matching the auth
-  app's own popup budget) settles `consent_abandoned` rather than hanging to
-  `timeoutMs`.
+- **A deadline backs the whole thing up.** `consentTimeoutMs` (default 5 min)
+  settles `consent_abandoned` rather than letting a flow hang to `timeoutMs`.
+  See below for why it is still needed now that the popup reports itself.
+
+### What the frame is entitled to tell you
+
+Nothing crosses the postMessage boundary that a host could authorise on, and
+that is the design rather than a missing feature.
+
+A `success` payload is **unverifiable at the receiving end**. Any page can post
+a well-shaped `{ id, email, … }` — which is why the origin is checked before the
+payload is read, and why `AuthEmbedUser` is advisory. It cannot mint a session,
+however convenient it looks.
+
+`consent_granted` is a claim of the same kind, and it is the only part of the
+exchange a host is entitled to act on: *the user said yes, so proceed*. The
+identity assertion you can actually trust arrives the other way — signed by
+general-api, at your `redirect_uri`, over a back-channel you control. So "the
+code never comes back through the frame" is the property that makes the flow
+worth using, not a limitation of it.
+
+Which also means the two outcomes reach you on **different channels, and joining
+them is yours to do**. `consent_granted` resolves in the host page, via the
+frame. The code lands at `redirect_uri`, loaded in the popup. Neither knows about
+the other: if your `redirect_uri` is a server endpoint the exchange happens out
+of the browser entirely; if it is a browser route doing a PKCE exchange, the
+popup and your host page are same-origin, so `BroadcastChannel` is the natural
+link between them — not `window.opener`, which is the auth app's frame.
 
 `awaitConsent: false` keeps the ordinary `authenticated`/`unresolved` semantics
 with a `redirectUri` — correct when the target is not an authorize endpoint and
@@ -207,10 +245,12 @@ is `aha-auth/src/services/embedBridge.ts`.
 | `ahaslides:auth:success` | signed in; the cookie is set |
 | `ahaslides:auth:close` | dismissed; unmount the frame |
 | `ahaslides:auth:consent` | the OAuth consent card was answered; carries `granted` |
+| `ahaslides:auth:abandoned` | the auth app gave up on its popup; carries `reason` (`closed` \| `timeout`) |
 
 A `consent` carrying no boolean `granted` is **dropped**, not defaulted:
 `granted` is the user's decision, and guessing it either invents a refusal
-nobody made or authorises a client on their behalf.
+nobody made or authorises a client on their behalf. An `abandoned` with an
+unrecognised `reason` is dropped for the same reason.
 
 `readAuthEmbedMessage()` checks `event.origin` **before** it looks at the
 payload — any page can post a perfectly-shaped `success`, and acting on one
@@ -231,6 +271,12 @@ it, never authorise anything.
 - **A `redirectUri` is validated here as well as there.** The auth app treats a
   value it rejects as absent, which silently restores the password flow — so a
   bad one throws at the call site instead of doing nothing visible.
+- **A blocked popup still reports nothing.** The auth app opens it from a
+  gesture inside a cross-origin iframe, which Safari treats more strictly than a
+  same-origin one, and a window that never opens sends no `abandoned` — the form
+  simply stays up to be clicked again. If the user does not retry, that surfaces
+  here as `consent_abandoned`. Read that status as "no answer", never as "the
+  user declined": it covers a browser's refusal as well as a person's.
 
 ## Migrating from v0.1 (popup)
 

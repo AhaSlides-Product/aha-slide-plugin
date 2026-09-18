@@ -413,6 +413,75 @@ describe('consent flow', () => {
   });
 });
 
+// The auth app reports a popup it stopped waiting on. It is a render signal, not
+// an outcome: the framed form is still up and still clickable, so ending the
+// flow here would take away the surface the user would retry from.
+describe('abandoned', () => {
+  function postAbandon(reason: unknown, origin = AUTH): void {
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { source: AUTH_EMBED_SOURCE, type: AUTH_EMBED_EVENT.abandoned, reason },
+        origin,
+      }),
+    );
+  }
+
+  it('reports the reason without settling or unmounting', async () => {
+    const onAbandon = vi.fn();
+    const flow = start({ onAbandon });
+
+    postAbandon('closed');
+    await Promise.resolve();
+
+    expect(onAbandon).toHaveBeenCalledWith('closed');
+    expect(unmount).not.toHaveBeenCalled();
+
+    // Still live: the user clicked again and signed in.
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    expect(await flow).toEqual({ status: 'authenticated' });
+  });
+
+  // It fires in every flow, not just the consent one.
+  it('reports during a consent flow and leaves it waiting for the card', async () => {
+    const onAbandon = vi.fn();
+    const flow = start({ redirectUri: 'https://presenter.ahaslides.com/api/auth/oauth/authorize' , onAbandon });
+
+    postFromFrame(AUTH_EMBED_EVENT.success);
+    postAbandon('timeout');
+    await Promise.resolve();
+
+    expect(onAbandon).toHaveBeenCalledWith('timeout');
+    expect(unmount).not.toHaveBeenCalled();
+
+    postConsent(true);
+    expect(await flow).toEqual({ status: 'consent_granted' });
+  });
+
+  // The documented lever for a host that would rather give up than offer a retry.
+  it('lets the host end it with cancelFrameSignIn', async () => {
+    const flow = start({ onAbandon: () => cancelFrameSignIn() });
+
+    postAbandon('closed');
+
+    expect(await flow).toEqual({ status: 'cancelled' });
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores an abandon carrying no reason it recognises', async () => {
+    const onAbandon = vi.fn();
+    const flow = start({ onAbandon });
+
+    postAbandon('blocked');
+    postAbandon(undefined);
+    await Promise.resolve();
+
+    expect(onAbandon).not.toHaveBeenCalled();
+
+    postFromFrame(AUTH_EMBED_EVENT.close);
+    expect(await flow).toEqual({ status: 'abandoned' });
+  });
+});
+
 // --- review reproductions (PR #136) ---
 describe('review regressions', () => {
   it('survives a throwing session reader', async () => {

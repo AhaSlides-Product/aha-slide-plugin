@@ -48,6 +48,7 @@ export type {
   SignInFrameSession,
   SignInOutcome,
   SignInStatus,
+  AuthAbandonReason,
   AuthEmbedEvent,
   AuthEmbedMessage,
   AuthEmbedUser,

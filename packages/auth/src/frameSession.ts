@@ -29,7 +29,7 @@ import type { SignInFrameOptions, SignInFrameSession } from './types.js';
  * ```
  */
 export function createSignInFrame(options: SignInFrameOptions): SignInFrameSession {
-  const { baseUrl, onReady, onSuccess, onClose, onConsent, ...urlOptions } = options;
+  const { baseUrl, onReady, onSuccess, onClose, onConsent, onAbandon, ...urlOptions } = options;
 
   // Both throw on a non-http(s) base, before any listener is attached — a bad
   // config must fail at the call site, not leave a subscription behind.
@@ -58,6 +58,11 @@ export function createSignInFrame(options: SignInFrameOptions): SignInFrameSessi
         // `granted` is guaranteed a boolean here: readAuthEmbedMessage drops a
         // consent that does not carry one.
         onConsent?.(message.granted === true);
+        return;
+      case AUTH_EMBED_EVENT.abandoned:
+        // `reason` is guaranteed valid here: readAuthEmbedMessage drops an
+        // abandon that does not carry one it recognises.
+        if (message.reason) onAbandon?.(message.reason);
         return;
     }
   }
