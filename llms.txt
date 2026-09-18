@@ -1,0 +1,47 @@
+# AhaSlides Slide Plugin SDK
+
+> Monorepo for building AhaSlides **slide types**: interactive slides (poll, quiz, ranking, idea board, …) that run as iframes inside the AhaSlides presenter and audience apps and talk to the host over zoid (`postMessage`). The quickest path is `@aha/standalone`, one `<script src>` from jsDelivr that exposes `window.AhaSlidePlugin`. It needs no bundler and no framework.
+
+Key facts for generating code against this SDK:
+
+- A slide type renders up to three surfaces, each its own HTML entry: **Presenter/Canvas** (projector), **Settings** (editor panel) and **Audience** (participant's phone).
+- Load the SDK: `<script src="https://cdn.jsdelivr.net/gh/AhaSlides-Product/aha-slide-plugin@cdn/aha-slide-plugin.global.js"></script>` (latest staging build, jsDelivr caches ~12h). For production, pin a `cdn`-branch commit SHA instead of `@cdn`.
+- Boot order: `initZoidForPresenter()` or `initZoidForAudience()`, then `initializeApp()`, then read `window.xprops`. That object holds the host data (`slide`, `presentation`, `presentationColorPalette`, `baseUrl`, …) and callbacks.
+- Every `xprops` function that returns a value crosses the iframe boundary and returns a **Promise**, so always `await` it.
+- `createSync` / `createReadOnlySync` sync state between surfaces in the **same browser only** (BroadcastChannel). Cross-device data goes through `upsertSlideAttributeAction` (config) and `ApiClient` (submissions and scored answers).
+- Audience iframes must report their height: `createHeightReporter({ rootSelector: '#app' }).start()`. The default selector is `#root`, and a selector that matches nothing fails silently.
+- Take colours and fonts from the deck (`presentationColorPalette`, `slide.textColour`, `ensureHostFontLoaded()`), not hard-coded CSS.
+- Declare control-bar buttons with `xprops.setActionButtons([...])`; don't render them inside the iframe. `disabled` and `loading` must be booleans, not functions.
+- Live-count or scored slides need a deployed backend handler for their slug, served under `/api/plugins/{slide-type}/*`. Without one, `sendLiveSubmission` shows no data and `createAnswer` returns 404.
+
+## Standalone SDK (vanilla JS)
+
+- [DOCS.md](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/standalone/DOCS.md): full runtime reference. Covers the `window.AhaSlidePlugin` surface, the complete `xprops` host contract, state sync, `ApiClient`, audience height, an end-to-end slide type, versioning, gotchas, and every field of the `presentation`, `slide`, `audience` and `teams` objects.
+- [README.md](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/standalone/README.md): loading via CDN or ESM, build outputs, and the release flow (staging → `cdn` branch).
+- [Sample fixtures](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/standalone/samples/README.md): real captured `presentation`/`slide`/palette payloads for faking `window.xprops` in tests.
+- [examples/standalone.html](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/standalone/examples/standalone.html): a runnable page.
+
+## Packages
+
+Published under the `@ahaslides-product` scope (GitHub Packages): `@aha/<x>` becomes `@ahaslides-product/plugins-<x>`.
+
+- [@aha/ui-vanilla](https://github.com/AhaSlides-Product/aha-slide-plugin/tree/staging/packages/ui-vanilla): framework-agnostic core. Contains the zoid contracts, sync stores, height reporting, auth, host fonts, and image/audio upload.
+- [@aha/api](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/api/README.md): `ApiClient` plus request/response types, and the auto-generated `SlideType` enum.
+- [@aha/common](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/common/README.md): shared types and utilities, with no dependencies.
+- [@aha/ui](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/ui/docs/README.md): Vue 3 layer (components, `useSync`, `useSyncReadOnly`). Adapters over the same `xprops`. See also [sync.md](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/ui/src/sync.md).
+- [@aha/auth](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/auth/README.md): embedded sign-in orchestration. The host must be an AhaSlides sub-domain.
+- [@aha/design](https://github.com/AhaSlides-Product/aha-slide-plugin/tree/staging/packages/design): AhaSlides design tokens (seed/map/alias).
+- [@aha/toolkit](https://github.com/AhaSlides-Product/aha-slide-plugin/tree/staging/packages/toolkit): shared JSON schemas and assets.
+- [@aha/backend-utils](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/packages/backend-utils/docs/README.md): shared NestJS DTOs and utilities.
+
+## Working in this repo
+
+- [README.md](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/README.md): setup, Turborepo commands, unified backend (`@aha/backend-main` auto-mounts `apps/*/backend` under `/api/plugins/{slide-type}`), and environments.
+- [CLAUDE.md](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/CLAUDE.md): stack, structure, and code conventions (Vue 3 + Vite + Ant Design Vue, NestJS 11).
+- [Sample slide frontend](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/apps/sample-slide/frontend/README.md): the reference Vue implementation. Copy `apps/sample-slide/` to start a new Vue slide type.
+
+## Optional
+
+- [Preference Grouping](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/apps/preferenceGrouping/README.md): a complete slide type with a backend (submission tally plus server-side group formation).
+- [MCP server](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/mcp_server/README.md): exposes each app's `slides_agent_specs.json` as MCP slide-creation tools.
+- [Consumer tests](https://raw.githubusercontent.com/AhaSlides-Product/aha-slide-plugin/staging/tests/consumer/README.md): contract tests for the published packages.
